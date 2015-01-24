@@ -12,7 +12,7 @@ public class GitPrac {
 	public static void main(String[] args) {
 		System.out.println("Wai Kit was here.");
 		System.out.println("Zheng Yi was here too.");
-		//KeJing
+		System.out.println("Ke Jing was here three");
 		//JiaJun
 
 	}
