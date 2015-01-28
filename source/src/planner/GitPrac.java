@@ -35,6 +35,7 @@ public class GitPrac {
 		System.out.println("Zheng Yi was here too.");
 		System.out.println("Ke Jing was here three");
 		System.out.println("Jia Jun was here :)");
+		System.out.println("Hello");
 
 	}
 
