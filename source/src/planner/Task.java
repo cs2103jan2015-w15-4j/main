@@ -31,4 +31,20 @@ public class Task {
     public String getName() {
         return taskName;
     }
+    
+    public String getDescription() {
+        return taskDescription;
+    }
+    
+    public String getTag() {
+        return taskTag;
+    }
+    
+    public int getPriority() {
+        return taskPriority;
+    }
+    
+    public Timestamp getDueDate() {
+        return dateDue;
+    }
 }
