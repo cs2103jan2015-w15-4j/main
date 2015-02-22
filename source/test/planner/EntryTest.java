@@ -134,4 +134,31 @@ public class EntryTest {
         Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2);
         assertEquals("Task due date should be "+taskDueDate2, taskDueDate2, another.getDueDate());
     }
+    
+    @Test
+    public void testSetName() {
+        String taskName = "getTask";
+        String taskDescription = "testing";
+        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        String taskTag = "nothing";
+        int taskPriority = 5;
+        
+        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag);
+        
+        String newName = "newTask";
+        entry.setName(newName);
+        assertEquals("New task name should be "+newName, newName, entry.getName());
+        
+        String taskName2 = "anotherTask";
+        String taskDescription2 = "other";
+        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        String taskTag2 = "others";
+        int taskPriority2 = 3;
+        
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2);
+        
+        String newName2 = "modifiedTask";
+        another.setName(newName2);
+        assertEquals("New task name should be "+newName2, newName2, another.getName());
+    }
 }

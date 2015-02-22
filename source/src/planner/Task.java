@@ -12,7 +12,21 @@ public class Task {
     private Timestamp dateCreated, dateDue;
     private int taskPriority;
     
-    public Task(String name, String description, Timestamp dueDate, int priority, String tag) throws IllegalArgumentException{
+    /**
+     * This method is the Task constructor
+     * @param name
+     *      Name of the task. This cannot be an empty string. Throws IllegalArgumentException when invalid.
+     * @param description
+     *      Description of task.
+     * @param dueDate
+     *      Due date of task. This is represented by the Timestamp class in java.sql.Timestamp.
+     * @param priority
+     *      Priority of task defined by an integer.
+     * @param tag
+     *      A string tag on a task.
+     * @throws IllegalArgumentException
+     */
+    public Task(String name, String description, Timestamp dueDate, int priority, String tag) throws IllegalArgumentException {
         if(name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
         }
@@ -46,5 +60,32 @@ public class Task {
     
     public Timestamp getDueDate() {
         return dateDue;
+    }
+    
+    public void setName(String newName) throws IllegalArgumentException {
+        if(newName.equals("")) {
+            throw new IllegalArgumentException("Task name cannot be empty!");
+        }
+        taskName = newName;
+    }
+    
+    //Not covered by tests yet
+    public void setDescription(String newDescription) {
+        taskDescription = newDescription;
+    }
+    
+    //Not covered by tests yet
+    public void setTag(String newTag) {
+        taskTag = newTag;
+    }
+    
+    //Not covered by tests yet
+    public void setPriority(int newPriority) {
+        taskPriority = newPriority;
+    }
+    
+    //Not covered by tests yet
+    public void setDueDate(Timestamp newDueDate) {
+        dateDue = newDueDate;
     }
 }
