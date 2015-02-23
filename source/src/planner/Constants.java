@@ -14,4 +14,6 @@ public class Constants {
     public enum COMMAND_TYPE {
         ADD, UPDATE, DELETE, SHOW, DONE, UNDO, SEARCH, HELP
     };
+    
+    public static String CONFIG_FILE_LOCATION = "config";
 }

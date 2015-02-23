@@ -13,12 +13,13 @@ public class StorageTest {
     @Test
     public void testSaveConfiguration() {
         try {
-            Configuration config1 = new Configuration("path1");
-            Storage.saveConfiguration(config1);
-            
-            File configFile = new File("config");
+            File configFile = new File(Constants.CONFIG_FILE_LOCATION);
             configFile.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(configFile));
+            
+            Configuration config1 = new Configuration("path1");
+            Storage.saveConfiguration(config1);
+
             
             String fileContents = br.readLine();
             
@@ -30,8 +31,7 @@ public class StorageTest {
             Configuration config2 = new Configuration("another.path");
             Storage.saveConfiguration(config2);
             
-            File configFile2 = new File("config");
-            configFile2.createNewFile();
+            File configFile2 = new File(Constants.CONFIG_FILE_LOCATION);
             BufferedReader br2 = new BufferedReader(new FileReader(configFile2));
             
             String fileContents2 = br2.readLine();

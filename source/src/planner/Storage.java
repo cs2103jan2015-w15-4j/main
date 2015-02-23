@@ -8,14 +8,19 @@ import java.io.IOException;
 public class Storage {
     
     public static void saveConfiguration(Configuration newConfig) throws IOException {
-        File configs = new File("config");
-        configs.createNewFile();
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
-        FileWriter fw = new FileWriter(configs);
-        fw.write(configObject.toJSONString());
+        writeToFile(Constants.CONFIG_FILE_LOCATION, configObject.toJSONString());
+    }
+    
+    private static void writeToFile(String fileName, String content) throws IOException {
+        File writeTarget = new File(fileName);
+        if(!writeTarget.exists()) {
+            writeTarget.createNewFile();
+        }
+        FileWriter fw = new FileWriter(writeTarget);
+        fw.write(content);
         fw.flush();
         fw.close();
     }
-    
 }
