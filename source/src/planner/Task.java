@@ -11,6 +11,7 @@ public class Task {
     private String taskName, taskDescription, taskTag;
     private Timestamp dateCreated, dateDue;
     private int taskPriority;
+    private boolean taskCompleted, taskFloating;
     
     /**
      * This method is the Task constructor
@@ -36,9 +37,19 @@ public class Task {
         taskTag = tag;
         
         dateCreated = new Timestamp(System.currentTimeMillis());
-        dateDue = dueDate;
+        
+        //Tests needed for null date
+        if(dueDate != null) {
+            dateDue = dueDate;
+            taskFloating = false;
+        } else {
+            dateDue = null;
+            taskFloating = true;
+        }
         
         taskPriority = priority;
+        
+        taskCompleted = false;
         
     }
     
@@ -61,6 +72,17 @@ public class Task {
     public Timestamp getDueDate() {
         return dateDue;
     }
+    
+    //Not covered by tests yet
+    public boolean isDone() {
+        return taskCompleted;
+    }
+    
+    //Not covered by tests yet
+    public boolean isFloating() {
+        return taskFloating;
+    }
+    
     
     public void setName(String newName) throws IllegalArgumentException {
         if(newName.equals("")) {
@@ -86,6 +108,23 @@ public class Task {
     
     //Not covered by tests yet
     public void setDueDate(Timestamp newDueDate) {
-        dateDue = newDueDate;
+        //Tests needed for null date
+        if(newDueDate != null) {
+            dateDue = newDueDate;
+            taskFloating = false;
+        } else {
+            dateDue = null;
+            taskFloating = true;
+        }
+    }
+    
+    //Not covered by tests yet
+    public void setDone() {
+        taskCompleted = true;
+    }
+    
+    //Not covered by tests yet
+    public void setUndone() {
+        taskCompleted = false;
     }
 }
