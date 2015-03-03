@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -42,6 +44,45 @@ public class StorageTest {
             configFile.delete();
             
             
+        } catch (Exception e) {
+            fail(e.toString());
+        }
+    }
+    
+    @Test
+    public void testWriteToFile() {
+        try {
+            Method method = Storage.class.getDeclaredMethod("writeToFile", String.class, ArrayList.class);
+            method.setAccessible(true);
+            
+            String testPath = "testPath";
+            String testContentLine1 = "testContent1";
+            String testContentLine2 = "testContent2";
+            String testContentLine3 = "testContent3";
+            ArrayList<String> testContent = new ArrayList<String>();
+            testContent.add(testContentLine1);
+            testContent.add(testContentLine2);
+            File tester = new File(testPath);
+            tester.createNewFile();
+            
+            method.invoke(null, testPath, testContent);
+            BufferedReader br = new BufferedReader(new FileReader(tester));
+            for(int i=0; i<testContent.size();i++) {
+                assertEquals("content in file should be same as content to be written", testContent.get(i), br.readLine());
+            }
+            br.close();
+            
+            testContent.add(testContentLine3);
+            method.invoke(null, testPath, testContent);
+            br = new BufferedReader(new FileReader(tester));
+            for(int i=0; i<testContent.size();i++) {
+                assertEquals("content in file should be same as content to be written", testContent.get(i), br.readLine());
+            }
+            br.close();
+            
+            
+            
+            tester.delete();
         } catch (Exception e) {
             fail(e.toString());
         }
