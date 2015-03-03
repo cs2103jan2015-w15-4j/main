@@ -73,6 +73,10 @@ public class Task {
         return dateDue;
     }
     
+    public Timestamp getCreatedDate() {
+        return dateCreated;
+    }
+    
     //Not covered by tests yet
     public boolean isDone() {
         return taskCompleted;
@@ -116,6 +120,12 @@ public class Task {
             dateDue = null;
             taskFloating = true;
         }
+    }
+    
+    //Not covered by tests yet
+    public void configureCreatedDate(Timestamp newCreatedDate) {
+        //Tests needed for null date
+        dateCreated = newCreatedDate;
     }
     
     //Not covered by tests yet
