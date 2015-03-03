@@ -129,4 +129,45 @@ public class StorageTest {
             fail(e.toString());
         }
     }
+    
+    @Test
+    public void testSaveAndReadTaskList() {
+        try{
+            Method save = Storage.class.getDeclaredMethod("saveTaskList", String.class, TaskList.class);
+            save.setAccessible(true);
+            Method read = Storage.class.getDeclaredMethod("readTaskStorage", String.class);
+            read.setAccessible(true);
+            
+            String fileName = "testFile.txt";
+            TaskList testList = new TaskList();
+            TaskList result;
+            Task saveTask;
+            Task readTask;
+            Task task1 = new Task("task1", "description1", new Timestamp(System.currentTimeMillis()), 3, "first tag");
+            Task task2 = new Task("task2", "description2", new Timestamp(System.currentTimeMillis()), 2, "second tag");
+            testList.add(task1);
+            testList.add(task2);
+            
+            save.invoke(null, fileName, testList);
+            result = (TaskList) read.invoke(null, fileName);
+            
+            for(int i=0; i<testList.size();i++) {
+                saveTask = testList.get(i);
+                readTask = result.get(i);
+                assertEquals("name after converting back and forth should be equal", saveTask.getName(), readTask.getName());
+                assertEquals("description after converting back and forth should be equal", saveTask.getDescription(), readTask.getDescription());
+                assertEquals("tag after converting back and forth should be equal", saveTask.getTag(), readTask.getTag());
+                assertEquals("priority after converting back and forth should be equal", saveTask.getPriority(), readTask.getPriority());
+                assertEquals("due date after converting back and forth should be equal", saveTask.getDueDate(), readTask.getDueDate());
+                assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
+                assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
+                assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
+            }
+            
+            File configFile = new File(fileName);
+            configFile.delete();
+        } catch(Exception e) {
+            fail(e.toString());
+        }
+    }
 }
