@@ -2,7 +2,9 @@ package planner;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -29,6 +31,43 @@ public class Storage {
         }
         fw.flush();
         fw.close();
+    }
+    
+    //Not tested yet
+    private static ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
+        ArrayList<String> results = new ArrayList<String>();
+        for(Task t:input) {
+            results.add(convertTaskToJsonString(t));
+        }
+        return results;
+    }
+    
+    //Not tested yet
+    private static void saveTaskList(String fileName, TaskList tasks) {
+        ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
+        try {
+            writeToFile(fileName, taskJsonStrings);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    //Not tested yet
+    private static TaskList readTaskStorage(String fileName) {
+        TaskList tasks = new TaskList();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String input;
+            while((input = br.readLine()) != null) {
+                tasks.add(convertTaskFromJsonString(input));
+            }
+            
+            br.close();
+            return tasks;
+        } catch (Exception e){
+            System.out.println(e);
+            return tasks;
+        }
     }
     
     private static String convertTaskToJsonString(Task task) {
@@ -70,6 +109,5 @@ public class Storage {
             System.out.println(e);
             return null;
         }
-        
     }
 }
