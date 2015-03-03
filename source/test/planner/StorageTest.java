@@ -164,6 +164,25 @@ public class StorageTest {
                 assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
             }
             
+            Task task3 = new Task("task3", "description3", new Timestamp(System.currentTimeMillis()), 1, "third tag");
+            Task task4 = new Task("task4", "description4", new Timestamp(System.currentTimeMillis()), 8, "fourth tag");
+            
+            save.invoke(null, fileName, testList);
+            result = (TaskList) read.invoke(null, fileName);
+            
+            for(int i=0; i<testList.size();i++) {
+                saveTask = testList.get(i);
+                readTask = result.get(i);
+                assertEquals("name after converting back and forth should be equal", saveTask.getName(), readTask.getName());
+                assertEquals("description after converting back and forth should be equal", saveTask.getDescription(), readTask.getDescription());
+                assertEquals("tag after converting back and forth should be equal", saveTask.getTag(), readTask.getTag());
+                assertEquals("priority after converting back and forth should be equal", saveTask.getPriority(), readTask.getPriority());
+                assertEquals("due date after converting back and forth should be equal", saveTask.getDueDate(), readTask.getDueDate());
+                assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
+                assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
+                assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
+            }
+            
             File configFile = new File(fileName);
             configFile.delete();
         } catch(Exception e) {

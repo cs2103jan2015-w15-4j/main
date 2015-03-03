@@ -12,6 +12,23 @@ import java.util.ArrayList;
 
 public class Storage {
     
+    //Not tested yet
+    public static Configuration readConfig() {
+        Configuration result = new Configuration("");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(Constants.CONFIG_FILE_LOCATION));
+            
+            JSONParser parser = new JSONParser();
+            JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
+            String path = (String) taskJson.get("storagePath");
+            
+            result = new Configuration(path);
+            return result;
+        } catch (Exception e) {
+            return result;
+        }
+    }
+    
     public static void saveConfiguration(Configuration newConfig) throws IOException {
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
