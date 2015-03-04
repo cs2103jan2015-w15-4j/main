@@ -14,13 +14,14 @@ public class Storage {
     
     //Not tested yet
     public static Configuration readConfig() {
-        Configuration result = new Configuration("");
+        Configuration result = new Configuration("data");
         try {
             BufferedReader br = new BufferedReader(new FileReader(Constants.CONFIG_FILE_LOCATION));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
+            long curTaskNum = Long.valueOf((String) taskJson.get("numTasks"));
             
             result = new Configuration(path);
             return result;
@@ -29,9 +30,12 @@ public class Storage {
         }
     }
     
+    
+    //Need to update tests
     public static void saveConfiguration(Configuration newConfig) throws IOException {
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
+        configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
         writeToFile(Constants.CONFIG_FILE_LOCATION, config);
@@ -96,6 +100,7 @@ public class Storage {
         taskObject.put("due", task.getDueDate().getTime());
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
+        taskObject.put("id", String.valueOf(task.getID()));
         return taskObject.toJSONString();
     }
     
@@ -108,11 +113,12 @@ public class Storage {
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
             Timestamp dueDate = new Timestamp((Long) taskJson.get("due"));
+            long ID = Long.valueOf((String)taskJson.get("id"));
             
             Timestamp createdDate = new Timestamp((Long) taskJson.get("created"));
             boolean done = (boolean) taskJson.get("done");
             
-            Task result = new Task(name, description, dueDate, priority, tag);
+            Task result = new Task(name, description, dueDate, priority, tag, ID);
             
             if(done) {
                 result.setDone();

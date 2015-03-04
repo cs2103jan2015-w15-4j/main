@@ -8,6 +8,7 @@ import java.sql.Timestamp;
  *
  */
 public class Task {
+    private final long ID;
     private String taskName, taskDescription, taskTag;
     private Timestamp dateCreated, dateDue;
     private int taskPriority;
@@ -27,7 +28,8 @@ public class Task {
      *      A string tag on a task.
      * @throws IllegalArgumentException
      */
-    public Task(String name, String description, Timestamp dueDate, int priority, String tag) throws IllegalArgumentException {
+    public Task(String name, String description, Timestamp dueDate, int priority, String tag, long id) throws IllegalArgumentException {
+        ID = id;
         if(name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
         }
@@ -75,6 +77,11 @@ public class Task {
     
     public Timestamp getCreatedDate() {
         return dateCreated;
+    }
+    
+    //Not tested yet
+    public long getID() {
+        return ID;
     }
     
     //Not covered by tests yet
