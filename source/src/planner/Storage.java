@@ -60,7 +60,7 @@ public class Storage {
     }
     
     //Not tested yet
-    private static void saveTaskList(String fileName, TaskList tasks) {
+    public static void saveTaskList(String fileName, TaskList tasks) {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         try {
             writeToFile(fileName, taskJsonStrings);
@@ -70,7 +70,7 @@ public class Storage {
     }
     
     //Not tested yet
-    private static TaskList readTaskStorage(String fileName) {
+    public static TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
         try {
             BufferedReader br = new BufferedReader(new FileReader(fileName));
