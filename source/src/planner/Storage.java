@@ -14,13 +14,14 @@ public class Storage {
     
     //Not tested yet
     public static Configuration readConfig() {
-        Configuration result = new Configuration("");
+        Configuration result = new Configuration("data");
         try {
             BufferedReader br = new BufferedReader(new FileReader(Constants.CONFIG_FILE_LOCATION));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
+            long curTaskNum = Long.valueOf((String) taskJson.get("numTasks"));
             
             result = new Configuration(path);
             return result;
@@ -29,9 +30,12 @@ public class Storage {
         }
     }
     
+    
+    //Need to update tests
     public static void saveConfiguration(Configuration newConfig) throws IOException {
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
+        configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
         writeToFile(Constants.CONFIG_FILE_LOCATION, config);

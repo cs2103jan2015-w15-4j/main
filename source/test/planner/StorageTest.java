@@ -26,7 +26,7 @@ public class StorageTest {
             
             String fileContents = br.readLine();
             
-            assertEquals("File should contain configuration", "{\"storagePath\":\""+config1.getStoragePath()+"\"}", fileContents);
+            assertEquals("File should contain configuration", "{\"storagePath\":\""+config1.getStoragePath()+"\",\"numTasks\":\"1\"}", fileContents);
             
             br.close();
             configFile.delete();
@@ -39,7 +39,7 @@ public class StorageTest {
             
             String fileContents2 = br2.readLine();
             
-            assertEquals("File should contain configuration", "{\"storagePath\":\""+config2.getStoragePath()+"\"}", fileContents2);
+            assertEquals("File should contain configuration", "{\"storagePath\":\""+config2.getStoragePath()+"\",\"numTasks\":\"1\"}", fileContents2);
             
             br2.close();
             configFile.delete();
