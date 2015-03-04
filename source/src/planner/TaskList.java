@@ -7,6 +7,13 @@ import java.util.ArrayList;
  * @author kohwaikit
  *
  */
-public class TaskList extends ArrayList<Task> {
+public class TaskList{
+    private ArrayList<Task> tasks;
+    public TaskList(ArrayList<Task> input) {
+        tasks = input;
+    }
     
+    public ArrayList<Task> getTasks() {
+        return tasks;
+    }
 }
