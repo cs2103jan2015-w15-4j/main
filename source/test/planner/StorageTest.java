@@ -104,8 +104,9 @@ public class StorageTest {
             Timestamp dueDate = new Timestamp(System.currentTimeMillis());
             int priority = 3;
             String tag = "testing";
+            long ID = 400;
             
-            Task testTask = new Task(name, description, dueDate, priority, tag);
+            Task testTask = new Task(name, description, dueDate, priority, tag, ID);
             
             Timestamp createdDate = testTask.getCreatedDate();
             boolean floating = testTask.isFloating();
@@ -123,6 +124,7 @@ public class StorageTest {
             assertEquals("created date after converting back and forth should be equal", testTask.getCreatedDate(), postConversionTask.getCreatedDate());
             assertEquals("done status after converting back and forth should be equal", testTask.isDone(), postConversionTask.isDone());
             assertEquals("floating status after converting back and forth should be equal", testTask.isFloating(), postConversionTask.isFloating());
+            assertEquals("ID after converting back and forth should be equal", testTask.getID(), postConversionTask.getID());
             
             
         } catch (Exception e) {
@@ -143,8 +145,8 @@ public class StorageTest {
             TaskList result;
             Task saveTask;
             Task readTask;
-            Task task1 = new Task("task1", "description1", new Timestamp(System.currentTimeMillis()), 3, "first tag");
-            Task task2 = new Task("task2", "description2", new Timestamp(System.currentTimeMillis()), 2, "second tag");
+            Task task1 = new Task("task1", "description1", new Timestamp(System.currentTimeMillis()), 3, "first tag", 1);
+            Task task2 = new Task("task2", "description2", new Timestamp(System.currentTimeMillis()), 2, "second tag", 2);
             testList.add(task1);
             testList.add(task2);
             
@@ -162,10 +164,11 @@ public class StorageTest {
                 assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
                 assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
                 assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
+                assertEquals("ID after converting back and forth should be equal", saveTask.getID(), readTask.getID());
             }
             
-            Task task3 = new Task("task3", "description3", new Timestamp(System.currentTimeMillis()), 1, "third tag");
-            Task task4 = new Task("task4", "description4", new Timestamp(System.currentTimeMillis()), 8, "fourth tag");
+            Task task3 = new Task("task3", "description3", new Timestamp(System.currentTimeMillis()), 1, "third tag", 3);
+            Task task4 = new Task("task4", "description4", new Timestamp(System.currentTimeMillis()), 8, "fourth tag", 4);
             
             save.invoke(null, fileName, testList);
             result = (TaskList) read.invoke(null, fileName);
@@ -181,6 +184,7 @@ public class StorageTest {
                 assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
                 assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
                 assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
+                assertEquals("ID after converting back and forth should be equal", saveTask.getID(), readTask.getID());
             }
             
             File configFile = new File(fileName);

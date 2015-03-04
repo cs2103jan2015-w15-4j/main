@@ -96,6 +96,7 @@ public class Storage {
         taskObject.put("due", task.getDueDate().getTime());
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
+        taskObject.put("id", String.valueOf(task.getID()));
         return taskObject.toJSONString();
     }
     
@@ -108,11 +109,12 @@ public class Storage {
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
             Timestamp dueDate = new Timestamp((Long) taskJson.get("due"));
+            long ID = Long.valueOf((String)taskJson.get("id"));
             
             Timestamp createdDate = new Timestamp((Long) taskJson.get("created"));
             boolean done = (boolean) taskJson.get("done");
             
-            Task result = new Task(name, description, dueDate, priority, tag);
+            Task result = new Task(name, description, dueDate, priority, tag, ID);
             
             if(done) {
                 result.setDone();
