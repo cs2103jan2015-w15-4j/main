@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 import org.junit.Test;
 
-public class EntryTest {
+public class TaskTest {
 
     @Test
     public void createTest() {
