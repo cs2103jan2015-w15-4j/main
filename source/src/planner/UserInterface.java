@@ -101,7 +101,7 @@ public class UserInterface extends JFrame {
     private void prepareDisplay(){
         
         displayScrollPane = new JScrollPane();
-        displayScrollPane.setBounds(40, 93, 526, 313);
+        displayScrollPane.setBounds(37, 90, 530, 317);
         contentPane.add(displayScrollPane);
         
         display = new JTextPane();
