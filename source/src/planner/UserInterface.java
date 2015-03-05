@@ -25,6 +25,8 @@ public class UserInterface extends JFrame {
     
     private JScrollPane displayScrollPane;
     private JTextPane display;
+    private JTextPane tentativeDisplay;
+    private JScrollPane tentativeDisplayScrollPane;
     
     /**
      * Launch the application.
@@ -59,6 +61,7 @@ public class UserInterface extends JFrame {
         
         prepareCommandTextField();
         prepareDisplay();
+        prepareTentativeDisplay();
         prepareBackground();
         
         
@@ -198,5 +201,26 @@ public class UserInterface extends JFrame {
         });
     }
 
-    
+    private void prepareTentativeDisplay(){
+        
+        tentativeDisplayScrollPane = new JScrollPane();
+        tentativeDisplayScrollPane.setBounds(588, 93, 148, 373);
+        contentPane.add(tentativeDisplayScrollPane);
+        
+        tentativeDisplay = new JTextPane();
+        tentativeDisplayScrollPane.setViewportView(tentativeDisplay);
+        
+        tentativeDisplayScrollPane.setBorder(null);
+        tentativeDisplayScrollPane.setOpaque(false);
+
+        tentativeDisplay.setBorder(null);
+        tentativeDisplay.setOpaque(false);
+        
+        tentativeDisplay.setEditable(false);
+        
+        tentativeDisplay.setFont( new Font( "Arial", Font.BOLD, 16 ) );
+        tentativeDisplayScrollPane.setForeground(new Color(255,255,255));
+        
+        tentativeDisplayScrollPane.getViewport().setOpaque(false);
+    }
 }
