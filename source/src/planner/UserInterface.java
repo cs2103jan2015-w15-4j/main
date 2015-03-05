@@ -13,12 +13,17 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 public class UserInterface extends JFrame {
 
     private JPanel contentPane;
     private JTextField command;
-
+    
+    private JScrollPane displayScrollPane;
+    private JTextPane display;
+    
     /**
      * Launch the application.
      */
@@ -51,6 +56,7 @@ public class UserInterface extends JFrame {
         contentPane.setLayout(null);
         
         prepareCommandTextField();
+        prepareDisplay();
         prepareBackground();
         
         
@@ -66,6 +72,33 @@ public class UserInterface extends JFrame {
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
         background.setBounds(0, 0, 781, 494);
         contentPane.add(background);
+    }
+    
+    void prepareDisplay(){
+        
+        displayScrollPane = new JScrollPane();
+        displayScrollPane.setBounds(40, 93, 526, 313);
+        contentPane.add(displayScrollPane);
+        
+        display = new JTextPane();
+        displayScrollPane.setViewportView(display);
+        
+        displayScrollPane.setBorder(null);
+        displayScrollPane.setOpaque(false);
+
+        display.setBorder(null);
+        display.setOpaque(false);
+        
+        display.setEditable(false);
+        display.setFont( new Font( "Arial", Font.BOLD, 16 ));
+        
+        display.setText( "This is a sample display box\n" );
+        display.setForeground(new Color( 255, 255, 255 ));
+        
+        displayScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        displayScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        
+        displayScrollPane.getViewport().setOpaque(false);
     }
     
     void prepareCommandTextField(){
@@ -124,6 +157,4 @@ public class UserInterface extends JFrame {
             
         });
     }
-
-    
 }
