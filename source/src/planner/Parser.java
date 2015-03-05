@@ -13,21 +13,25 @@ import planner.Constants.COMMAND_TYPE;
  * @author Tham Zheng Yi
  */
 public class Parser {
+
+    private static String partlyParsedCmd = "";
+
     public static ParseResult parse(String command) {
         ParseResult result = process(command);
         return result;
     }    
     
     private static ParseResult process(String command) {
-        COMMAND_TYPE commandType = extractCommandType(command);
-        Date parsedDate = extractDate(command);
-        Date dateToRemind = extractDateToRemind(command);
-        int priorityLevel = extractPriorityLevel(command);
-        long taskId = extractTaskId(command);
-        String taskName = extractTaskName(command);
-        String taskDescription = extractTaskDescription(command);
-        String taskTag = extractTaskTag(command);
-        ArrayList<Boolean> flagValues = checkFlagValues(command);
+        partlyParsedCmd = command;
+        COMMAND_TYPE commandType = extractCommandType(partlyParsedCmd);
+        Date parsedDate = extractDate(partlyParsedCmd);
+        Date dateToRemind = extractDateToRemind(partlyParsedCmd);
+        int priorityLevel = extractPriorityLevel(partlyParsedCmd);
+        long taskId = extractTaskId(partlyParsedCmd);
+        String taskName = extractTaskName(partlyParsedCmd);
+        String taskDescription = extractTaskDescription(partlyParsedCmd);
+        String taskTag = extractTaskTag(partlyParsedCmd);
+        ArrayList<Boolean> flagValues = checkFlagValues(partlyParsedCmd);
 
         return new ParseResult(commandType, parsedDate, dateToRemind,
                                priorityLevel, taskId, taskName,
