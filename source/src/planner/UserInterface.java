@@ -22,6 +22,7 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
+// This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
 
     private JPanel contentPane;
@@ -42,25 +43,26 @@ public class UserInterface extends JFrame {
     private int mouseXCoordinate;
     private int mouseYCoordinate;
     
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
+        
         EventQueue.invokeLater(new Runnable() {
+            
             public void run() {
+                
                 try {
+                    
                     UserInterface frame = new UserInterface();
                     frame.setVisible(true);
+                    
                 } catch (Exception e) {
+                    
                     e.printStackTrace();
                 }
+                
             }
         });
     }
 
-    /**
-     * Create the frame.
-     */
     public UserInterface() {
         
         // Main frame
