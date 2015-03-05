@@ -34,6 +34,7 @@ public class UserInterface extends JFrame {
     private JScrollPane tentativeDisplayScrollPane;
     
     private JLabel closeButton;
+    private JLabel minimiseButton;
     
     /**
      * Launch the application.
@@ -70,6 +71,7 @@ public class UserInterface extends JFrame {
         prepareDisplay();
         prepareTentativeDisplay();
         prepareCloseButton();
+        prepareMinimiseButton();
         prepareBackground();
         
         
@@ -267,5 +269,43 @@ public class UserInterface extends JFrame {
             public void mouseExited(MouseEvent e) {
             }
         });
+    }
+
+    private void prepareMinimiseButton(){
+        
+        minimiseButton = new JLabel("");
+        minimiseButton.setBounds(707, 12, 28, 28);
+        contentPane.add(minimiseButton);
+        
+        minimiseButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
+        
+        minimiseButton.addMouseListener( new MouseListener(){
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                
+                if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
+                    
+                    setState( UserInterface.ICONIFIED );
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+            
+        } );
     }
 }
