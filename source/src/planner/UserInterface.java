@@ -1,12 +1,15 @@
 package planner;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,12 +24,16 @@ import javax.swing.text.StyledDocument;
 public class UserInterface extends JFrame {
 
     private JPanel contentPane;
+    
     private JTextField command;
     
     private JScrollPane displayScrollPane;
     private JTextPane display;
+    
     private JTextPane tentativeDisplay;
     private JScrollPane tentativeDisplayScrollPane;
+    
+    private JLabel closeButton;
     
     /**
      * Launch the application.
@@ -62,6 +69,7 @@ public class UserInterface extends JFrame {
         prepareCommandTextField();
         prepareDisplay();
         prepareTentativeDisplay();
+        prepareCloseButton();
         prepareBackground();
         
         
@@ -222,5 +230,42 @@ public class UserInterface extends JFrame {
         tentativeDisplayScrollPane.setForeground(new Color(255,255,255));
         
         tentativeDisplayScrollPane.getViewport().setOpaque(false);
+    }
+
+    private void prepareCloseButton(){
+        
+        closeButton = new JLabel("");
+        closeButton.setBounds(744, 13, 27, 27);
+        contentPane.add(closeButton);
+        
+        closeButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
+        
+        closeButton.addMouseListener( new MouseListener(){
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                
+                if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
+                    
+                    System.exit(0);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 }
