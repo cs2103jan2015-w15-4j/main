@@ -70,7 +70,7 @@ public class UserInterface extends JFrame {
         setLocationRelativeTo(null);
     }
     
-    void prepareBackground(){
+    private void prepareBackground(){
         
         // Adding UI background
         JLabel background = new JLabel("");
@@ -79,7 +79,7 @@ public class UserInterface extends JFrame {
         contentPane.add(background);
     }
     
-    void prepareDisplay(){
+    private void prepareDisplay(){
         
         displayScrollPane = new JScrollPane();
         displayScrollPane.setBounds(40, 93, 526, 313);
@@ -106,7 +106,7 @@ public class UserInterface extends JFrame {
         displayScrollPane.getViewport().setOpaque(false);
     }
     
-    void prepareCommandTextField(){
+    private void prepareCommandTextField(){
         
         // Adding command text field
         command = new JTextField();
