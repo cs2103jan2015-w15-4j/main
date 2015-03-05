@@ -1,60 +1,59 @@
 package planner;
 
-import java.awt.LayoutManager;
+import java.awt.EventQueue;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JScrollPane;
-import org.
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
 
-/**
- *
- * @author jia jun
- */
-public class UserInterface extends javax.swing.JFrame {
+public class UserInterface extends JFrame {
 
-    // J-components
-    private JPanel mainFrame;
-    private JLabel Background;
-    private JLabel closeButton;
-    private JLabel dragPanel;
-    private JLabel minimiseButton;
-    
-    private JTextField command;
-    
-    private JPanel commandPanel;
-    
-    private JTextPane display;
-    private JScrollPane displayScroll;
-    
-    private JTextPane tentative;
-    private JScrollPane tentativeScroll;
-    
-    public UserInterface(){
+    private JPanel contentPane;
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    UserInterface frame = new UserInterface();
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * Create the frame.
+     */
+    public UserInterface() {
         
-        setVisible(true);
+        setResizable(false);
         
-        minimiseButton = new JLabel();
-        closeButton = new JLabel();
-        dragPanel = new JLabel();
-        Background = new JLabel();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        commandPanel = new JPanel();
-        command = new JTextField();
+        setBounds(100, 100, 781, 494);
+        contentPane = new JPanel();
         
-        tentativeScroll = new JScrollPane();
-        tentative = new JTextPane();
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
         
-        displayScroll = new JScrollPane();
-        display = new JTextPane();
+        // UI background
+        JLabel background = new JLabel("");
+        background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
+        background.setBounds(0, 0, 781, 494);
+        
+        
+        
+        contentPane.add(background);
         
         setUndecorated(true);
-        setResizable(false);
-        getContentPane().setLayout(null);
         
-        pack();
         setLocationRelativeTo(null);
     }
 }
