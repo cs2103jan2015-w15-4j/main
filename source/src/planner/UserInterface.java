@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -35,6 +36,11 @@ public class UserInterface extends JFrame {
     
     private JLabel closeButton;
     private JLabel minimiseButton;
+    private JLabel dragPanel;
+    
+    // Used for drag logic
+    private int mouseXCoordinate;
+    private int mouseYCoordinate;
     
     /**
      * Launch the application.
@@ -72,6 +78,7 @@ public class UserInterface extends JFrame {
         prepareTentativeDisplay();
         prepareCloseButton();
         prepareMinimiseButton();
+        prepareDragPanel();
         prepareBackground();
         
         
@@ -307,5 +314,56 @@ public class UserInterface extends JFrame {
             }
             
         } );
+    }
+
+    private void prepareDragPanel(){
+        
+        dragPanel = new JLabel("");
+        dragPanel.setBounds(0, 0, 780, 490);
+        contentPane.add(dragPanel);
+        
+        dragPanel.addMouseMotionListener( new MouseMotionListener(){ 
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                
+                int mouseDragXCoordinate = e.getXOnScreen();
+                int mouseDragYCoordinate = e.getYOnScreen();
+                
+                setLocation( mouseDragXCoordinate - mouseXCoordinate,
+                             mouseDragYCoordinate - mouseYCoordinate);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+            }
+            
+        });
+        
+        dragPanel.addMouseListener( new MouseListener(){ 
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                
+                mouseXCoordinate = e.getX();
+                mouseYCoordinate = e.getY();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 }
