@@ -7,8 +7,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Storage {
     
@@ -112,10 +112,10 @@ public class Storage {
             String description = (String) taskJson.get("description");
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
-            Timestamp dueDate = new Timestamp((Long) taskJson.get("due"));
+            Date dueDate = new Date((Long) taskJson.get("due"));
             long ID = Long.valueOf((String)taskJson.get("id"));
             
-            Timestamp createdDate = new Timestamp((Long) taskJson.get("created"));
+            Date createdDate = new Date((Long) taskJson.get("created"));
             boolean done = (boolean) taskJson.get("done");
             
             Task result = new Task(name, description, dueDate, priority, tag, ID);
