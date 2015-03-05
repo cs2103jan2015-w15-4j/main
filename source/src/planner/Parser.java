@@ -13,24 +13,57 @@ import planner.Constants.COMMAND_TYPE;
  * @author Tham Zheng Yi
  */
 public class Parser {
-    public ParseResult parse(String command) {
+    public static ParseResult parse(String command) {
         ParseResult result = process(command);
         return result;
     }    
     
-    private ParseResult process(String command) {
+    private static ParseResult process(String command) {
         COMMAND_TYPE commandType = extractCommandType(command);
+        Date parsedTime = extractDate(command);
+        int priorityLevel = extractPriorityLevel(command);
+        long taskId = extractTaskId(command);
+        String taskName = extractTaskName(command);
+        String taskDescription = extractTaskDescription(command);
+        String taskTag = extractTaskTag(command);
         ArrayList<Boolean> flagValues = checkFlagValues(command);
-        Date currentTime = new Date();
-        return new ParseResult(commandType, currentTime, flagValues);
+
+        return new ParseResult(commandType, parsedTime, priorityLevel,
+                               taskId, taskName, taskDescription, taskTag,
+                               flagValues);
     }
-    
-    private ArrayList<Boolean> checkFlagValues(String command) {
+
+    private static COMMAND_TYPE extractCommandType(String command) {
+        return null;
+    }
+
+    private static Date extractDate(String command) {
+        return new Date();
+    }
+
+    private static int extractPriorityLevel(String command) {
+        return 0;
+    }
+
+    private static long extractTaskId(String command) {
+        return 0;
+    }
+
+    private static String extractTaskName(String command) {
+        return "";
+    }
+
+    private static String extractTaskDescription(String command) {
+        return "";
+    }
+
+    private static String extractTaskTag(String command) {
+        return "";
+    }
+
+    private static ArrayList<Boolean> checkFlagValues(String command) {
         ArrayList<Boolean> flagValues = new ArrayList<Boolean>();
         return flagValues;
     }
-    
-    private COMMAND_TYPE extractCommandType(String command) {
-        return null;
-    }
+
 }

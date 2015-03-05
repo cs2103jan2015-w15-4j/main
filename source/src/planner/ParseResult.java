@@ -13,28 +13,63 @@ import planner.Constants.COMMAND_TYPE;
  */
 public class ParseResult {
     private COMMAND_TYPE commandType = null;
-    private Date dateGiven = new Date();
-    private int priorityLevel = 0;
-    ArrayList<Boolean> commandFlags = new ArrayList<Boolean>();
+    private Date parsedDate = new Date();
+    private int priorityLevel = Constants.NO_PRIORITY_LEVEL;
+    private long taskId = Constants.NO_ID_SET;
+    private String taskName = "";
+    private String taskDescription = "";
+    private String taskTag = "";
+    private ArrayList<Boolean> commandFlags = new ArrayList<Boolean>();
     
     /**
      * This method is the ParseResult constructor
      * 
      * @param commandType Type of the command e.g. search
      * @param time        Time/date parsed from command               
-     * @param flags       Booleans that indicate presence of properties (e.g. time)
+     * @param flags       Indicate presence of properties (e.g. time)
      */
-    public ParseResult(COMMAND_TYPE commandType, Date time, ArrayList<Boolean> flags) {
+    public ParseResult(COMMAND_TYPE commandType, Date date, int priorityLevel,
+                       long id, String name, String description, String tag,
+                       ArrayList<Boolean> flags) {
         this.commandType = commandType;
-        this.dateGiven = time;
+        this.parsedDate = date;
+        this.priorityLevel = priorityLevel;
+        this.taskId = id;
+        this.taskName = name;
+        this.taskDescription = description;
+        this.taskTag = tag;
         this.commandFlags = flags;
     }
-    
-    public void setCommandType(COMMAND_TYPE desiredType) {
-        commandType = desiredType;
-    }
-    
+
     public COMMAND_TYPE getCommandType() {
         return commandType;
+    }
+    
+    public Date getTime() {
+        return parsedDate;
+    }
+    
+    public int getPriorityLevel() {
+        return priorityLevel;
+    }
+
+    public long getId() {
+        return taskId;
+    }
+
+    public String getName() {
+        return taskName;
+    }
+
+    public String getDescription() {
+        return taskDescription;
+    }
+
+    public String getTag() {
+        return taskTag;
+    }
+
+    public ArrayList<Boolean> getCommandFlags() {
+        return commandFlags;
     }
 }

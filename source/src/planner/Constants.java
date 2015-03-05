@@ -16,4 +16,7 @@ public class Constants {
     };
     
     public static String CONFIG_FILE_LOCATION = "config";
+
+    public static final int NO_PRIORITY_LEVEL = 0;
+    public static final int NO_ID_SET = 0;
 }
