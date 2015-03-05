@@ -14,6 +14,7 @@ import planner.Constants.COMMAND_TYPE;
 public class ParseResult {
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = new Date();
+    private Date dateToRemind = new Date();
     private int priorityLevel = Constants.NO_PRIORITY_LEVEL;
     private long taskId = Constants.NO_ID_SET;
     private String taskName = "";
@@ -28,11 +29,13 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-    public ParseResult(COMMAND_TYPE commandType, Date date, int priorityLevel,
-                       long id, String name, String description, String tag,
+    public ParseResult(COMMAND_TYPE commandType, Date date, Date dateToRemind,
+                       int priorityLevel, long id, String name,
+                       String description, String tag,
                        ArrayList<Boolean> flags) {
         this.commandType = commandType;
         this.parsedDate = date;
+        this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;
         this.taskId = id;
         this.taskName = name;
@@ -45,10 +48,14 @@ public class ParseResult {
         return commandType;
     }
     
-    public Date getTime() {
+    public Date getDate() {
         return parsedDate;
     }
     
+    public Date getDateToRemind() {
+        return dateToRemind;
+    }
+
     public int getPriorityLevel() {
         return priorityLevel;
     }

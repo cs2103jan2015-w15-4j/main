@@ -20,7 +20,8 @@ public class Parser {
     
     private static ParseResult process(String command) {
         COMMAND_TYPE commandType = extractCommandType(command);
-        Date parsedTime = extractDate(command);
+        Date parsedDate = extractDate(command);
+        Date dateToRemind = extractDateToRemind(command);
         int priorityLevel = extractPriorityLevel(command);
         long taskId = extractTaskId(command);
         String taskName = extractTaskName(command);
@@ -28,9 +29,9 @@ public class Parser {
         String taskTag = extractTaskTag(command);
         ArrayList<Boolean> flagValues = checkFlagValues(command);
 
-        return new ParseResult(commandType, parsedTime, priorityLevel,
-                               taskId, taskName, taskDescription, taskTag,
-                               flagValues);
+        return new ParseResult(commandType, parsedDate, dateToRemind,
+                               priorityLevel, taskId, taskName,
+                               taskDescription, taskTag, flagValues);
     }
 
     private static COMMAND_TYPE extractCommandType(String command) {
@@ -38,6 +39,10 @@ public class Parser {
     }
 
     private static Date extractDate(String command) {
+        return new Date();
+    }
+
+    private static Date extractDateToRemind(String command) {
         return new Date();
     }
 
