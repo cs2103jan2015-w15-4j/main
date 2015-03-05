@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 public class UserInterface extends JFrame {
 
@@ -147,6 +149,44 @@ public class UserInterface extends JFrame {
                     if( command.getText().length() <= 0 ){
                         
                         e.consume();
+                    } 
+                    
+                } else if( e.getKeyCode() == KeyEvent.VK_ENTER ){
+                        
+                    try{
+                        
+                        String input = command.getText();
+                        
+                        if( input.equalsIgnoreCase("clear") ){
+                            
+                            display.setCaretPosition(0);
+                            
+                            display.setText(null);
+                            
+                            command.setCaretPosition(0);
+
+                            command.setText(null);
+                            
+                        } else if( input.length() > 0 ){
+                        
+                            StyledDocument doc = display.getStyledDocument();
+
+                            doc.insertString(doc.getLength(), input + "\n", null );
+
+                            command.setCaretPosition(0);
+
+                            command.setText("");
+                            
+                        } else{
+                            
+                            command.setText( "Invalid Command" );
+                            
+                            display.requestFocus();
+                        }
+                        
+                    } catch( BadLocationException badLocationException ){
+                        
+                        command.setText( "Bad insert position :(" );
                     }
                 }
             }
@@ -157,4 +197,6 @@ public class UserInterface extends JFrame {
             
         });
     }
+
+    
 }
