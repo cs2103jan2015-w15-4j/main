@@ -61,13 +61,18 @@ public class Parser {
                         // process arguments of the previous command
                         processArgs(keywordBeingProcessed);
                         keywordArgs = "";
+                        keywordBeingProcessed = wordBeingProcessed;
                     } else {
                         // add to arguments of previous command
-                        keywordArgs += wordBeingProcessed;
+                        keywordArgs += wordBeingProcessed + " ";
                     }
+                    indexBeingProcessed++;
+
                 }
+                processArgs(keywordBeingProcessed);
                 if (name.equals("")) {
                     resultType = RESULT_TYPE.INVALID;
+                    errorMessage = "the name of the task added cannot be blank";
                 }
                 flags = updateResultFlags(flags);
 
