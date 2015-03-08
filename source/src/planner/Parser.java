@@ -35,7 +35,7 @@ public class Parser {
     private static String name = "";
     private static String description = "";
     private static String tag = "";
-    private static ArrayList<Boolean> flags = new ArrayList<Boolean>();
+    private static boolean[] flags = new boolean[7];
 
     public static ParseResult parse(String command) {
         resetFields();
@@ -63,6 +63,8 @@ public class Parser {
                         keywordArgs += wordBeingProcessed;
                     }
                 }
+                flags = updateResultFlags(flags);
+
             case UPDATE:
 
             case DELETE:
@@ -140,7 +142,7 @@ public class Parser {
         name = "";
         description = "";
         tag = "";
-        flags = new ArrayList<Boolean>();
+        flags = new boolean[7];
     }
 
     private static Boolean isKeyword(String word) {
@@ -228,6 +230,33 @@ public class Parser {
             default:
                 break;
         }
+    }
+
+    private static boolean[] updateResultFlags(boolean[] flags) {
+        // flags order: date, dateToRemind, priorityLevel, id, name,
+        // description, tag
+        if (date != null) {
+            flags[0] = true;
+        }
+        if (dateToRemind != null) {
+            flags[1] = true;
+        }
+        if (priorityLevel != 0) {
+            flags[2] = true;
+        }
+        if (id != 0) {
+            flags[3] = true;
+        }
+        if (!name.equals("")) {
+            flags[4] = true;
+        }
+        if (!description.equals("")) {
+            flags[5] = true;
+        }
+        if (!tag.equals("")) {
+            flags[6] = true;
+        }
+        return flags;
     }
 
     private static ArrayList<Boolean> checkFlagValues(String command) {

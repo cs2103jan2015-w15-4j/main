@@ -24,7 +24,7 @@ public class ParseResult {
     private String taskName = "";
     private String taskDescription = "";
     private String taskTag = "";
-    private ArrayList<Boolean> commandFlags = new ArrayList<Boolean>();
+    private boolean[] commandFlags;
     
     /**
      * This method is the ParseResult constructor
@@ -36,7 +36,7 @@ public class ParseResult {
     public ParseResult(COMMAND_TYPE commandType, Date date, Date dateToRemind,
                        int priorityLevel, long id, String name,
                        String description, String tag,
-                       ArrayList<Boolean> flags) {
+                       boolean[] flags) {
         this.commandType = commandType;
         this.parsedDate = date;
         this.dateToRemind = dateToRemind;
@@ -80,7 +80,7 @@ public class ParseResult {
         return taskTag;
     }
 
-    public ArrayList<Boolean> getCommandFlags() {
+    public boolean[] getCommandFlags() {
         return commandFlags;
     }
 }
