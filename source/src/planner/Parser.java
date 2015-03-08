@@ -63,17 +63,19 @@ public class Parser {
 
         switch(commandType) {
             case ADD:
-                processAddCommand();
+                processCommand("add");
                 break;
                 
             case UPDATE:
-                processUpdateCommand();
+                processCommand("update");
                 break;
                 
             case DELETE:
+                processCommand("delete");
                 break;
                 
             case SHOW:
+                processCommand("show");
                 break;
                 
             case DONE:
@@ -93,7 +95,7 @@ public class Parser {
                 errorMessage = "invalid command type";
                 break;
         }
-        return parseResult(resultType, commandType);
+        return createParseResult(resultType, commandType);
     }
 
     private static COMMAND_TYPE extractCommandType(String commandWord) {
@@ -168,15 +170,13 @@ public class Parser {
                 break;
 
             case "update":
+            case "delete":
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorMessage = "a number must be entered for the task id";
                 }
-                break;
-
-            case "delete":
                 break;
 
             case "show":
@@ -229,19 +229,28 @@ public class Parser {
         }
     }
 
-    private static void processAddCommand() {
+    private static void processCommand(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
         String wordBeingProcessed = "";
         // to decide what to do with args
-        String keywordBeingProcessed = "add";
+        String keywordBeingProcessed = commandWord;
 
         while(indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
             if (isKeyword(wordBeingProcessed)) {
-                // process arguments of the previous command
-                processArgs(keywordBeingProcessed);
-                keywordArgs = "";
-                keywordBeingProcessed = wordBeingProcessed;
+                // all text after the id is ignored for delete
+                if (keywordBeingProcessed.equals("delete")) {
+                    break;
+
+                // all text after 'show' is ignored for show
+                } else if (keywordBeingProcessed.equals("show")) {
+                    break;
+                } else {
+                    // process arguments of the previous command
+                    processArgs(keywordBeingProcessed);
+                    keywordArgs = "";
+                    keywordBeingProcessed = wordBeingProcessed;
+                }
             } else {
                 // add to arguments of previous command
                 keywordArgs += wordBeingProcessed + " ";
@@ -250,35 +259,17 @@ public class Parser {
 
         }
         processArgs(keywordBeingProcessed);
-        if (name.equals("")) {
-            resultType = RESULT_TYPE.INVALID;
-            errorMessage = "the name of the task added cannot be blank";
-        }
-        flags = updateResultFlags(flags);
-    }
 
-    private static void processUpdateCommand() {
-        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
-        String wordBeingProcessed = "";
-        // to decide what to do with args
-        String keywordBeingProcessed = "update";
-
-        while(indexBeingProcessed < commandWords.length) {
-            wordBeingProcessed = commandWords[indexBeingProcessed];
-            if (isKeyword(wordBeingProcessed)) {
-                // process arguments of the previous command
-                processArgs(keywordBeingProcessed);
-                keywordArgs = "";
-                keywordBeingProcessed = wordBeingProcessed;
-            } else {
-                // add to arguments of previous command
-                keywordArgs += wordBeingProcessed + " ";
+        // check for valid name in the case of the add command
+        if (commandWord.equals("add")) {
+            if (name.equals("")) {
+                resultType = RESULT_TYPE.INVALID;
+                errorMessage = "the name of the task added cannot be blank";
             }
-            indexBeingProcessed++;
-
         }
-        processArgs(keywordBeingProcessed);
+
         flags = updateResultFlags(flags);
+
     }
 
     private static boolean[] updateResultFlags(boolean[] flags) {
@@ -309,7 +300,7 @@ public class Parser {
     }
 
     // constructs and returns result based on existing fields
-    private static ParseResult parseResult(RESULT_TYPE resultType,
+    private static ParseResult createParseResult(RESULT_TYPE resultType,
                                            COMMAND_TYPE commandType) {
         return new ParseResult(resultType, commandType, date, dateToRemind,
                                priorityLevel, id, name, description, tag,
