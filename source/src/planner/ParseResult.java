@@ -12,11 +12,15 @@ import planner.Constants.COMMAND_TYPE;
  * @author Tham Zheng Yi
  */
 public class ParseResult {
+
+    private final int NO_PRIORITY_LEVEL = 0;
+    private final int NO_ID_SET = 0;
+
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = new Date();
     private Date dateToRemind = new Date();
-    private int priorityLevel = Constants.NO_PRIORITY_LEVEL;
-    private long taskId = Constants.NO_ID_SET;
+    private int priorityLevel = NO_PRIORITY_LEVEL;
+    private long taskId = NO_ID_SET;
     private String taskName = "";
     private String taskDescription = "";
     private String taskTag = "";
