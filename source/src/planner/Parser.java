@@ -1,9 +1,8 @@
 package planner;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
@@ -20,6 +19,7 @@ public class Parser {
 
     // stores the arguments for each keyword
     private static String keywordArgs = "";
+
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
         "every", "in", "priority", "desc", "description", "date", "due",
@@ -27,8 +27,17 @@ public class Parser {
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
+    private static String[] monthsArray = {"Jan", "January", "Feb", "February",
+        "Mar", "March", "Apr", "April", "May", "May", "Jun", "June", "Jul",
+        "July", "Aug", "August", "Sep", "September", "Oct", "October", "Nov",
+        "November", "Dec", "December"
+    };
+    private static ArrayList<String> months =
+            new ArrayList<String>(Arrays.asList(monthsArray));
 
     // these fields will be used to construct the parseResult
+    private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
+    private static COMMAND_TYPE commandType = null;
     private static Date date = null;
     private static Date dateToRemind = null;
     private static int priorityLevel = 0;
@@ -38,6 +47,7 @@ public class Parser {
     private static String tag = "";
     private static String errorMessage = "";
     private static boolean[] flags = new boolean[7];
+    private static Calendar calendar = null;
 
     public static ParseResult parse(String command) {
         resetFields();
@@ -47,8 +57,7 @@ public class Parser {
     
     private static ParseResult process(String command) {
         commandWords = command.split(" ");
-        RESULT_TYPE resultType = RESULT_TYPE.VALID;
-        COMMAND_TYPE commandType = extractCommandType(commandWords[0]);
+        commandType = extractCommandType(commandWords[0]);
         int indexBeingProcessed = 1; // next word after command type
         String wordBeingProcessed = "";
         String keywordBeingProcessed = ""; // to decide what to do with args
@@ -141,6 +150,8 @@ public class Parser {
     }
 
     private static void resetFields() {
+        resultType = RESULT_TYPE.VALID;
+        commandType = null;
         keywordArgs = "";
         commandWords = null;
         date = null;
@@ -204,12 +215,8 @@ public class Parser {
             case "on":
             case "date":
             case "due":
-                DateFormat format = new SimpleDateFormat("dd.MMMM.yyyy");
-                try {
-                    date = format.parse(keywordArgs);
-                } catch (Exception e) {
-                    date = new Date();
-                }
+                calendar = parseDate(keywordArgs);
+                date = calendar.getTime();
                 break;
 
             case "every":
@@ -228,12 +235,8 @@ public class Parser {
                 break;
 
             case "remind":
-                DateFormat format2 = new SimpleDateFormat("dd.MMMM.yyyy");
-                try {
-                    dateToRemind = format2.parse(keywordArgs);
-                } catch (Exception e) {
-                    dateToRemind = new Date();
-                }
+                calendar = parseDate(keywordArgs);
+                dateToRemind = calendar.getTime();
                 break;
 
             default:
@@ -274,6 +277,48 @@ public class Parser {
         return new ParseResult(resultType, commandType, date, dateToRemind,
                                priorityLevel, id, name, description, tag,
                                errorMessage, flags);
+    }
+
+    private static Calendar parseDate(String arguments) {
+        int day = 0;
+        int month = 0;
+        int year = 0;
+        String[] dateParts = arguments.split(" ");
+        String expectedDay = dateParts[0];
+        String expectedMonth = dateParts[0];
+        String expectedYear = dateParts[0];
+
+        try {
+            day = Integer.parseInt(expectedDay);
+        } catch (NumberFormatException e) {
+            resultType = Constants.RESULT_TYPE.INVALID;
+            errorMessage = "Unable to parse date";
+        }
+
+        try {
+            month = Integer.parseInt(expectedMonth);
+        } catch (NumberFormatException e) {
+            int monthIndex = months.indexOf(expectedMonth);
+            // check whether it is found in the list of month strings
+            if (monthIndex == -1) {
+                resultType = Constants.RESULT_TYPE.INVALID;
+                errorMessage = "Unable to parse date";
+            } else {
+                month = (monthIndex / 2) + 1;
+            }
+
+        }
+
+        try {
+            year = Integer.parseInt(expectedYear);
+        } catch (NumberFormatException e) {
+            resultType = Constants.RESULT_TYPE.INVALID;
+            errorMessage = "Unable to parse date";
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month - 1, day);
+        return calendar;
     }
 
 }
