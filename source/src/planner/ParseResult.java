@@ -18,8 +18,8 @@ public class ParseResult {
 
     private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
-    private Date parsedDate = new Date();
-    private Date dateToRemind = new Date();
+    private Date parsedDate = null;
+    private Date dateToRemind = null;
     private int priorityLevel = NO_PRIORITY_LEVEL;
     private long taskId = NO_ID_SET;
     private String taskName = "";
@@ -39,6 +39,7 @@ public class ParseResult {
                        Date date, Date dateToRemind, int priorityLevel,
                        long id, String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
+        this.resultType = resultType;
         this.commandType = commandType;
         this.parsedDate = date;
         this.dateToRemind = dateToRemind;

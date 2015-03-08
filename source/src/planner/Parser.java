@@ -49,6 +49,8 @@ public class Parser {
     private static boolean[] flags = new boolean[7];
     private static Calendar calendar = null;
 
+    private static final int FIRST_AFTER_COMMAND_TYPE = 1;
+
     public static ParseResult parse(String command) {
         resetFields();
         ParseResult result = process(command);
@@ -58,49 +60,38 @@ public class Parser {
     private static ParseResult process(String command) {
         commandWords = command.split(" ");
         commandType = extractCommandType(commandWords[0]);
-        int indexBeingProcessed = 1; // next word after command type
-        String wordBeingProcessed = "";
-        String keywordBeingProcessed = ""; // to decide what to do with args
+
         switch(commandType) {
             case ADD:
-                keywordBeingProcessed = "add";
-                while(indexBeingProcessed < commandWords.length) {
-                    wordBeingProcessed = commandWords[indexBeingProcessed];
-                    if (isKeyword(wordBeingProcessed)) {
-                        // process arguments of the previous command
-                        processArgs(keywordBeingProcessed);
-                        keywordArgs = "";
-                        keywordBeingProcessed = wordBeingProcessed;
-                    } else {
-                        // add to arguments of previous command
-                        keywordArgs += wordBeingProcessed + " ";
-                    }
-                    indexBeingProcessed++;
-
-                }
-                processArgs(keywordBeingProcessed);
-                if (name.equals("")) {
-                    resultType = RESULT_TYPE.INVALID;
-                    errorMessage = "the name of the task added cannot be blank";
-                }
-                flags = updateResultFlags(flags);
-
+                processAddCommand();
+                break;
+                
             case UPDATE:
-
+                processUpdateCommand();
+                break;
+                
             case DELETE:
-
+                break;
+                
             case SHOW:
-
+                break;
+                
             case DONE:
-
+                break;
+                
             case UNDO:
-
+                break;
+                
             case SEARCH:
-
+                break;
+                
             case HELP:
-
+                break;
+                
             default:
-
+                resultType = Constants.RESULT_TYPE.INVALID;
+                errorMessage = "invalid command type";
+                break;
         }
         return parseResult(resultType, commandType);
     }
@@ -173,40 +164,34 @@ public class Parser {
         switch(keyword) {
             // command keywords start here
             case "add":
-            case "new":
                 name = keywordArgs;
                 break;
 
             case "update":
-            case "edit":
-            case "change":
+                try {
+                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                } catch (NumberFormatException e) {
+                    resultType = Constants.RESULT_TYPE.INVALID;
+                    errorMessage = "a number must be entered for the task id";
+                }
                 break;
 
             case "delete":
-            case "trash":
-            case "remove":
-            case "del":
                 break;
 
             case "show":
-            case "display":
                 break;
 
             case "done":
-            case "completed":
-            case "finished":
                 break;
 
             case "undo":
-            case "revert":
                 break;
 
             case "search":
-            case "find":
                 break;
 
             case "help":
-            case "sos":
                 break;
 
             // non command keywords start here
@@ -242,6 +227,58 @@ public class Parser {
             default:
                 break;
         }
+    }
+
+    private static void processAddCommand() {
+        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
+        String wordBeingProcessed = "";
+        // to decide what to do with args
+        String keywordBeingProcessed = "add";
+
+        while(indexBeingProcessed < commandWords.length) {
+            wordBeingProcessed = commandWords[indexBeingProcessed];
+            if (isKeyword(wordBeingProcessed)) {
+                // process arguments of the previous command
+                processArgs(keywordBeingProcessed);
+                keywordArgs = "";
+                keywordBeingProcessed = wordBeingProcessed;
+            } else {
+                // add to arguments of previous command
+                keywordArgs += wordBeingProcessed + " ";
+            }
+            indexBeingProcessed++;
+
+        }
+        processArgs(keywordBeingProcessed);
+        if (name.equals("")) {
+            resultType = RESULT_TYPE.INVALID;
+            errorMessage = "the name of the task added cannot be blank";
+        }
+        flags = updateResultFlags(flags);
+    }
+
+    private static void processUpdateCommand() {
+        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
+        String wordBeingProcessed = "";
+        // to decide what to do with args
+        String keywordBeingProcessed = "update";
+
+        while(indexBeingProcessed < commandWords.length) {
+            wordBeingProcessed = commandWords[indexBeingProcessed];
+            if (isKeyword(wordBeingProcessed)) {
+                // process arguments of the previous command
+                processArgs(keywordBeingProcessed);
+                keywordArgs = "";
+                keywordBeingProcessed = wordBeingProcessed;
+            } else {
+                // add to arguments of previous command
+                keywordArgs += wordBeingProcessed + " ";
+            }
+            indexBeingProcessed++;
+
+        }
+        processArgs(keywordBeingProcessed);
+        flags = updateResultFlags(flags);
     }
 
     private static boolean[] updateResultFlags(boolean[] flags) {
@@ -317,7 +354,7 @@ public class Parser {
         }
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, day);
+        calendar.set(year, month - 1, day, 0 , 0, 0);
         return calendar;
     }
 
