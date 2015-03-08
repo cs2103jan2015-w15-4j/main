@@ -285,8 +285,8 @@ public class Parser {
         int year = 0;
         String[] dateParts = arguments.split(" ");
         String expectedDay = dateParts[0];
-        String expectedMonth = dateParts[0];
-        String expectedYear = dateParts[0];
+        String expectedMonth = dateParts[1];
+        String expectedYear = dateParts[2];
 
         try {
             day = Integer.parseInt(expectedDay);
