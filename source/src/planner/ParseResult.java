@@ -1,9 +1,9 @@
 package planner;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
+import planner.Constants.RESULT_TYPE;
 
 /**
  * This class is used to deliver the results of  
@@ -16,6 +16,7 @@ public class ParseResult {
     private final int NO_PRIORITY_LEVEL = 0;
     private final int NO_ID_SET = 0;
 
+    private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = new Date();
     private Date dateToRemind = new Date();
@@ -24,6 +25,7 @@ public class ParseResult {
     private String taskName = "";
     private String taskDescription = "";
     private String taskTag = "";
+    private String errorMessage = "";
     private boolean[] commandFlags;
     
     /**
@@ -33,10 +35,10 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-    public ParseResult(COMMAND_TYPE commandType, Date date, Date dateToRemind,
-                       int priorityLevel, long id, String name,
-                       String description, String tag,
-                       boolean[] flags) {
+    public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
+                       Date date, Date dateToRemind, int priorityLevel,
+                       long id, String name, String description, String tag,
+                       String errorMessage, boolean[] flags) {
         this.commandType = commandType;
         this.parsedDate = date;
         this.dateToRemind = dateToRemind;
@@ -45,7 +47,12 @@ public class ParseResult {
         this.taskName = name;
         this.taskDescription = description;
         this.taskTag = tag;
+        this.errorMessage = errorMessage;
         this.commandFlags = flags;
+    }
+
+    public RESULT_TYPE getResultType() {
+        return resultType;
     }
 
     public COMMAND_TYPE getCommandType() {
@@ -78,6 +85,10 @@ public class ParseResult {
 
     public String getTag() {
         return taskTag;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public boolean[] getCommandFlags() {

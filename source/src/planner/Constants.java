@@ -8,7 +8,7 @@ package planner;
  */
 public class Constants {
     public enum RESULT_TYPE {
-        SEARCH, UPDATE, DELETE
+        VALID, INVALID
     };
     
     public enum COMMAND_TYPE {

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
+import planner.Constants.RESULT_TYPE;
 
 /**
  * This class contains all the logic for parsing
@@ -35,6 +36,7 @@ public class Parser {
     private static String name = "";
     private static String description = "";
     private static String tag = "";
+    private static String errorMessage = "";
     private static boolean[] flags = new boolean[7];
 
     public static ParseResult parse(String command) {
@@ -45,6 +47,7 @@ public class Parser {
     
     private static ParseResult process(String command) {
         commandWords = command.split(" ");
+        RESULT_TYPE resultType = RESULT_TYPE.VALID;
         COMMAND_TYPE commandType = extractCommandType(commandWords[0]);
         int indexBeingProcessed = 1; // next word after command type
         String wordBeingProcessed = "";
@@ -62,6 +65,9 @@ public class Parser {
                         // add to arguments of previous command
                         keywordArgs += wordBeingProcessed;
                     }
+                }
+                if (name.equals("")) {
+                    resultType = RESULT_TYPE.INVALID;
                 }
                 flags = updateResultFlags(flags);
 
@@ -82,10 +88,7 @@ public class Parser {
             default:
 
         }
-
-        return new ParseResult(commandType, date, dateToRemind,
-                               priorityLevel, id, name,
-                               description, tag, flags);
+        return parseResult(resultType, commandType);
     }
 
     private static COMMAND_TYPE extractCommandType(String commandWord) {
@@ -142,6 +145,7 @@ public class Parser {
         name = "";
         description = "";
         tag = "";
+        errorMessage = "";
         flags = new boolean[7];
     }
 
@@ -259,9 +263,12 @@ public class Parser {
         return flags;
     }
 
-    private static ArrayList<Boolean> checkFlagValues(String command) {
-        ArrayList<Boolean> flagValues = new ArrayList<Boolean>();
-        return flagValues;
+    // constructs and returns result based on existing fields
+    private static ParseResult parseResult(RESULT_TYPE resultType,
+                                           COMMAND_TYPE commandType) {
+        return new ParseResult(resultType, commandType, date, dateToRemind,
+                               priorityLevel, id, name, description, tag,
+                               errorMessage, flags);
     }
 
 }
