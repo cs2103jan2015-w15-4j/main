@@ -4,9 +4,23 @@ import java.util.StringTokenizer;
 
 public class SearchLogic {
     
+    public static void searchAll(TaskList input, TaskList searchList, String wordToLookFor) {
+        for (int i = 0; i < input.size(); i++) {
+            if (containsSearchedWord(input.get(i).getName(), wordToLookFor)) {
+                searchList.add(input.get(i));
+            }
+            else if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
+                searchList.add(input.get(i));
+            }
+            else if (containsSearchedWord(input.get(i).getTag(), wordToLookFor)) {
+                searchList.add(input.get(i));
+            }
+        }
+    }
+    
     public static void searchByTags(TaskList input, TaskList searchList, String tagToLookFor){
         for (int i = 0; i < input.size(); i++) {
-            if (containsSearchedWord(input.get(i).getName(), tagToLookFor)) {
+            if (containsSearchedWord(input.get(i).getTag(), tagToLookFor)) {
                 searchList.add(input.get(i));
             }
         }
@@ -17,7 +31,7 @@ public class SearchLogic {
         StringTokenizer token = new StringTokenizer(description);
         while (token.hasMoreTokens()) {
             String word = token.nextToken();
-            if (word.equals(wordToLookFor.trim())) {
+            if (word.toUpperCase().equals(wordToLookFor.toUpperCase().trim())) {
                 return true;
             }
         }

@@ -4,6 +4,7 @@ public class Logic {
     
     //Sorts according to due date
     //Assumption: TaskList passed to this method MUST have a non-null due date (Non-tentative tasks).
+    //Sort in this order, Due Date > Priority > Name >
     public static void sortTaskListByDate(TaskList tasks){
         SortLogic.sortByDate(tasks);
     }
@@ -28,5 +29,7 @@ public class Logic {
         SearchLogic.searchByTags(input, searchList, tagToLookFor);
     }
     
-
+    public static void searchAll(TaskList input, TaskList searchList, String wordToLookFor) {
+        SearchLogic.searchAll(input,searchList, wordToLookFor);
+    }
 }
