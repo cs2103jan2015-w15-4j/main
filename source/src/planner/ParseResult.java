@@ -26,6 +26,8 @@ public class ParseResult {
     private String taskDescription = "";
     private String taskTag = "";
     private String errorMessage = "";
+    // flags order: date, dateToRemind, priorityLevel, id, name,
+    //              description, tag
     private boolean[] commandFlags;
     
     /**

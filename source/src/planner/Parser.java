@@ -180,6 +180,12 @@ public class Parser {
                 break;
 
             case "show":
+                try {
+                    // check whether next token is an id of the task to show
+                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                } catch (NumberFormatException e) {
+                    // if not, do nothing -> show everything
+                }
                 break;
 
             case "done":
@@ -274,7 +280,7 @@ public class Parser {
 
     private static boolean[] updateResultFlags(boolean[] flags) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
-        // description, tag
+        //              description, tag
         if (date != null) {
             flags[0] = true;
         }

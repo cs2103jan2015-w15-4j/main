@@ -25,7 +25,7 @@ public class ParserTest {
         assertEquals("anniversary outing with my waifu ", result.getName());
         
     }
-    
+
     @Test
     public void testUpdateCommand() {
         ParseResult result = Parser.parse("update 123 date 23 June 2015");
@@ -59,7 +59,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testShowCommand() {
+    public void testShowAllTasksCommand() {
         ParseResult result = Parser.parse("display for the at 10 Jun 1999");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.SHOW, result.getCommandType());
@@ -70,6 +70,22 @@ public class ParserTest {
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
         boolean[] flags = {false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+
+    @Test
+    public void testShowSingleTaskCommand() {
+        ParseResult result = Parser.parse("display 135135 on at by 1992");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.SHOW, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(135135, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals("", result.getErrorMessage());
+        boolean[] flags = {false, false, false, true, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
