@@ -13,8 +13,7 @@ public class Engine {
         try {
             config = Storage.readConfig();
             allTasks = Storage.readTaskStorage(config.getStoragePath());
-            Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
-            Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
+            refreshLists();
             return true;
         } catch(Exception e) {
             return false;
@@ -33,34 +32,69 @@ public class Engine {
     }
     
     //Not tested yet
+    private static void refreshLists() {
+        doneTasks.clear();
+        undoneTasks.clear();
+        normalTasks.clear();
+        tentativeTasks.clear();
+        Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
+        Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
+    }
+    
+    //Not tested yet
     public static Constants.COMMAND_TYPE process(String userInput) {
         ParseResult result = Parser.parse(userInput);
         Constants.COMMAND_TYPE command = result.getCommandType();
+        long ID;
         switch (command) {
             case ADD:
-                //TO BE DONE
-                break;
+                Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.newTaskNumber());
+                allTasks.add(newTask);
+                refreshLists();
+                return Constants.COMMAND_TYPE.ADD;
             case UPDATE:
-                //TO BE DONE
-                break;
+                boolean[] flags = result.getCommandFlags();
+                ID = result.getId();
+                Task toBeUpdated = allTasks.getTaskByID(ID);
+                if(flags[0]) {
+                    toBeUpdated.setDueDate(result.getDate());
+                }
+                if(flags[2]) {
+                    toBeUpdated.setPriority(result.getPriorityLevel());
+                }
+                if(flags[4]) {
+                    toBeUpdated.setName(result.getName());
+                }
+                if(flags[5]) {
+                    toBeUpdated.setDescription(result.getDescription());
+                }
+                if(flags[6]) {
+                    toBeUpdated.setTag(result.getTag());
+                }
+                refreshLists();
+                return Constants.COMMAND_TYPE.UPDATE;
             case DELETE:
-                //TO BE DONE
-                break;
+                ID = result.getId();
+                allTasks.remove(allTasks.getTaskByID(ID));
+                refreshLists();
+                return Constants.COMMAND_TYPE.DELETE;
             case SHOW:
                 //TO BE DONE
-                break;
+                return Constants.COMMAND_TYPE.SHOW;
             case DONE:
                 //TO BE DONE
-                break;
+                return Constants.COMMAND_TYPE.DONE;
             case UNDO:
                 //TO BE DONE
-                break;
+                return Constants.COMMAND_TYPE.UNDO;
             case SEARCH:
                 //TO BE DONE
-                break;
+                return Constants.COMMAND_TYPE.SEARCH;
             case HELP:
                 //TO BE DONE
-                break;
+                return Constants.COMMAND_TYPE.HELP;
+            default:
+                return Constants.COMMAND_TYPE.INVALID;
         }
     }
     
