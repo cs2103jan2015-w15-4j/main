@@ -117,6 +117,7 @@ public class Parser {
 
             case "show":
             case "display":
+                // at this point, undetermined if showing one task or all
                 return COMMAND_TYPE.SHOW;
 
             case "done":
@@ -183,8 +184,9 @@ public class Parser {
                 try {
                     // check whether next token is an id of the task to show
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    commandType = Constants.COMMAND_TYPE.SHOW_ONE;
                 } catch (NumberFormatException e) {
-                    // if not, do nothing -> show everything
+                    commandType = Constants.COMMAND_TYPE.SHOW_ALL;
                 }
                 break;
 

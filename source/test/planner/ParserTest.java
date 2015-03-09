@@ -62,7 +62,7 @@ public class ParserTest {
     public void testShowAllTasksCommand() {
         ParseResult result = Parser.parse("display for the at 10 Jun 1999");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
-        assertEquals(Constants.COMMAND_TYPE.SHOW, result.getCommandType());
+        assertEquals(Constants.COMMAND_TYPE.SHOW_ALL, result.getCommandType());
         assertTrue(result.getDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(0, result.getId());
@@ -78,7 +78,7 @@ public class ParserTest {
     public void testShowSingleTaskCommand() {
         ParseResult result = Parser.parse("display 135135 on at by 1992");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
-        assertEquals(Constants.COMMAND_TYPE.SHOW, result.getCommandType());
+        assertEquals(Constants.COMMAND_TYPE.SHOW_ONE, result.getCommandType());
         assertTrue(result.getDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(135135, result.getId());
