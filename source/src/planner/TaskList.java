@@ -26,6 +26,14 @@ public class TaskList implements List<Task>{
         return tasks;
     }
 
+    public Task getTaskByID(long ID) {
+        for(Task t:tasks) {
+            if(t.getID() == ID) {
+                return t;
+            }
+        }
+        return null;
+    }
     @Override
     public int size() {
         return tasks.size();

@@ -22,6 +22,11 @@ public class Configuration {
         return curTaskNum;
     }
     
+    public Long newTaskNumber() {
+        curTaskNum++;
+        return curTaskNum-1;
+    }
+    
     public void setStoragePath(String newPath) {
         storagePath = newPath;
     }
