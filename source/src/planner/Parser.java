@@ -212,6 +212,14 @@ public class Parser {
                 break;
 
             case "help":
+                // check whether the user needs help with specific command
+                String cmdToHelpWith = keywordArgs.split(" ")[0];
+                COMMAND_TYPE cmdToHelpWithType = extractCommandType(cmdToHelpWith);
+                if (!cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
+                    // if no command given, no need to modify anything
+                } else {
+                    commandNeedingHelp = cmdToHelpWithType;
+                }
                 break;
 
             // non command keywords start here
