@@ -159,4 +159,21 @@ public class ParserTest {
         assertEquals("", result.getName());
     }
 
+    // test help command used to show the usage of a specific command
+    public void testSpecificHelpCommand() {
+        ParseResult result = Parser.parse("help add search delete done at 24 Jan 1172");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.HELP, result.getCommandType());
+        assertEquals(Constants.COMMAND_TYPE.ADD, result.getCommandNeedingHelp());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(Constants.NO_ID_SET, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals("", result.getErrorMessage());
+        boolean[] flags = {false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+
 }
