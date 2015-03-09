@@ -38,7 +38,6 @@ public class Parser {
     // these fields will be used to construct the parseResult
     private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
     private static COMMAND_TYPE commandType = null;
-    private static COMMAND_TYPE commandNeedingHelp = null;
     private static Date date = null;
     private static Date dateToRemind = null;
     private static int priorityLevel = 0;
@@ -149,7 +148,6 @@ public class Parser {
     private static void resetFields() {
         resultType = RESULT_TYPE.VALID;
         commandType = null;
-        commandNeedingHelp = null;
         keywordArgs = "";
         commandWords = null;
         date = null;
@@ -215,10 +213,10 @@ public class Parser {
                 // check whether the user needs help with specific command
                 String cmdToHelpWith = keywordArgs.split(" ")[0];
                 COMMAND_TYPE cmdToHelpWithType = extractCommandType(cmdToHelpWith);
-                if (!cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
+                if (cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
                     // if no command given, no need to modify anything
                 } else {
-                    commandNeedingHelp = cmdToHelpWithType;
+                    commandType = determineHelpCommandType(cmdToHelpWithType);
                 }
                 break;
 
@@ -338,9 +336,42 @@ public class Parser {
     // constructs and returns result based on existing fields
     private static ParseResult createParseResult(RESULT_TYPE resultType,
                                            COMMAND_TYPE commandType) {
-        return new ParseResult(resultType, commandType, commandNeedingHelp,
-                               date, dateToRemind, priorityLevel, id, name,
-                               description, tag, errorMessage, flags);
+        return new ParseResult(resultType, commandType, date, dateToRemind, 
+                               priorityLevel, id, name, description, tag, 
+                               errorMessage, flags);
+    }
+    
+    // returns a command type for the result based on what user wants help with
+    private static COMMAND_TYPE determineHelpCommandType(COMMAND_TYPE commandType) {
+        switch(commandType) {
+            case ADD:
+                return COMMAND_TYPE.HELP_ADD;
+                
+            case UPDATE:
+                return COMMAND_TYPE.HELP_UPDATE;
+                
+            case DELETE:
+                return COMMAND_TYPE.HELP_DELETE;
+                
+            case SHOW:
+                return COMMAND_TYPE.HELP_SHOW;
+
+                
+            case DONE:
+                return COMMAND_TYPE.HELP_DONE;
+                
+            case UNDO:
+                // not yet implemented
+                return COMMAND_TYPE.INVALID;
+                
+            case SEARCH:
+                return COMMAND_TYPE.HELP_SEARCH;
+                
+            default:
+                errorMessage = "invalid command type";
+                return COMMAND_TYPE.INVALID;
+
+        }
     }
 
     private static Calendar parseDate(String arguments) {

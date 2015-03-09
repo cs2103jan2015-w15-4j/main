@@ -18,7 +18,6 @@ public class ParseResult {
 
     private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
-    private COMMAND_TYPE commandNeedingHelp = null;
     private Date parsedDate = null;
     private Date dateToRemind = null;
     private int priorityLevel = NO_PRIORITY_LEVEL;
@@ -39,13 +38,11 @@ public class ParseResult {
      * @param flags       Indicate presence of properties (e.g. time)
      */
     public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
-                       COMMAND_TYPE commandNeedingHelp, Date date,
-                       Date dateToRemind, int priorityLevel, long id,
+                       Date date, Date dateToRemind, int priorityLevel, long id,
                        String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
         this.resultType = resultType;
         this.commandType = commandType;
-        this.commandNeedingHelp = commandNeedingHelp;
         this.parsedDate = date;
         this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;
@@ -63,10 +60,6 @@ public class ParseResult {
 
     public COMMAND_TYPE getCommandType() {
         return commandType;
-    }
-    
-    public COMMAND_TYPE getCommandNeedingHelp() {
-        return commandNeedingHelp;
     }
 
     public Date getDate() {
