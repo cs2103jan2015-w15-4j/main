@@ -122,7 +122,23 @@ public class ParserTest {
         assertEquals("a number must be entered for the task id", result.getErrorMessage());
         boolean[] flags = {false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
-        assertEquals("", result.getName()); 
+        assertEquals("", result.getName());
+    }
+
+    @Test
+    public void testSearchCommand() {
+        ParseResult result = Parser.parse("search sushi bar tag food description delicious on 10 Oct 1528 remind 9 Oct 1528");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.SEARCH, result.getCommandType());
+        assertEquals("Sat Oct 10 00:00:00 SGT 1528", result.getDate().toString());
+        assertEquals("Fri Oct 09 00:00:00 SGT 1528", result.getDateToRemind().toString());
+        assertEquals(Constants.NO_ID_SET, result.getId());
+        assertEquals("delicious", result.getDescription());
+        assertEquals("food", result.getTag());
+        assertEquals("", result.getErrorMessage());
+        boolean[] flags = {true, true, false, false, true, true, true};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("sushi bar", result.getName());
     }
 
 }
