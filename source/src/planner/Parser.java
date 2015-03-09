@@ -38,6 +38,7 @@ public class Parser {
     // these fields will be used to construct the parseResult
     private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
     private static COMMAND_TYPE commandType = null;
+    private static COMMAND_TYPE commandNeedingHelp = null;
     private static Date date = null;
     private static Date dateToRemind = null;
     private static int priorityLevel = 0;
@@ -148,6 +149,7 @@ public class Parser {
     private static void resetFields() {
         resultType = RESULT_TYPE.VALID;
         commandType = null;
+        commandNeedingHelp = null;
         keywordArgs = "";
         commandWords = null;
         date = null;
@@ -159,6 +161,7 @@ public class Parser {
         tag = "";
         errorMessage = "";
         flags = new boolean[7];
+        calendar = null;
     }
 
     private static Boolean isKeyword(String word) {
@@ -262,7 +265,7 @@ public class Parser {
                 // all text after the id is ignored for delete
                 if (keywordBeingProcessed.equals("delete")) {
                     break;
-                    
+
                  // all text after the id is ignored for done    
                 } else if (keywordBeingProcessed.equals("done")) {
                     break;
@@ -327,9 +330,9 @@ public class Parser {
     // constructs and returns result based on existing fields
     private static ParseResult createParseResult(RESULT_TYPE resultType,
                                            COMMAND_TYPE commandType) {
-        return new ParseResult(resultType, commandType, date, dateToRemind,
-                               priorityLevel, id, name, description, tag,
-                               errorMessage, flags);
+        return new ParseResult(resultType, commandType, commandNeedingHelp,
+                               date, dateToRemind, priorityLevel, id, name,
+                               description, tag, errorMessage, flags);
     }
 
     private static Calendar parseDate(String arguments) {
