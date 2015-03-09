@@ -83,6 +83,7 @@ public class Parser {
                 break;
                 
             case UNDO:
+                // not yet implemented
                 break;
                 
             case SEARCH:
@@ -90,6 +91,7 @@ public class Parser {
                 break;
                 
             case HELP:
+                processCommand("help");
                 break;
                 
             default:
@@ -259,8 +261,11 @@ public class Parser {
         while(indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
             if (isKeyword(wordBeingProcessed)) {
-                // all text after the id is ignored for delete
-                if (keywordBeingProcessed.equals("delete")) {
+                // all text after the "help" command is ignored
+                if (keywordBeingProcessed.equals("help")) {
+                    break;
+                 // all text after the id is ignored for delete
+                } else if (keywordBeingProcessed.equals("delete")) {
                     break;
                     
                  // all text after the id is ignored for done    
