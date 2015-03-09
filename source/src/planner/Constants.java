@@ -12,7 +12,9 @@ public class Constants {
     };
     
     public enum COMMAND_TYPE {
-        ADD, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, UNDO, SEARCH, HELP, INVALID
+        ADD, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, UNDO, SEARCH,
+        HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_SHOW, HELP_DONE,
+        HELP_UNDO, HELP_SEARCH, INVALID
     };
     
     public static String CONFIG_FILE_LOCATION = "config";

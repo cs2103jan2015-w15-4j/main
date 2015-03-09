@@ -38,8 +38,8 @@ public class ParseResult {
      * @param flags       Indicate presence of properties (e.g. time)
      */
     public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
-                       Date date, Date dateToRemind, int priorityLevel,
-                       long id, String name, String description, String tag,
+                       Date date, Date dateToRemind, int priorityLevel, long id,
+                       String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
         this.resultType = resultType;
         this.commandType = commandType;
@@ -61,7 +61,7 @@ public class ParseResult {
     public COMMAND_TYPE getCommandType() {
         return commandType;
     }
-    
+
     public Date getDate() {
         return parsedDate;
     }
