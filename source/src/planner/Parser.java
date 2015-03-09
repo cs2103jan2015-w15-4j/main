@@ -23,7 +23,7 @@ public class Parser {
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
         "every", "in", "priority", "desc", "description", "date", "due",
-        "remind"
+        "remind", "tag"
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
@@ -79,12 +79,14 @@ public class Parser {
                 break;
                 
             case DONE:
+                processCommand("done");
                 break;
                 
             case UNDO:
                 break;
                 
             case SEARCH:
+                processCommand("search");
                 break;
                 
             case HELP:
@@ -167,7 +169,7 @@ public class Parser {
         switch(keyword) {
             // command keywords start here
             case "add":
-                name = keywordArgs;
+                name = keywordArgs.trim();
                 break;
 
             case "update":
@@ -191,12 +193,19 @@ public class Parser {
                 break;
 
             case "done":
+                try {
+                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                } catch (NumberFormatException e) {
+                    resultType = Constants.RESULT_TYPE.INVALID;
+                    errorMessage = "a number must be entered for the task id";
+                }
                 break;
 
             case "undo":
                 break;
 
             case "search":
+                name = keywordArgs.trim();
                 break;
 
             case "help":
@@ -219,17 +228,21 @@ public class Parser {
                 break;
 
             case "priority":
-                priorityLevel = Integer.parseInt(keywordArgs);
+                priorityLevel = Integer.parseInt(keywordArgs.split(" ")[0]);
                 break;
 
             case "desc":
             case "description":
-                description = keywordArgs;
+                description = keywordArgs.trim();
                 break;
 
             case "remind":
                 calendar = parseDate(keywordArgs);
                 dateToRemind = calendar.getTime();
+                break;
+                
+            case "tag":
+                tag = keywordArgs.trim();
                 break;
 
             default:
@@ -249,8 +262,12 @@ public class Parser {
                 // all text after the id is ignored for delete
                 if (keywordBeingProcessed.equals("delete")) {
                     break;
-
-                // all text after 'show' is ignored for show
+                    
+                 // all text after the id is ignored for done    
+                } else if (keywordBeingProcessed.equals("done")) {
+                    break;
+                    
+                // all text after 'show' and its id is ignored for show 
                 } else if (keywordBeingProcessed.equals("show")) {
                     break;
                 } else {
