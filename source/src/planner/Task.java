@@ -1,6 +1,6 @@
 package planner;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * This class is used to represent the entries for storing tasks.
@@ -8,8 +8,9 @@ import java.sql.Timestamp;
  *
  */
 public class Task {
+    private final long ID;
     private String taskName, taskDescription, taskTag;
-    private Timestamp dateCreated, dateDue;
+    private Date dateCreated, dateDue;
     private int taskPriority;
     private boolean taskCompleted, taskFloating;
     
@@ -27,7 +28,8 @@ public class Task {
      *      A string tag on a task.
      * @throws IllegalArgumentException
      */
-    public Task(String name, String description, Timestamp dueDate, int priority, String tag) throws IllegalArgumentException {
+    public Task(String name, String description, Date dueDate, int priority, String tag, long id) throws IllegalArgumentException {
+        ID = id;
         if(name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
         }
@@ -36,7 +38,7 @@ public class Task {
         taskDescription = description;
         taskTag = tag;
         
-        dateCreated = new Timestamp(System.currentTimeMillis());
+        dateCreated = new Date(System.currentTimeMillis());
         
         //Tests needed for null date
         if(dueDate != null) {
@@ -69,12 +71,17 @@ public class Task {
         return taskPriority;
     }
     
-    public Timestamp getDueDate() {
+    public Date getDueDate() {
         return dateDue;
     }
     
-    public Timestamp getCreatedDate() {
+    public Date getCreatedDate() {
         return dateCreated;
+    }
+    
+    //Not tested yet
+    public long getID() {
+        return ID;
     }
     
     //Not covered by tests yet
@@ -111,7 +118,7 @@ public class Task {
     }
     
     //Not covered by tests yet
-    public void setDueDate(Timestamp newDueDate) {
+    public void setDueDate(Date newDueDate) {
         //Tests needed for null date
         if(newDueDate != null) {
             dateDue = newDueDate;
@@ -123,7 +130,7 @@ public class Task {
     }
     
     //Not covered by tests yet
-    public void configureCreatedDate(Timestamp newCreatedDate) {
+    public void configureCreatedDate(Date newCreatedDate) {
         //Tests needed for null date
         dateCreated = newCreatedDate;
     }
