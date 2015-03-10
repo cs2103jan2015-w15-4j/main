@@ -19,7 +19,7 @@ public class Configuration {
     }
     
     public Long getCurTaskNum() {
-        return curTaskNum-1;
+        return curTaskNum;
     }
     
     public Long newTaskNumber() {
