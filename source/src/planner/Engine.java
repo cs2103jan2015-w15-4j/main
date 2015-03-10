@@ -75,22 +75,34 @@ public class Engine {
                 return Constants.COMMAND_TYPE.ADD;
             case UPDATE:
                 boolean[] flags = result.getCommandFlags();
+                boolean nothing = true;
                 ID = result.getId();
                 Task toBeUpdated = allTasks.getTaskByID(ID);
+                if(toBeUpdated == null) {
+                    return Constants.COMMAND_TYPE.INVALID;
+                }
                 if(flags[0]) {
+                    nothing = false;
                 	toBeUpdated.setDueDate(result.getDate());
                 }
                 if(flags[2]) {
+                    nothing = false;
                     toBeUpdated.setPriority(result.getPriorityLevel());
                 }
                 if(flags[4]) {
+                    nothing = false;
                     toBeUpdated.setName(result.getName());
                 }
                 if(flags[5]) {
+                    nothing = false;
                     toBeUpdated.setDescription(result.getDescription());
                 }
                 if(flags[6]) {
+                    nothing = false;
                     toBeUpdated.setTag(result.getTag());
+                }
+                if(nothing) {
+                    return Constants.COMMAND_TYPE.INVALID;
                 }
                 refreshLists();
                 return Constants.COMMAND_TYPE.UPDATE;

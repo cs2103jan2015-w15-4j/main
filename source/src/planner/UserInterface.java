@@ -302,9 +302,10 @@ public class UserInterface extends JFrame {
                     			
                     			System.out.printf( "newTaskNumber = " + newTaskNumber + "\n" );
                     			
-                    			if( newTaskNumber >= 0 ){
+                    			//CHANGED CONDITIONAL FROM newTaskNumber >= 0  to true
+                    			if( true ){
                     				
-                    				command.setText( "Task " + newTaskNumber + " updated successfully" );
+                    				command.setText( "Task updated successfully" );
                     				
                     				currentList.copyTaskList(tempTaskList);
                     				
