@@ -19,11 +19,12 @@ public class Configuration {
     }
     
     public Long getCurTaskNum() {
-        return curTaskNum;
+        return curTaskNum-1;
     }
     
     public Long newTaskNumber() {
         curTaskNum++;
+        System.out.println(curTaskNum);
         return curTaskNum-1;
     }
     

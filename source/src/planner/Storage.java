@@ -16,19 +16,16 @@ public class Storage {
     public static Configuration readConfig() {
         Configuration result = new Configuration("data");
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Constants.CONFIG_FILE_LOCATION));
+            BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + Constants.CONFIG_FILE_LOCATION));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
             long curTaskNum = Long.valueOf((String) taskJson.get("numTasks"));
             
-            result = new Configuration(path);
+            result = new Configuration(path, curTaskNum);
             return result;
         } catch (Exception e) {
-        	
-        	
-        	
             return result;
         }
     }
@@ -41,7 +38,7 @@ public class Storage {
         configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
-        writeToFile(Constants.CONFIG_FILE_LOCATION, config);
+        writeToFile(Storage.class.getResource("").getFile() + Constants.CONFIG_FILE_LOCATION, config);
     }
     
     private static void writeToFile(String fileName, ArrayList<String> content) throws IOException {
@@ -70,7 +67,7 @@ public class Storage {
     public static void saveTaskList(String fileName, TaskList tasks) {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         try {
-            writeToFile(fileName, taskJsonStrings);
+            writeToFile(Storage.class.getResource("").getFile() + fileName, taskJsonStrings);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -80,7 +77,7 @@ public class Storage {
     public static TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + fileName));
             String input;
             while((input = br.readLine()) != null) {
                 tasks.add(convertTaskFromJsonString(input));

@@ -10,14 +10,12 @@ public class Engine {
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
     
-    private static long id = 0;
-    
     //Not tested yet
     public static boolean init() {
         try {
         	
-            //config = Storage.readConfig();
-            //allTasks = Storage.readTaskStorage(config.getStoragePath());
+            config = Storage.readConfig();
+            allTasks = Storage.readTaskStorage(config.getStoragePath());
         	allTasks = new TaskList();
         	doneTasks = new TaskList();
         	undoneTasks = new TaskList();
@@ -34,8 +32,8 @@ public class Engine {
     //Not tested yet
     public static boolean exit() {
         try {
-            //Storage.saveConfiguration(config);
-            //Storage.saveTaskList(config.getStoragePath(), allTasks);
+            Storage.saveConfiguration(config);
+            Storage.saveTaskList(config.getStoragePath(), allTasks);
             return true;
         } catch(Exception e) {
             return false;
@@ -70,7 +68,7 @@ public class Engine {
         long ID;
         switch (command) {
             case ADD:
-                Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), id++);
+                Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.newTaskNumber());
                 allTasks.add(newTask);
                 refreshLists();
                 return Constants.COMMAND_TYPE.ADD;
