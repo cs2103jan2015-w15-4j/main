@@ -341,7 +341,21 @@ public class UserInterface extends JFrame {
                     			}
                     			
                     			break;
-                    			
+                    		//ADDED CODE HERE
+                            case DONE:
+                                newTaskNumber = compareList( currentList, tempTaskList );
+                                    
+                                command.setText( "Task completed successfully" );
+                                    
+                                currentList.copyTaskList(tempTaskList);
+                                    
+                                displayPane.clearDisplay();
+                                    
+                                displayPane.addTasksToDisplay(currentList);
+                                
+                                break;
+                            //END OF ADDED CODE
+                                
                     		case INVALID:
                     			
                     			command.setText( "Invalid Command" );

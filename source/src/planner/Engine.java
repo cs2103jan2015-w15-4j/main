@@ -103,8 +103,19 @@ public class Engine {
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.SHOW;
             case DONE:
-                //TO BE DONE
-                return Constants.COMMAND_TYPE.DONE;
+                if(!result.getCommandFlags()[3]) {
+                    return Constants.COMMAND_TYPE.INVALID;
+                } else {
+                    ID = result.getId();
+                    Task toBeDone = allTasks.getTaskByID(ID);
+                    if(toBeDone == null) {
+                        return Constants.COMMAND_TYPE.INVALID;
+                    } else {
+                        toBeDone.setDone();
+                        return Constants.COMMAND_TYPE.DONE;
+                    }
+                    
+                }
             case UNDO:
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.UNDO;
