@@ -101,7 +101,7 @@ public class UserInterface extends JFrame {
     private void prepareDisplay(){
         
         displayScrollPane = new JScrollPane();
-        displayScrollPane.setBounds(37, 90, 530, 317);
+        displayScrollPane.setBounds(37, 107, 545, 300);
         contentPane.add(displayScrollPane);
         
         display = new JTextPane();
@@ -129,7 +129,7 @@ public class UserInterface extends JFrame {
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(40, 433, 521, 33);
+        command.setBounds(40, 433, 539, 33);
         contentPane.add(command);
         command.setColumns(10);
         
@@ -223,7 +223,7 @@ public class UserInterface extends JFrame {
     private void prepareTentativeDisplay(){
         
         tentativeDisplayScrollPane = new JScrollPane();
-        tentativeDisplayScrollPane.setBounds(588, 93, 148, 373);
+        tentativeDisplayScrollPane.setBounds(601, 99, 152, 364);
         contentPane.add(tentativeDisplayScrollPane);
         
         tentativeDisplay = new JTextPane();
