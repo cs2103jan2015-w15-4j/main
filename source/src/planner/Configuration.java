@@ -24,7 +24,6 @@ public class Configuration {
     
     public Long newTaskNumber() {
         curTaskNum++;
-        System.out.println(curTaskNum);
         return curTaskNum-1;
     }
     

@@ -16,13 +16,13 @@ public class Engine {
         	
             config = Storage.readConfig();
             allTasks = Storage.readTaskStorage(config.getStoragePath());
-        	allTasks = new TaskList();
         	doneTasks = new TaskList();
         	undoneTasks = new TaskList();
         	tentativeTasks = new TaskList();
         	normalTasks = new TaskList();
         	
             refreshLists();
+            System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
             return false;
@@ -34,6 +34,7 @@ public class Engine {
         try {
             Storage.saveConfiguration(config);
             Storage.saveTaskList(config.getStoragePath(), allTasks);
+            System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
             return false;
