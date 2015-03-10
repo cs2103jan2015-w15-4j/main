@@ -11,16 +11,17 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Iterator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
+import javax.swing.SwingConstants;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -29,19 +30,24 @@ public class UserInterface extends JFrame {
     
     private JTextField command;
     
-    private JScrollPane displayScrollPane;
-    private JTextPane display;
-    
     private JTextPane tentativeDisplay;
     private JScrollPane tentativeDisplayScrollPane;
     
     private JLabel closeButton;
     private JLabel minimiseButton;
     private JLabel dragPanel;
+    private JLabel sectionTitle;
+    private JLabel sectionTitleLine;
+    
+    private DisplayPane displayPane;
     
     // Used for drag logic
     private int mouseXCoordinate;
     private int mouseYCoordinate;
+    
+    private TaskList currentList;
+    
+    private boolean isMessageDisplayed;
     
     public static void main(String[] args) {
         
@@ -65,6 +71,15 @@ public class UserInterface extends JFrame {
 
     public UserInterface() {
         
+    	// Initialise engine
+    	if( !Engine.init() ){
+    		
+    		JOptionPane.showMessageDialog(null, "Engine failed to initialise :(", "Error Message", JOptionPane.ERROR_MESSAGE);
+    		System.exit(1);
+    	}
+    	
+    	isMessageDisplayed = true;
+    	
         // Main frame
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,50 +96,93 @@ public class UserInterface extends JFrame {
         prepareCloseButton();
         prepareMinimiseButton();
         prepareDragPanel();
+        prepareSectionTitle();
+        prepareSectionTitleLine();
         prepareBackground();
-        
         
         setUndecorated(true);
         
         setLocationRelativeTo(null);
     }
     
+    private void prepareSectionTitle(){
+    	
+    	sectionTitle = new JLabel();
+    	sectionTitle.setBounds(40, 60, 539, 33);
+    	sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
+    	sectionTitle.setForeground( new Color( 255,255,255,200 ) );
+    	sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        contentPane.add(sectionTitle);
+        sectionTitle.setText("All Tasks");
+    }
+    
+    private void prepareSectionTitleLine(){
+    	
+    	sectionTitleLine = new JLabel();
+    	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
+    	sectionTitleLine.setBounds(40, 60, 539, 33);
+    	contentPane.add(sectionTitleLine);
+    }
+    
     private void prepareBackground(){
         
         // Adding UI background
-        JLabel background = new JLabel("");
+        JLabel background = new JLabel();
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
         background.setBounds(0, 0, 781, 494);
         contentPane.add(background);
     }
     
-    private void prepareDisplay(){
+	private void prepareDisplay(){
         
-        displayScrollPane = new JScrollPane();
-        displayScrollPane.setBounds(37, 107, 545, 300);
-        contentPane.add(displayScrollPane);
+    	displayPane = new DisplayPane();
+        displayPane.setBounds(40, 99, 539, 307);
+        contentPane.add(displayPane);
         
-        display = new JTextPane();
-        displayScrollPane.setViewportView(display);
+        // Copying of all tasks
+        currentList = new TaskList( Engine.getAllTasks() );
         
-        displayScrollPane.setBorder(null);
-        displayScrollPane.setOpaque(false);
-
-        display.setBorder(null);
-        display.setOpaque(false);
-        
-        display.setEditable(false);
-        display.setFont( new Font( "Arial", Font.BOLD, 16 ));
-        
-        display.setText( "This is a sample display box\n" );
-        display.setForeground(new Color( 255, 255, 255 ));
-        
-        displayScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        displayScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        
-        displayScrollPane.getViewport().setOpaque(false);
+        // Display all tasks as default screen for now
+        displayPane.addTasksToDisplay(currentList);
     }
     
+	private long compareList( TaskList originalList, TaskList modifiedList ){
+		
+		if( originalList == null || modifiedList == null ){
+			
+			return -1;
+		}
+		
+		Iterator<Task> iteratorOriginal = originalList.iterator();
+		Iterator<Task> iteratorModified = modifiedList.iterator();
+		
+		Task originalTask;
+		Task modifiedTask;
+		
+		long lineNumber = 1L;
+		while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
+			
+			originalTask = iteratorOriginal.next();
+			modifiedTask = iteratorModified.next();
+			
+			if( !originalTask.equals(modifiedTask) ){
+				
+				return lineNumber;
+			}
+			
+			++lineNumber;
+		}
+		
+		if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
+			
+			return lineNumber;
+			
+		} else {
+			
+			return 0L;
+		}
+	}
+	
     private void prepareCommandTextField(){
         
         // Adding command text field
@@ -147,23 +205,42 @@ public class UserInterface extends JFrame {
             public void focusGained(FocusEvent e) {
                 
                 command.setForeground( new Color( 0,0,0 ) );
-                command.setText("");
+                
+                if( isMessageDisplayed ){
+                	
+                	command.setText("");
+                	
+                	isMessageDisplayed = false;
+                	
+                } else{
+                	
+                	command.setText(command.getText());
+                }
             }
 
             @Override
             public void focusLost(FocusEvent e) {
                 
-                command.setForeground(new Color( 128,128,128 ));
+                command.setForeground( new Color( 128,128,128 ) );
                 
-                if( !command.getText().equals("Invalid Command") ){
+                String input = command.getText();
+                
+                if( !isMessageDisplayed || input.length() <= 0 ){
                     
                     command.setText("Enter commands here");
+                    
+                    isMessageDisplayed = true;
+                    
+                } else{
+                	
+                	command.setText(input);
                 }
             }
         });
         
         command.addKeyListener(new KeyListener(){
                     
+        	@Override
             public void keyPressed( KeyEvent e ){
                 
                 if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
@@ -174,47 +251,125 @@ public class UserInterface extends JFrame {
                     } 
                     
                 } else if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-                        
-                    try{
-                        
-                        String input = command.getText();
-                        
-                        if( input.equalsIgnoreCase("clear") ){
-                            
-                            display.setCaretPosition(0);
-                            
-                            display.setText(null);
-                            
-                            command.setCaretPosition(0);
+                       
+                    String input = command.getText();
+                    
+                    TaskList tempTaskList;
+                    
+                    long newTaskNumber;
+                    
+                    if( input.length() > 0 ){
+                    
+                    	planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
+                    	
+                    	tempTaskList = Engine.getAllTasks();
+                    	
+                    	switch( commandType ){
+                    	
+                    		case ADD:
+                    			
+                    			if( tempTaskList.size() > currentList.size() ){
 
-                            command.setText(null);
-                            
-                        } else if( input.length() > 0 ){
-                        
-                            StyledDocument doc = display.getStyledDocument();
+                    				newTaskNumber = compareList( currentList, tempTaskList );
+                    				
+                    				if( newTaskNumber > 0 ){
+                    					
+                    					command.setText( "Task added successfully" );
+                    					
+                    					currentList.copyTaskList(tempTaskList);
+                        				
+                    					displayPane.clearDisplay();
+                    					
+                        				displayPane.addTasksToDisplay(currentList);
+                        				
+                        				displayPane.selectTask(newTaskNumber);
+                        				
+                    				} else{
+                    					
+                    					command.setText( "Unknown internal error" );
+                    				}
 
-                            doc.insertString(doc.getLength(), input + "\n", null );
-
-                            command.setCaretPosition(0);
-
-                            command.setText("");
-                            
-                        } else{
-                            
-                            command.setText( "Invalid Command" );
-                            
-                            display.requestFocus();
-                        }
+                    			} else{
+                    				
+                    				command.setText( "Failed to add task" );
+                    			}
+                    			
+                    			break;
+                    			
+                    		case UPDATE:
+                    			
+                    			newTaskNumber = compareList( currentList, tempTaskList );
+                    			
+                    			System.out.printf( "newTaskNumber = " + newTaskNumber + "\n" );
+                    			
+                    			if( newTaskNumber >= 0 ){
+                    				
+                    				command.setText( "Task " + newTaskNumber + " updated successfully" );
+                    				
+                    				currentList.copyTaskList(tempTaskList);
+                    				
+                    				displayPane.clearDisplay();
+                    				
+                    				displayPane.addTasksToDisplay(currentList);
+                    				
+                    				displayPane.selectTask(1);
+                    				
+                    			} else{
+                    				
+                    				command.setText( "Failed to update task" );
+                    			}
+                    			
+                    			break;
+                    			
+                    		case DELETE:
+                    			
+                    			newTaskNumber = compareList( currentList, tempTaskList );
+                    			
+                    			if( newTaskNumber > 0 ){
+                    				
+                    				command.setText( "Task deleted successfully" );
+                    				
+                    				currentList.copyTaskList(tempTaskList);
+                    				
+                    				displayPane.clearDisplay();
+                    				
+                    				displayPane.addTasksToDisplay(currentList);
+                    				
+                    			} else{
+                    				
+                    				command.setText( "Failed to delete task" );
+                    			}
+                    			
+                    			break;
+                    			
+                    		case INVALID:
+                    			
+                    			command.setText( "Invalid Command" );
+                    			
+                    			break;
+                    			
+                    		default:
+                    			
+                    			command.setText( "Feature not supported in V0.1" );
+                    			
+                    			break;
+                    	}
+                    	
+                    	displayPane.requestFocus();
+                    	
+                    	isMessageDisplayed = true;
+                    	
+                    } else{
                         
-                    } catch( BadLocationException badLocationException ){
-                        
-                        command.setText( "Bad insert position :(" );
+                    	e.consume();
                     }
                 }
             }
     
+        	@Override
             public void keyTyped(KeyEvent e) {}
     
+        	@Override
             public void keyReleased(KeyEvent e) {}
             
         });
@@ -245,7 +400,7 @@ public class UserInterface extends JFrame {
 
     private void prepareCloseButton(){
         
-        closeButton = new JLabel("");
+        closeButton = new JLabel();
         closeButton.setBounds(744, 13, 27, 27);
         contentPane.add(closeButton);
         
@@ -258,6 +413,8 @@ public class UserInterface extends JFrame {
                 
                 if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
                     
+                	Engine.exit();
+                	
                     System.exit(0);
                 }
             }
@@ -282,7 +439,7 @@ public class UserInterface extends JFrame {
 
     private void prepareMinimiseButton(){
         
-        minimiseButton = new JLabel("");
+        minimiseButton = new JLabel();
         minimiseButton.setBounds(707, 12, 28, 28);
         contentPane.add(minimiseButton);
         
@@ -320,7 +477,7 @@ public class UserInterface extends JFrame {
 
     private void prepareDragPanel(){
         
-        dragPanel = new JLabel("");
+        dragPanel = new JLabel();
         dragPanel.setBounds(0, 0, 780, 490);
         contentPane.add(dragPanel);
         

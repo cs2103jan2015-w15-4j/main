@@ -272,9 +272,11 @@ public class DisplayPane extends JScrollPane{
 			
 			currentTaskBar = new TaskBar();
 			
+
 			//setTaskBarParameters( currentTaskBar, currentTask, count + 1 );
 			
 			setTaskBarParameters( currentTaskBar, currentTask, currentTask.getID() );
+
 			
 			currentTaskBar.setPosition( display.getCaretPosition() );
 			
