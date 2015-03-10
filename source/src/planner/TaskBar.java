@@ -204,7 +204,7 @@ public class TaskBar extends JComponent {
 	private void prepareTaskCheckBox(){
 		
 		taskCheckBox = new JLabel();
-		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/NotDoneCheckBox.png")));
+		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/NotDoneCheckBox.png")));
 		taskCheckBox.setFocusable(false);
 		taskCheckBox.setBounds(460, 18, 35, 35);
 		add(taskCheckBox);
@@ -212,17 +212,17 @@ public class TaskBar extends JComponent {
 	
 	public void setTaskDone(){
 		
-		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/DoneCheckBox.png")));
+		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/DoneCheckBox.png")));
 	}
 	
 	public void setTaskNotDone(){
 		
-		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/NotDoneCheckBox.png")));
+		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/NotDoneCheckBox.png")));
 	}
 	
 	public void setTaskHalfDone(){
 		
-		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/HalfDoneCheckBox.png")));
+		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/HalfDoneCheckBox.png")));
 	}
 	
 	// Title label functions
@@ -269,7 +269,7 @@ public class TaskBar extends JComponent {
 		
 		taskBarBackground = new JLabel();
 		taskBarBackground.setBackground(Color.WHITE);
-		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/TaskBar.png")));
+		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TaskBar.png")));
 		taskBarBackground.setFocusable(false);
 		taskBarBackground.setBounds( componentCoordinates.left, componentCoordinates.top, m_width, m_height );
 		add(taskBarBackground);
@@ -277,11 +277,11 @@ public class TaskBar extends JComponent {
 	
 	public void setFocusedTaskBar(){
 		
-		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/TaskBarActivated.png")));
+		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TaskBarActivated.png")));
 	}
 	
 	public void setUnfocusedTaskBar(){
 		
-		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/TestComponents/TaskBar.png")));
+		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TaskBar.png")));
 	}
 }

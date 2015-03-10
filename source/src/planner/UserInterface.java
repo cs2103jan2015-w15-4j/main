@@ -119,7 +119,7 @@ public class UserInterface extends JFrame {
     private void prepareSectionTitleLine(){
     	
     	sectionTitleLine = new JLabel();
-    	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/TestComponents/titleLine.png")));
+    	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
     	sectionTitleLine.setBounds(40, 60, 539, 33);
     	contentPane.add(sectionTitleLine);
     }
@@ -128,7 +128,7 @@ public class UserInterface extends JFrame {
         
         // Adding UI background
         JLabel background = new JLabel();
-        background.setIcon(new ImageIcon(UserInterface.class.getResource("/TestComponents/UI_Pic.png")));
+        background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
         background.setBounds(0, 0, 781, 494);
         contentPane.add(background);
     }
