@@ -260,7 +260,7 @@ public class UserInterface extends JFrame {
                     
                     if( input.length() > 0 ){
                     
-                    	TestComponents.Constants.COMMAND_TYPE commandType = Engine.process(input);
+                    	planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
                     	
                     	tempTaskList = Engine.getAllTasks();
                     	
