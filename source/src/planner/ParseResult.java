@@ -37,13 +37,19 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-    public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
+    @SuppressWarnings("deprecation")
+	public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
                        Date date, Date dateToRemind, int priorityLevel, long id,
                        String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
         this.resultType = resultType;
         this.commandType = commandType;
-        this.parsedDate = date;
+        
+        this.parsedDate = new Date();
+        this.parsedDate.setDate( date == null ? 21 : date.getDate() );
+        this.parsedDate.setMonth(date == null ? 5 : date.getMonth());
+        this.parsedDate.setYear( date == null ? 2013 :date.getYear() );
+        
         this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;
         this.taskId = id;

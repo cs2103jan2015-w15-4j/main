@@ -1,5 +1,7 @@
 package planner;
 
+import java.io.File;
+
 public class Engine {
     private static Configuration config;
     private static TaskList allTasks;
@@ -8,11 +10,20 @@ public class Engine {
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
     
+    private static long id = 0;
+    
     //Not tested yet
     public static boolean init() {
         try {
-            config = Storage.readConfig();
-            allTasks = Storage.readTaskStorage(config.getStoragePath());
+        	
+            //config = Storage.readConfig();
+            //allTasks = Storage.readTaskStorage(config.getStoragePath());
+        	allTasks = new TaskList();
+        	doneTasks = new TaskList();
+        	undoneTasks = new TaskList();
+        	tentativeTasks = new TaskList();
+        	normalTasks = new TaskList();
+        	
             refreshLists();
             return true;
         } catch(Exception e) {
@@ -23,8 +34,8 @@ public class Engine {
     //Not tested yet
     public static boolean exit() {
         try {
-            Storage.saveConfiguration(config);
-            Storage.saveTaskList(config.getStoragePath(), allTasks);
+            //Storage.saveConfiguration(config);
+            //Storage.saveTaskList(config.getStoragePath(), allTasks);
             return true;
         } catch(Exception e) {
             return false;
@@ -33,22 +44,33 @@ public class Engine {
     
     //Not tested yet
     private static void refreshLists() {
+    	
+    	
         doneTasks.clear();
         undoneTasks.clear();
         normalTasks.clear();
         tentativeTasks.clear();
+        
+        
+        
         Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
         Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
     }
     
     //Not tested yet
     public static Constants.COMMAND_TYPE process(String userInput) {
+    	
+    	if(userInput == null){
+    		
+    		return Constants.COMMAND_TYPE.INVALID;
+    	}
+    	
         ParseResult result = Parser.parse(userInput);
         Constants.COMMAND_TYPE command = result.getCommandType();
         long ID;
         switch (command) {
             case ADD:
-                Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.newTaskNumber());
+                Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), id++);
                 allTasks.add(newTask);
                 refreshLists();
                 return Constants.COMMAND_TYPE.ADD;
@@ -57,7 +79,7 @@ public class Engine {
                 ID = result.getId();
                 Task toBeUpdated = allTasks.getTaskByID(ID);
                 if(flags[0]) {
-                    toBeUpdated.setDueDate(result.getDate());
+                	toBeUpdated.setDueDate(result.getDate());
                 }
                 if(flags[2]) {
                     toBeUpdated.setPriority(result.getPriorityLevel());

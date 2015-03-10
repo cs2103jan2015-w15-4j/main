@@ -26,6 +26,9 @@ public class Storage {
             result = new Configuration(path);
             return result;
         } catch (Exception e) {
+        	
+        	
+        	
             return result;
         }
     }

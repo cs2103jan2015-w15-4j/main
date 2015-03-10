@@ -12,6 +12,7 @@ import java.util.ListIterator;
  *
  */
 public class TaskList implements List<Task>{
+	
     private ArrayList<Task> tasks;
     
     public TaskList() {
@@ -19,7 +20,43 @@ public class TaskList implements List<Task>{
     }
     
     public TaskList(ArrayList<Task> input) {
-        tasks = input;
+        
+    	if( input != null ){
+    		
+    		tasks = input;
+    		
+    	} else{
+    		
+    		tasks = new ArrayList<Task>();
+    	}
+    }
+    
+    public TaskList( TaskList anotherTaskList ){
+    	
+    	tasks = new ArrayList<Task>();
+    	
+    	copyTaskList( anotherTaskList );
+    }
+    
+    public boolean copyTaskList( TaskList anotherTaskList ){
+    	
+    	if( anotherTaskList != null ){
+    		
+    		tasks.clear();
+    		
+    		Iterator<Task> iterator = anotherTaskList.iterator();
+    		
+    		while( iterator.hasNext() ){
+    			
+    			tasks.add(iterator.next());
+    		}
+    		
+    		return true;
+    		
+    	} else{
+    		
+    		return false;
+    	}
     }
     
     public ArrayList<Task> getTasks() {
@@ -34,6 +71,7 @@ public class TaskList implements List<Task>{
         }
         return null;
     }
+    
     @Override
     public int size() {
         return tasks.size();
