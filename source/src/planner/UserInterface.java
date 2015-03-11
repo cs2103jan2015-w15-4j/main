@@ -342,9 +342,9 @@ public class UserInterface extends JFrame {
                     			}
                     			
                     			break;
-                    		//ADDED CODE HERE
+                    			
+                    	    //ADDED CODE HERE
                             case DONE:
-                                newTaskNumber = compareList( currentList, tempTaskList );
                                     
                                 command.setText( "Task completed successfully" );
                                     
