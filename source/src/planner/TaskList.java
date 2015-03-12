@@ -1,6 +1,7 @@
 package planner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,13 +22,28 @@ public class TaskList implements List<Task>{
     
     public TaskList(ArrayList<Task> input) {
         
+        tasks = new ArrayList<Task>();
+        
+        // Changed to defensive copy
     	if( input != null ){
     		
-    		tasks = input;
-    		
-    	} else{
-    		
-    		tasks = new ArrayList<Task>();
+    	    Iterator<Task> iterator = input.iterator();
+    	    Task currentTask;
+    	    
+    	    while( iterator.hasNext() ){
+    	        
+    	        currentTask = iterator.next();
+    	        
+    	        if( currentTask != null ){
+    	            
+    	            input.add( new Task( currentTask.getName(), 
+                                         currentTask.getDescription(), 
+                                         currentTask.getDueDate(),
+                                         currentTask.getPriority(),
+                                         currentTask.getTag(),
+                                         currentTask.getID()));
+    	        }
+    	    }
     	}
     }
     
@@ -46,9 +62,23 @@ public class TaskList implements List<Task>{
     		
     		Iterator<Task> iterator = anotherTaskList.iterator();
     		
+    		Task tempTask;
+    		
     		while( iterator.hasNext() ){
     			
-    			tasks.add(iterator.next());
+    		    tempTask = iterator.next();
+    		    
+    		    // Corner case: NULL is inserted into anotherTaskList
+    		    // Changed adding tasks to defensive copy
+    		    if( tempTask != null ){
+    		        
+    		        tasks.add(new Task( tempTask.getName(), 
+    		                            tempTask.getDescription(), 
+    		                            tempTask.getDueDate(), 
+    		                            tempTask.getPriority(), 
+    		                            tempTask.getTag(), 
+    		                            tempTask.getID() ));
+    		    }
     		}
     		
     		return true;
