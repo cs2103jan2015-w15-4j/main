@@ -234,11 +234,13 @@ public class DisplayPane extends JScrollPane{
 		
 		long taskBarID = listOfTasks.size();
 		
-		appendString(" ");
+		//appendString(" ");
 		
 		TaskBar taskBar = new TaskBar();
 		
-		setTaskBarParameters( taskBar, task, taskBarID + 1 );
+		//setTaskBarParameters( taskBar, task, taskBarID + 1 );
+		
+		setTaskBarParameters( taskBar, task, task.getID() );
 		
 		taskBar.setPosition( display.getCaretPosition() );
 		
@@ -266,7 +268,7 @@ public class DisplayPane extends JScrollPane{
 		long count = 0;
 		while( iterator.hasNext() ){
 			
-			appendString(" ");
+			//appendString(" ");
 			
 			currentTask = iterator.next();
 			
