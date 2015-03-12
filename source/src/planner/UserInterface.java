@@ -108,7 +108,7 @@ public class UserInterface extends JFrame {
     private void prepareSectionTitle(){
     	
     	sectionTitle = new JLabel();
-    	sectionTitle.setBounds(40, 60, 539, 33);
+    	sectionTitle.setBounds(6, 36, 381, 33);
     	sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
     	sectionTitle.setForeground( new Color( 255,255,255,200 ) );
     	sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -120,7 +120,7 @@ public class UserInterface extends JFrame {
     	
     	sectionTitleLine = new JLabel();
     	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
-    	sectionTitleLine.setBounds(40, 60, 539, 33);
+    	sectionTitleLine.setBounds(-142, 35, 539, 33);
     	contentPane.add(sectionTitleLine);
     }
     
@@ -136,7 +136,7 @@ public class UserInterface extends JFrame {
 	private void prepareDisplay(){
         
     	displayPane = new DisplayPane();
-        displayPane.setBounds(40, 99, 539, 307);
+        displayPane.setBounds(25, 83, 548, 337);
         contentPane.add(displayPane);
         
         // Copying of all tasks
@@ -166,8 +166,9 @@ public class UserInterface extends JFrame {
 			modifiedTask = iteratorModified.next();
 			
 			if( !originalTask.equals(modifiedTask) ){
-				
+			    
 				return lineNumber;
+				
 			}
 			
 			++lineNumber;
@@ -187,7 +188,7 @@ public class UserInterface extends JFrame {
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(40, 433, 539, 33);
+        command.setBounds(30, 433, 539, 33);
         contentPane.add(command);
         command.setColumns(10);
         
@@ -259,7 +260,7 @@ public class UserInterface extends JFrame {
                     long newTaskNumber;
                     
                     if( input.length() > 0 ){
-                    
+                        
                     	planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
                     	
                     	tempTaskList = Engine.getAllTasks();
@@ -268,11 +269,8 @@ public class UserInterface extends JFrame {
                     	
                     		case ADD:
                     			
-                    			if( tempTaskList.size() > currentList.size() ){
-
-                    				newTaskNumber = compareList( currentList, tempTaskList );
-                    				
-                    				if( newTaskNumber > 0 ){
+                    			if( tempTaskList.size() > currentList.size() &&
+                    			    (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
                     					
                     					command.setText( "Task added successfully" );
                     					
@@ -284,26 +282,21 @@ public class UserInterface extends JFrame {
                         				
                         				displayPane.selectTask(newTaskNumber);
                         				
-                    				} else{
-                    					
-                    					command.setText( "Unknown internal error" );
-                    				}
-
-                    			} else{
-                    				
-                    				command.setText( "Failed to add task" );
-                    			}
+                				} else{
+                					
+                				    command.setText( "Failed to add task" );
+                				}
                     			
                     			break;
                     			
                     		case UPDATE:
-                    			
+                    		    
                     			newTaskNumber = compareList( currentList, tempTaskList );
                     			
-                    			System.out.printf( "newTaskNumber = " + newTaskNumber + "\n" );
-                    			
-                    			//CHANGED CONDITIONAL FROM newTaskNumber >= 0  to true
-                    			if( true ){
+                    			// changed back to newTaskNumber > 0 after fixing bug that caused data of a task in both taskList 
+                    			// (currentList and tempTaskList) to change even though the program was only changing data of the task 
+                    			// in only one taskList (tempTaskList)
+                    			if( newTaskNumber > 0 ){
                     				
                     				command.setText( "Task updated successfully" );
                     				
@@ -313,20 +306,19 @@ public class UserInterface extends JFrame {
                     				
                     				displayPane.addTasksToDisplay(currentList);
                     				
-                    				displayPane.selectTask(1);
+                    				displayPane.selectTask(newTaskNumber);
                     				
                     			} else{
-                    				
-                    				command.setText( "Failed to update task" );
+                    			    
+                    			    command.setText( "Failed to update task" );
                     			}
                     			
                     			break;
                     			
                     		case DELETE:
                     			
-                    			newTaskNumber = compareList( currentList, tempTaskList );
-                    			
-                    			if( newTaskNumber > 0 ){
+                    			if( tempTaskList.size() < currentList.size() &&
+                    			    (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
                     				
                     				command.setText( "Task deleted successfully" );
                     				
@@ -335,6 +327,8 @@ public class UserInterface extends JFrame {
                     				displayPane.clearDisplay();
                     				
                     				displayPane.addTasksToDisplay(currentList);
+                    				
+                    				displayPane.selectTask( newTaskNumber - 1 );
                     				
                     			} else{
                     				
@@ -393,7 +387,7 @@ public class UserInterface extends JFrame {
     private void prepareTentativeDisplay(){
         
         tentativeDisplayScrollPane = new JScrollPane();
-        tentativeDisplayScrollPane.setBounds(601, 99, 152, 364);
+        tentativeDisplayScrollPane.setBounds(601, 83, 179, 330);
         contentPane.add(tentativeDisplayScrollPane);
         
         tentativeDisplay = new JTextPane();
