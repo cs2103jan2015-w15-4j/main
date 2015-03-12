@@ -1,5 +1,6 @@
 package planner;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
@@ -15,7 +16,8 @@ public class ParseResult {
 
     private final int NO_PRIORITY_LEVEL = 0;
     private final int NO_ID_SET = 0;
-
+    private final int COMMAND_FLAGS_MAX_SIZE = 7;
+    
     private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = null;
@@ -37,27 +39,48 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-    @SuppressWarnings("deprecation")
+   
 	public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
                        Date date, Date dateToRemind, int priorityLevel, long id,
                        String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
+        
         this.resultType = resultType;
         this.commandType = commandType;
         
-        this.parsedDate = new Date();
-        this.parsedDate.setDate( date == null ? 21 : date.getDate() );
-        this.parsedDate.setMonth(date == null ? 5 : date.getMonth());
-        this.parsedDate.setYear( date == null ? 2013 :date.getYear() );
+        if( date != null ){
+            
+            this.parsedDate = new Date(date.getTime());            // Changed to defensive copy
+            
+        } else{
+            
+            this.parsedDate = null;
+        }
         
-        this.dateToRemind = dateToRemind;
+        if( dateToRemind != null ){
+            
+            this.dateToRemind = new Date(dateToRemind.getTime());  // Changed to defensive copy
+            
+        } else{
+            
+            this.dateToRemind = null;
+        }
+        
         this.priorityLevel = priorityLevel;
         this.taskId = id;
         this.taskName = name;
         this.taskDescription = description;
         this.taskTag = tag;
         this.errorMessage = errorMessage;
-        this.commandFlags = flags;
+        
+        if( flags != null ){
+            
+            this.commandFlags = Arrays.copyOf( flags, flags.length );   // changed to defensive copy
+            
+        } else{
+            
+            this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
+        }
     }
 
     public RESULT_TYPE getResultType() {
@@ -69,11 +92,13 @@ public class ParseResult {
     }
 
     public Date getDate() {
-        return parsedDate;
+        
+        return parsedDate != null ? new Date(parsedDate.getTime()) : null;    // Changed to defensive copy
     }
     
     public Date getDateToRemind() {
-        return dateToRemind;
+        
+        return dateToRemind != null ? new Date(dateToRemind.getTime()) : null;    // Changed to defensive copy
     }
 
     public int getPriorityLevel() {
@@ -101,6 +126,7 @@ public class ParseResult {
     }
 
     public boolean[] getCommandFlags() {
-        return commandFlags;
+        
+        return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];    // Changed to defensive copy
     }
 }
