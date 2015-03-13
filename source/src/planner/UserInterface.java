@@ -187,7 +187,7 @@ public class UserInterface extends JFrame {
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(32, 433, 532, 33);
+        command.setBounds(34, 432, 531, 33);
         contentPane.add(command);
         command.setColumns(10);
         
