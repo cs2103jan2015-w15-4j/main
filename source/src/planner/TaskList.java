@@ -36,12 +36,7 @@ public class TaskList implements List<Task>{
     	        
     	        if( currentTask != null ){
     	            
-    	            input.add( new Task( currentTask.getName(), 
-                                         currentTask.getDescription(), 
-                                         currentTask.getDueDate(),
-                                         currentTask.getPriority(),
-                                         currentTask.getTag(),
-                                         currentTask.getID()));
+    	            input.add( new Task( currentTask ) );
     	        }
     	    }
     	}
@@ -72,12 +67,7 @@ public class TaskList implements List<Task>{
     		    // Changed adding tasks to defensive copy
     		    if( tempTask != null ){
     		        
-    		        tasks.add(new Task( tempTask.getName(), 
-    		                            tempTask.getDescription(), 
-    		                            tempTask.getDueDate(), 
-    		                            tempTask.getPriority(), 
-    		                            tempTask.getTag(), 
-    		                            tempTask.getID() ));
+    		        tasks.add(new Task(tempTask));
     		    }
     		}
     		
