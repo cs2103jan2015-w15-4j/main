@@ -225,7 +225,7 @@ public class UserInterface extends JFrame {
                 
                 String input = command.getText();
                 
-                if( !isMessageDisplayed || input.length() <= 0 ){
+                if( !isMessageDisplayed && input.length() <= 0 ){
                     
                     command.setText("Enter commands here");
                     
