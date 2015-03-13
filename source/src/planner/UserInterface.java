@@ -408,6 +408,7 @@ public class UserInterface extends JFrame {
 
         tentativeDisplay.setBorder(null);
         tentativeDisplay.setOpaque(false);
+        tentativeDisplay.setFocusable(false);
         
         tentativeDisplay.setEditable(false);
         
