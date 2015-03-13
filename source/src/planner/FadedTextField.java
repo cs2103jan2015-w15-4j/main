@@ -46,6 +46,53 @@ public class FadedTextField extends JTextField{
 		setOpaque( false );
 	}
 	
+	private int locateSuitableMaxStringLength( String str, FontMetrics fontMetrics ){
+	    
+	    if( str == null || fontMetrics == null ){
+	        
+	        return 0;
+	    }
+	    
+	    String currString = str;
+	    
+	    int currStringWidth = fontMetrics.stringWidth(currString);
+	    int fieldWidth = getWidth();
+	    
+	    if( currStringWidth <= fieldWidth ){
+	        
+	        return m_MaxCharacters;
+	    }
+	    
+	    int startIdx = 0;
+	    int endIdx = str.length()-1;
+	    int midIdx;
+	    fieldWidth -= fontMetrics.stringWidth("...");
+	    
+	    while( startIdx <= endIdx ){
+	        
+	        midIdx = (startIdx + endIdx)/2;
+	        
+	        currString = str.substring(0, midIdx+1);
+	        
+	        currStringWidth = fontMetrics.stringWidth(currString);
+	        
+	        if( currStringWidth == fieldWidth ){
+	            
+	            return currString.length();
+	            
+	        } else if( currStringWidth < fieldWidth ){
+	            
+	            startIdx = midIdx + 1;
+	            
+	        } else{
+	            
+	            endIdx = midIdx - 1;
+	        }
+	    }
+	    
+	    return endIdx + 1;
+	}
+	
 	@Override
 	public void paintComponent( Graphics graphics ) {
 		
@@ -60,39 +107,42 @@ public class FadedTextField extends JTextField{
 		
 		try{
 		
+		    FontMetrics fontMetrics = graphics.getFontMetrics();
+		    
+		    int tempMaxCharacters = Math.min( m_MaxCharacters, locateSuitableMaxStringLength( inputString, fontMetrics ) );
+		    int tempNumCharactersBeforeFade = Math.max( 0, m_NumCharactersBeforeFade-(m_MaxCharacters-tempMaxCharacters) );
+		    
 			int offsetForText = viewToModel( new Point( componentCoordinates.left, componentCoordinates.top ) );
-			inputString = inputString.substring(offsetForText, Math.min(stringLength, m_MaxCharacters));
+			inputString = inputString.substring(offsetForText, Math.min(stringLength, tempMaxCharacters));
 			
-			int tempMaxCharacters = m_MaxCharacters;
-			
-			if( stringLength > m_MaxCharacters ){
+			if( stringLength > tempMaxCharacters ){
 				
 				inputString += "...";
 				stringLength = inputString.length();
 				tempMaxCharacters += 3;
 			}
 			
-			FontMetrics fontMetrics = graphics.getFontMetrics();
-			
 			// Values obtained in this line is via testing
-			int textWidth = fontMetrics.stringWidth(inputString)+30;
+			//int textWidth = fontMetrics.stringWidth(inputString)+30;
+			int textWidth = fontMetrics.stringWidth("ZZZZ") - fontMetrics.stringWidth("ZZZ") + 30 ;
 			
 			int offsetToPaint = componentCoordinates.left;
 			int heightOfText = fontMetrics.getAscent() + componentCoordinates.top;
 			
-			GradientPaint paintForText = new GradientPaint( offsetToPaint, 0, m_FromColor, offsetToPaint + textWidth, 0, m_ToColor );
+			//GradientPaint paintForText = new GradientPaint( offsetToPaint, 0, m_FromColor, offsetToPaint + textWidth, 0, m_ToColor, true );
+			GradientPaint paintForText = new GradientPaint( offsetToPaint, 0, m_ToColor, offsetToPaint + textWidth, 0, m_FromColor, true );
 			
 			Graphics2D textGraphics = (Graphics2D) graphics;
 		
-			String nStr = inputString.substring( offsetToPaint, Math.min( stringLength, m_NumCharactersBeforeFade ) );
+			String nStr = inputString.substring( offsetToPaint, Math.min( stringLength, tempNumCharactersBeforeFade ) );
 			
 			textGraphics.setPaint( m_FromColor );
 			
 			textGraphics.drawString( nStr, offsetToPaint, heightOfText );
 			
-			if( stringLength > m_NumCharactersBeforeFade ){
+			if( stringLength > tempNumCharactersBeforeFade ){
 				
-				String sStr = inputString.substring( offsetForText + m_NumCharactersBeforeFade, Math.min(tempMaxCharacters, stringLength) );
+				String sStr = inputString.substring( offsetForText + tempNumCharactersBeforeFade, Math.min(tempMaxCharacters, stringLength) );
 				
 				textGraphics.setPaint(paintForText);
 				
