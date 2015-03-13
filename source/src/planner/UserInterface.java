@@ -85,7 +85,7 @@ public class UserInterface extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Adding paintable component to main frame
-        setBounds(100, 100, 781, 494);
+        setBounds(100, 100, 781, 493);
         contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(null);
@@ -129,14 +129,14 @@ public class UserInterface extends JFrame {
         // Adding UI background
         JLabel background = new JLabel();
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
-        background.setBounds(0, 0, 781, 494);
+        background.setBounds(0, -1, 781, 494);
         contentPane.add(background);
     }
     
 	private void prepareDisplay(){
         
     	displayPane = new DisplayPane();
-        displayPane.setBounds(25, 83, 548, 337);
+        displayPane.setBounds(25, 83, 548, 334);
         contentPane.add(displayPane);
         
         // Copying of all tasks
@@ -166,9 +166,8 @@ public class UserInterface extends JFrame {
 			modifiedTask = iteratorModified.next();
 			
 			if( !originalTask.equals(modifiedTask) ){
-			    
+
 				return lineNumber;
-				
 			}
 			
 			++lineNumber;
@@ -188,7 +187,7 @@ public class UserInterface extends JFrame {
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(30, 433, 539, 33);
+        command.setBounds(32, 433, 532, 33);
         contentPane.add(command);
         command.setColumns(10);
         
@@ -282,6 +281,8 @@ public class UserInterface extends JFrame {
                         				
                         				displayPane.selectTask(newTaskNumber);
                         				
+                        				System.out.println( "line added = " + newTaskNumber );
+                        				
                 				} else{
                 					
                 				    command.setText( "Failed to add task" );
@@ -340,13 +341,22 @@ public class UserInterface extends JFrame {
                     	    //ADDED CODE HERE
                             case DONE:
                                     
-                                command.setText( "Task completed successfully" );
+                                if( (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
                                     
-                                currentList.copyTaskList(tempTaskList);
+                                    command.setText( "Task marked done successfully" );
                                     
-                                displayPane.clearDisplay();
+                                    currentList.copyTaskList(tempTaskList);
+                                        
+                                    displayPane.clearDisplay();
+                                        
+                                    displayPane.addTasksToDisplay(currentList);
                                     
-                                displayPane.addTasksToDisplay(currentList);
+                                    displayPane.selectTask( newTaskNumber );
+                                    
+                                } else{
+                                    
+                                    command.setText( "Fail to mark task as done" );
+                                }
                                 
                                 break;
                             //END OF ADDED CODE
@@ -487,7 +497,7 @@ public class UserInterface extends JFrame {
     private void prepareDragPanel(){
         
         dragPanel = new JLabel();
-        dragPanel.setBounds(0, 0, 780, 490);
+        dragPanel.setBounds(0, 0, 781, 493);
         contentPane.add(dragPanel);
         
         dragPanel.addMouseMotionListener( new MouseMotionListener(){ 
