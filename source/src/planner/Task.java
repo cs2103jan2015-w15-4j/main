@@ -24,7 +24,7 @@ public class Task {
     * A string tag on a task.
     * @throws IllegalArgumentException
     */
-    public Task(String name, String description, Date dueDate, int priority, String tag, long id) throws IllegalArgumentException {
+    public Task(String name, String description, Date dueDate, int priority, String tag, long id ) throws IllegalArgumentException {
         
         ID = id;
         
@@ -52,6 +52,55 @@ public class Task {
         
         taskPriority = priority;
         taskCompleted = false;
+    }
+    
+    public Task( Task anotherTask ) throws IllegalArgumentException {
+        
+        if( anotherTask != null ){
+            
+            ID = anotherTask.getID();
+            
+            if(anotherTask.getName().equals("")) {
+                
+                throw new IllegalArgumentException("Task name cannot be empty!");
+            }
+            
+            taskName = anotherTask.getName();
+            
+            taskDescription = anotherTask.getDescription();
+            
+            taskTag = anotherTask.getTag();
+            
+            dateCreated = new Date(anotherTask.getCreatedDate().getTime());
+            
+            //Tests needed for null date
+            if(anotherTask.getDueDate() != null) {
+                
+                dateDue = new Date(anotherTask.getDueDate().getTime());     // Changed to defensive copy
+                taskFloating = false;
+                
+            } else {
+                
+                dateDue = null;
+                taskFloating = true;
+            }
+            
+            taskPriority = anotherTask.getPriority();
+            
+            taskCompleted = anotherTask.isDone();
+            
+        } else{
+            
+            ID = 0;
+            taskName = "Insert task Name here";
+            taskDescription = "Insert task description here";
+            taskTag = "";
+            dateCreated = new Date( System.currentTimeMillis() );
+            dateDue = null;
+            taskFloating = true;
+            taskPriority = 0;
+            taskCompleted = false;
+        }
     }
     
     public String getName() {
