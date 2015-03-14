@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.util.Iterator;
 
@@ -22,10 +23,170 @@ import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.event.MouseInputAdapter;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
 
+    ///////////////////////////////////////////////////////////////////// 
+    //  PROCESS COMMANDS FUNCTIONS START HERE
+    ///////////////////////////////////////////////////////////////////// 
+    public void processCommand( String input ){
+        
+        planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
+        
+        TaskList tempTaskList = Engine.getAllTasks();
+        
+        switch( commandType ){
+        
+            case ADD:
+                
+                handleAddOperation(tempTaskList);
+                
+                break;
+                
+            case UPDATE:
+                
+                handleUpdateOperation(tempTaskList);
+                
+                break;
+                
+            case DELETE:
+                
+                handleDeleteOperation(tempTaskList);
+                
+                break;
+                
+            case DONE:
+                    
+                handleDoneOperation(tempTaskList);
+                
+                break;
+                
+            case INVALID:
+                
+                handleInvalidOperation();
+                
+                break;
+                
+            default:
+                
+                handleUnexpectedOperation();
+            
+                break;
+        }
+    }
+    
+    private void handleAddOperation( TaskList newTaskList ){
+        
+        long newTaskNumber;
+        
+        if( newTaskList!= null && 
+            newTaskList.size() > currentList.size() &&
+            (newTaskNumber = compareList( currentList, newTaskList )) > 0 ){
+                
+                command.setText( "Task added successfully" );
+                
+                currentList.copyTaskList(newTaskList);
+                
+                displayPane.clearDisplay();
+                
+                displayPane.addTasksToDisplay(currentList);
+                
+                displayPane.selectTask(newTaskNumber);
+                
+                System.out.println( "line added = " + newTaskNumber );
+                
+        } else{
+            
+            command.setText( "Failed to add task" );
+        }
+    }
+    
+    private void handleUpdateOperation( TaskList newTaskList ){
+        
+        long newTaskNumber = compareList( currentList, newTaskList );
+        
+        // changed back to newTaskNumber > 0 after fixing bug that caused data of a task in both taskList 
+        // (currentList and tempTaskList) to change even though the program was only changing data of the task 
+        // in only one taskList (tempTaskList)
+        if( newTaskNumber > 0 ){
+            
+            command.setText( "Task updated successfully" );
+            
+            currentList.copyTaskList(newTaskList);
+            
+            displayPane.clearDisplay();
+            
+            displayPane.addTasksToDisplay(currentList);
+            
+            displayPane.selectTask(newTaskNumber);
+            
+        } else{
+            
+            command.setText( "Failed to update task" );
+        }
+    }
+    
+    private void handleDoneOperation( TaskList newTaskList ){
+        
+        long newTaskNumber = compareList( currentList, newTaskList );
+        
+        if( newTaskNumber > 0 ){
+            
+            command.setText( "Task marked done successfully" );
+            
+            currentList.copyTaskList(newTaskList);
+                
+            displayPane.clearDisplay();
+                
+            displayPane.addTasksToDisplay(currentList);
+            
+            displayPane.selectTask( newTaskNumber );
+            
+        } else{
+            
+            command.setText( "Fail to mark task as done" );
+        }
+    }
+    
+    private void handleDeleteOperation( TaskList newTaskList ){
+        
+        long newTaskNumber;
+        
+        if( newTaskList != null && 
+            newTaskList.size() < currentList.size() &&
+            (newTaskNumber = compareList( currentList, newTaskList )) > 0 ){
+            
+            command.setText( "Task deleted successfully" );
+            
+            currentList.copyTaskList(newTaskList);
+            
+            displayPane.clearDisplay();
+            
+            displayPane.addTasksToDisplay(currentList);
+            
+            displayPane.selectTask( newTaskNumber - 1 );
+            
+        } else{
+            
+            command.setText( "Failed to delete task" );
+        }
+    }
+    
+    private void handleInvalidOperation(){
+        
+        command.setText( "Invalid Command" );
+    }
+    
+    public void handleUnexpectedOperation(){
+        
+        command.setText( "Feature not supported in V0.1" );
+    }
+    ///////////////////////////////////////////////////////////////////// 
+    //  PROCESS COMMANDS FUNCTIONS END HERE
+    /////////////////////////////////////////////////////////////////////
+    
     private JPanel contentPane;
     
     private JTextField command;
@@ -101,7 +262,6 @@ public class UserInterface extends JFrame {
         prepareBackground();
         
         setUndecorated(true);
-        
         setLocationRelativeTo(null);
     }
     
@@ -198,200 +358,98 @@ public class UserInterface extends JFrame {
         command.setForeground(new Color( 128,128,128 ));
         command.setText("Enter commands here");
         
-        // Set up listeners for command text field
-        command.addFocusListener(new FocusListener(){
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                
-                command.setForeground( new Color( 0,0,0 ) );
-                
-                if( isMessageDisplayed ){
-                	
-                	command.setText("");
-                	
-                	isMessageDisplayed = false;
-                	
-                } else{
-                	
-                	command.setText(command.getText());
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                
-                command.setForeground( new Color( 128,128,128 ) );
-                
-                String input = command.getText();
-                
-                if( !isMessageDisplayed && input.length() <= 0 ){
-                    
-                    command.setText("Enter commands here");
-                    
-                    isMessageDisplayed = true;
-                    
-                } else{
-                	
-                	command.setText(input);
-                }
-            }
-        });
+        addFocusListenerToCommandTextField(command);
+        addKeyBindingsToCommandTextField(command);
+    }
+    
+    private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
         
-        command.addKeyListener(new KeyListener(){
-                    
-        	@Override
-            public void keyPressed( KeyEvent e ){
+        if( currentCommand != null ){
+            
+            currentCommand.addKeyListener(new KeyListener(){
                 
-                if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
+                @Override
+                public void keyPressed( KeyEvent e ){
                     
-                    if( command.getText().length() <= 0 ){
+                    if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
                         
-                        e.consume();
-                    } 
-                    
-                } else if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-                       
-                    String input = command.getText();
-                    
-                    TaskList tempTaskList;
-                    
-                    long newTaskNumber;
-                    
-                    if( input.length() > 0 ){
+                        if( command.getText().length() <= 0 ){
+                            
+                            e.consume();
+                        } 
                         
-                    	planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
-                    	
-                    	tempTaskList = Engine.getAllTasks();
-                    	
-                    	switch( commandType ){
-                    	
-                    		case ADD:
-                    			
-                    			if( tempTaskList.size() > currentList.size() &&
-                    			    (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
-                    					
-                    					command.setText( "Task added successfully" );
-                    					
-                    					currentList.copyTaskList(tempTaskList);
-                        				
-                    					displayPane.clearDisplay();
-                    					
-                        				displayPane.addTasksToDisplay(currentList);
-                        				
-                        				displayPane.selectTask(newTaskNumber);
-                        				
-                        				System.out.println( "line added = " + newTaskNumber );
-                        				
-                				} else{
-                					
-                				    command.setText( "Failed to add task" );
-                				}
-                    			
-                    			break;
-                    			
-                    		case UPDATE:
-                    		    
-                    			newTaskNumber = compareList( currentList, tempTaskList );
-                    			
-                    			// changed back to newTaskNumber > 0 after fixing bug that caused data of a task in both taskList 
-                    			// (currentList and tempTaskList) to change even though the program was only changing data of the task 
-                    			// in only one taskList (tempTaskList)
-                    			if( newTaskNumber > 0 ){
-                    				
-                    				command.setText( "Task updated successfully" );
-                    				
-                    				currentList.copyTaskList(tempTaskList);
-                    				
-                    				displayPane.clearDisplay();
-                    				
-                    				displayPane.addTasksToDisplay(currentList);
-                    				
-                    				displayPane.selectTask(newTaskNumber);
-                    				
-                    			} else{
-                    			    
-                    			    command.setText( "Failed to update task" );
-                    			}
-                    			
-                    			break;
-                    			
-                    		case DELETE:
-                    			
-                    			if( tempTaskList.size() < currentList.size() &&
-                    			    (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
-                    				
-                    				command.setText( "Task deleted successfully" );
-                    				
-                    				currentList.copyTaskList(tempTaskList);
-                    				
-                    				displayPane.clearDisplay();
-                    				
-                    				displayPane.addTasksToDisplay(currentList);
-                    				
-                    				displayPane.selectTask( newTaskNumber - 1 );
-                    				
-                    			} else{
-                    				
-                    				command.setText( "Failed to delete task" );
-                    			}
-                    			
-                    			break;
-                    			
-                    	    //ADDED CODE HERE
-                            case DONE:
-                                    
-                                if( (newTaskNumber = compareList( currentList, tempTaskList )) > 0 ){
-                                    
-                                    command.setText( "Task marked done successfully" );
-                                    
-                                    currentList.copyTaskList(tempTaskList);
-                                        
-                                    displayPane.clearDisplay();
-                                        
-                                    displayPane.addTasksToDisplay(currentList);
-                                    
-                                    displayPane.selectTask( newTaskNumber );
-                                    
-                                } else{
-                                    
-                                    command.setText( "Fail to mark task as done" );
-                                }
-                                
-                                break;
-                            //END OF ADDED CODE
-                                
-                    		case INVALID:
-                    			
-                    			command.setText( "Invalid Command" );
-                    			
-                    			break;
-                    			
-                    		default:
-                    			
-                    			command.setText( "Feature not supported in V0.1" );
-                    			
-                    			break;
-                    	}
-                    	
-                    	displayPane.requestFocus();
-                    	
-                    	isMessageDisplayed = true;
-                    	
-                    } else{
+                    } else if( e.getKeyCode() == KeyEvent.VK_ENTER ){
+                           
+                        String input = command.getText();
                         
-                    	e.consume();
+                        if( input.length() > 0 ){
+                            
+                            processCommand(input);
+                            
+                            displayPane.requestFocus();
+                            
+                            isMessageDisplayed = true;
+                            
+                        } else{
+                            
+                            e.consume();
+                        }
                     }
                 }
-            }
+        
+                @Override
+                public void keyTyped(KeyEvent e) {}
+        
+                @Override
+                public void keyReleased(KeyEvent e) {}
+                
+            });
+        }
+    }
     
-        	@Override
-            public void keyTyped(KeyEvent e) {}
-    
-        	@Override
-            public void keyReleased(KeyEvent e) {}
+    private void addFocusListenerToCommandTextField( JTextField currentCommand ){
+        
+        if(currentCommand != null){
             
-        });
+            currentCommand.addFocusListener(new FocusListener(){
+
+                @Override
+                public void focusGained(FocusEvent e) {
+                    
+                    command.setForeground( new Color( 0,0,0 ) );
+                    
+                    if( isMessageDisplayed ){
+                        
+                        command.setText("");
+                        
+                        isMessageDisplayed = false;
+                        
+                    } else{
+                        
+                        command.setText(command.getText());
+                    }
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    
+                    command.setForeground( new Color( 128,128,128 ) );
+                    
+                    String input = command.getText();
+                    
+                    if( !isMessageDisplayed && input.length() <= 0 ){
+                        
+                        command.setText("Enter commands here");
+                        
+                        isMessageDisplayed = true;
+                        
+                    } else{
+                        
+                        command.setText(input);
+                    }
+                }
+            });
+        }
     }
 
     private void prepareTentativeDisplay(){
@@ -426,37 +484,28 @@ public class UserInterface extends JFrame {
         
         closeButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
         
-        closeButton.addMouseListener( new MouseListener(){
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                
-                if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
-                    
-                	Engine.exit();
-                	
-                    System.exit(0);
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        });
+        addMouseActionListenersToCloseButton(closeButton);
     }
 
+    private void addMouseActionListenersToCloseButton( JLabel currentCloseButton ){
+        
+        if( currentCloseButton != null ){
+            
+            currentCloseButton.addMouseListener( new MouseInputAdapter(){
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    
+                    if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
+                        
+                        Engine.exit();
+                        System.exit(0);
+                    }
+                }
+            });
+        }
+    }
+    
     private void prepareMinimiseButton(){
         
         minimiseButton = new JLabel();
@@ -465,84 +514,70 @@ public class UserInterface extends JFrame {
         
         minimiseButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
         
-        minimiseButton.addMouseListener( new MouseListener(){
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                
-                if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
-                    
-                    setState( UserInterface.ICONIFIED );
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-            
-        } );
+        addMouseActionListenersToMinimiseButton(minimiseButton);
     }
 
+    private void addMouseActionListenersToMinimiseButton( JLabel currentMinimiseButton ){
+        
+        if( currentMinimiseButton != null ){
+            
+            currentMinimiseButton.addMouseListener( new MouseInputAdapter(){
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    
+                    if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
+                        
+                        setState( UserInterface.ICONIFIED );
+                    }
+                }
+                
+            } );
+        }
+    }
+    
     private void prepareDragPanel(){
         
         dragPanel = new JLabel();
         dragPanel.setBounds(0, 0, 781, 493);
         contentPane.add(dragPanel);
         
-        dragPanel.addMouseMotionListener( new MouseMotionListener(){ 
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                
-                int mouseDragXCoordinate = e.getXOnScreen();
-                int mouseDragYCoordinate = e.getYOnScreen();
-                
-                setLocation( mouseDragXCoordinate - mouseXCoordinate,
-                             mouseDragYCoordinate - mouseYCoordinate);
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-            }
-            
-        });
+        addMouseMovementBindingsToDragPanel(dragPanel);
+        addMouseActionListenersToDragPanel(dragPanel);
+    }
+    
+    private void addMouseMovementBindingsToDragPanel( JLabel currentDragPanel ){
         
-        dragPanel.addMouseListener( new MouseListener(){ 
+        if( currentDragPanel != null ){
+            
+            currentDragPanel.addMouseMotionListener( new MouseMotionAdapter(){ 
+    
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    
+                    int mouseDragXCoordinate = e.getXOnScreen();
+                    int mouseDragYCoordinate = e.getYOnScreen();
+                    
+                    setLocation( mouseDragXCoordinate - mouseXCoordinate,
+                                 mouseDragYCoordinate - mouseYCoordinate);
+                }                
+            });
+        }
+    }
+    
+    private void addMouseActionListenersToDragPanel( JLabel currentDragPanel ){
+        
+        if( currentDragPanel != null ){
+            
+            currentDragPanel.addMouseListener( new MouseInputAdapter(){ 
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                
-                mouseXCoordinate = e.getX();
-                mouseYCoordinate = e.getY();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        });
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    
+                    mouseXCoordinate = e.getX();
+                    mouseYCoordinate = e.getY();
+                }
+            });
+        }
     }
 }
