@@ -59,6 +59,7 @@ public class Parser {
     
     private static ParseResult process(String command) {
         commandWords = command.split(" ");
+        assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[0]);
 
         switch(commandType) {
@@ -314,6 +315,7 @@ public class Parser {
     private static boolean[] updateResultFlags(boolean[] flags) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
         //              description, tag
+        assert(flags.length == 7);
         if (date != null) {
             flags[0] = true;
         }
@@ -384,6 +386,7 @@ public class Parser {
         int month = 0;
         int year = 0;
         String[] dateParts = arguments.split(" ");
+        assert(dateParts.length == 3);
         String expectedDay = dateParts[0];
         String expectedMonth = dateParts[1];
         String expectedYear = dateParts[2];
