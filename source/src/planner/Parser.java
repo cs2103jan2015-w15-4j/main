@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import planner.Constants.COMMAND_TYPE;
 import planner.Constants.RESULT_TYPE;
@@ -17,6 +19,8 @@ import planner.Constants.RESULT_TYPE;
  */
 public class Parser {
 
+    private static Logger logger = Logger.getLogger("Parser");
+    
     // stores the arguments for each keyword
     private static String keywordArgs = "";
 
@@ -58,6 +62,7 @@ public class Parser {
     }    
     
     private static ParseResult process(String command) {
+        logger.log(Level.INFO, "going to begin processing");
         commandWords = command.split(" ");
         assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[0]);
@@ -100,6 +105,7 @@ public class Parser {
                 errorMessage = "invalid command type";
                 break;
         }
+        logger.log(Level.INFO, "processing ended. returning result.");
         return createParseResult(resultType, commandType);
     }
 
@@ -181,6 +187,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorMessage = "a number must be entered for the task id";
                 }
@@ -190,8 +197,11 @@ public class Parser {
                 try {
                     // check whether next token is an id of the task to show
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    logger.log(Level.INFO, "successfully parsed id, show" + 
+                               "specific task");
                     commandType = Constants.COMMAND_TYPE.SHOW_ONE;
                 } catch (NumberFormatException e) {
+                    logger.log(Level.INFO, "no id parsed, show all tasks");
                     commandType = Constants.COMMAND_TYPE.SHOW_ALL;
                 }
                 break;
@@ -200,6 +210,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorMessage = "a number must be entered for the task id";
                 }
@@ -217,8 +228,9 @@ public class Parser {
                 String cmdToHelpWith = keywordArgs.split(" ")[0];
                 COMMAND_TYPE cmdToHelpWithType = extractCommandType(cmdToHelpWith);
                 if (cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
-                    // if no command given, no need to modify anything
+                    logger.log(Level.INFO, "show general help");
                 } else {
+                    logger.log(Level.INFO, "show help for specific command");
                     commandType = determineHelpCommandType(cmdToHelpWithType);
                 }
                 break;
