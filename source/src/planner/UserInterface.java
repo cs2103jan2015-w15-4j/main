@@ -4,14 +4,16 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
@@ -19,10 +21,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 
 // This class handles all GUI logic and processing
@@ -194,13 +198,19 @@ public class UserInterface extends JFrame {
     private JTextPane tentativeDisplay;
     private JScrollPane tentativeDisplayScrollPane;
     
+    private DisplayPane displayPane;
+    
     private JLabel closeButton;
     private JLabel minimiseButton;
     private JLabel dragPanel;
     private JLabel sectionTitle;
     private JLabel sectionTitleLine;
+    private JLabel background;
     
-    private DisplayPane displayPane;
+    private InvisibleButton upArrowButton;
+    private InvisibleButton downArrowButton;
+    
+    private JTextPane taskDisplayPanel;
     
     // Used for drag logic
     private int mouseXCoordinate;
@@ -261,8 +271,167 @@ public class UserInterface extends JFrame {
         prepareSectionTitleLine();
         prepareBackground();
         
+        if( displayPane != null ){
+            
+            prepareUpArrowButton(displayPane);
+            
+            prepareDownArrowButton(displayPane);
+            
+            prepareTaskDisplayPanel(displayPane);
+        }
+        
         setUndecorated(true);
         setLocationRelativeTo(null);
+    }
+    
+    private void prepareTaskDisplayPanel( DisplayPane displayPanel ){
+        
+        if( displayPanel != null ){
+            
+            taskDisplayPanel = displayPanel.getDisplayComponent();
+            
+            addKeyBindingsToTextView(taskDisplayPanel);
+        }
+    }
+    
+    private void prepareDownArrowButton( DisplayPane displayPanel ){
+        
+        if( displayPanel != null ){
+            
+            downArrowButton = displayPanel.getDownButtonComponent();
+            
+            addKeyBindingsToButton(downArrowButton);
+        }
+    }
+    
+    private void prepareUpArrowButton( DisplayPane displayPanel ){
+        
+        if( displayPanel != null ){
+            
+            upArrowButton = displayPanel.getUpButtonComponent();
+            
+            addKeyBindingsToButton(upArrowButton);
+        }
+    }
+    
+    private void addKeyBindingsToTextView( JTextPane currentTextView ){
+        
+        if( currentTextView != null ){
+            
+            currentTextView.addKeyListener(new KeyAdapter(){
+
+                @Override
+                public void keyPressed(KeyEvent event) {
+
+                    handleKeyEvent(event);
+                }
+            });
+        }
+    }
+    
+    private void addKeyBindingsToButton( InvisibleButton currentArrowButton ){
+        
+        if( currentArrowButton != null ){
+            
+            currentArrowButton.addKeyListener(new KeyAdapter(){
+
+                @Override
+                public void keyPressed(KeyEvent event) {
+
+                    handleKeyEvent(event);
+                }
+            });
+        }
+    }
+    
+    private void handleKeyEvent(KeyEvent event){
+        
+        if( event != null ){
+            
+            if( event.getKeyCode() == KeyEvent.VK_PAGE_UP || 
+                event.getKeyCode() == KeyEvent.VK_PAGE_DOWN){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                JScrollBar verticalScrollBar = displayPane.getVerticalScrollBar();
+                int currentScrollValue = verticalScrollBar.getValue();
+             
+                int tempScrollUnitDifference = (event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -verticalScrollBar.getBlockIncrement(-1) : verticalScrollBar.getBlockIncrement(1));
+                verticalScrollBar.setValue( currentScrollValue + tempScrollUnitDifference );
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_UP ){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                displayPane.selectPreviousTask();
+                
+                event.consume();
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_DOWN ){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                displayPane.selectNextTask();
+                
+                event.consume();
+                
+            } else{
+                
+                if( !command.isFocusOwner() ){
+                    
+                    /*
+                    if( isMessageDisplayed ){
+                        
+                        Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
+                        
+                        command.setText("" + ((char)event.getKeyCode()) );
+                        
+                        isMessageDisplayed = false;
+                        
+                    } else{
+                        
+                        command.setText(command.getText() + ((char)event.getKeyCode()));
+                    }*/
+                    
+                    command.requestFocusInWindow();   
+                }
+                
+                if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
+                    
+                    if( command.getText().length() <= 0 ){
+                        
+                        event.consume();
+                    } 
+                    
+                } else if( event.getKeyCode() == KeyEvent.VK_ENTER ){
+                       
+                    String input = command.getText();
+                    
+                    if( input.length() > 0 ){
+                        
+                        processCommand(input);
+                        
+                        displayPane.requestFocusInWindow();
+                        
+                        isMessageDisplayed = true;
+                        
+                    } else{
+                        
+                        event.consume();
+                    }
+                    
+                }
+            }
+        }
     }
     
     private void prepareSectionTitle(){
@@ -287,7 +456,7 @@ public class UserInterface extends JFrame {
     private void prepareBackground(){
         
         // Adding UI background
-        JLabel background = new JLabel();
+        background = new JLabel();
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
         background.setBounds(0, -1, 781, 494);
         contentPane.add(background);
@@ -297,6 +466,7 @@ public class UserInterface extends JFrame {
         
     	displayPane = new DisplayPane();
         displayPane.setBounds(25, 83, 548, 334);
+        
         contentPane.add(displayPane);
         
         // Copying of all tasks
@@ -304,8 +474,27 @@ public class UserInterface extends JFrame {
         
         // Display all tasks as default screen for now
         displayPane.addTasksToDisplay(currentList);
+        
+        displayPane.requestFocusInWindow();
+        
+        addKeyBindingsToDisplay(displayPane);
     }
     
+	private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
+	    
+	    if( currentDisplayPane != null ){
+	        
+	        currentDisplayPane.addKeyListener(new KeyAdapter(){
+
+                @Override
+                public void keyPressed(KeyEvent event) {
+                    
+                    handleKeyEvent(event);
+                }            
+	        });
+	    }
+	}
+	
 	private long compareList( TaskList originalList, TaskList modifiedList ){
 		
 		if( originalList == null || modifiedList == null ){
@@ -368,33 +557,11 @@ public class UserInterface extends JFrame {
             
             currentCommand.addKeyListener(new KeyListener(){
                 
+                
                 @Override
                 public void keyPressed( KeyEvent e ){
                     
-                    if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
-                        
-                        if( command.getText().length() <= 0 ){
-                            
-                            e.consume();
-                        } 
-                        
-                    } else if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-                           
-                        String input = command.getText();
-                        
-                        if( input.length() > 0 ){
-                            
-                            processCommand(input);
-                            
-                            displayPane.requestFocus();
-                            
-                            isMessageDisplayed = true;
-                            
-                        } else{
-                            
-                            e.consume();
-                        }
-                    }
+                    handleKeyEvent(e);
                 }
         
                 @Override
