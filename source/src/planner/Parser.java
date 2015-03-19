@@ -19,7 +19,7 @@ import planner.Constants.RESULT_TYPE;
  */
 public class Parser {
 
-    private static Logger logger = Logger.getLogger("Parser");
+    private static Logger logger = Logger.getLogger("Parser");    
     
     // stores the arguments for each keyword
     private static String keywordArgs = "";
@@ -31,10 +31,10 @@ public class Parser {
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
-    private static String[] monthsArray = {"Jan", "January", "Feb", "February",
-        "Mar", "March", "Apr", "April", "May", "May", "Jun", "June", "Jul",
-        "July", "Aug", "August", "Sep", "September", "Oct", "October", "Nov",
-        "November", "Dec", "December"
+    private static String[] monthsArray = {"jan", "january", "feb", "february",
+        "mar", "march", "apr", "april", "may", "may", "jun", "june", "jul",
+        "july", "aug", "august", "sep", "september", "oct", "october", "nov",
+        "november", "dec", "december"
     };
     private static ArrayList<String> months =
             new ArrayList<String>(Arrays.asList(monthsArray));
@@ -56,12 +56,14 @@ public class Parser {
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
 
     public static ParseResult parse(String command) {
+        logger.setLevel(Level.WARNING);
         resetFields();
         ParseResult result = process(command);
         return result;
     }    
     
     private static ParseResult process(String command) {
+        
         logger.log(Level.INFO, "going to begin processing");
         commandWords = command.split(" ");
         assert(commandWords.length > 0);
@@ -106,7 +108,9 @@ public class Parser {
                 break;
         }
         logger.log(Level.INFO, "processing ended. returning result.");
-        return createParseResult(resultType, commandType);
+        ParseResult parseResult = createParseResult(resultType, commandType);
+        logger.log(Level.INFO, "result date: " + parseResult.getDate().toString());
+        return parseResult;
     }
 
     private static COMMAND_TYPE extractCommandType(String commandWord) {
@@ -394,6 +398,7 @@ public class Parser {
     }
 
     private static Calendar parseDate(String arguments) {
+        logger.log(Level.INFO, "beginning date parsing");
         int day = 0;
         int month = 0;
         int year = 0;
@@ -402,6 +407,9 @@ public class Parser {
         String expectedDay = dateParts[0];
         String expectedMonth = dateParts[1];
         String expectedYear = dateParts[2];
+        logger.log(Level.INFO, "value expected to be day: " + expectedDay);
+        logger.log(Level.INFO, "value expected to be month: " + expectedMonth);
+        logger.log(Level.INFO, "value expected to be year: " + expectedYear);
 
         try {
             day = Integer.parseInt(expectedDay);
@@ -413,13 +421,15 @@ public class Parser {
         try {
             month = Integer.parseInt(expectedMonth);
         } catch (NumberFormatException e) {
-            int monthIndex = months.indexOf(expectedMonth);
+            int monthIndex = months.indexOf(expectedMonth.toLowerCase());
             // check whether it is found in the list of month strings
             if (monthIndex == -1) {
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorMessage = "Unable to parse date";
+                logger.log(Level.WARNING, "unable to parse date");
             } else {
                 month = (monthIndex / 2) + 1;
+                logger.log(Level.INFO, "month of parsed date: " + month);
             }
 
         }
@@ -432,7 +442,7 @@ public class Parser {
         }
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, day, 0 , 0, 0);
+        calendar.set(year, month - 1, day, 0, 0, 0);
         return calendar;
     }
 
