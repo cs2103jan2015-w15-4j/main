@@ -171,7 +171,7 @@ public class Parser {
         description = "";
         tag = "";
         errorMessage = "";
-        flags = new boolean[7];
+        flags = new boolean[8];
         calendar = null;
     }
 
