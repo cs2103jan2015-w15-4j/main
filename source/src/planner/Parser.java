@@ -180,6 +180,14 @@ public class Parser {
     }
 
     private static void processArgs(String keyword) {
+        // remove escape character from arguments since now unneeded
+        String[] keywordArgsArray = keywordArgs.split(" ");
+        StringBuilder sb = new StringBuilder(keywordArgs.length());
+        for (String s: keywordArgsArray) {
+            sb.append(s.replaceFirst("/", "") + " ");
+        }
+        keywordArgs = sb.toString().trim();
+        
         switch(keyword) {
             // command keywords start here
             case "add":
@@ -245,6 +253,7 @@ public class Parser {
             case "on":
             case "date":
             case "due":
+            case "from":
                 calendar = parseDate(keywordArgs);
                 date = calendar.getTime();
                 break;

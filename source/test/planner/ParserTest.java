@@ -96,7 +96,7 @@ public class ParserTest {
     
     @Test
     // test correct usage of done
-    public void testDoneCommand() {        
+    public void testDoneCommand() {
         ParseResult result = Parser.parse("done 347564 date 111 Mar 3917");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.DONE, result.getCommandType());
@@ -114,7 +114,7 @@ public class ParserTest {
     }
     
     @Test
-    // test done command without a valid id immediately after 'done'
+    // test done command without a valid id immediately after 'done' (incorrect usage)
     public void testDoneCommandWithoutID() {
         ParseResult result = Parser.parse("done fishburger 234234 pig sandwich");
         assertEquals(Constants.RESULT_TYPE.INVALID, result.getResultType());
