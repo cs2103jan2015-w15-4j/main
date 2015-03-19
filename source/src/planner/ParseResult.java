@@ -20,6 +20,7 @@ public class ParseResult {
     private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = null;
+    private Date parsedDate2 = null;
     private Date dateToRemind = null;
     private int priorityLevel = NO_PRIORITY_LEVEL;
     private long taskId = NO_ID_SET;
@@ -39,9 +40,10 @@ public class ParseResult {
      * @param flags       Indicate presence of properties (e.g. time)
      */
 	public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
-                       Date date, Date dateToRemind, int priorityLevel, long id,
-                       String name, String description, String tag,
-                       String errorMessage, boolean[] flags) {
+                       Date date, Date date2, Date dateToRemind, 
+                       int priorityLevel, long id, String name, 
+                       String description, String tag, String errorMessage, 
+                       boolean[] flags) {
         this.resultType = resultType;
         this.commandType = commandType;
         if (date == null && commandType == COMMAND_TYPE.ADD) {
@@ -50,7 +52,8 @@ public class ParseResult {
             this.parsedDate = calendar.getTime();
         } else {
             this.parsedDate = date;
-        }        
+        }
+        this.parsedDate2 = date2;
         this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;
         this.taskId = id;
@@ -71,6 +74,10 @@ public class ParseResult {
 
     public Date getDate() {
         return parsedDate;
+    }
+    
+    public Date getSecondDate() {
+        return parsedDate2;
     }
     
     public Date getDateToRemind() {

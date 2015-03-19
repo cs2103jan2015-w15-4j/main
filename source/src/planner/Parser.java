@@ -27,7 +27,7 @@ public class Parser {
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
         "every", "in", "priority", "desc", "description", "date", "due",
-        "remind", "tag"
+        "remind", "tag", "until"
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
@@ -43,6 +43,7 @@ public class Parser {
     private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
     private static COMMAND_TYPE commandType = null;
     private static Date date = null;
+    private static Date date2 = null;
     private static Date dateToRemind = null;
     private static int priorityLevel = 0;
     private static long id = 0;
@@ -50,7 +51,7 @@ public class Parser {
     private static String description = "";
     private static String tag = "";
     private static String errorMessage = "";
-    private static boolean[] flags = new boolean[7];
+    private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
 
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
@@ -247,6 +248,12 @@ public class Parser {
                 calendar = parseDate(keywordArgs);
                 date = calendar.getTime();
                 break;
+            
+            // end date (for timed tasks)
+            case "until":
+                calendar = parseDate(keywordArgs);
+                date2 = calendar.getTime();
+                break;
 
             case "every":
                 break;
@@ -352,13 +359,16 @@ public class Parser {
         if (!tag.equals("")) {
             flags[6] = true;
         }
+        if (date2 != null) {
+            flags[7] = true;
+        }
         return flags;
     }
 
     // constructs and returns result based on existing fields
     private static ParseResult createParseResult(RESULT_TYPE resultType,
                                            COMMAND_TYPE commandType) {
-        return new ParseResult(resultType, commandType, date, dateToRemind, 
+        return new ParseResult(resultType, commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorMessage, flags);
     }
