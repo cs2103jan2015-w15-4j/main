@@ -22,8 +22,7 @@ public class ParserTest {
         assertEquals("", result.getErrorMessage());
         boolean[] flags = {true, false, true, false, true, false, true};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
-        assertEquals("important meeting with boss", result.getName());
-        
+        assertEquals("important meeting with boss", result.getName());        
     }
 
     @Test

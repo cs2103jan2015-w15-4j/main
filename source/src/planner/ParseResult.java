@@ -1,5 +1,6 @@
 package planner;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
@@ -37,19 +38,19 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-    @SuppressWarnings("deprecation")
 	public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
                        Date date, Date dateToRemind, int priorityLevel, long id,
                        String name, String description, String tag,
                        String errorMessage, boolean[] flags) {
         this.resultType = resultType;
         this.commandType = commandType;
-        
-        this.parsedDate = new Date();
-        this.parsedDate.setDate( date == null ? 21 : date.getDate() );
-        this.parsedDate.setMonth(date == null ? 5 : date.getMonth());
-        this.parsedDate.setYear( date == null ? 2013 :date.getYear() );
-        
+        if (date == null && commandType == COMMAND_TYPE.ADD) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(9999, 8, 9, 9, 9, 9);
+            this.parsedDate = calendar.getTime();
+        } else {
+            this.parsedDate = date;
+        }        
         this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;
         this.taskId = id;

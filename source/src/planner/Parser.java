@@ -108,8 +108,7 @@ public class Parser {
                 break;
         }
         logger.log(Level.INFO, "processing ended. returning result.");
-        ParseResult parseResult = createParseResult(resultType, commandType);
-        logger.log(Level.INFO, "result date: " + parseResult.getDate().toString());
+        ParseResult parseResult = createParseResult(resultType, commandType);        
         return parseResult;
     }
 
