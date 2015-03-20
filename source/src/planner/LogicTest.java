@@ -2,7 +2,6 @@ package planner;
 
 import static org.junit.Assert.*;
 
-import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -182,7 +181,7 @@ public class LogicTest {
         initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
-        Task task1 = new Task("Work to do for CS2103T", "Need to work on demo video", date, 1, "work", 1);
+        Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
         Task task2 = new Task("CS2103T", "Need to integrate components", date, 2, "workload", 2);
         Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", date, 1, "workload", 3);
         Task task4 = new Task("LAJ2201 WORK", "", date, 1, "", 4);
@@ -197,15 +196,15 @@ public class LogicTest {
         TL1.add(task5);
         TaskList TL2 = new TaskList();
         TL2.add(task1);
-        TL2.add(task3);
-        TL2.add(task4);
+       /* TL2.add(task3);
+        TL2.add(task4);*/
         TL2.add(task5);
         
-        Logic.searchAll(TL1, Search, "work");
+        Logic.searchAll(TL1, Search, "finish homework");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
-        assertEquals(Search.get(2), TL2.get(2));
-        assertEquals(Search.get(3), TL2.get(3));
+       /* assertEquals(Search.get(2), TL2.get(2));
+        assertEquals(Search.get(3), TL2.get(3));*/
     }
     
     //Test splitting by completion

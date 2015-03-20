@@ -1,7 +1,5 @@
 package planner;
 
-import java.util.StringTokenizer;
-
 public class SearchLogic {
     
     public static void searchAll(TaskList input, TaskList searchList, String wordToLookFor) {
@@ -10,12 +8,12 @@ public class SearchLogic {
                 if (containsSearchedWord(input.get(i).getName(), wordToLookFor)) {
                     searchList.add(input.get(i));
                 }
-                else if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
+                if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
                     searchList.add(input.get(i));
                 }
-                else if (containsSearchedWord(input.get(i).getTag(), wordToLookFor)) {
+                /*else if (containsSearchedWord(input.get(i).getTag(), wordToLookFor)) {
                     searchList.add(input.get(i));
-                }
+                }*/
             }
         } catch (Exception e) {
             System.err.println("Invalid input: " + e.getMessage());
@@ -39,11 +37,26 @@ public class SearchLogic {
         if (wordToLookFor.equals("")) {
             throw new Exception("Cannot search for empty string");
         }
-        StringTokenizer token = new StringTokenizer(description);
-        while (token.hasMoreTokens()) {
-            String word = token.nextToken();
-            if (word.toUpperCase().equals(wordToLookFor.toUpperCase().trim())) {
-                return true;
+        if (description.equals("")) {
+            return false;
+        }
+        String[] token = description.split(" ");
+        String[] words = wordToLookFor.split(" ");
+        for (int i = 0; i < token.length; i++) {
+            int j = 0;
+            int temp = i;
+            if (words[j].toUpperCase().equals(token[i].toUpperCase().trim())) {
+                while (words[j].toUpperCase().equals(token[temp].toUpperCase().trim())) {
+                    if (j + 1 == words.length) {
+                        return true;
+                    }
+                    j++;
+                    if (temp + 1 < token.length) {
+                        temp++;
+                    } else {
+                        return false;
+                    }
+                }
             }
         }
         return false;
