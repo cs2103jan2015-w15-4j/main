@@ -200,7 +200,7 @@ public class LogicTest {
         TL2.add(task4);*/
         TL2.add(task5);
         
-        Logic.searchAll(TL1, Search, "finish homework");
+        Logic.searchAll(TL1, Search, "fiNIsH hOMeWORk");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
        /* assertEquals(Search.get(2), TL2.get(2));
