@@ -8,12 +8,12 @@ public class SearchLogic {
                 if (containsSearchedWord(input.get(i).getName(), wordToLookFor)) {
                     searchList.add(input.get(i));
                 }
-                if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
+                else if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
                     searchList.add(input.get(i));
                 }
-                /*else if (containsSearchedWord(input.get(i).getTag(), wordToLookFor)) {
+                else if (containsSearchedWord(input.get(i).getTag(), wordToLookFor)) {
                     searchList.add(input.get(i));
-                }*/
+                }
             }
         } catch (Exception e) {
             System.err.println("Invalid input: " + e.getMessage());
