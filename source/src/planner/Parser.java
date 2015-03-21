@@ -364,10 +364,23 @@ public class Parser {
         processArgs(keywordBeingProcessed);
 
         // check for valid name in the case of the add command
-        if (commandWord.equals("add")) {
+        if (commandType.equals(COMMAND_TYPE.ADD)) {
             if (name.equals("")) {
                 resultType = RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.BLANK_TASK_NAME;
+            }
+            
+        // check for two valid dates in the case of the convert timed 
+        } else if (commandType.equals(COMMAND_TYPE.CONVERT_TIMED)) {
+            if (date == null || date2 == null) {
+                resultType = RESULT_TYPE.INVALID;
+                errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
+            }
+         // check for at least one valid date in the case of convert deadline
+        } else if (commandType.equals(COMMAND_TYPE.CONVERT_DEADLINE)) {
+            if (date == null && date2 == null) {
+                resultType = RESULT_TYPE.INVALID;
+                errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
         }
 
