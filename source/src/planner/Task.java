@@ -11,7 +11,7 @@ public class Task {
 	
 	private final long ID;
 	private String taskName, taskDescription, taskTag;
-	private Date dateCreated, dateDue, dateEnd;
+	private Date dateCreated, dateDue, dateEnd, dateCompleted;
 	private int taskPriority;
 	private boolean taskCompleted, taskFloating, isTimedTask;
 	
@@ -196,11 +196,22 @@ public class Task {
 	public void setDone() {
 		
 		taskCompleted = true;
+		dateCompleted = new Date(System.currentTimeMillis());
+		
 	}
 	//Not covered by tests yet
 	public void setUndone() {
 		
 		taskCompleted = false;
+		dateCompleted = null;
+		
+	}
+	
+	//Not covered by tests yet
+	public Date getDateCompleted() {
+	    
+	    return dateCompleted;
+	    
 	}
 	
 	@Override
