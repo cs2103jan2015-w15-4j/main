@@ -183,5 +183,90 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
+    
+    @Test
+    public void testConvertToTimedCommand() {
+        ParseResult result = Parser.parse("convert 275 timed date 15 Jun 1992 by 27 Jun 1992");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.CONVERT_TIMED, result.getCommandType());
+        assertEquals("Mon Jun 15 00:00:00 SGT 1992", result.getDate().toString());
+        assertEquals("Sat Jun 27 00:00:00 SGT 1992", result.getSecondDate().toString());
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(275, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, true, false, false, false, true};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    public void testConvertToTimedWithOnlyOneDate() {
+        ParseResult result = Parser.parse("convert 12616 timed date 15 Jun 1992");
+        assertEquals(Constants.RESULT_TYPE.INVALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.CONVERT_TIMED, result.getCommandType());
+        assertEquals("Mon Jun 15 00:00:00 SGT 1992", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(12616, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ERROR_TYPE.INVALID_ARGUMENTS, result.getErrorType());
+        boolean[] flags = {true, false, false, true, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    public void testConvertToFloatingCommand() {
+        ParseResult result = Parser.parse("convert 592 floating date 17 Jun 1992 by 28 Jun 1992");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.CONVERT_FLOATING, result.getCommandType());
+        assertEquals("Wed Jun 17 00:00:00 SGT 1992", result.getDate().toString());
+        assertEquals("Sun Jun 28 00:00:00 SGT 1992", result.getSecondDate().toString());
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(592, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, true, false, false, false, true};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }    
+    
+    @Test
+    public void testConvertToDeadlineCommand() {
+        ParseResult result = Parser.parse("convert 491 deadline date 19 Jun 1992 by 24 Jun 1992");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.CONVERT_DEADLINE, result.getCommandType());
+        assertEquals("Fri Jun 19 00:00:00 SGT 1992", result.getDate().toString());
+        assertEquals("Wed Jun 24 00:00:00 SGT 1992", result.getSecondDate().toString());
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(491, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, true, false, false, false, true};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    public void testConvertToDeadLineWithNoDate() {
+        ParseResult result = Parser.parse("convert 3516 deadline");
+        assertEquals(Constants.RESULT_TYPE.INVALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.CONVERT_DEADLINE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(3516, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ERROR_TYPE.INVALID_ARGUMENTS, result.getErrorType());
+        boolean[] flags = {false, false, false, true, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
 
 }
