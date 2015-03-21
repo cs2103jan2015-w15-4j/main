@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import planner.Constants.COMMAND_TYPE;
+import planner.Constants.ERROR_TYPE;
 import planner.Constants.RESULT_TYPE;
 
 /**
@@ -29,7 +30,7 @@ public class ParseResult {
     private String taskName = "";
     private String taskDescription = "";
     private String taskTag = "";
-    private String errorMessage = "";
+    private ERROR_TYPE errorType = null;
     // flags order: date, dateToRemind, priorityLevel, id, name,
     //              description, tag
     private boolean[] commandFlags;
@@ -44,7 +45,7 @@ public class ParseResult {
 	public ParseResult(RESULT_TYPE resultType, COMMAND_TYPE commandType,
                        Date date, Date date2, Date dateToRemind, 
                        int priorityLevel, long id, String name, 
-                       String description, String tag, String errorMessage, 
+                       String description, String tag, ERROR_TYPE errorType,
                        boolean[] flags) {
 
         this.resultType = resultType;
@@ -82,15 +83,16 @@ public class ParseResult {
         this.taskName = name;
         this.taskDescription = description;
         this.taskTag = tag;
-        this.errorMessage = errorMessage;
+        this.errorType = errorType;
+        this.commandFlags = flags;
         
         if( flags != null ){
             
             this.commandFlags = Arrays.copyOf( flags, flags.length );   // changed to defensive copy
             
-        } else{
+        } else {
             
-            this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
+            this.commandFlags = new boolean[8];
         }
     }
 
@@ -136,8 +138,8 @@ public class ParseResult {
         return taskTag;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public ERROR_TYPE getErrorType() {
+        return errorType;
     }
 
     public boolean[] getCommandFlags() {
