@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import planner.Constants.COMMAND_TYPE;
 import planner.Constants.ERROR_TYPE;
-import planner.Constants.RESULT_TYPE;
 
 /**
  * This class contains all the logic for parsing
@@ -41,7 +40,6 @@ public class Parser {
             new ArrayList<String>(Arrays.asList(monthsArray));
 
     // these fields will be used to construct the parseResult
-    private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
     private static ERROR_TYPE errorType = null;
     private static COMMAND_TYPE commandType = null;    
     private static Date date = null;
@@ -118,13 +116,12 @@ public class Parser {
                 break;
                 
             default:
-                resultType = Constants.RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
                 logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
                 break;
         }
         logger.log(Level.INFO, "processing ended. returning result.");
-        ParseResult parseResult = createParseResult(resultType, commandType);        
+        ParseResult parseResult = createParseResult(commandType);        
         return parseResult;
     }
 
@@ -183,7 +180,6 @@ public class Parser {
     }
 
     private static void resetFields() {
-        resultType = RESULT_TYPE.VALID;
         commandType = null;
         keywordArgs = "";
         commandWords = null;
@@ -225,7 +221,7 @@ public class Parser {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in delete");
-                    resultType = Constants.RESULT_TYPE.INVALID;
+                    commandType = Constants.COMMAND_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
@@ -249,7 +245,7 @@ public class Parser {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in done");
-                    resultType = Constants.RESULT_TYPE.INVALID;
+                    commandType = Constants.COMMAND_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
@@ -280,7 +276,7 @@ public class Parser {
                     id = Long.parseLong(convertArgs[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id for convert");
-                    resultType = Constants.RESULT_TYPE.INVALID;
+                    commandType = Constants.COMMAND_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 
@@ -383,7 +379,7 @@ public class Parser {
         // check for valid name in the case of the add command
         if (commandType.equals(COMMAND_TYPE.ADD)) {
             if (name.equals("")) {
-                resultType = RESULT_TYPE.INVALID;
+                commandType = Constants.COMMAND_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.BLANK_TASK_NAME;
             }
             
@@ -391,14 +387,14 @@ public class Parser {
         } else if (commandType.equals(COMMAND_TYPE.CONVERT_TIMED)) {
             if (date == null || date2 == null) {
                 logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
-                resultType = RESULT_TYPE.INVALID;
+                commandType = Constants.COMMAND_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
          // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(COMMAND_TYPE.CONVERT_DEADLINE)) {
             logger.log(Level.WARNING, "no valid dates for Convert Deadline");
             if (date == null && date2 == null) {
-                resultType = RESULT_TYPE.INVALID;
+                commandType = Constants.COMMAND_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
         }
@@ -439,9 +435,8 @@ public class Parser {
     }
 
     // constructs and returns result based on existing fields
-    private static ParseResult createParseResult(RESULT_TYPE resultType,
-                                           COMMAND_TYPE commandType) {
-        return new ParseResult(resultType, commandType, date, date2, dateToRemind, 
+    private static ParseResult createParseResult(COMMAND_TYPE commandType) {
+        return new ParseResult(commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorType, flags);
     }
@@ -514,7 +509,7 @@ public class Parser {
         try {
             day = Integer.parseInt(expectedDay);
         } catch (NumberFormatException e) {
-            resultType = Constants.RESULT_TYPE.INVALID;
+            commandType = Constants.COMMAND_TYPE.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse day");
         }
@@ -525,7 +520,7 @@ public class Parser {
             int monthIndex = months.indexOf(expectedMonth.toLowerCase());
             // check whether it is found in the list of month strings
             if (monthIndex == -1) {
-                resultType = Constants.RESULT_TYPE.INVALID;
+                commandType = Constants.COMMAND_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_DATE;
                 logger.log(Level.WARNING, "unable to parse month");
             } else {
@@ -538,7 +533,7 @@ public class Parser {
         try {
             year = Integer.parseInt(expectedYear);
         } catch (NumberFormatException e) {
-            resultType = Constants.RESULT_TYPE.INVALID;
+            commandType = Constants.COMMAND_TYPE.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse year");
         }

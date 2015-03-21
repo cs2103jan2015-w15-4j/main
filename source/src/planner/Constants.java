@@ -10,9 +10,6 @@ import java.util.HashMap;
  *
  */
 public class Constants {
-    public enum RESULT_TYPE {
-        VALID, INVALID
-    };
     
     public enum COMMAND_TYPE {
         ADD, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, SETNOTDONE, UNDO, SEARCH,
