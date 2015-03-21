@@ -83,21 +83,17 @@ public class ParseResult {
         this.taskName = name;
         this.taskDescription = description;
         this.taskTag = tag;
-<<<<<<< HEAD
         this.errorType = errorType;
         this.commandFlags = flags;
-=======
-        this.errorMessage = errorMessage;
         
         if( flags != null ){
             
             this.commandFlags = Arrays.copyOf( flags, flags.length );   // changed to defensive copy
             
-        } else{
+        } else {
             
-            this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
+            this.commandFlags = new boolean[8];
         }
->>>>>>> a4ff94ef9bfebcbe950c1d7291df036a6dbd9b9f
     }
 
     public RESULT_TYPE getResultType() {
