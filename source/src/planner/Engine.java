@@ -144,6 +144,23 @@ public class Engine {
         }
     }
     
+    private static Constants.COMMAND_TYPE setUndoneTask(ParseResult result) {
+        if(!result.getCommandFlags()[3]) {
+            return Constants.COMMAND_TYPE.INVALID;
+        } else {
+            long ID = result.getId();
+            Task toBeDone = allTasks.getTaskByID(ID);
+            if(toBeDone == null) {
+                return Constants.COMMAND_TYPE.INVALID;
+            } else {
+                toBeDone.setUndone();
+                lastModifiedTask = toBeDone.getID();
+                return Constants.COMMAND_TYPE.DONE;
+            }
+            
+        }
+    }
+    
     private static Constants.COMMAND_TYPE searchTask(ParseResult result) {
         boolean[] flags = result.getCommandFlags();
         searchResults = new TaskList(allTasks);
@@ -193,6 +210,8 @@ public class Engine {
                 return Constants.COMMAND_TYPE.UNDO;
             case SEARCH:
                 return searchTask(result);
+            case SETNOTDONE:
+                return setUndoneTask(result);
             case HELP:
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.HELP;
