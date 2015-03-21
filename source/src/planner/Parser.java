@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import planner.Constants.COMMAND_TYPE;
+import planner.Constants.ERROR_TYPE;
 import planner.Constants.RESULT_TYPE;
 
 /**
@@ -41,7 +42,8 @@ public class Parser {
 
     // these fields will be used to construct the parseResult
     private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
-    private static COMMAND_TYPE commandType = null;
+    private static ERROR_TYPE errorType = null;
+    private static COMMAND_TYPE commandType = null;    
     private static Date date = null;
     private static Date date2 = null;
     private static Date dateToRemind = null;
@@ -50,7 +52,7 @@ public class Parser {
     private static String name = "";
     private static String description = "";
     private static String tag = "";
-    private static String errorMessage = "";
+    
     private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
 
@@ -109,7 +111,7 @@ public class Parser {
                 
             default:
                 resultType = Constants.RESULT_TYPE.INVALID;
-                errorMessage = "invalid command type";
+                errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
                 break;
         }
         logger.log(Level.INFO, "processing ended. returning result.");
@@ -177,7 +179,7 @@ public class Parser {
         name = "";
         description = "";
         tag = "";
-        errorMessage = "";
+        errorType = null;
         flags = new boolean[8];
         calendar = null;
     }
@@ -208,7 +210,7 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
-                    errorMessage = "a number must be entered for the task id";
+                    errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
 
@@ -231,7 +233,7 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
-                    errorMessage = "a number must be entered for the task id";
+                    errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
 
@@ -344,7 +346,7 @@ public class Parser {
         if (commandWord.equals("add")) {
             if (name.equals("")) {
                 resultType = RESULT_TYPE.INVALID;
-                errorMessage = "the name of the task added cannot be blank";
+                errorType = Constants.ERROR_TYPE.BLANK_TASK_NAME;
             }
         }
 
@@ -388,7 +390,7 @@ public class Parser {
                                            COMMAND_TYPE commandType) {
         return new ParseResult(resultType, commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
-                               errorMessage, flags);
+                               errorType, flags);
     }
     
     // returns a command type for the result based on what user wants help with
@@ -418,7 +420,7 @@ public class Parser {
                 return COMMAND_TYPE.HELP_SEARCH;
                 
             default:
-                errorMessage = "invalid command type";
+                errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
                 return COMMAND_TYPE.INVALID;
 
         }
@@ -442,7 +444,7 @@ public class Parser {
             day = Integer.parseInt(expectedDay);
         } catch (NumberFormatException e) {
             resultType = Constants.RESULT_TYPE.INVALID;
-            errorMessage = "Unable to parse date";
+            errorType = Constants.ERROR_TYPE.INVALID_DATE;
         }
 
         try {
@@ -452,7 +454,7 @@ public class Parser {
             // check whether it is found in the list of month strings
             if (monthIndex == -1) {
                 resultType = Constants.RESULT_TYPE.INVALID;
-                errorMessage = "Unable to parse date";
+                errorType = Constants.ERROR_TYPE.INVALID_DATE;
                 logger.log(Level.WARNING, "unable to parse date");
             } else {
                 month = (monthIndex / 2) + 1;
@@ -465,7 +467,7 @@ public class Parser {
             year = Integer.parseInt(expectedYear);
         } catch (NumberFormatException e) {
             resultType = Constants.RESULT_TYPE.INVALID;
-            errorMessage = "Unable to parse date";
+            errorType = Constants.ERROR_TYPE.INVALID_DATE;
         }
 
         Calendar calendar = Calendar.getInstance();
