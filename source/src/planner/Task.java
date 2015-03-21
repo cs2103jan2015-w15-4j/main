@@ -6,9 +6,9 @@ public class Task {
 	
 	private final long ID;
 	private String taskName, taskDescription, taskTag;
-	private Date dateCreated, dateDue;
+	private Date dateCreated, dateDue, dateEnd;
 	private int taskPriority;
-	private boolean taskCompleted, taskFloating;
+	private boolean taskCompleted, taskFloating, isTimedTask;
 	
 	/**
 	* This method is the Task constructor
@@ -17,7 +17,7 @@ public class Task {
 	* @param description
 	* Description of task.
 	* @param dueDate
-	* Due date of task. This is represented by the Timestamp class in java.sql.Timestamp.
+	* Due date of task. This is represented by the Date class.
 	* @param priority
 	* Priority of task defined by an integer.
 	* @param tag
@@ -51,7 +51,32 @@ public class Task {
 		
 		taskPriority = priority;
 		taskCompleted = false;
+		isTimedTask = false;
 	}
+	
+	public Task(String name, String description, Date startDate, Date endDate, int priority, String tag, long id) throws IllegalArgumentException {
+        
+        ID = id;
+        
+        if(name.equals("")) {
+            
+            throw new IllegalArgumentException("Task name cannot be empty!");
+        }
+        
+        taskName = name;
+        taskDescription = description;
+        taskTag = tag;
+        dateCreated = new Date(System.currentTimeMillis());
+        
+        //Tests needed for null date
+        dateDue = startDate;
+        taskFloating = false;
+        dateEnd = endDate;
+        
+        taskPriority = priority;
+        taskCompleted = false;
+        isTimedTask = true;
+    }
 	
 	public String getName() {
 		return taskName;
