@@ -26,12 +26,7 @@ public class LogicTest {
         Date date2 = dateFormat.parse("22/09/2015");
         Date date3 = dateFormat.parse("30/08/2015");
         Date date4 = dateFormat.parse("10/08/2013");
-        /*
-        long time = date.getTime();
-        Timestamp dueDate = new Timestamp(time);
-        Date now = new Date();
-        Timestamp dateCreated = new Timestamp(now.getTime());
-        */
+
         Task task1 = new Task("dummy1", "test", date, 1, "selfie", 1);
         Task task2 = new Task("dummy2", "test", date2, 1, "hashtags", 1);
         Task task3 = new Task("dummy3", "test", date3, 1, "merlini", 1);
@@ -167,7 +162,7 @@ public class LogicTest {
         TL2.add(task2);
         TL2.add(task5);
         
-        Logic.searchTaskByTags(TL1, Search, "woRK");
+        Search = Logic.searchTaskByTags(TL1, "woRK");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
         assertEquals(Search.get(2), TL2.get(2));
@@ -200,13 +195,78 @@ public class LogicTest {
         TL2.add(task4);*/
         TL2.add(task5);
         
-        Logic.searchAll(TL1, Search, "fiNIsH hOMeWORk");
+        Search = Logic.searchAll(TL1, "fiNIsH hOMeWORk");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
        /* assertEquals(Search.get(2), TL2.get(2));
         assertEquals(Search.get(3), TL2.get(3));*/
     }
     
+    @Test
+    public void testSearchPriority() throws Exception{
+        initialize();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
+        Task task2 = new Task("CS2103T", "Need to integrate components", date, 2, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", date, 5, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", date, 1, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 3, "work", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList Search = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TL2.add(task3);
+        TL2.add(task5);
+        
+        Search = Logic.searchPriority(TL1, 3);
+        assertEquals(Search.get(0), TL2.get(0));
+        assertEquals(Search.get(1), TL2.get(1));
+        
+    }
+    
+    @Test
+    public void testSplitTentative() throws Exception {
+        initialize();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("HELLO WORLD", "Need to finish homework on demo video", null, 1, "work", 1);
+        Task task2 = new Task("SILHFGYUIJ", "Need to integrate components", date, 2, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", null, 5, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", null, 1, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 3, "work", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList SearchTent = new TaskList();
+        TaskList SearchConf = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TaskList TL3 = new TaskList();
+        TL2.add(task1);
+        TL2.add(task3);
+        TL2.add(task4);
+        TL3.add(task2);
+        TL3.add(task5);
+        
+        SearchTent = Logic.searchTentative(TL1);
+        SearchConf = Logic.searchConfirmed(TL1);
+        assertEquals(SearchTent.get(0), TL2.get(0));
+        assertEquals(SearchTent.get(1), TL2.get(1));
+        assertEquals(SearchTent.get(2), TL2.get(2));
+        assertEquals(SearchConf.get(0), TL3.get(0));
+        assertEquals(SearchConf.get(1), TL3.get(1));
+        
+    }
+/**    
     //Test splitting by completion
     //Test cases are by mixing some incomplete with completed tasks
     @Test
@@ -288,4 +348,5 @@ public class LogicTest {
         assertEquals(tentative.get(1), TL3.get(1));
         assertEquals(tentative.get(2), TL3.get(2));
     }
+    **/
 }
