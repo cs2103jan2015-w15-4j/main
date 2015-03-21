@@ -151,7 +151,7 @@ public class Engine {
             searchResults = Logic.searchAll(searchResults, result.getName());
         }
         if(flags[5]) {
-            searchResults = Logic.searchAll(searchResults, result.getName());
+            searchResults = Logic.searchAll(searchResults, result.getDescription());
         }
         if(flags[6]) {
             searchResults = Logic.searchTaskByTags(searchResults, result.getTag());
