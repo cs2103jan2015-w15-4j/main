@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.RenderingHints;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -42,7 +43,6 @@ public class FadedTextField extends JTextField{
 		setBorder(null);
 		setHighlighter(null);
 		setEditable(false);
-		
 		setOpaque( false );
 	}
 	
@@ -138,6 +138,8 @@ public class FadedTextField extends JTextField{
 			
 			textGraphics.setPaint( m_FromColor );
 			
+			textGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			
 			textGraphics.drawString( nStr, offsetToPaint, heightOfText );
 			
 			if( stringLength > tempNumCharactersBeforeFade ){
@@ -148,6 +150,8 @@ public class FadedTextField extends JTextField{
 				
 				textGraphics.drawString( sStr, offsetToPaint+fontMetrics.stringWidth(nStr), heightOfText );
 			}
+			
+			textGraphics.dispose();
 			
 		} catch( StringIndexOutOfBoundsException stringIndexOutOfBoundsException ){}
 	}
