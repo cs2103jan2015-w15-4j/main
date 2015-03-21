@@ -256,7 +256,7 @@ public class TaskBar extends JComponent {
 		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(0,0,0,0), new Color(0,0,0,0), 24, 23);
 		taskTitleLabel.setBounds(67, 12, 228, 25);
 		taskTitleLabel.setFocusable(false);
-		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 19));
+		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 14));
 		add(taskTitleLabel);
 		taskTitleLabel.setText("This is a sample text testing one two");
 	}
