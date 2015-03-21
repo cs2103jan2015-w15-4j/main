@@ -1,5 +1,6 @@
 package planner;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -17,7 +18,8 @@ public class ParseResult {
 
     private final int NO_PRIORITY_LEVEL = 0;
     private final int NO_ID_SET = 0;
-
+    private final int COMMAND_FLAGS_MAX_SIZE = 7;
+    
     private RESULT_TYPE resultType = null;
     private COMMAND_TYPE commandType = null;
     private Date parsedDate = null;
@@ -45,8 +47,28 @@ public class ParseResult {
                        int priorityLevel, long id, String name, 
                        String description, String tag, ERROR_TYPE errorType,
                        boolean[] flags) {
+
         this.resultType = resultType;
         this.commandType = commandType;
+        
+        if( date != null ){
+            
+            this.parsedDate = new Date(date.getTime());            // Changed to defensive copy
+            
+        } else{
+            
+            this.parsedDate = null;
+        }
+        
+        if( dateToRemind != null ){
+            
+            this.dateToRemind = new Date(dateToRemind.getTime());  // Changed to defensive copy
+            
+        } else{
+            
+            this.dateToRemind = null;
+        }
+       
         if (date == null && commandType == COMMAND_TYPE.ADD) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(9999, 8, 9, 9, 9, 9);
@@ -61,8 +83,21 @@ public class ParseResult {
         this.taskName = name;
         this.taskDescription = description;
         this.taskTag = tag;
+<<<<<<< HEAD
         this.errorType = errorType;
         this.commandFlags = flags;
+=======
+        this.errorMessage = errorMessage;
+        
+        if( flags != null ){
+            
+            this.commandFlags = Arrays.copyOf( flags, flags.length );   // changed to defensive copy
+            
+        } else{
+            
+            this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
+        }
+>>>>>>> a4ff94ef9bfebcbe950c1d7291df036a6dbd9b9f
     }
 
     public RESULT_TYPE getResultType() {
@@ -74,7 +109,8 @@ public class ParseResult {
     }
 
     public Date getDate() {
-        return parsedDate;
+        
+        return parsedDate != null ? new Date(parsedDate.getTime()) : null;    // Changed to defensive copy
     }
     
     public Date getSecondDate() {
@@ -82,7 +118,8 @@ public class ParseResult {
     }
     
     public Date getDateToRemind() {
-        return dateToRemind;
+        
+        return dateToRemind != null ? new Date(dateToRemind.getTime()) : null;    // Changed to defensive copy
     }
 
     public int getPriorityLevel() {
@@ -110,6 +147,7 @@ public class ParseResult {
     }
 
     public boolean[] getCommandFlags() {
-        return commandFlags;
+        
+        return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];    // Changed to defensive copy
     }
 }

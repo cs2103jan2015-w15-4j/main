@@ -16,13 +16,15 @@ public class StorageTest {
     @Test
     public void testSaveConfiguration() {
         try {
-            File configFile = new File(Constants.CONFIG_FILE_LOCATION);
+
+            Storage storage = new Storage();
+            File configFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
             configFile.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(configFile));
-            
-            Configuration config1 = new Configuration("path1");
-            Storage.saveConfiguration(config1);
 
+            Configuration config1 = new Configuration("path1");
+
+            storage.saveConfiguration(config1);
             
             String fileContents = br.readLine();
             
@@ -32,9 +34,9 @@ public class StorageTest {
             configFile.delete();
             
             Configuration config2 = new Configuration("another.path");
-            Storage.saveConfiguration(config2);
+            storage.saveConfiguration(config2);
             
-            File configFile2 = new File(Constants.CONFIG_FILE_LOCATION);
+            File configFile2 = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
             BufferedReader br2 = new BufferedReader(new FileReader(configFile2));
             
             String fileContents2 = br2.readLine();
@@ -92,6 +94,7 @@ public class StorageTest {
     @Test
     public void testConvertTaskBetweenJsonString() {
         try {
+            Storage storage = new Storage();
             Method convertToJson = Storage.class.getDeclaredMethod("convertTaskToJsonString", Task.class);
             convertToJson.setAccessible(true);
             Method convertFromJson = Storage.class.getDeclaredMethod("convertTaskFromJsonString", String.class);
@@ -112,8 +115,8 @@ public class StorageTest {
             boolean floating = testTask.isFloating();
             boolean done = testTask.isDone();
             
-            result = (String) convertToJson.invoke(null, testTask);
-            Task postConversionTask = (Task) convertFromJson.invoke(null, result);
+            result = (String) convertToJson.invoke(storage, testTask);
+            Task postConversionTask = (Task) convertFromJson.invoke(storage, result);
             
             
             assertEquals("name after converting back and forth should be equal", testTask.getName(), postConversionTask.getName());
@@ -135,6 +138,7 @@ public class StorageTest {
     @Test
     public void testSaveAndReadTaskList() {
         try{
+            Storage storage = new Storage();
             Method save = Storage.class.getDeclaredMethod("saveTaskList", String.class, TaskList.class);
             save.setAccessible(true);
             Method read = Storage.class.getDeclaredMethod("readTaskStorage", String.class);
@@ -150,8 +154,8 @@ public class StorageTest {
             testList.add(task1);
             testList.add(task2);
             
-            save.invoke(null, fileName, testList);
-            result = (TaskList) read.invoke(null, fileName);
+            save.invoke(storage, fileName, testList);
+            result = (TaskList) read.invoke(storage, fileName);
             
             for(int i=0; i<testList.size();i++) {
                 saveTask = testList.get(i);
@@ -170,8 +174,8 @@ public class StorageTest {
             Task task3 = new Task("task3", "description3", new Date(System.currentTimeMillis()), 1, "third tag", 3);
             Task task4 = new Task("task4", "description4", new Date(System.currentTimeMillis()), 8, "fourth tag", 4);
             
-            save.invoke(null, fileName, testList);
-            result = (TaskList) read.invoke(null, fileName);
+            save.invoke(storage, fileName, testList);
+            result = (TaskList) read.invoke(storage, fileName);
             
             for(int i=0; i<testList.size();i++) {
                 saveTask = testList.get(i);
