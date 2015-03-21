@@ -10,6 +10,10 @@ public class Engine {
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
     
+    public static boolean isFirstRun() {
+        return config.isNew();
+    }
+    
     //Not tested yet
     public static boolean init() {
         try {
