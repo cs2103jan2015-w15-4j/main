@@ -54,18 +54,12 @@ public class ParseResult {
             this.parsedDate = null;
         }
         
-        if (date2 != null) {            
-            this.parsedDate = new Date(date.getTime());            // Changed to defensive copy            
-        } else {            
-            this.parsedDate = null;
-        }
-        
         if (dateToRemind != null) {            
             this.dateToRemind = new Date(dateToRemind.getTime());  // Changed to defensive copy            
         } else {            
             this.dateToRemind = null;
-        }       
-        
+        }
+
         this.parsedDate2 = date2;
         this.dateToRemind = dateToRemind;
         this.priorityLevel = priorityLevel;

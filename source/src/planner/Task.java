@@ -226,7 +226,7 @@ public class Task {
 				   taskDescription.equals( anotherTask.getDescription() ) &&
 				   taskTag.equals( anotherTask.getTag() ) &&
 				   dateCreated.equals(anotherTask.getCreatedDate()) &&
-				   dateDue.equals( anotherTask.getDueDate() ) &&
+				   dateDue.equals( anotherTask.getDueDate() ) && // TODO: check null
 				   (taskPriority == anotherTask.getPriority()) &&
 				   (taskCompleted == anotherTask.isDone()) &&
 				   (taskFloating == anotherTask.isFloating());
