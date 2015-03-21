@@ -9,9 +9,14 @@ public class Engine {
     private static TaskList undoneTasks;
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
+    private static long lastModifiedTask;
     
     public static boolean isFirstRun() {
         return config.isNew();
+    }
+    
+    public static long lastModifiedTask() {
+        return lastModifiedTask;
     }
     
     //Not tested yet
@@ -76,6 +81,7 @@ public class Engine {
                 Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.newTaskNumber());
                 allTasks.add(newTask);
                 refreshLists();
+                lastModifiedTask = newTask.getID();
                 return Constants.COMMAND_TYPE.ADD;
             case UPDATE:
                 boolean[] flags = result.getCommandFlags();
@@ -109,6 +115,7 @@ public class Engine {
                     return Constants.COMMAND_TYPE.INVALID;
                 }
                 refreshLists();
+                lastModifiedTask = toBeUpdated.getID();
                 return Constants.COMMAND_TYPE.UPDATE;
             case DELETE:
                 ID = result.getId();
@@ -128,6 +135,7 @@ public class Engine {
                         return Constants.COMMAND_TYPE.INVALID;
                     } else {
                         toBeDone.setDone();
+                        lastModifiedTask = toBeDone.getID();
                         return Constants.COMMAND_TYPE.DONE;
                     }
                     
