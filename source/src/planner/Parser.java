@@ -109,6 +109,9 @@ public class Parser {
                 processCommand("jump");
                 break;
                 
+            case CONVERT:
+                processCommand("convert");
+                
             default:
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
@@ -160,6 +163,9 @@ public class Parser {
                 
             case "jump":
                 return COMMAND_TYPE.JUMP;
+                
+            case "convert":
+                return COMMAND_TYPE.CONVERT;
 
             default:
                 return COMMAND_TYPE.INVALID;
@@ -255,6 +261,20 @@ public class Parser {
                     commandType = determineHelpCommandType(cmdToHelpWithType);
                 }
                 break;
+            
+            case "convert":
+                String[] convertArgs = keywordArgs.split(" ");
+                // get id of task to convert
+                try {
+                    id = Long.parseLong(convertArgs[0]);
+                } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, "error parsing id");
+                    resultType = Constants.RESULT_TYPE.INVALID;
+                    errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
+                }
+                
+                // determine type to convert to
+                commandType = determineConvertType(convertArgs[1]);
 
             // non command keywords start here
             case "at":            
@@ -331,6 +351,7 @@ public class Parser {
                     // process arguments of the previous command
                     processArgs(keywordBeingProcessed);
                     keywordArgs = "";
+                    previousKeywordProcessed = keywordBeingProcessed;
                     keywordBeingProcessed = wordBeingProcessed;
                 }
             } else {
@@ -423,6 +444,23 @@ public class Parser {
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
                 return COMMAND_TYPE.INVALID;
 
+        }
+    }
+    
+    private static COMMAND_TYPE determineConvertType(String convertTypeString) {
+        switch (convertTypeString) {
+            case "deadline":
+                return COMMAND_TYPE.CONVERT_DEADLINE;
+                
+            case "floating":
+                return COMMAND_TYPE.CONVERT_FLOATING;
+                
+            case "timed":
+                return COMMAND_TYPE.CONVERT_TIMED;
+               
+            default:
+                errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
+                return COMMAND_TYPE.INVALID;
         }
     }
 
