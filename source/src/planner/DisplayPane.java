@@ -203,6 +203,7 @@ public class DisplayPane extends JScrollPane{
 		if( component != null ){
 			
 			try{
+			    
 				StyledDocument styledDocument = (StyledDocument) display.getDocument();
 				Style style = styledDocument.addStyle("component", null);
 				StyleConstants.setComponent(style, component);
