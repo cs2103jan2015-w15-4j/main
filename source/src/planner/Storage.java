@@ -13,10 +13,10 @@ import java.util.Date;
 public class Storage {
     
     //Not tested yet
-    public static Configuration readConfig() {
+    public Configuration readConfig() {
         Configuration result = new Configuration("data");
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + Constants.CONFIG_FILE_LOCATION));
+            BufferedReader br = new BufferedReader(new FileReader(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
@@ -32,13 +32,15 @@ public class Storage {
     
     
     //Need to update tests
-    public static void saveConfiguration(Configuration newConfig) throws IOException {
+    public void saveConfiguration(Configuration newConfig) throws IOException {
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
         configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
-        writeToFile(Storage.class.getResource("").getFile() + Constants.CONFIG_FILE_LOCATION, config);
+        writeToFile(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION, config);
+        System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
+        System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
     }
     
     private static void writeToFile(String fileName, ArrayList<String> content) throws IOException {
@@ -55,7 +57,7 @@ public class Storage {
     }
     
     //Not tested yet
-    private static ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
+    private ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
         ArrayList<String> results = new ArrayList<String>();
         for(Task t:input) {
             results.add(convertTaskToJsonString(t));
@@ -64,20 +66,20 @@ public class Storage {
     }
     
     //Not tested yet
-    public static void saveTaskList(String fileName, TaskList tasks) {
+    public void saveTaskList(String fileName, TaskList tasks) {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         try {
-            writeToFile(Storage.class.getResource("").getFile() + fileName, taskJsonStrings);
+            writeToFile(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + fileName, taskJsonStrings);
         } catch (Exception e) {
             System.out.println(e);
         }
     }
     
     //Not tested yet
-    public static TaskList readTaskStorage(String fileName) {
+    public TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + fileName));
+            BufferedReader br = new BufferedReader(new FileReader(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + fileName));
             String input;
             while((input = br.readLine()) != null) {
                 tasks.add(convertTaskFromJsonString(input));
@@ -91,7 +93,7 @@ public class Storage {
         }
     }
     
-    private static String convertTaskToJsonString(Task task) {
+    private String convertTaskToJsonString(Task task) {
         JSONObject taskObject = new JSONObject();
         taskObject.put("name", task.getName());
         taskObject.put("description", task.getDescription());
@@ -104,7 +106,7 @@ public class Storage {
         return taskObject.toJSONString();
     }
     
-    private static Task convertTaskFromJsonString(String taskString) {
+    private Task convertTaskFromJsonString(String taskString) {
         try {
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(taskString);

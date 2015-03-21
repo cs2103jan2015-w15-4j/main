@@ -114,6 +114,24 @@ public class ParserTest {
     }
     
     @Test
+    // test correct usage of undone
+    public void testNotDoneCommand() {
+        ParseResult result = Parser.parse("setnotdone 322 date 111 Mar 3917");
+        assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
+        assertEquals(Constants.COMMAND_TYPE.SETNOTDONE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(322, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, true, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName()); 
+    }
+    
+    @Test
     // test done command without a valid id immediately after 'done' (incorrect usage)
     public void testDoneCommandWithoutID() {
         ParseResult result = Parser.parse("done fishburger 234234 pig sandwich");

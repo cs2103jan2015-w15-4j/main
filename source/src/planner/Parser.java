@@ -92,6 +92,10 @@ public class Parser {
             case DONE:
                 processCommand("done");
                 break;
+            
+            case SETNOTDONE:
+                processCommand("setnotdone");
+                break;
                 
             case UNDO:
                 // not yet implemented
@@ -150,6 +154,9 @@ public class Parser {
             case "completed":
             case "finished":
                 return COMMAND_TYPE.DONE;
+                
+            case "setnotdone":
+                return COMMAND_TYPE.SETNOTDONE;
 
             case "undo":
             case "revert":
@@ -235,7 +242,8 @@ public class Parser {
                     commandType = Constants.COMMAND_TYPE.SHOW_ALL;
                 }
                 break;
-
+                
+            case "setnotdone":
             case "done":
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
@@ -348,6 +356,9 @@ public class Parser {
 
                  // all text after the id is ignored for done
                 } else if (keywordBeingProcessed.equals("done")) {
+                    break;
+                 // all text after the id is ignored for setnotdone   
+                } else if (keywordBeingProcessed.equals("setnotdone")) {
                     break;
                     
                 // all text after 'show' and its id is ignored for show 

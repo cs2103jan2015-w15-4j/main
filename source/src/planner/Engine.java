@@ -16,6 +16,7 @@ public class Engine {
     private static TaskList normalTasks;
     private static TaskList searchResults;
     private static long lastModifiedTask;
+    private static Storage storage;
     
     public static boolean isFirstRun() {
         return config.isNew();
@@ -28,14 +29,14 @@ public class Engine {
     //Not tested yet
     public static boolean init() {
         try {
-        	
-            config = Storage.readConfig();
-            allTasks = Storage.readTaskStorage(config.getStoragePath());
-        	doneTasks = new TaskList();
-        	undoneTasks = new TaskList();
-        	tentativeTasks = new TaskList();
-        	normalTasks = new TaskList();
-        	
+            storage = new Storage();
+            config = storage.readConfig();
+            allTasks = storage.readTaskStorage(config.getStoragePath());
+            doneTasks = new TaskList();
+            undoneTasks = new TaskList();
+            tentativeTasks = new TaskList();
+            normalTasks = new TaskList();
+            
             refreshLists();
             System.out.println(allTasks.size());
             return true;
@@ -47,8 +48,8 @@ public class Engine {
     //Not tested yet
     public static boolean exit() {
         try {
-            Storage.saveConfiguration(config);
-            Storage.saveTaskList(config.getStoragePath(), allTasks);
+            storage.saveConfiguration(config);
+            storage.saveTaskList(config.getStoragePath(), allTasks);
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
@@ -58,8 +59,8 @@ public class Engine {
     
     //Not tested yet
     private static void refreshLists() {
-    	
-    	
+        
+        
         doneTasks.clear();
         undoneTasks.clear();
         normalTasks.clear();
@@ -143,6 +144,23 @@ public class Engine {
         }
     }
     
+    private static Constants.COMMAND_TYPE setUndoneTask(ParseResult result) {
+        if(!result.getCommandFlags()[3]) {
+            return Constants.COMMAND_TYPE.INVALID;
+        } else {
+            long ID = result.getId();
+            Task toBeDone = allTasks.getTaskByID(ID);
+            if(toBeDone == null) {
+                return Constants.COMMAND_TYPE.INVALID;
+            } else {
+                toBeDone.setUndone();
+                lastModifiedTask = toBeDone.getID();
+                return Constants.COMMAND_TYPE.DONE;
+            }
+            
+        }
+    }
+    
     private static Constants.COMMAND_TYPE searchTask(ParseResult result) {
         boolean[] flags = result.getCommandFlags();
         searchResults = new TaskList(allTasks);
@@ -166,12 +184,12 @@ public class Engine {
     
     //Not tested yet
     public static Constants.COMMAND_TYPE process(String userInput) {
-    	
-    	if(userInput == null){
-    		
-    		return Constants.COMMAND_TYPE.INVALID;
-    	}
-    	
+        
+        if(userInput == null){
+            
+            return Constants.COMMAND_TYPE.INVALID;
+        }
+        
         ParseResult result = Parser.parse(userInput);
         Constants.COMMAND_TYPE command = result.getCommandType();
         long ID;
@@ -192,6 +210,8 @@ public class Engine {
                 return Constants.COMMAND_TYPE.UNDO;
             case SEARCH:
                 return searchTask(result);
+            case SETNOTDONE:
+                return setUndoneTask(result);
             case HELP:
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.HELP;

@@ -1,20 +1,39 @@
 package planner;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ListIterator;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.ScrollBarUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.Utilities;
 
 public class DisplayPane extends JScrollPane{
 
@@ -25,6 +44,8 @@ public class DisplayPane extends JScrollPane{
 	private long currentTaskBarID;
 	
 	private TreeMap<Long, TaskBar> listOfTasks;
+	
+	private CustomScrollBarUI scrollBarSkin;
 	
 	public DisplayPane(){
 		
@@ -42,12 +63,19 @@ public class DisplayPane extends JScrollPane{
 		setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		getViewport().setOpaque(false);
+		
+		JScrollBar verticalScrollBar = getVerticalScrollBar();
+		verticalScrollBar.setOpaque(false);
+		
+		scrollBarSkin = new CustomScrollBarUI();
+		verticalScrollBar.setUI( scrollBarSkin );
 	}
 	
 	private void prepareDisplay(){
 		
 		display = new JTextPane();
 		
+		display.setHighlighter(null);
 		display.setEditable(false);
 		display.setOpaque(false);
 		display.setBorder(null);
@@ -64,6 +92,11 @@ public class DisplayPane extends JScrollPane{
 		currentTaskBarID = -1;
 		
 		listOfTasks.clear();
+	}
+	
+	public long getCurrentSelectedTaskID(){
+	    
+	    return currentTaskBarID;
 	}
 	
 	public boolean selectTask( long lineNumber ){
@@ -93,12 +126,14 @@ public class DisplayPane extends JScrollPane{
 		
 		if( currentTaskBarID - 1 >= 0 ){
 		
-			TaskBar tempTaskBar = listOfTasks.get( currentTaskBarID + 1 );
+		    long newCurrentTaskBarID = currentTaskBarID - 1;
+		    
+			TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
 			
 			if( tempTaskBar != null ){
 				
-				selectTask( tempTaskBar, currentTaskBarID + 1 );
-				
+				selectTask( tempTaskBar, currentTaskBarID - 1 );
+                
 				return true;
 				
 			} else{
@@ -113,15 +148,17 @@ public class DisplayPane extends JScrollPane{
 	}
 	
 	public boolean selectNextTask(){
-		
+	    
 		if( currentTaskBarID + 1 < listOfTasks.size() ){
 			
-			TaskBar tempTaskBar = listOfTasks.get( currentTaskBarID + 1 );
+		    long newCurrentTaskBarID = currentTaskBarID + 1;
+		    
+			TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
 			
 			if( tempTaskBar != null ){
 				
 				selectTask( tempTaskBar, currentTaskBarID + 1 );
-				
+	            
 				return true;
 				
 			} else{
@@ -138,7 +175,7 @@ public class DisplayPane extends JScrollPane{
 	private void selectTask( TaskBar taskBar, long id ){
 		
 		if( taskBar != null && id >= 0 && id < listOfTasks.size() ){
-		
+		    
 			deselectTask( currentTaskBar );
 			
 			taskBar.setFocusedTaskBar();
@@ -166,15 +203,13 @@ public class DisplayPane extends JScrollPane{
 		if( component != null ){
 			
 			try{
+			    
 				StyledDocument styledDocument = (StyledDocument) display.getDocument();
 				Style style = styledDocument.addStyle("component", null);
 				StyleConstants.setComponent(style, component);
 				styledDocument.insertString( styledDocument.getLength(), "component", style );
 				
-			} catch( BadLocationException badLocationException ){
-				
-				
-			}
+			} catch( BadLocationException badLocationException ){}
 		}
 	}
 	
@@ -225,7 +260,7 @@ public class DisplayPane extends JScrollPane{
 		}
 	}
 	
-	public boolean addTaskToDisplay( Task task  ){
+	public boolean addTaskToDisplay( Task task ){
 		
 		if( task == null ){
 			
@@ -234,11 +269,13 @@ public class DisplayPane extends JScrollPane{
 		
 		long taskBarID = listOfTasks.size();
 		
-		appendString(" ");
+		appendString("               ");
 		
 		TaskBar taskBar = new TaskBar();
 		
-		setTaskBarParameters( taskBar, task, taskBarID + 1 );
+		//setTaskBarParameters( taskBar, task, taskBarID + 1 );
+		
+		setTaskBarParameters( taskBar, task, task.getID() );
 		
 		taskBar.setPosition( display.getCaretPosition() );
 		
@@ -263,30 +300,30 @@ public class DisplayPane extends JScrollPane{
 		ListIterator<Task> iterator = taskList.listIterator();
 		Task currentTask;
 		
-		long count = 0;
+		long idxForCurrentTaskBar;
 		while( iterator.hasNext() ){
 			
-			appendString(" ");
+			appendString("               ");
 			
 			currentTask = iterator.next();
 			
 			currentTaskBar = new TaskBar();
 			
-
 			//setTaskBarParameters( currentTaskBar, currentTask, count + 1 );
 			
 			setTaskBarParameters( currentTaskBar, currentTask, currentTask.getID() );
 
-			
 			currentTaskBar.setPosition( display.getCaretPosition() );
+			
+			//System.out.println( "Position of " + currentTask.getName() + " = " + currentTaskBar.getPosition() );
 			
 			addComponentToDisplay( currentTaskBar );
 			
-			listOfTasks.put( count, currentTaskBar );
+			idxForCurrentTaskBar = listOfTasks.size();
+			
+			listOfTasks.put( idxForCurrentTaskBar, currentTaskBar );
 			
 			appendString("\n");
-			
-			++count;
 		}
 		
 		if( !listOfTasks.isEmpty() ){
@@ -296,4 +333,19 @@ public class DisplayPane extends JScrollPane{
 		
 		return true;
 	}
+	
+	public InvisibleButton getUpButtonComponent(){
+        
+        return (scrollBarSkin != null ? scrollBarSkin.getUpButtonComponent() : null);
+    }
+    
+    public InvisibleButton getDownButtonComponent(){
+        
+        return (scrollBarSkin != null ? scrollBarSkin.getDownButtonComponent() : null);
+    }
+    
+    public JTextPane getDisplayComponent(){
+        
+        return display;
+    }
 }

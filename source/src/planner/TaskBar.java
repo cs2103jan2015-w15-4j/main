@@ -1,4 +1,5 @@
 package planner;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -10,8 +11,13 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 
 import java.awt.Color;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,10 +30,10 @@ import javax.swing.text.StyledDocument;
 
 public class TaskBar extends JComponent {
 
-	private Insets componentCoordinates;
+    private Insets componentCoordinates;
 	
 	private final int m_width = 515;
-	private final int m_height = 69;
+	private final int m_height = 82;
 	
 	private JLabel taskBarBackground;
 	private JLabel taskPriorityBar;
@@ -45,10 +51,24 @@ public class TaskBar extends JComponent {
 	
 	private int position;
 	
+	// Helper functions
 	@Override
 	public Dimension getPreferredSize() {
 	    return new Dimension(m_width, m_height);
 	}
+	
+	private void removeMouseListener( Component component ){
+        
+        if( component != null ){
+            
+            component.addMouseListener( new MouseAdapter(){
+
+                @Override
+                public void mouseClicked(MouseEvent arg0) {}
+            });
+        }
+    }
+	// End of helper functions
 	
 	public TaskBar() {
 		
@@ -94,7 +114,7 @@ public class TaskBar extends JComponent {
 		
 		taskTimeDataLabel = new JTextArea();
 		taskTimeDataLabel.setEditable(false);
-		taskTimeDataLabel.setBounds(67, 30, 229, 30);
+		taskTimeDataLabel.setBounds(67, 38, 238, 32);
 		taskTimeDataLabel.setOpaque(false);
 		taskTimeDataLabel.setFocusable(false);
 		taskTimeDataLabel.setFont(new Font( "Arial", Font.PLAIN, 11 ));
@@ -117,11 +137,12 @@ public class TaskBar extends JComponent {
 	private void prepareTaskPriorityBar(){
 		
 		taskPriorityBar = new JLabel();
-		taskPriorityBar.setBounds(58, 14, 5, 45);
+		taskPriorityBar.setBounds(58, 12, 5, 57);
 		taskPriorityBar.setBackground(new Color( 255, 0, 0 ));
-		taskPriorityBar.setFocusable(false);
+		
 		taskPriorityBar.setOpaque(true);
 		add(taskPriorityBar);
+		removeMouseListener(taskPriorityBar);
 	}
 	
 	public void setPriorityBarColour( Color colour ){
@@ -140,9 +161,10 @@ public class TaskBar extends JComponent {
 		taskTimeCounter.setForeground(new Color(255, 102, 0));
 		taskTimeCounter.setHorizontalAlignment(SwingConstants.CENTER);
 		taskTimeCounter.setFocusable(false);
-		taskTimeCounter.setBounds(302, 9, 145, 24);
+		taskTimeCounter.setBounds(310, 15, 145, 24);
 		add(taskTimeCounter);
 		taskTimeCounter.setText("12");
+		removeMouseListener(taskTimeCounter);
 	}
 	
 	public void setTimeCounter( String time ){
@@ -165,9 +187,10 @@ public class TaskBar extends JComponent {
 		taskTimeCounterLabel.setForeground(new Color(238, 238, 238));
 		taskTimeCounterLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		taskTimeCounterLabel.setFocusable(false);
-		taskTimeCounterLabel.setBounds(302, 32, 145, 14);
+		taskTimeCounterLabel.setBounds(310, 38, 145, 14);
 		add(taskTimeCounterLabel);
 		taskTimeCounterLabel.setText("Days Left");
+		removeMouseListener(taskTimeCounterLabel);
 	}
 	
 	// will change this to Left or Overdue. And time unit will be an enum value
@@ -187,9 +210,10 @@ public class TaskBar extends JComponent {
 		taskTagLabel.setForeground(new Color(31, 190, 214));
 		taskTagLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		taskTagLabel.setFocusable(false);
-		taskTagLabel.setBounds(302, 46, 145, 14);
+		taskTagLabel.setBounds(310, 54, 145, 14);
 		add(taskTagLabel);
 		taskTagLabel.setText("#Work #Important #Final");
+		removeMouseListener(taskTagLabel);
 	}
 	
 	public void setTaskTags( String tags ){
@@ -206,8 +230,9 @@ public class TaskBar extends JComponent {
 		taskCheckBox = new JLabel();
 		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/NotDoneCheckBox.png")));
 		taskCheckBox.setFocusable(false);
-		taskCheckBox.setBounds(460, 18, 35, 35);
+		taskCheckBox.setBounds(460, 23, 35, 35);
 		add(taskCheckBox);
+		removeMouseListener(taskCheckBox);
 	}
 	
 	public void setTaskDone(){
@@ -228,10 +253,10 @@ public class TaskBar extends JComponent {
 	// Title label functions
 	private void prepareTaskTitleLabel(){
 		
-		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(102,102,102), new Color(102,102,102), 25, 22);
-		taskTitleLabel.setBounds(67, 10, 228, 24);
+		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(0,0,0,0), new Color(0,0,0,0), 24, 23);
+		taskTitleLabel.setBounds(67, 12, 228, 25);
 		taskTitleLabel.setFocusable(false);
-		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 18 ));
+		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 14));
 		add(taskTitleLabel);
 		taskTitleLabel.setText("This is a sample text testing one two");
 	}
@@ -248,12 +273,13 @@ public class TaskBar extends JComponent {
 	private void prepareLineNumberLabel(){
 		
 		lineNumberLabel = new JLabel("#0");
-		lineNumberLabel.setBounds(10, 14, 42, 44);
+		lineNumberLabel.setBounds(10, 12, 42, 57);
 		lineNumberLabel.setForeground(new Color( 255,255,255,220 ));
 		lineNumberLabel.setFont(new Font( "Arial", Font.BOLD, 15 ));
 		lineNumberLabel.setFocusable(false);
 		lineNumberLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lineNumberLabel);
+		removeMouseListener(lineNumberLabel);
 	}
 	
 	public void setLineNumber( long lineNumber ){
@@ -273,6 +299,7 @@ public class TaskBar extends JComponent {
 		taskBarBackground.setFocusable(false);
 		taskBarBackground.setBounds( componentCoordinates.left, componentCoordinates.top, m_width, m_height );
 		add(taskBarBackground);
+		removeMouseListener(taskBarBackground);
 	}
 	
 	public void setFocusedTaskBar(){
