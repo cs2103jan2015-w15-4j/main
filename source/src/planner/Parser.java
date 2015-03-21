@@ -102,6 +102,10 @@ public class Parser {
             case HELP:
                 processCommand("help");
                 break;
+            
+            case JUMP:
+                processCommand("jump");
+                break;
                 
             default:
                 resultType = Constants.RESULT_TYPE.INVALID;
@@ -151,6 +155,9 @@ public class Parser {
             case "help":
             case "sos":
                 return COMMAND_TYPE.HELP;
+                
+            case "jump":
+                return COMMAND_TYPE.JUMP;
 
             default:
                 return COMMAND_TYPE.INVALID;
@@ -248,17 +255,17 @@ public class Parser {
                 break;
 
             // non command keywords start here
-            case "at":
-            case "by":
+            case "at":            
             case "on":
-            case "date":
-            case "due":
+            case "date":            
             case "from":
                 calendar = parseDate(keywordArgs);
                 date = calendar.getTime();
                 break;
             
             // end date (for timed tasks)
+            case "by":
+            case "due":
             case "until":
                 calendar = parseDate(keywordArgs);
                 date2 = calendar.getTime();
@@ -296,6 +303,8 @@ public class Parser {
     private static void processCommand(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
         String wordBeingProcessed = "";
+        // store previous keyword that was processed
+        String previousKeywordProcessed = "";
         // to decide what to do with args
         String keywordBeingProcessed = commandWord;
 
@@ -309,7 +318,7 @@ public class Parser {
                 } else if (keywordBeingProcessed.equals("delete")) {
                     break;
 
-                 // all text after the id is ignored for done    
+                 // all text after the id is ignored for done
                 } else if (keywordBeingProcessed.equals("done")) {
                     break;
                     
