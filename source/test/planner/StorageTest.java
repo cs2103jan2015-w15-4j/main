@@ -16,13 +16,16 @@ public class StorageTest {
     @Test
     public void testSaveConfiguration() {
         try {
-            File configFile = new File(Constants.CONFIG_FILE_LOCATION);
-            configFile.createNewFile();
-            BufferedReader br = new BufferedReader(new FileReader(configFile));
+            
+            
             
             Configuration config1 = new Configuration("path1");
             Storage.saveConfiguration(config1);
-
+            
+            File configFile = new File(Constants.CONFIG_FILE_LOCATION);
+            configFile.createNewFile();
+            
+            BufferedReader br = new BufferedReader(new FileReader(configFile));
             
             String fileContents = br.readLine();
             

@@ -13,10 +13,10 @@ import java.util.Date;
 public class Storage {
     
     //Not tested yet
-    public static Configuration readConfig() {
+    public Configuration readConfig() {
         Configuration result = new Configuration("data");
         try {
-            BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + Constants.CONFIG_FILE_LOCATION));
+            BufferedReader br = new BufferedReader(new FileReader(getClass().getResource("").getFile() + Constants.CONFIG_FILE_LOCATION));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
@@ -32,7 +32,7 @@ public class Storage {
     
     
     //Need to update tests
-    public static void saveConfiguration(Configuration newConfig) throws IOException {
+    public void saveConfiguration(Configuration newConfig) throws IOException {
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
         configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
@@ -55,7 +55,7 @@ public class Storage {
     }
     
     //Not tested yet
-    private static ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
+    private ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
         ArrayList<String> results = new ArrayList<String>();
         for(Task t:input) {
             results.add(convertTaskToJsonString(t));
@@ -64,7 +64,7 @@ public class Storage {
     }
     
     //Not tested yet
-    public static void saveTaskList(String fileName, TaskList tasks) {
+    public void saveTaskList(String fileName, TaskList tasks) {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         try {
             writeToFile(Storage.class.getResource("").getFile() + fileName, taskJsonStrings);
@@ -74,7 +74,7 @@ public class Storage {
     }
     
     //Not tested yet
-    public static TaskList readTaskStorage(String fileName) {
+    public TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
         try {
             BufferedReader br = new BufferedReader(new FileReader(Storage.class.getResource("").getFile() + fileName));
@@ -91,7 +91,7 @@ public class Storage {
         }
     }
     
-    private static String convertTaskToJsonString(Task task) {
+    private String convertTaskToJsonString(Task task) {
         JSONObject taskObject = new JSONObject();
         taskObject.put("name", task.getName());
         taskObject.put("description", task.getDescription());
@@ -104,7 +104,7 @@ public class Storage {
         return taskObject.toJSONString();
     }
     
-    private static Task convertTaskFromJsonString(String taskString) {
+    private Task convertTaskFromJsonString(String taskString) {
         try {
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(taskString);

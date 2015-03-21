@@ -10,8 +10,10 @@ public class SortLogic {
     private static Comparator<Task> dueDateComparator = new Comparator<Task>() {
         @Override
         public int compare(Task task1, Task task2) {
-            long t1 = task1.getDueDate().getTime();
-            long t2 = task2.getDueDate().getTime();
+            Long t1 = task1.getDueDate().getTime();
+            Long t2 = task2.getDueDate().getTime();
+            assert (t1 != null);    //Assertion that date cannot be null
+            assert (t2 != null);
             if (t1>t2) {
                 return 1;
             }
@@ -66,15 +68,9 @@ public class SortLogic {
                 return -1;
             }
             else {
-                long t1 = task1.getDueDate().getTime();
-                long t2 = task2.getDueDate().getTime();
-                if (t1>t2) {
-                    return 1;
-                }
-                else if (t2>t1) {
-                    return -1;
-                }
-                else {
+                Long t1 = task1.getDueDate().getTime();
+                Long t2 = task2.getDueDate().getTime();
+                if ((t1 == null && t2 == null) || (t1 != null && t2 != null)) {
                     String name1 = task1.getName();
                     String name2 = task2.getName();
                     int name = name1.compareTo(name2);
@@ -83,8 +79,7 @@ public class SortLogic {
                     }
                     else if (name < 0) {
                         return -1;
-                    }
-                    else {
+                    } else {
                         long ID1 = task1.getID();
                         long ID2 = task2.getID();
                         if (ID1 > ID2) {
@@ -97,6 +92,12 @@ public class SortLogic {
                             return 0;
                         }
                     }
+                }
+                else if (t1 == null) {
+                    return 1;
+                }
+                else {
+                    return -1;
                 }
             }
         }

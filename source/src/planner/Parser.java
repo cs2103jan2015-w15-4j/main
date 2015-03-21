@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import planner.Constants.COMMAND_TYPE;
 import planner.Constants.RESULT_TYPE;
@@ -17,20 +19,22 @@ import planner.Constants.RESULT_TYPE;
  */
 public class Parser {
 
+    private static Logger logger = Logger.getLogger("Parser");    
+    
     // stores the arguments for each keyword
     private static String keywordArgs = "";
 
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
         "every", "in", "priority", "desc", "description", "date", "due",
-        "remind", "tag"
+        "remind", "tag", "until"
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
-    private static String[] monthsArray = {"Jan", "January", "Feb", "February",
-        "Mar", "March", "Apr", "April", "May", "May", "Jun", "June", "Jul",
-        "July", "Aug", "August", "Sep", "September", "Oct", "October", "Nov",
-        "November", "Dec", "December"
+    private static String[] monthsArray = {"jan", "january", "feb", "february",
+        "mar", "march", "apr", "april", "may", "may", "jun", "june", "jul",
+        "july", "aug", "august", "sep", "september", "oct", "october", "nov",
+        "november", "dec", "december"
     };
     private static ArrayList<String> months =
             new ArrayList<String>(Arrays.asList(monthsArray));
@@ -39,6 +43,7 @@ public class Parser {
     private static RESULT_TYPE resultType = RESULT_TYPE.VALID;
     private static COMMAND_TYPE commandType = null;
     private static Date date = null;
+    private static Date date2 = null;
     private static Date dateToRemind = null;
     private static int priorityLevel = 0;
     private static long id = 0;
@@ -46,19 +51,23 @@ public class Parser {
     private static String description = "";
     private static String tag = "";
     private static String errorMessage = "";
-    private static boolean[] flags = new boolean[7];
+    private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
 
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
 
     public static ParseResult parse(String command) {
+        logger.setLevel(Level.WARNING);
         resetFields();
         ParseResult result = process(command);
         return result;
     }    
     
     private static ParseResult process(String command) {
+        
+        logger.log(Level.INFO, "going to begin processing");
         commandWords = command.split(" ");
+        assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[0]);
 
         switch(commandType) {
@@ -93,13 +102,19 @@ public class Parser {
             case HELP:
                 processCommand("help");
                 break;
+            
+            case JUMP:
+                processCommand("jump");
+                break;
                 
             default:
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorMessage = "invalid command type";
                 break;
         }
-        return createParseResult(resultType, commandType);
+        logger.log(Level.INFO, "processing ended. returning result.");
+        ParseResult parseResult = createParseResult(resultType, commandType);        
+        return parseResult;
     }
 
     private static COMMAND_TYPE extractCommandType(String commandWord) {
@@ -140,6 +155,9 @@ public class Parser {
             case "help":
             case "sos":
                 return COMMAND_TYPE.HELP;
+                
+            case "jump":
+                return COMMAND_TYPE.JUMP;
 
             default:
                 return COMMAND_TYPE.INVALID;
@@ -160,7 +178,7 @@ public class Parser {
         description = "";
         tag = "";
         errorMessage = "";
-        flags = new boolean[7];
+        flags = new boolean[8];
         calendar = null;
     }
 
@@ -169,6 +187,14 @@ public class Parser {
     }
 
     private static void processArgs(String keyword) {
+        // remove escape character from arguments since now unneeded
+        String[] keywordArgsArray = keywordArgs.split(" ");
+        StringBuilder sb = new StringBuilder(keywordArgs.length());
+        for (String s: keywordArgsArray) {
+            sb.append(s.replaceFirst("/", "") + " ");
+        }
+        keywordArgs = sb.toString().trim();
+        
         switch(keyword) {
             // command keywords start here
             case "add":
@@ -180,6 +206,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorMessage = "a number must be entered for the task id";
                 }
@@ -189,8 +216,11 @@ public class Parser {
                 try {
                     // check whether next token is an id of the task to show
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    logger.log(Level.INFO, "successfully parsed id, show" + 
+                               "specific task");
                     commandType = Constants.COMMAND_TYPE.SHOW_ONE;
                 } catch (NumberFormatException e) {
+                    logger.log(Level.INFO, "no id parsed, show all tasks");
                     commandType = Constants.COMMAND_TYPE.SHOW_ALL;
                 }
                 break;
@@ -199,6 +229,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
+                    logger.log(Level.WARNING, "error parsing id");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorMessage = "a number must be entered for the task id";
                 }
@@ -216,20 +247,28 @@ public class Parser {
                 String cmdToHelpWith = keywordArgs.split(" ")[0];
                 COMMAND_TYPE cmdToHelpWithType = extractCommandType(cmdToHelpWith);
                 if (cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
-                    // if no command given, no need to modify anything
+                    logger.log(Level.INFO, "show general help");
                 } else {
+                    logger.log(Level.INFO, "show help for specific command");
                     commandType = determineHelpCommandType(cmdToHelpWithType);
                 }
                 break;
 
             // non command keywords start here
-            case "at":
-            case "by":
+            case "at":            
             case "on":
-            case "date":
-            case "due":
+            case "date":            
+            case "from":
                 calendar = parseDate(keywordArgs);
                 date = calendar.getTime();
+                break;
+            
+            // end date (for timed tasks)
+            case "by":
+            case "due":
+            case "until":
+                calendar = parseDate(keywordArgs);
+                date2 = calendar.getTime();
                 break;
 
             case "every":
@@ -264,6 +303,8 @@ public class Parser {
     private static void processCommand(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
         String wordBeingProcessed = "";
+        // store previous keyword that was processed
+        String previousKeywordProcessed = "";
         // to decide what to do with args
         String keywordBeingProcessed = commandWord;
 
@@ -277,7 +318,7 @@ public class Parser {
                 } else if (keywordBeingProcessed.equals("delete")) {
                     break;
 
-                 // all text after the id is ignored for done    
+                 // all text after the id is ignored for done
                 } else if (keywordBeingProcessed.equals("done")) {
                     break;
                     
@@ -314,6 +355,7 @@ public class Parser {
     private static boolean[] updateResultFlags(boolean[] flags) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
         //              description, tag
+        assert(flags.length == 7);
         if (date != null) {
             flags[0] = true;
         }
@@ -335,13 +377,16 @@ public class Parser {
         if (!tag.equals("")) {
             flags[6] = true;
         }
+        if (date2 != null) {
+            flags[7] = true;
+        }
         return flags;
     }
 
     // constructs and returns result based on existing fields
     private static ParseResult createParseResult(RESULT_TYPE resultType,
                                            COMMAND_TYPE commandType) {
-        return new ParseResult(resultType, commandType, date, dateToRemind, 
+        return new ParseResult(resultType, commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorMessage, flags);
     }
@@ -380,13 +425,18 @@ public class Parser {
     }
 
     private static Calendar parseDate(String arguments) {
+        logger.log(Level.INFO, "beginning date parsing");
         int day = 0;
         int month = 0;
         int year = 0;
         String[] dateParts = arguments.split(" ");
+        assert(dateParts.length == 3);
         String expectedDay = dateParts[0];
         String expectedMonth = dateParts[1];
         String expectedYear = dateParts[2];
+        logger.log(Level.INFO, "value expected to be day: " + expectedDay);
+        logger.log(Level.INFO, "value expected to be month: " + expectedMonth);
+        logger.log(Level.INFO, "value expected to be year: " + expectedYear);
 
         try {
             day = Integer.parseInt(expectedDay);
@@ -398,13 +448,15 @@ public class Parser {
         try {
             month = Integer.parseInt(expectedMonth);
         } catch (NumberFormatException e) {
-            int monthIndex = months.indexOf(expectedMonth);
+            int monthIndex = months.indexOf(expectedMonth.toLowerCase());
             // check whether it is found in the list of month strings
             if (monthIndex == -1) {
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorMessage = "Unable to parse date";
+                logger.log(Level.WARNING, "unable to parse date");
             } else {
                 month = (monthIndex / 2) + 1;
+                logger.log(Level.INFO, "month of parsed date: " + month);
             }
 
         }
@@ -417,7 +469,7 @@ public class Parser {
         }
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, day, 0 , 0, 0);
+        calendar.set(year, month - 1, day, 0, 0, 0);
         return calendar;
     }
 

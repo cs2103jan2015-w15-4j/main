@@ -10,20 +10,20 @@ public class ParserTest {
     
     @Test
     public void testAddCommand() {
-        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 priority 5 tag important");
+        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 until 6 Mar 2018 priority 5 tag important");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.ADD, result.getCommandType());
         assertEquals("Mon Mar 05 00:00:00 SGT 2018", result.getDate().toString());
+        assertEquals("Tue Mar 06 00:00:00 SGT 2018", result.getSecondDate().toString()); 
         assertTrue(result.getDateToRemind() == null);
         assertEquals(5, result.getPriorityLevel());
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("important", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {true, false, true, false, true, false, true};
+        boolean[] flags = {true, false, true, false, true, false, true, true};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
-        assertEquals("important meeting with boss", result.getName());
-        
+        assertEquals("important meeting with boss", result.getName());        
     }
 
     @Test
@@ -32,12 +32,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.UPDATE, result.getCommandType());
         assertEquals("Tue Jun 23 00:00:00 SGT 2015", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(123, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {true, false, false, true, false, false, false};
+        boolean[] flags = {true, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
@@ -48,12 +49,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.DELETE, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(462, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, true, false, false, false};
+        boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
@@ -64,12 +66,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.SHOW_ALL, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, false, false, false, false};
+        boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
@@ -80,47 +83,50 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.SHOW_ONE, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(135135, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, true, false, false, false};
+        boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
     
     @Test
     // test correct usage of done
-    public void testDoneCommand() {        
+    public void testDoneCommand() {
         ParseResult result = Parser.parse("done 347564 date 111 Mar 3917");
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.DONE, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(347564, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, true, false, false, false};
+        boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());        
 
     }
     
     @Test
-    // test done command without a valid id immediately after 'done'
+    // test done command without a valid id immediately after 'done' (incorrect usage)
     public void testDoneCommandWithoutID() {
         ParseResult result = Parser.parse("done fishburger 234234 pig sandwich");
         assertEquals(Constants.RESULT_TYPE.INVALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.DONE, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("a number must be entered for the task id", result.getErrorMessage());
-        boolean[] flags = {false, false, false, false, false, false, false};
+        boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
@@ -131,12 +137,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.SEARCH, result.getCommandType());
         assertEquals("Sat Oct 10 00:00:00 SGT 1528", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
         assertEquals("Fri Oct 09 00:00:00 SGT 1528", result.getDateToRemind().toString());
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("delicious", result.getDescription());
         assertEquals("food", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {true, true, false, false, true, true, true};
+        boolean[] flags = {true, true, false, false, true, true, true, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("sushi bar", result.getName());
     }
@@ -148,12 +155,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.HELP, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, false, false, false, false};
+        boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
@@ -164,12 +172,13 @@ public class ParserTest {
         assertEquals(Constants.RESULT_TYPE.VALID, result.getResultType());
         assertEquals(Constants.COMMAND_TYPE.HELP_ADD, result.getCommandType());
         assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
         assertEquals("", result.getErrorMessage());
-        boolean[] flags = {false, false, false, false, false, false, false};
+        boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }

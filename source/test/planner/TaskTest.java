@@ -3,6 +3,7 @@ package planner;
 import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 import org.junit.Test;
 
@@ -134,11 +135,11 @@ public class TaskTest {
         long ID = 4;
         
         Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        assertEquals("Task due date should be "+taskDueDate, taskDueDate, entry.getDueDate());
+        assertEquals("Task due date should be "+taskDueDate, taskDueDate.toString(), entry.getDueDate().toString());
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 42;
