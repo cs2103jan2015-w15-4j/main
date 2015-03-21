@@ -20,7 +20,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("important", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {true, false, true, false, true, false, true, true};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("important meeting with boss", result.getName());        
@@ -37,7 +37,7 @@ public class ParserTest {
         assertEquals(123, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {true, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -54,7 +54,7 @@ public class ParserTest {
         assertEquals(462, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -71,7 +71,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -88,7 +88,7 @@ public class ParserTest {
         assertEquals(135135, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -106,7 +106,7 @@ public class ParserTest {
         assertEquals(347564, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());        
@@ -125,7 +125,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("a number must be entered for the task id", result.getErrorMessage());
+        assertEquals(Constants.ERROR_TYPE.INVALID_TASK_ID, result.getErrorType());
         boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -142,7 +142,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("delicious", result.getDescription());
         assertEquals("food", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {true, true, false, false, true, true, true, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("sushi bar", result.getName());
@@ -160,7 +160,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -177,7 +177,7 @@ public class ParserTest {
         assertEquals(Constants.NO_ID_SET, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals("", result.getErrorMessage());
+        assertTrue(result.getErrorType() == null);
         boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
