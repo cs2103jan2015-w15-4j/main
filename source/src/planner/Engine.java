@@ -9,6 +9,7 @@ public class Engine {
     private static TaskList undoneTasks;
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
+    private static TaskList searchResults;
     private static long lastModifiedTask;
     
     public static boolean isFirstRun() {
@@ -120,6 +121,44 @@ public class Engine {
         return Constants.COMMAND_TYPE.DELETE;
     }
     
+    private static Constants.COMMAND_TYPE setDoneTask(ParseResult result) {
+        if(!result.getCommandFlags()[3]) {
+            return Constants.COMMAND_TYPE.INVALID;
+        } else {
+            long ID = result.getId();
+            Task toBeDone = allTasks.getTaskByID(ID);
+            if(toBeDone == null) {
+                return Constants.COMMAND_TYPE.INVALID;
+            } else {
+                toBeDone.setDone();
+                lastModifiedTask = toBeDone.getID();
+                return Constants.COMMAND_TYPE.DONE;
+            }
+            
+        }
+    }
+    
+    private static Constants.COMMAND_TYPE searchTask(ParseResult result) {
+        boolean[] flags = result.getCommandFlags();
+        searchResults = new TaskList(allTasks);
+        if(flags[0] && flags[7]) {
+            searchResults = Logic.searchPeriod(searchResults, result.getDate(), result.getSecondDate());
+        }
+        if(flags[2]) {
+            searchResults = Logic.searchPriority(searchResults, result.getPriorityLevel());
+        }
+        if(flags[4]) {
+            searchResults = Logic.searchAll(searchResults, result.getName());
+        }
+        if(flags[5]) {
+            searchResults = Logic.searchAll(searchResults, result.getName());
+        }
+        if(flags[6]) {
+            searchResults = Logic.searchTaskByTags(searchResults, result.getTag());
+        }
+        return Constants.COMMAND_TYPE.SEARCH;
+    }
+    
     //Not tested yet
     public static Constants.COMMAND_TYPE process(String userInput) {
     	
@@ -142,26 +181,12 @@ public class Engine {
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.SHOW;
             case DONE:
-                if(!result.getCommandFlags()[3]) {
-                    return Constants.COMMAND_TYPE.INVALID;
-                } else {
-                    ID = result.getId();
-                    Task toBeDone = allTasks.getTaskByID(ID);
-                    if(toBeDone == null) {
-                        return Constants.COMMAND_TYPE.INVALID;
-                    } else {
-                        toBeDone.setDone();
-                        lastModifiedTask = toBeDone.getID();
-                        return Constants.COMMAND_TYPE.DONE;
-                    }
-                    
-                }
+                return setDoneTask(result);
             case UNDO:
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.UNDO;
             case SEARCH:
-                //TO BE DONE
-                return Constants.COMMAND_TYPE.SEARCH;
+                return searchTask(result);
             case HELP:
                 //TO BE DONE
                 return Constants.COMMAND_TYPE.HELP;
@@ -195,5 +220,8 @@ public class Engine {
         return normalTasks;
     }
     
-    //
+    //Not tested yet
+    public static TaskList getSearchResult() {
+        return searchResults;
+    }
 }
