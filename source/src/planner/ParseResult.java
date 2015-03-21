@@ -30,7 +30,7 @@ public class ParseResult {
     private String taskTag = "";
     private ERROR_TYPE errorType = null;
     // flags order: date, dateToRemind, priorityLevel, id, name,
-    //              description, tag
+    //              description, tag, date2
     private boolean[] commandFlags;
     
     /**

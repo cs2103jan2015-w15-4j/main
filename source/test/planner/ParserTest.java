@@ -165,7 +165,8 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
-
+    
+    @Test
     // test help command used to show the usage of a specific command
     public void testSpecificHelpCommand() {
         ParseResult result = Parser.parse("help add search delete done at 24 Jan 1172");

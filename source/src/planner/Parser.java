@@ -111,10 +111,12 @@ public class Parser {
                 
             case CONVERT:
                 processCommand("convert");
+                break;
                 
             default:
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
+                logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
                 break;
         }
         logger.log(Level.INFO, "processing ended. returning result.");
@@ -179,6 +181,7 @@ public class Parser {
         keywordArgs = "";
         commandWords = null;
         date = null;
+        date2 = null;
         dateToRemind = null;
         priorityLevel = 0;
         id = 0;
@@ -214,7 +217,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id");
+                    logger.log(Level.WARNING, "error parsing id in delete");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
@@ -237,7 +240,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id");
+                    logger.log(Level.WARNING, "error parsing id in done");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
@@ -268,13 +271,15 @@ public class Parser {
                 try {
                     id = Long.parseLong(convertArgs[0]);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id");
+                    logger.log(Level.WARNING, "error parsing id for convert");
                     resultType = Constants.RESULT_TYPE.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 
                 // determine type to convert to
                 commandType = determineConvertType(convertArgs[1]);
+                
+                break;
 
             // non command keywords start here
             case "at":            
@@ -289,6 +294,7 @@ public class Parser {
             case "by":
             case "due":
             case "until":
+            case "to":
                 calendar = parseDate(keywordArgs);
                 date2 = calendar.getTime();
                 break;
@@ -373,11 +379,13 @@ public class Parser {
         // check for two valid dates in the case of the convert timed 
         } else if (commandType.equals(COMMAND_TYPE.CONVERT_TIMED)) {
             if (date == null || date2 == null) {
+                logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
                 resultType = RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
          // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(COMMAND_TYPE.CONVERT_DEADLINE)) {
+            logger.log(Level.WARNING, "no valid dates for Convert Deadline");
             if (date == null && date2 == null) {
                 resultType = RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
@@ -391,7 +399,7 @@ public class Parser {
     private static boolean[] updateResultFlags(boolean[] flags) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
         //              description, tag
-        assert(flags.length == 7);
+        assert(flags.length == 8);
         if (date != null) {
             flags[0] = true;
         }
@@ -461,7 +469,7 @@ public class Parser {
     }
     
     private static COMMAND_TYPE determineConvertType(String convertTypeString) {
-        switch (convertTypeString) {
+        switch (convertTypeString.trim()) {
             case "deadline":
                 return COMMAND_TYPE.CONVERT_DEADLINE;
                 
@@ -473,6 +481,7 @@ public class Parser {
                
             default:
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
+                logger.log(Level.WARNING, "unable to determine convert type");
                 return COMMAND_TYPE.INVALID;
         }
     }
@@ -496,6 +505,7 @@ public class Parser {
         } catch (NumberFormatException e) {
             resultType = Constants.RESULT_TYPE.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
+            logger.log(Level.WARNING, "unable to parse day");
         }
 
         try {
@@ -506,7 +516,7 @@ public class Parser {
             if (monthIndex == -1) {
                 resultType = Constants.RESULT_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_DATE;
-                logger.log(Level.WARNING, "unable to parse date");
+                logger.log(Level.WARNING, "unable to parse month");
             } else {
                 month = (monthIndex / 2) + 1;
                 logger.log(Level.INFO, "month of parsed date: " + month);
@@ -519,6 +529,7 @@ public class Parser {
         } catch (NumberFormatException e) {
             resultType = Constants.RESULT_TYPE.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
+            logger.log(Level.WARNING, "unable to parse year");
         }
 
         Calendar calendar = Calendar.getInstance();
