@@ -16,6 +16,7 @@ public class Engine {
     private static TaskList normalTasks;
     private static TaskList searchResults;
     private static long lastModifiedTask;
+    private static Storage storage;
     
     public static boolean isFirstRun() {
         return config.isNew();
@@ -28,9 +29,9 @@ public class Engine {
     //Not tested yet
     public static boolean init() {
         try {
-        	
-            config = Storage.readConfig();
-            allTasks = Storage.readTaskStorage(config.getStoragePath());
+            storage = new Storage();
+            config = storage.readConfig();
+            allTasks = storage.readTaskStorage(config.getStoragePath());
         	doneTasks = new TaskList();
         	undoneTasks = new TaskList();
         	tentativeTasks = new TaskList();
@@ -47,8 +48,8 @@ public class Engine {
     //Not tested yet
     public static boolean exit() {
         try {
-            Storage.saveConfiguration(config);
-            Storage.saveTaskList(config.getStoragePath(), allTasks);
+            storage.saveConfiguration(config);
+            storage.saveTaskList(config.getStoragePath(), allTasks);
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
