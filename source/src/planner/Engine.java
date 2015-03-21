@@ -59,10 +59,14 @@ public class Engine {
         normalTasks.clear();
         tentativeTasks.clear();
         
+        //Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
+        //Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
         
+        doneTasks = Logic.searchDone(allTasks);
+        undoneTasks = Logic.searchNotDone(allTasks);
+        normalTasks = Logic.searchConfirmed(undoneTasks);
+        tentativeTasks = Logic.searchTentative(undoneTasks);
         
-        Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
-        Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
     }
     
     private static Constants.COMMAND_TYPE addTask (ParseResult result) {
