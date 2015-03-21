@@ -1,5 +1,10 @@
 package planner;
 
+/**
+ * 
+ * @author kohwaikit
+ *
+ */
 public class Configuration {
     private String storagePath;
     private Long curTaskNum;

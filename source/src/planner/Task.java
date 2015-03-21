@@ -2,6 +2,11 @@ package planner;
 
 import java.util.Date;
 
+/**
+ * 
+ * @author kohwaikit
+ *
+ */
 public class Task {
 	
 	private final long ID;

@@ -2,6 +2,11 @@ package planner;
 
 import java.io.File;
 
+/**
+ * 
+ * @author kohwaikit
+ *
+ */
 public class Engine {
     private static Configuration config;
     private static TaskList allTasks;
