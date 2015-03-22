@@ -509,6 +509,8 @@ public class Parser {
         try {
             day = Integer.parseInt(firstArg);
         } catch (NumberFormatException e) {
+            
+            //Goes into parseNext when "next" is detected
             if (firstArg.toLowerCase().trim().equals("next")) {
                 return parseNext(arguments);
             } else { 
@@ -518,6 +520,9 @@ public class Parser {
                 return createCalendar(year, month, day, 0, 0, 0);
             }
         }
+        
+        //Checks whether date information is incomplete, if so checks whether date has passed
+        //If so push to next month, else keep the current month
         if (dateParts.length == 1) {
             if (day < currentTime.get(Calendar.DATE)) {
                 return createCalendar(year, month + 1, day, 0, 0, 0); 
@@ -541,6 +546,8 @@ public class Parser {
                     logger.log(Level.INFO, "month of parsed date: " + month);
                 }
             }
+            
+            //Similar check as above, push to next year if month had passed
             if (dateParts.length == 2) {
                 if (month < currentTime.get(Calendar.MONTH)) {
                     return createCalendar(year + 1, month - 1, day, 0, 0, 0);
@@ -565,6 +572,8 @@ public class Parser {
         }
     }
     
+    //Parses whatever that comes after "next" is typed
+    //Will delete/change bad comments before refactoring the code
     private static Calendar parseNext(String arguments) {
         String[] dateParts = arguments.split(" ");
         String secondArg = dateParts[1].toLowerCase().trim();
@@ -584,7 +593,10 @@ public class Parser {
                 case "year":
                     return createCalendar(year + 1, 0, 1, 0 ,0 ,0);
                     
-                case "week":
+                case "week": 
+                    
+                    //Calendar forces monday = 2, sunday = 1 for some reason and hence if current date is monday
+                    //the difference calculated after %7 is 0 so i must change it to 7
                     int daysDifference = (8 - day + 1) % 7;
                     if (daysDifference == 0) {
                         daysDifference = 7;
@@ -592,14 +604,23 @@ public class Parser {
                     return createCalendar(year, month, date + daysDifference, 0 ,0, 0);
                     
                 default:
+                    
+                    //Checks the months arraylist to find matches
                     int index = months.indexOf(secondArg.toLowerCase().trim());
                     if (index == -1) {
+                        
+                        //If it is not in months, check newly created daysInWeek arraylist
                         index = days.indexOf(secondArg.toLowerCase().trim());
                         if (index == -1) {
+                            
+                            //report error and return junk calendar values to avoid exception errors 
                             commandType = Constants.COMMAND_TYPE.INVALID;
                             errorType = Constants.ERROR_TYPE.INVALID_DATE;
                             break;
                         } else {
+                            
+                            //If found calculate differences, magic numbers again since mon = 2 for calendar 
+                            //while mon = 1 from arraylist index
                             int dayDifference = 7 + (index / 2) + 1 - (day - 1);
                             System.out.println(day);
                             return createCalendar(year, month, date + dayDifference , 0, 0, 0);
@@ -617,6 +638,7 @@ public class Parser {
         
     }
     
+    //Creates calendar 
     private static Calendar createCalendar(int year, int month, int date, int hour, int minute, int second) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, date, hour, minute, second);
