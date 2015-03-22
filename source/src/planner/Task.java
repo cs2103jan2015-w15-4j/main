@@ -220,13 +220,19 @@ public class Task {
 		if( obj instanceof Task ){
 			
 			Task anotherTask = (Task)obj;
+			boolean dateCheck;
+			if (dateDue == null || anotherTask.getDueDate() == null) {
+			    dateCheck = (dateDue == anotherTask.getDueDate());
+			} else {
+			    dateCheck = dateDue.equals(anotherTask.getDueDate());
+			}
 			
 			return (ID == anotherTask.getID()) &&
 				   taskName.equals( anotherTask.getName() ) &&
 				   taskDescription.equals( anotherTask.getDescription() ) &&
 				   taskTag.equals( anotherTask.getTag() ) &&
 				   dateCreated.equals(anotherTask.getCreatedDate()) &&
-				   dateDue.equals( anotherTask.getDueDate() ) && // TODO: check null
+				   dateCheck &&
 				   (taskPriority == anotherTask.getPriority()) &&
 				   (taskCompleted == anotherTask.isDone()) &&
 				   (taskFloating == anotherTask.isFloating());
