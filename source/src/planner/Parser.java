@@ -38,6 +38,12 @@ public class Parser {
     };
     private static ArrayList<String> months =
             new ArrayList<String>(Arrays.asList(monthsArray));
+    private static String[] daysInWeek = {"mon", "monday", "tue", "tuesday", 
+        "wed", "wednesday", "thu", "thursday", "fri", "friday", "sat", "saturday",
+        "sun", "sunday"
+    };
+    private static ArrayList<String> days =
+            new ArrayList<String>(Arrays.asList(daysInWeek));
 
     // these fields will be used to construct the parseResult
     private static ERROR_TYPE errorType = null;
@@ -494,53 +500,126 @@ public class Parser {
 
     private static Calendar parseDate(String arguments) {
         logger.log(Level.INFO, "beginning date parsing");
-        int day = 0;
-        int month = 0;
-        int year = 0;
+        Calendar currentTime = Calendar.getInstance();
+        int day = currentTime.get(Calendar.DATE);
+        int month = currentTime.get(Calendar.MONTH);
+        int year = currentTime.get(Calendar.YEAR);
         String[] dateParts = arguments.split(" ");
-        assert(dateParts.length == 3);
-        String expectedDay = dateParts[0];
-        String expectedMonth = dateParts[1];
-        String expectedYear = dateParts[2];
-        logger.log(Level.INFO, "value expected to be day: " + expectedDay);
-        logger.log(Level.INFO, "value expected to be month: " + expectedMonth);
-        logger.log(Level.INFO, "value expected to be year: " + expectedYear);
-
+        String firstArg = dateParts[0];
         try {
-            day = Integer.parseInt(expectedDay);
+            day = Integer.parseInt(firstArg);
         } catch (NumberFormatException e) {
-            commandType = Constants.COMMAND_TYPE.INVALID;
-            errorType = Constants.ERROR_TYPE.INVALID_DATE;
-            logger.log(Level.WARNING, "unable to parse day");
-        }
-
-        try {
-            month = Integer.parseInt(expectedMonth);
-        } catch (NumberFormatException e) {
-            int monthIndex = months.indexOf(expectedMonth.toLowerCase());
-            // check whether it is found in the list of month strings
-            if (monthIndex == -1) {
+            if (firstArg.toLowerCase().trim().equals("next")) {
+                return parseNext(arguments);
+            } else { 
                 commandType = Constants.COMMAND_TYPE.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_DATE;
-                logger.log(Level.WARNING, "unable to parse month");
-            } else {
-                month = (monthIndex / 2) + 1;
-                logger.log(Level.INFO, "month of parsed date: " + month);
+                logger.log(Level.WARNING, "unable to parse day");
+                return createCalendar(year, month, day, 0, 0, 0);
             }
-
         }
-
+        if (dateParts.length == 1) {
+            if (day < currentTime.get(Calendar.DATE)) {
+                return createCalendar(year, month + 1, day, 0, 0, 0); 
+            } else {
+                return createCalendar(year, month, day, 0, 0, 0);
+            }
+        } else {
+            String expectedMonth = dateParts[1];
+            try {
+                month = Integer.parseInt(expectedMonth);
+            } catch (NumberFormatException e) {
+                int monthIndex = months.indexOf(expectedMonth.toLowerCase());
+                // check whether it is found in the list of month strings
+                if (monthIndex == -1) {
+                    commandType = Constants.COMMAND_TYPE.INVALID;
+                    errorType = Constants.ERROR_TYPE.INVALID_DATE;
+                    logger.log(Level.WARNING, "unable to parse month");
+                    return createCalendar(year, month, day, 0, 0, 0);
+                } else {
+                    month = (monthIndex / 2) + 1;
+                    logger.log(Level.INFO, "month of parsed date: " + month);
+                }
+            }
+            if (dateParts.length == 2) {
+                if (month < currentTime.get(Calendar.MONTH)) {
+                    return createCalendar(year + 1, month - 1, day, 0, 0, 0);
+                } else {
+                    return createCalendar(year, month - 1, day, 0, 0, 0);
+                }
+            } else {
+                String expectedYear = dateParts[2];
+                logger.log(Level.INFO, "value expected to be day: " + day);
+                logger.log(Level.INFO, "value expected to be month: " + expectedMonth);
+                logger.log(Level.INFO, "value expected to be year: " + expectedYear);
+                try {
+                    year = Integer.parseInt(expectedYear);
+                } catch (NumberFormatException e) {
+                    commandType = Constants.COMMAND_TYPE.INVALID;
+                    errorType = Constants.ERROR_TYPE.INVALID_DATE;
+                    logger.log(Level.WARNING, "unable to parse year");
+                }
+                
+                return createCalendar(year, month - 1, day, 0, 0, 0);
+            }
+        }
+    }
+    
+    private static Calendar parseNext(String arguments) {
+        String[] dateParts = arguments.split(" ");
+        String secondArg = dateParts[1].toLowerCase().trim();
+        Calendar currentTime = Calendar.getInstance();
+        int year = currentTime.get(Calendar.YEAR);
+        int month = currentTime.get(Calendar.MONTH);
+        int date = currentTime.get(Calendar.DATE);
+        int day = currentTime.get(Calendar.DAY_OF_WEEK);
         try {
-            year = Integer.parseInt(expectedYear);
+            switch(secondArg) {
+                case "day":
+                    return createCalendar(year, month, date + 1, 0, 0, 0);
+                
+                case "month":
+                    return createCalendar(year, month + 1, 1, 0 ,0 ,0);
+                    
+                case "year":
+                    return createCalendar(year + 1, 0, 1, 0 ,0 ,0);
+                    
+                case "week":
+                    int daysDifference = (8 - day + 1) % 7;
+                    if (daysDifference == 0) {
+                        daysDifference = 7;
+                    }
+                    return createCalendar(year, month, date + daysDifference, 0 ,0, 0);
+                    
+                default:
+                    int index = months.indexOf(secondArg.toLowerCase().trim());
+                    if (index == -1) {
+                        index = days.indexOf(secondArg.toLowerCase().trim());
+                        if (index == -1) {
+                            commandType = Constants.COMMAND_TYPE.INVALID;
+                            errorType = Constants.ERROR_TYPE.INVALID_DATE;
+                            break;
+                        } else {
+                            int dayDifference = 7 + (index / 2) + 1 - (day - 1);
+                            System.out.println(day);
+                            return createCalendar(year, month, date + dayDifference , 0, 0, 0);
+                        }
+                    } else {
+                        int monthRequested = (index / 2) + 1;
+                        return createCalendar(year + 1, monthRequested - 1, 1, 0, 0, 0);                    
+                    }
+            }
         } catch (NumberFormatException e) {
             commandType = Constants.COMMAND_TYPE.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
-            logger.log(Level.WARNING, "unable to parse year");
         }
-
+        return createCalendar(year, month, date, 0, 0, 0);
+        
+    }
+    
+    private static Calendar createCalendar(int year, int month, int date, int hour, int minute, int second) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month - 1, day, 0, 0, 0);
+        calendar.set(year, month, date, hour, minute, second);
         return calendar;
     }
-
 }
