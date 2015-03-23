@@ -24,7 +24,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import planner.Constants.TIP_TYPE;
+import planner.Constants.TipType;
 
 public class SliderPanel extends JComponent{
     
@@ -177,7 +177,7 @@ public class SliderPanel extends JComponent{
         tips.setVisible(false);
     }
     
-    private void showTip( TIP_TYPE tipType ){
+    private void showTip( TipType tipType ){
         
         tips.setVisible(true);
         
@@ -274,19 +274,19 @@ public class SliderPanel extends JComponent{
                                 
                                 hideUpArrow();
                                 showDownArrow();
-                                showTip( TIP_TYPE.DOWN_TIP );
+                                showTip( TipType.DOWN_TIP );
                                 
                             } else if( verticalScrollBar.getValue() + scrollBarExtent >= verticalScrollBar.getMaximum() ){
                                 
                                 hideDownArrow();
                                 showUpArrow();
-                                showTip( TIP_TYPE.UP_TIP );
+                                showTip( TipType.UP_TIP );
                                 
                             } else{
                                 
                                 showUpArrow();
                                 showDownArrow();
-                                showTip( TIP_TYPE.UPDOWN_TIP );
+                                showTip( TipType.UPDOWN_TIP );
                             }
                         }
                         

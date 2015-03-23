@@ -23,7 +23,7 @@ public class Constants {
         INVALID_ARGUMENTS
     };
     
-    public enum TIP_TYPE{
+    public enum TipType{
         UP_TIP, DOWN_TIP, UPDOWN_TIP
     }
     
