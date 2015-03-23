@@ -1,22 +1,38 @@
 package planner;
-import org.json.simple.*;
-import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import java.security.CodeSource;
+
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+/**
+ * This class handles the external storage of the program. The storage format
+ * of the program is in JSON using the json.simple library. This class handles
+ * the saving and loading of TaskList objects and Configuration objects.
+ * 
+ * @author kohwaikit
+ *
+ */
 public class Storage {
     
     //Not tested yet
     public Configuration readConfig() {
         Configuration result = new Configuration("data");
         try {
-            BufferedReader br = new BufferedReader(new FileReader(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION));
+            CodeSource cs = getClass().getProtectionDomain().getCodeSource();
+            String sourcePath = cs.getLocation().getPath();
+            String filePath = sourcePath + Constants.CONFIG_FILE_LOCATION;
+            
+            BufferedReader br = new BufferedReader(new FileReader(filePath));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
@@ -31,27 +47,55 @@ public class Storage {
     }
     
     
-    //Need to update tests
+    /**
+     * Converts a Configuration object into a JSONObject, then into a string
+     * and put into an ArrayList then passed to writeToFile to write into the
+     * config file.
+     * 
+     * @param newConfig The Configuration object to be saved.
+     * @throws IOException If there is a problem writing to file.
+     */
     public void saveConfiguration(Configuration newConfig) throws IOException {
+        
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
-        configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
+        configObject.put("numTasks", 
+                String.valueOf(newConfig.getCurTaskNum()));
+        
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
-        writeToFile(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION, config);
-        System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
-        System.out.println(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+        
+        CodeSource cs = getClass().getProtectionDomain().getCodeSource();
+        writeToFile(cs.getLocation().getPath() + 
+                Constants.CONFIG_FILE_LOCATION, config);
+        
     }
     
-    private static void writeToFile(String fileName, ArrayList<String> content) throws IOException {
+    /**
+     * Takes in the location to write, and an ArrayList of Strings as content
+     * to be written. Creates the file if it does not exist.Writes each string
+     * as a line in the new file.
+     * 
+     * @param fileName The location of the file to write to.
+     * @param content An ArrayList of Strings to be written to file.
+     * @throws IOException If there is a problem writing to file.
+     */
+    private static void writeToFile(String fileName, ArrayList<String> content)
+            throws IOException {
+        
         File writeTarget = new File(fileName);
+        
         if(!writeTarget.exists()) {
             writeTarget.createNewFile();
         }
+        
         FileWriter fw = new FileWriter(writeTarget);
+        
         for(String s:content) {
-            fw.write(s+System.lineSeparator());
+            fw.write(s);
+            fw.write(System.lineSeparator());
         }
+        
         fw.flush();
         fw.close();
     }
