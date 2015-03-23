@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class Constants {
     
-    public enum COMMAND_TYPE {
+    public enum CommandType {
         ADD, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, SETNOTDONE, UNDO, SEARCH,
         HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_SHOW, HELP_DONE,
         HELP_UNDO, HELP_SEARCH, JUMP, CONVERT, CONVERT_FLOATING, 

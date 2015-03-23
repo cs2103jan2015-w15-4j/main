@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-import planner.Constants.COMMAND_TYPE;
+import planner.Constants.CommandType;
 import planner.Constants.ERROR_TYPE;
 
 /**
@@ -19,7 +19,7 @@ public class ParseResult {
     private final int NO_ID_SET = 0;
     private final int COMMAND_FLAGS_MAX_SIZE = 8;    
 
-    private COMMAND_TYPE commandType = null;
+    private CommandType commandType = null;
     private Date parsedDate = null;
     private Date parsedDate2 = null;
     private Date dateToRemind = null;
@@ -40,7 +40,7 @@ public class ParseResult {
      * @param time        Time/date parsed from command               
      * @param flags       Indicate presence of properties (e.g. time)
      */
-	public ParseResult(COMMAND_TYPE commandType,
+	public ParseResult(CommandType commandType,
                        Date date, Date date2, Date dateToRemind, 
                        int priorityLevel, long id, String name, 
                        String description, String tag, ERROR_TYPE errorType,
@@ -77,7 +77,7 @@ public class ParseResult {
         }
     }
 
-    public COMMAND_TYPE getCommandType() {
+    public CommandType getCommandType() {
         return commandType;
     }
 

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import planner.Constants.COMMAND_TYPE;
+import planner.Constants.CommandType;
 import planner.Constants.ERROR_TYPE;
 
 /**
@@ -41,7 +41,7 @@ public class Parser {
 
     // these fields will be used to construct the parseResult
     private static ERROR_TYPE errorType = null;
-    private static COMMAND_TYPE commandType = null;    
+    private static CommandType commandType = null;    
     private static Date date = null;
     private static Date date2 = null;
     private static Date dateToRemind = null;
@@ -125,56 +125,56 @@ public class Parser {
         return parseResult;
     }
 
-    private static COMMAND_TYPE extractCommandType(String commandWord) {
+    private static CommandType extractCommandType(String commandWord) {
         switch(commandWord.toLowerCase()) {
             case "add":
             case "new":
-                return COMMAND_TYPE.ADD;
+                return CommandType.ADD;
 
             case "update":
             case "edit":
             case "change":
-                return COMMAND_TYPE.UPDATE;
+                return CommandType.UPDATE;
 
             case "delete":
             case "trash":
             case "remove":
             case "del":
-                return COMMAND_TYPE.DELETE;
+                return CommandType.DELETE;
 
             case "show":
             case "display":
                 // at this point, undetermined if showing one task or all
-                return COMMAND_TYPE.SHOW;
+                return CommandType.SHOW;
 
             case "done":
             case "completed":
             case "finished":
-                return COMMAND_TYPE.DONE;
+                return CommandType.DONE;
                 
             case "setnotdone":
-                return COMMAND_TYPE.SETNOTDONE;
+                return CommandType.SETNOTDONE;
 
             case "undo":
             case "revert":
-                return COMMAND_TYPE.UNDO;
+                return CommandType.UNDO;
 
             case "search":
             case "find":
-                return COMMAND_TYPE.SEARCH;
+                return CommandType.SEARCH;
 
             case "help":
             case "sos":
-                return COMMAND_TYPE.HELP;
+                return CommandType.HELP;
                 
             case "jump":
-                return COMMAND_TYPE.JUMP;
+                return CommandType.JUMP;
                 
             case "convert":
-                return COMMAND_TYPE.CONVERT;
+                return CommandType.CONVERT;
 
             default:
-                return COMMAND_TYPE.INVALID;
+                return CommandType.INVALID;
 
         }
     }
@@ -221,7 +221,7 @@ public class Parser {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in delete");
-                    commandType = Constants.COMMAND_TYPE.INVALID;
+                    commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
@@ -232,10 +232,10 @@ public class Parser {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                     logger.log(Level.INFO, "successfully parsed id, show" + 
                                "specific task");
-                    commandType = Constants.COMMAND_TYPE.SHOW_ONE;
+                    commandType = Constants.CommandType.SHOW_ONE;
                 } catch (NumberFormatException e) {
                     logger.log(Level.INFO, "no id parsed, show all tasks");
-                    commandType = Constants.COMMAND_TYPE.SHOW_ALL;
+                    commandType = Constants.CommandType.SHOW_ALL;
                 }
                 break;
                 
@@ -245,7 +245,7 @@ public class Parser {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in done");
-                    commandType = Constants.COMMAND_TYPE.INVALID;
+                    commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 break;
@@ -260,8 +260,8 @@ public class Parser {
             case "help":
                 // check whether the user needs help with specific command
                 String cmdToHelpWith = keywordArgs.split(" ")[0];
-                COMMAND_TYPE cmdToHelpWithType = extractCommandType(cmdToHelpWith);
-                if (cmdToHelpWithType.equals(Constants.COMMAND_TYPE.INVALID)) {
+                CommandType cmdToHelpWithType = extractCommandType(cmdToHelpWith);
+                if (cmdToHelpWithType.equals(Constants.CommandType.INVALID)) {
                     logger.log(Level.INFO, "show general help");
                 } else {
                     logger.log(Level.INFO, "show help for specific command");
@@ -276,7 +276,7 @@ public class Parser {
                     id = Long.parseLong(convertArgs[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id for convert");
-                    commandType = Constants.COMMAND_TYPE.INVALID;
+                    commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ERROR_TYPE.INVALID_TASK_ID;
                 }
                 
@@ -377,24 +377,24 @@ public class Parser {
         processArgs(keywordBeingProcessed);
 
         // check for valid name in the case of the add command
-        if (commandType.equals(COMMAND_TYPE.ADD)) {
+        if (commandType.equals(CommandType.ADD)) {
             if (name.equals("")) {
-                commandType = Constants.COMMAND_TYPE.INVALID;
+                commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ERROR_TYPE.BLANK_TASK_NAME;
             }
             
         // check for two valid dates in the case of the convert timed 
-        } else if (commandType.equals(COMMAND_TYPE.CONVERT_TIMED)) {
+        } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
             if (date == null || date2 == null) {
                 logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
-                commandType = Constants.COMMAND_TYPE.INVALID;
+                commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
          // check for at least one valid date in the case of convert deadline
-        } else if (commandType.equals(COMMAND_TYPE.CONVERT_DEADLINE)) {
+        } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
             logger.log(Level.WARNING, "no valid dates for Convert Deadline");
             if (date == null && date2 == null) {
-                commandType = Constants.COMMAND_TYPE.INVALID;
+                commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_ARGUMENTS;
             }
         }
@@ -435,60 +435,60 @@ public class Parser {
     }
 
     // constructs and returns result based on existing fields
-    private static ParseResult createParseResult(COMMAND_TYPE commandType) {
+    private static ParseResult createParseResult(CommandType commandType) {
         return new ParseResult(commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorType, flags);
     }
     
     // returns a command type for the result based on what user wants help with
-    private static COMMAND_TYPE determineHelpCommandType(COMMAND_TYPE commandType) {
+    private static CommandType determineHelpCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
-                return COMMAND_TYPE.HELP_ADD;
+                return CommandType.HELP_ADD;
                 
             case UPDATE:
-                return COMMAND_TYPE.HELP_UPDATE;
+                return CommandType.HELP_UPDATE;
                 
             case DELETE:
-                return COMMAND_TYPE.HELP_DELETE;
+                return CommandType.HELP_DELETE;
                 
             case SHOW:
-                return COMMAND_TYPE.HELP_SHOW;
+                return CommandType.HELP_SHOW;
 
                 
             case DONE:
-                return COMMAND_TYPE.HELP_DONE;
+                return CommandType.HELP_DONE;
                 
             case UNDO:
                 // not yet implemented
-                return COMMAND_TYPE.INVALID;
+                return CommandType.INVALID;
                 
             case SEARCH:
-                return COMMAND_TYPE.HELP_SEARCH;
+                return CommandType.HELP_SEARCH;
                 
             default:
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
-                return COMMAND_TYPE.INVALID;
+                return CommandType.INVALID;
 
         }
     }
     
-    private static COMMAND_TYPE determineConvertType(String convertTypeString) {
+    private static CommandType determineConvertType(String convertTypeString) {
         switch (convertTypeString.trim()) {
             case "deadline":
-                return COMMAND_TYPE.CONVERT_DEADLINE;
+                return CommandType.CONVERT_DEADLINE;
                 
             case "floating":
-                return COMMAND_TYPE.CONVERT_FLOATING;
+                return CommandType.CONVERT_FLOATING;
                 
             case "timed":
-                return COMMAND_TYPE.CONVERT_TIMED;
+                return CommandType.CONVERT_TIMED;
                
             default:
                 errorType = Constants.ERROR_TYPE.INVALID_COMMAND;
                 logger.log(Level.WARNING, "unable to determine convert type");
-                return COMMAND_TYPE.INVALID;
+                return CommandType.INVALID;
         }
     }
 
@@ -509,7 +509,7 @@ public class Parser {
         try {
             day = Integer.parseInt(expectedDay);
         } catch (NumberFormatException e) {
-            commandType = Constants.COMMAND_TYPE.INVALID;
+            commandType = Constants.CommandType.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse day");
         }
@@ -520,7 +520,7 @@ public class Parser {
             int monthIndex = months.indexOf(expectedMonth.toLowerCase());
             // check whether it is found in the list of month strings
             if (monthIndex == -1) {
-                commandType = Constants.COMMAND_TYPE.INVALID;
+                commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ERROR_TYPE.INVALID_DATE;
                 logger.log(Level.WARNING, "unable to parse month");
             } else {
@@ -533,7 +533,7 @@ public class Parser {
         try {
             year = Integer.parseInt(expectedYear);
         } catch (NumberFormatException e) {
-            commandType = Constants.COMMAND_TYPE.INVALID;
+            commandType = Constants.CommandType.INVALID;
             errorType = Constants.ERROR_TYPE.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse year");
         }

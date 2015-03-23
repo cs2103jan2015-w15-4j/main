@@ -47,7 +47,7 @@ public class UserInterface extends JFrame {
     ///////////////////////////////////////////////////////////////////// 
     public void processCommand( String input ){
         
-        planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
+        planner.Constants.CommandType commandType = Engine.process(input);
         
         TaskList tempTaskList = Engine.getAllTasks();
         
