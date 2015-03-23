@@ -18,7 +18,7 @@ public class Constants {
         CONVERT_DEADLINE, CONVERT_TIMED, INVALID
     };
     
-    public enum ERROR_TYPE {
+    public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
         INVALID_ARGUMENTS
     };
@@ -55,12 +55,12 @@ public class Constants {
     public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 16;
     public static final int NAVIGATION_BARS_MAX_NUM = 10;
     
-    EnumMap<ERROR_TYPE, String> errorMessages = new EnumMap<ERROR_TYPE, String>(ERROR_TYPE.class);
+    EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
     
     public void initializeErrorMessages() {
-        errorMessages.put(ERROR_TYPE.INVALID_COMMAND, "invalid command type");
-        errorMessages.put(ERROR_TYPE.INVALID_TASK_ID, "a number must be entered for the task id");
-        errorMessages.put(ERROR_TYPE.BLANK_TASK_NAME, "the name of the task added cannot be blank");
-        errorMessages.put(ERROR_TYPE.INVALID_DATE, "Unable to parse date");
+        errorMessages.put(ErrorType.INVALID_COMMAND, "invalid command type");
+        errorMessages.put(ErrorType.INVALID_TASK_ID, "a number must be entered for the task id");
+        errorMessages.put(ErrorType.BLANK_TASK_NAME, "the name of the task added cannot be blank");
+        errorMessages.put(ErrorType.INVALID_DATE, "Unable to parse date");
     }
 }

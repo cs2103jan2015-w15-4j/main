@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import planner.Constants.CommandType;
-import planner.Constants.ERROR_TYPE;
+import planner.Constants.ErrorType;
 
 /**
  * This class is used to deliver the results of  
@@ -28,7 +28,7 @@ public class ParseResult {
     private String taskName = "";
     private String taskDescription = "";
     private String taskTag = "";
-    private ERROR_TYPE errorType = null;
+    private ErrorType errorType = null;
     // flags order: date, dateToRemind, priorityLevel, id, name,
     //              description, tag, date2
     private boolean[] commandFlags;
@@ -43,7 +43,7 @@ public class ParseResult {
 	public ParseResult(CommandType commandType,
                        Date date, Date date2, Date dateToRemind, 
                        int priorityLevel, long id, String name, 
-                       String description, String tag, ERROR_TYPE errorType,
+                       String description, String tag, ErrorType errorType,
                        boolean[] flags) {
 
         this.commandType = commandType;
@@ -113,7 +113,7 @@ public class ParseResult {
         return taskTag;
     }
 
-    public ERROR_TYPE getErrorType() {
+    public ErrorType getErrorType() {
         return errorType;
     }
 
