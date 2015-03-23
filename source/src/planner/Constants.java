@@ -27,7 +27,7 @@ public class Constants {
         UP_TIP, DOWN_TIP, UPDOWN_TIP
     }
     
-    public enum DISPLAY_STATE_FLAG{
+    public enum DisplayStateFlag {
         ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID
     }
     
