@@ -77,7 +77,7 @@ public class Engine {
     }
     
     private static Constants.CommandType addTask (ParseResult result) {
-        Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.newTaskNumber());
+        Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
         allTasks.add(newTask);
         refreshLists();
         lastModifiedTask = newTask.getID();
