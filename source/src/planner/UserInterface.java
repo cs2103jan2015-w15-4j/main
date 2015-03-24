@@ -237,6 +237,9 @@ public class UserInterface extends JFrame {
     
     private final static Logger userInterfaceLogger = Logger.getLogger(UserInterface.class.getName());
     
+    private char characterToTransfer;
+    private boolean isBackspacePressed;
+    
     public static void main(String[] args) {
         
         userInterfaceLogger.setLevel(java.util.logging.Level.SEVERE);
@@ -280,7 +283,7 @@ public class UserInterface extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Adding paintable component to main frame
-        setBounds(100, 100, 781, 587);
+        setBounds(100, 100, 867, 587);
         contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(null);
@@ -353,7 +356,7 @@ public class UserInterface extends JFrame {
 
                 @Override
                 public void keyPressed(KeyEvent event) {
-
+                    
                     handleKeyEvent(event);
                 }
             });
@@ -368,10 +371,42 @@ public class UserInterface extends JFrame {
 
                 @Override
                 public void keyPressed(KeyEvent event) {
-
+                    
                     handleKeyEvent(event);
                 }
             });
+        }
+    }
+    
+    
+    private char filterKeys( char keyCode ){
+        
+        if( (keyCode >= 32 && keyCode <= 126) || keyCode == 8 ){
+            
+            return keyCode;
+            
+        } else{
+            
+            return '\0';
+        }
+    }
+    
+    private void handleKeys( char keyTyped ){
+        
+        if( keyTyped >= 32 && keyTyped <= 126){
+            
+            characterToTransfer = keyTyped;
+            isBackspacePressed = false;
+            
+        } else if( keyTyped == 8 ){
+            
+            characterToTransfer = '\0';
+            isBackspacePressed = true;
+            
+        } else{
+            
+            characterToTransfer = '\0';
+            isBackspacePressed = false;
         }
     }
     
@@ -525,22 +560,15 @@ public class UserInterface extends JFrame {
                         
                     } else{
                         
+                        characterToTransfer = '\0';
+                        isBackspacePressed = false;
+                        
+                        handleKeys( filterKeys(event.getKeyChar()) );
+                        
                         command.requestFocusInWindow();
+                        
+                        event.consume();
                     }
-                    
-                    /*
-                    if( isMessageDisplayed ){
-                        
-                        Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
-                        
-                        command.setText("" + ((char)event.getKeyCode()) );
-                        
-                        isMessageDisplayed = false;
-                        
-                    } else{
-                        
-                        command.setText(command.getText() + ((char)event.getKeyCode()));
-                    }*/
                 }
                 
                 if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
@@ -575,7 +603,7 @@ public class UserInterface extends JFrame {
     private void prepareSectionTitle(){
     	
     	sectionTitle = new JLabel();
-    	sectionTitle.setBounds(6, 36, 381, 33);
+    	sectionTitle.setBounds(6, 30, 497, 33);
     	sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
     	sectionTitle.setForeground( new Color( 255,255,255,200 ) );
     	sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
@@ -587,14 +615,14 @@ public class UserInterface extends JFrame {
     	
     	sectionTitleLine = new JLabel();
     	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
-    	sectionTitleLine.setBounds(-142, 35, 539, 33);
+    	sectionTitleLine.setBounds(-142, 28, 643, 33);
     	contentPane.add(sectionTitleLine);
     }
     
     private void prepareSlidePanel(){
         
         slidePanelFrame = new JPanel();
-        slidePanelFrame.setBounds(583, 45, 396, 520);
+        slidePanelFrame.setBounds(670, 45, 396, 520);
         contentPane.add(slidePanelFrame);
         slidePanelFrame.setLayout(null);
         slidePanelFrame.setOpaque(false);
@@ -796,14 +824,14 @@ public class UserInterface extends JFrame {
         // Adding UI background
         background = new JLabel();
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
-        background.setBounds(0, 0, 781, 587);
+        background.setBounds(0, 0, 867, 587);
         contentPane.add(background);
     }
     
 	private void prepareDisplay(){
         
     	displayPane = new DisplayPane();
-        displayPane.setBounds(25, 83, 548, 430);
+        displayPane.setBounds(25, 83, 630, 430);
         
         contentPane.add(displayPane);
         
@@ -830,7 +858,8 @@ public class UserInterface extends JFrame {
                 public void keyPressed(KeyEvent event) {
                     
                     handleKeyEvent(event);
-                }            
+                    
+                }
 	        });
 	    }
 	}
@@ -876,7 +905,7 @@ public class UserInterface extends JFrame {
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(34, 530, 531, 33);
+        command.setBounds(34, 530, 610, 33);
         contentPane.add(command);
         command.setColumns(10);
         
@@ -889,6 +918,9 @@ public class UserInterface extends JFrame {
         
         addFocusListenerToCommandTextField(command);
         addKeyBindingsToCommandTextField(command);
+        
+        characterToTransfer = '\0';
+        isBackspacePressed = false;
     }
     
     private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
@@ -897,19 +929,35 @@ public class UserInterface extends JFrame {
             
             currentCommand.addKeyListener(new KeyListener(){
                 
-                
                 @Override
                 public void keyPressed( KeyEvent e ){
-                    
+                        
                     handleKeyEvent(e);
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
+                    
+                    return;
                 }
         
                 @Override
-                public void keyTyped(KeyEvent e) {}
+                public void keyTyped(KeyEvent e) {
+                    
+                    if( characterToTransfer != '\0' ){
+                        
+                        e.consume();
+                    }
+                    
+                    return;
+                }
         
                 @Override
-                public void keyReleased(KeyEvent e) {}
-                
+                public void keyReleased(KeyEvent e) {
+                    
+                    e.consume();
+                    
+                    return;
+                }
             });
         }
     }
@@ -925,15 +973,24 @@ public class UserInterface extends JFrame {
                     
                     command.setForeground( new Color( 0,0,0 ) );
                     
+                    String additionalCharacterToAdd = (characterToTransfer != '\0' ? characterToTransfer + "" : "");
+                    
                     if( isMessageDisplayed ){
                         
-                        command.setText("");
+                        command.setText(additionalCharacterToAdd);
                         
                         isMessageDisplayed = false;
                         
                     } else{
                         
-                        command.setText(command.getText());
+                        String finalString = command.getText() + additionalCharacterToAdd;
+                        
+                        if( isBackspacePressed && finalString.length() > 0 ){
+                            
+                            finalString = finalString.substring(0, finalString.length()-1);
+                        }
+                        
+                        command.setText(finalString);
                     }
                 }
 
@@ -954,6 +1011,9 @@ public class UserInterface extends JFrame {
                         
                         command.setText(input);
                     }
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
                 }
             });
         }
@@ -962,7 +1022,7 @@ public class UserInterface extends JFrame {
     private void prepareCloseButton(){
         
         closeButton = new JLabel();
-        closeButton.setBounds(744, 13, 27, 27);
+        closeButton.setBounds(819, 13, 27, 27);
         contentPane.add(closeButton);
         
         closeButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
@@ -992,7 +1052,7 @@ public class UserInterface extends JFrame {
     private void prepareMinimiseButton(){
         
         minimiseButton = new JLabel();
-        minimiseButton.setBounds(707, 12, 28, 28);
+        minimiseButton.setBounds(782, 12, 28, 28);
         contentPane.add(minimiseButton);
         
         minimiseButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
@@ -1022,7 +1082,7 @@ public class UserInterface extends JFrame {
     private void prepareDragPanel(){
         
         dragPanel = new JLabel();
-        dragPanel.setBounds(0, 0, 781, 587);
+        dragPanel.setBounds(0, 0, 867, 587);
         contentPane.add(dragPanel);
         
         addMouseMovementBindingsToDragPanel(dragPanel);
