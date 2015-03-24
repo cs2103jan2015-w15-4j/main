@@ -216,7 +216,7 @@ public class DisplayPane extends JScrollPane{
 	private void setTaskBarParameters( TaskBar taskBar, Task task, long lineNumber ){
 		
 		if( taskBar != null && task != null ){
-			
+		    
 			// Set Line number
 			if( lineNumber > 0 ){
 				
@@ -232,14 +232,11 @@ public class DisplayPane extends JScrollPane{
 			// set task name	
 			taskBar.setTaskTitle(task.getName());
 			
-			// Set due date
-			if( task.getDueDate() != null ){
-				
-				taskBar.setTaskTimeDataLabel( task.getDueDate(), "30 days");
-			}
-			
 			// Set tags
-			taskBar.setTaskTags("#DisabledForV0.1");
+			taskBar.setTags(task);
+			
+			// Set due date label
+			taskBar.setTimeDisplayLabel(task);
 		}
 	}
 	
