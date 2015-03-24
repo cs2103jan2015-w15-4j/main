@@ -1,5 +1,6 @@
 package planner;
 
+import java.awt.Color;
 import java.util.EnumMap;
 import java.util.HashMap;
 
@@ -47,6 +48,14 @@ public class Constants {
                                                               " Recurring Tasks",
                                                               " Task Done",
                                                               " Tasks Done"};
+    
+    public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
+                                           new Color( 244, 132, 57 ),
+                                           new Color( 224, 226, 54 ),
+                                           new Color( 47, 244, 237 ),
+                                           new Color( 74, 243, 110 ),
+                                           new Color( 242, 141, 236 ),
+                                           new Color( 245, 142, 142 ) };
     
     public static String CONFIG_FILE_LOCATION = "config";
 
