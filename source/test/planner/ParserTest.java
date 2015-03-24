@@ -40,7 +40,23 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
-
+    
+    @Test
+    public void testNextMonth(){
+        ParseResult result = Parser.parse("edit 322 date next month");
+        assertEquals(Constants.COMMAND_TYPE.UPDATE, result.getCommandType());
+        assertEquals("Wed Apr 01 00:00:00 SGT 2015", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(322, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, true, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
     @Test
     public void testDeleteCommand() {
         ParseResult result = Parser.parse("remove 462 at 15 Nov 1995");
@@ -270,5 +286,4 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
-
 }
