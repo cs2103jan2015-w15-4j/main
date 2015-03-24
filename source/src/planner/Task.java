@@ -211,7 +211,12 @@ public class Task {
 	public Date getDateCompleted() {
 	    
 	    return dateCompleted;
+	}
+	
+	// Added this getter method - jia jun
+	public Date getEndDate(){
 	    
+	    return dateEnd;
 	}
 	
 	@Override
