@@ -132,7 +132,6 @@ public class Storage {
             br.close();
             return tasks;
         } catch (Exception e){
-            System.out.println(e);
             return tasks;
         }
     }
