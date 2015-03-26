@@ -33,12 +33,14 @@ public class Task {
 		
 	    ID = id;
         
-        if(name.equals("")) {
-            
+	    if (name == null) {
+            throw new IllegalArgumentException("Task name cannot be null!");
+        } else if (name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
+        } else {
+            taskName = name;
         }
         
-        taskName = name;
         taskDescription = description;
         taskTag = tag;
         dateCreated = new Date(System.currentTimeMillis());
@@ -152,11 +154,13 @@ public class Task {
 	
 	public void setName(String newName) throws IllegalArgumentException {
 		
-		if(newName.equals("")) {
+	    if (newName == null) {
+            throw new IllegalArgumentException("Task name cannot be null!");
+        } else if (newName.equals("")) {
 			throw new IllegalArgumentException("Task name cannot be empty!");
+		} else {
+		    taskName = newName;
 		}
-		
-		taskName = newName;
 	}
 	//Not covered by tests yet
 	public void setDescription(String newDescription) {
