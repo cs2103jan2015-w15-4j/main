@@ -2,17 +2,17 @@ package planner;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import java.security.CodeSource;
-
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * This class handles the external storage of the program. The storage format
@@ -24,15 +24,26 @@ import org.json.simple.parser.JSONParser;
  */
 public class Storage {
     
+    /**
+     * This method reads the config file, of which the location is stored in 
+     * Constants.CONFIG_FILE_LOCATION and data stored in JSON String, and 
+     * converts the data from the JSON object into a Configuration object.
+     * 
+     * When the method fails to find the file or fails to read the config file,
+     * a new Configuration is new. The program will run as if it is ran for the
+     * first time.
+     * 
+     * @return Configuration object read from the file or a brand new object
+     */
     //Not tested yet
     public Configuration readConfig() {
         Configuration result = new Configuration("data");
+        BufferedReader br = null;
         try {
-            CodeSource cs = getClass().getProtectionDomain().getCodeSource();
-            String sourcePath = cs.getLocation().getPath();
+            String sourcePath = getSourcePath();
             String filePath = sourcePath + Constants.CONFIG_FILE_LOCATION;
             
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
+            br = new BufferedReader(new FileReader(filePath));
             
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
@@ -40,10 +51,22 @@ public class Storage {
             long curTaskNum = Long.valueOf((String) taskJson.get("numTasks"));
             
             result = new Configuration(path, curTaskNum);
-            return result;
-        } catch (Exception e) {
-            return result;
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found!");
+        } catch (IOException e) {
+            System.out.println("IO Error!");
+        } catch (ParseException e) {
+            System.out.println("Parse error!");
+        } finally {
+            if(br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    
+                }
+            }
         }
+        return result;
     }
     
     
@@ -65,15 +88,15 @@ public class Storage {
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
         
-        CodeSource cs = getClass().getProtectionDomain().getCodeSource();
-        writeToFile(cs.getLocation().getPath() + 
+        String sourcePath = getSourcePath();
+        writeToFile(sourcePath + 
                 Constants.CONFIG_FILE_LOCATION, config);
         
     }
     
     /**
      * Takes in the location to write, and an ArrayList of Strings as content
-     * to be written. Creates the file if it does not exist.Writes each string
+     * to be written. Creates the file if it does not exist. Writes each string
      * as a line in the new file.
      * 
      * @param fileName The location of the file to write to.
@@ -100,6 +123,14 @@ public class Storage {
         fw.close();
     }
     
+    /**
+     * Takes in a TaskList intended to be written to data storage, and converts
+     * each task into a String using convertTaskToJsonString. The resultant 
+     * ArrayList of Strings will be write ready for the data storage.
+     * 
+     * @param input the TaskList to be converted
+     * @return Strings that are ready to be written to data storage
+     */
     //Not tested yet
     private ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
         ArrayList<String> results = new ArrayList<String>();
@@ -109,21 +140,27 @@ public class Storage {
         return results;
     }
     
+    /**
+     * Takes in the file name to be used for the storage file and the TaskList
+     * to be stored. Saves the taskList in the storage file.
+     * 
+     * @param fileName The file name to store the list of tasks as
+     * @param tasks The TaskList to be stored
+     * @throws IOException if writing fails
+     */
     //Not tested yet
-    public void saveTaskList(String fileName, TaskList tasks) {
+    public void saveTaskList(String fileName, TaskList tasks) 
+            throws IOException {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
-        try {
-            writeToFile(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + fileName, taskJsonStrings);
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        writeToFile(getSourcePath() + fileName, taskJsonStrings);
     }
     
     //Not tested yet
     public TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
+        BufferedReader br = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + fileName));
+            br = new BufferedReader(new FileReader(getSourcePath() + fileName));
             String input;
             while((input = br.readLine()) != null) {
                 tasks.add(convertTaskFromJsonString(input));
@@ -185,5 +222,10 @@ public class Storage {
             System.out.println(e);
             return null;
         }
+    }
+    
+    private String getSourcePath() {
+        CodeSource cs = getClass().getProtectionDomain().getCodeSource();
+        return cs.getLocation().getPath();
     }
 }
