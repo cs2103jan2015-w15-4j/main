@@ -44,7 +44,7 @@ public class ParserTest {
     @Test
     public void testNextMonth(){
         ParseResult result = Parser.parse("edit 322 date next month");
-        assertEquals(Constants.COMMAND_TYPE.UPDATE, result.getCommandType());
+        assertEquals(Constants.CommandType.UPDATE, result.getCommandType());
         assertEquals("Wed Apr 01 00:00:00 SGT 2015", result.getDate().toString());
         assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
