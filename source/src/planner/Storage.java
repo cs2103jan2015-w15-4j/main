@@ -142,7 +142,11 @@ public class Storage {
         taskObject.put("description", task.getDescription());
         taskObject.put("tag", task.getTag());
         taskObject.put("priority", String.valueOf(task.getPriority()));
-        taskObject.put("due", task.getDueDate().getTime());
+        if(task.getDueDate() == null) {
+            taskObject.put("due", null);
+        } else {
+            taskObject.put("due", task.getDueDate().getTime());
+        }
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
         taskObject.put("id", String.valueOf(task.getID()));
@@ -157,8 +161,13 @@ public class Storage {
             String description = (String) taskJson.get("description");
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
-            Date dueDate = new Date((Long) taskJson.get("due"));
+            Object due = taskJson.get("due");
+            Date dueDate = null;
+            if(due != null) {
+                dueDate = new Date((Long) taskJson.get("due"));
+            }
             long ID = Long.valueOf((String)taskJson.get("id"));
+            
             
             Date createdDate = new Date((Long) taskJson.get("created"));
             boolean done = (boolean) taskJson.get("done");
@@ -171,7 +180,6 @@ public class Storage {
                 result.setUndone();
             }
             result.configureCreatedDate(createdDate);
-            
             return result;
         } catch (Exception e) {
             System.out.println(e);

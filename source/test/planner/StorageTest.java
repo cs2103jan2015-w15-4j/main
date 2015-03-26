@@ -176,7 +176,7 @@ public class StorageTest {
             }
             
             Task task3 = new Task("task3", "description3", new Date(System.currentTimeMillis()), 1, "third tag", 3);
-            Task task4 = new Task("task4", "description4", new Date(System.currentTimeMillis()), 8, "fourth tag", 4);
+            Task task4 = new Task("task4", "description4", null, 8, "fourth tag", 4);
             
             save.invoke(storage, fileName, testList);
             result = (TaskList) read.invoke(storage, fileName);

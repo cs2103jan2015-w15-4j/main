@@ -41,6 +41,7 @@ public class Engine {
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
+            System.out.println("read error");
             return false;
         }
     }
@@ -53,6 +54,7 @@ public class Engine {
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
+            System.out.println("write error");
             return false;
         }
     }
