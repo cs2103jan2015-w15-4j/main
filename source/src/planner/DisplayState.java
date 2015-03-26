@@ -2,18 +2,18 @@ package planner;
 
 import java.awt.event.KeyEvent;
 
-import planner.Constants.DISPLAY_STATE_FLAG;
+import planner.Constants.DisplayStateFlag;
 
 public class DisplayState {
 
-    private DISPLAY_STATE_FLAG displayStateFlag;
+    private DisplayStateFlag displayStateFlag;
     
     private String title;
     private String command;
     
     private int keyCode;
     
-    public DisplayState( DISPLAY_STATE_FLAG displayStateFlag, String title, String command, int keyCode ){
+    public DisplayState( DisplayStateFlag displayStateFlag, String title, String command, int keyCode ){
         
         this.displayStateFlag = displayStateFlag;
         
@@ -38,7 +38,7 @@ public class DisplayState {
         this.keyCode = keyCode;
     }
     
-    public DISPLAY_STATE_FLAG getdisplayStateFlag(){
+    public DisplayStateFlag getdisplayStateFlag(){
         
         return displayStateFlag;
     }

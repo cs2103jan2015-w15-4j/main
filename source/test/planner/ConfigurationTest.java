@@ -75,7 +75,7 @@ public class ConfigurationTest {
         Long oldConfigID = 35l;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (oldConfigID + i), Long.valueOf(oldConfigID + i), oldConfig.newTaskNumber());
+            assertEquals("ID returned should be " + (oldConfigID + i), Long.valueOf(oldConfigID + i), oldConfig.getNewTaskNumber());
             assertEquals("New num should be " + (oldConfigID + i + 1), Long.valueOf(oldConfigID + i + 1), oldConfig.getCurTaskNum());
 
         }
@@ -84,7 +84,7 @@ public class ConfigurationTest {
         String newConfigPathUpdate = "/User/Downloads/";
         Configuration newConfig = new Configuration(newConfigPath);
         for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (1 + i), Long.valueOf(1 + i), newConfig.newTaskNumber());
+            assertEquals("ID returned should be " + (1 + i), Long.valueOf(1 + i), newConfig.getNewTaskNumber());
             assertEquals("New num should be " + (1 + i + 1), Long.valueOf(1 + i + 1), newConfig.getCurTaskNum());
 
         }

@@ -47,7 +47,7 @@ public class UserInterface extends JFrame {
     ///////////////////////////////////////////////////////////////////// 
     public void processCommand( String input ){
         
-        planner.Constants.COMMAND_TYPE commandType = Engine.process(input);
+        planner.Constants.CommandType commandType = Engine.process(input);
         
         TaskList tempTaskList = Engine.getAllTasks();
         
@@ -666,7 +666,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // Today tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.TODAY ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
                 
                 tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
                 
@@ -677,7 +677,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // all tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.ALL ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                 
                 tempTaskList = Engine.getAllTasks();
                 
@@ -697,7 +697,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // Tentative tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.TENTATIVE ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                 
                 tempTaskList = Engine.getTentativeTasks();
                 
@@ -717,7 +717,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // Overdue tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.OVERDUE ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
                 
                 tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10], "F" + key ));
                 
@@ -728,7 +728,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // Recurring tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.RECURRING ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.RECURRING ){
                 
                 tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
                 
@@ -739,7 +739,7 @@ public class UserInterface extends JFrame {
             ++key;
             
             // Done tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DISPLAY_STATE_FLAG.DONE ){
+            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
                 
                 tempTaskList = Engine.getTentativeTasks();
                 
@@ -817,7 +817,7 @@ public class UserInterface extends JFrame {
         
         addKeyBindingsToDisplay(displayPane);
         
-        currentDisplayState = new DisplayState( planner.Constants.DISPLAY_STATE_FLAG.ALL, "All tasks", null, KeyEvent.VK_F4 );
+        currentDisplayState = new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, KeyEvent.VK_F4 );
     }
     
 	private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
