@@ -713,6 +713,7 @@ public class Parser {
                                                 int indexToCheck, int year, 
                                                 int month, int day) {
         
+        // check for a valid argument to be parsed as the time
         if (indexToCheck > dateParts.length) {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
@@ -721,15 +722,25 @@ public class Parser {
         } 
         String timeString = dateParts[indexToCheck];
         String[] timeParts = timeString.split(".");
+        
+        // check for appropriate format (##.##)
         if (timeParts.length != 2) {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse time on first argument due to incorrect format");
             return createCalendar(year, month, day, 0, 0, 0);
         } else {
-            int hour = Integer.parseInt(timeParts[0]);
-            int min = Integer.parseInt(timeParts[1]);
-            return createCalendar(year, month, day, hour, min, 0);
+            try {
+                int hour = Integer.parseInt(timeParts[0]);
+                int min = Integer.parseInt(timeParts[1]);
+                return createCalendar(year, month, day, hour, min, 0); 
+            } catch (NumberFormatException e) {
+                commandType = Constants.CommandType.INVALID;
+                errorType = Constants.ErrorType.INVALID_DATE;
+                logger.log(Level.WARNING, "error parsing time on first argument");
+                return createCalendar(year, month, day, 0, 0, 0);
+            }
+            
         }
     }
     
