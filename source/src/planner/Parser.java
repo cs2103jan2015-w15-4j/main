@@ -62,6 +62,7 @@ public class Parser {
     private static Calendar calendar = null;
 
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
+    private static final int HALF_DAY_IN_HOURS = 12;
 
     public static ParseResult parse(String command) {
         logger.setLevel(Level.WARNING);
@@ -731,7 +732,12 @@ public class Parser {
             try {
                 int hour = Integer.parseInt(timeParts[0]);
                 int min = Integer.parseInt(timeParts[1]);
-                return createCalendar(year, month, day, hour, min); 
+                if (pmOrAm.equals("pm")) {
+                    return createCalendar(year, month, day, hour + HALF_DAY_IN_HOURS, min); 
+                } else {
+                    return createCalendar(year, month, day, hour, min); 
+                }
+                
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_DATE;
@@ -745,6 +751,8 @@ public class Parser {
     //Creates calendar 
     private static Calendar createCalendar(int year, int month, int date, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
+        // first set the second to 0
+        calendar.set(0, 0, 0, 0, 0, 0);
         calendar.set(year, month, date, hour, minute);
         return calendar;
     }
