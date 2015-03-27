@@ -513,10 +513,10 @@ public class Parser {
         String[] dateParts = arguments.split(" ");
         assert(dateParts.length > 0);
         // may be a representation of the day, or a time keyword, or the next keyword
-        String firstArg = dateParts[tokenBeingParsedIndex];
+        String firstArg = dateParts[tokenBeingParsedIndex].toLowerCase();
         
         // check whether the current argument is a keyword for time
-        if (firstArg.toLowerCase().equals("pm") || firstArg.toLowerCase().equals("am")) {
+        if (firstArg.equals("pm") || firstArg.equals("am")) {
             return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, year, month, day); 
         
         } else {
@@ -552,10 +552,10 @@ public class Parser {
             // now parsing the second token
             tokenBeingParsedIndex++;
             // may be a representation of the month, or a time keyword
-            String secondArg = dateParts[tokenBeingParsedIndex];
+            String secondArg = dateParts[tokenBeingParsedIndex].toLowerCase();
             
             // check whether the current argument is a keyword for time
-            if (secondArg.toLowerCase().equals("pm") || secondArg.toLowerCase().equals("am")) {
+            if (secondArg.equals("pm") || secondArg.equals("am")) {
                 return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
                                            year, month, day); 
                 
@@ -591,11 +591,10 @@ public class Parser {
             // now parsing the third token
             tokenBeingParsedIndex++;
             // may be a representation of the year, or a time keyword
-            String thirdArg = dateParts[2];
+            String thirdArg = dateParts[2].toLowerCase();
 
             // check whether the current argument is a keyword for time
-            if (thirdArg.toLowerCase().equals("pm") ||
-                thirdArg.toLowerCase().equals("am")) {
+            if (thirdArg.equals("pm") || thirdArg.equals("am")) {
                 return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
                                            year, month, day);
 
