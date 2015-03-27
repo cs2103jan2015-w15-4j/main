@@ -384,28 +384,7 @@ public class Parser {
         }
         processArgs(keywordBeingProcessed);
 
-        // check for valid name in the case of the add command
-        if (commandType.equals(CommandType.ADD)) {
-            if (name.equals("")) {
-                commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.BLANK_TASK_NAME;
-            }
-            
-        // check for two valid dates in the case of the convert timed 
-        } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
-            if (date == null || date2 == null) {
-                logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
-                commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
-            }
-         // check for at least one valid date in the case of convert deadline
-        } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
-            logger.log(Level.WARNING, "no valid dates for Convert Deadline");
-            if (date == null && date2 == null) {
-                commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
-            }
-        }
+        checkAddConvertValidFields();
 
         flags = updateResultFlags(flags);
 
@@ -760,5 +739,30 @@ public class Parser {
         calendar.set(0, 0, 0, 0, 0, 0);
         calendar.set(year, month, date, hour, minute);
         return calendar;
+    }
+    
+    private static void checkAddConvertValidFields() {
+        // check for valid name in the case of the add command
+        if (commandType.equals(CommandType.ADD)) {
+            if (name.equals("")) {
+                commandType = Constants.CommandType.INVALID;
+                errorType = Constants.ErrorType.BLANK_TASK_NAME;
+            }
+            
+        // check for two valid dates in the case of the convert timed 
+        } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
+            if (date == null || date2 == null) {
+                logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
+                commandType = Constants.CommandType.INVALID;
+                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
+            }
+         // check for at least one valid date in the case of convert deadline
+        } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
+            logger.log(Level.WARNING, "no valid dates for Convert Deadline");
+            if (date == null && date2 == null) {
+                commandType = Constants.CommandType.INVALID;
+                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
+            }
+        }
     }
 }
