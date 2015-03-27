@@ -28,7 +28,7 @@ public class Parser {
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
         "every", "in", "priority", "desc", "description", "date", "due",
-        "remind", "tag", "until"
+        "remind", "tag", "until", "to"
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));

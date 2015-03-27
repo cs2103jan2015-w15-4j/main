@@ -209,7 +209,7 @@ public class ParserTest {
     
     @Test
     public void testConvertToTimedCommand() {
-        ParseResult result = Parser.parse("convert 275 timed date 15 Jun 1992 by 27 Jun 1992");
+        ParseResult result = Parser.parse("convert 275 timed date 15 Jun 1992 until 27 Jun 1992");
         assertEquals(Constants.CommandType.CONVERT_TIMED, result.getCommandType());
         assertEquals("Mon Jun 15 00:00:00 SGT 1992", result.getDate().toString());
         assertEquals("Sat Jun 27 00:00:00 SGT 1992", result.getSecondDate().toString());
@@ -241,7 +241,7 @@ public class ParserTest {
     
     @Test
     public void testConvertToFloatingCommand() {
-        ParseResult result = Parser.parse("convert 592 floating date 17 Jun 1992 by 28 Jun 1992");
+        ParseResult result = Parser.parse("convert 592 floating date 17 Jun 1992 to 28 Jun 1992");
         assertEquals(Constants.CommandType.CONVERT_FLOATING, result.getCommandType());
         assertEquals("Wed Jun 17 00:00:00 SGT 1992", result.getDate().toString());
         assertEquals("Sun Jun 28 00:00:00 SGT 1992", result.getSecondDate().toString());
@@ -257,7 +257,7 @@ public class ParserTest {
     
     @Test
     public void testConvertToDeadlineCommand() {
-        ParseResult result = Parser.parse("convert 491 deadline date 19 Jun 1992 by 24 Jun 1992");
+        ParseResult result = Parser.parse("convert 491 deadline date 19 Jun 1992 until 24 Jun 1992");
         assertEquals(Constants.CommandType.CONVERT_DEADLINE, result.getCommandType());
         assertEquals("Fri Jun 19 00:00:00 SGT 1992", result.getDate().toString());
         assertEquals("Wed Jun 24 00:00:00 SGT 1992", result.getSecondDate().toString());
