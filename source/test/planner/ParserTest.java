@@ -9,11 +9,11 @@ import org.junit.Test;
 public class ParserTest {
     
     @Test
-    public void testAddCommandWithDatesTimesPriorityTag() {
-        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 am 9.30 until 6 Mar 2018 pm 2.30 priority 5 tag important");
+    public void testAddCommandWithDatesTime1PriorityTag() {
+        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 am 9.30 until 6 Mar 2018 priority 5 tag important");
         assertEquals(Constants.CommandType.ADD, result.getCommandType());
         assertEquals("Mon Mar 05 09:30:00 SGT 2018", result.getDate().toString());
-        assertEquals("Tue Mar 06 14:30:00 SGT 2018", result.getSecondDate().toString()); 
+        assertEquals("Tue Mar 06 23:59:00 SGT 2018", result.getSecondDate().toString()); 
         assertTrue(result.getDateToRemind() == null);
         assertEquals(5, result.getPriorityLevel());
         assertEquals(Constants.NO_ID_SET, result.getId());
