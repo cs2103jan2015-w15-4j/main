@@ -715,7 +715,7 @@ public class Parser {
         // check for a valid argument to be parsed as the time
         if (indexToCheck > dateParts.length) {
             commandType = Constants.CommandType.INVALID;
-            errorType = Constants.ErrorType.INVALID_DATE;
+            errorType = Constants.ErrorType.INVALID_TIME;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
             return createCalendar(year, month, day, 0, 0);
         } 
@@ -725,14 +725,19 @@ public class Parser {
         // check for appropriate format (##.##)
         if (timeParts.length != 2) {
             commandType = Constants.CommandType.INVALID;
-            errorType = Constants.ErrorType.INVALID_DATE;
+            errorType = Constants.ErrorType.INVALID_TIME;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
             return createCalendar(year, month, day, 0, 0);
         } else {
             try {
                 int hour = Integer.parseInt(timeParts[0]);
                 int min = Integer.parseInt(timeParts[1]);
-                if (pmOrAm.equals("pm")) {
+                if (hour < 1 || hour > 12 || min < 0 || min > 59) {
+                    commandType = Constants.CommandType.INVALID;
+                    errorType = Constants.ErrorType.INVALID_TIME;
+                    logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
+                    return createCalendar(year, month, day, 0, 0);
+                } else if (pmOrAm.equals("pm")) {
                     return createCalendar(year, month, day, hour + HALF_DAY_IN_HOURS, min); 
                 } else {
                     return createCalendar(year, month, day, hour, min); 
@@ -740,7 +745,7 @@ public class Parser {
                 
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_DATE;
+                errorType = Constants.ErrorType.INVALID_TIME;
                 logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
                 return createCalendar(year, month, day, 0, 0);
             }
