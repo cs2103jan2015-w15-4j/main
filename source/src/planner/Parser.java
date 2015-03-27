@@ -57,6 +57,8 @@ public class Parser {
     private static String name = "";
     private static String description = "";
     private static String tag = "";
+    private static boolean isTimeSetByUser = false;
+    private static boolean isTime2SetByUser = false;
     
     private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
@@ -202,6 +204,9 @@ public class Parser {
         errorType = null;
         flags = new boolean[8];
         calendar = null;
+        isTimeSetByUser = false;
+        isTime2SetByUser = false;
+        
     }
 
     private static Boolean isKeyword(String word) {
@@ -300,14 +305,14 @@ public class Parser {
             case "from":
             case "by":
             case "due":
-                calendar = parseDate(keywordArgs);
+                calendar = parseDate(keywordArgs, "date1");
                 date = calendar.getTime();
                 break;
             
             // end date (for timed tasks)
             case "until":
             case "to":
-                calendar = parseDate(keywordArgs);
+                calendar = parseDate(keywordArgs, "date2");
                 date2 = calendar.getTime();
                 break;
 
@@ -327,7 +332,7 @@ public class Parser {
                 break;
 
             case "remind":
-                calendar = parseDate(keywordArgs);
+                calendar = parseDate(keywordArgs, "dateRemind");
                 dateToRemind = calendar.getTime();
                 break;
                 
@@ -383,9 +388,8 @@ public class Parser {
 
         }
         processArgs(keywordBeingProcessed);
-
         checkAddConvertValidFields();
-
+        setDefaultDatesForAdd();
         flags = updateResultFlags(flags);
 
     }
@@ -479,14 +483,12 @@ public class Parser {
         }
     }
 
-    private static Calendar parseDate(String arguments) {
+    private static Calendar parseDate(String arguments, String parseTarget) {
         logger.log(Level.INFO, "beginning date parsing");
         Calendar currentTime = Calendar.getInstance();
         int day = currentTime.get(Calendar.DATE);
         int month = currentTime.get(Calendar.MONTH);
         int year = currentTime.get(Calendar.YEAR);
-        int hour = currentTime.get(Calendar.HOUR);
-        int minute = currentTime.get(Calendar.MINUTE);
         int tokenBeingParsedIndex = 0;
         
         // the tokens that will individually represent day, month etc
@@ -497,7 +499,8 @@ public class Parser {
         
         // check whether the current argument is a keyword for time
         if (firstArg.equals("pm") || firstArg.equals("am")) {
-            return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+            setTimeSetByUserToTrue(parseTarget);
+            return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                        firstArg, year, month, day); 
         
         } else {
@@ -537,7 +540,8 @@ public class Parser {
             
             // check whether the current argument is a keyword for time
             if (secondArg.equals("pm") || secondArg.equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                setTimeSetByUserToTrue(parseTarget);
+                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            secondArg, year, month, day); 
                 
             } else {
@@ -576,7 +580,8 @@ public class Parser {
 
             // check whether the current argument is a keyword for time
             if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                setTimeSetByUserToTrue(parseTarget);
+                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            thirdArg, year, month, day); 
 
             } else {
@@ -597,7 +602,8 @@ public class Parser {
             // expected to be a time keyword
             String fourthArg = dateParts[3].toLowerCase();
             if (fourthArg.equals("pm") || fourthArg.equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                setTimeSetByUserToTrue(parseTarget);
+                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            fourthArg, year, month, day); 
             }
         }
@@ -686,7 +692,7 @@ public class Parser {
      *  @param day          day of desired date
      *  @return             representation of full date
      */    
-    private static Calendar returnDateGivenTime(String[] dateParts, 
+    private static Calendar calcDateGivenTime(String[] dateParts, 
                                                 int indexBeingParsed, 
                                                 String pmOrAm, int year, 
                                                 int month, int day) {
@@ -762,6 +768,62 @@ public class Parser {
             if (date == null && date2 == null) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_ARGUMENTS;
+            }
+        }
+    }
+    
+    private static void setTimeSetByUserToTrue(String targetTime) {
+        if (targetTime.equals("date1")) {
+            isTimeSetByUser = true;
+        } else if (targetTime.equals("date2")) {
+            isTime2SetByUser = true;
+        }
+    }
+    
+    private static void setDefaultDatesForAdd() {
+        if (commandType.equals(CommandType.ADD)) {
+            Calendar calendar = Calendar.getInstance();
+            // case of timed task
+            if (date != null && date2 != null) {
+                if (!isTimeSetByUser) {
+                    // set the default time for first date to start of the day
+                    calendar.setTime(date);
+                    int existingYear = calendar.get(Calendar.YEAR);
+                    int existingMonth = calendar.get(Calendar.MONTH);
+                    int existingDay = calendar.get(Calendar.DATE);
+                    calendar.set(existingYear, existingMonth, existingDay, 0, 0);
+                    date = calendar.getTime();
+                }
+                if (!isTime2SetByUser) {
+                    // set the default time for second date to end of the day
+                    calendar.setTime(date2);
+                    int existingYear = calendar.get(Calendar.YEAR);
+                    int existingMonth = calendar.get(Calendar.MONTH);
+                    int existingDay = calendar.get(Calendar.DATE);
+                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+                    date2 = calendar.getTime();
+                }
+            // case of deadline task
+            } else if (date != null || date2 != null) {
+                if (!isTimeSetByUser && date != null) {
+                    // set the default time for the date to end of the day
+                    calendar.setTime(date);
+                    int existingYear = calendar.get(Calendar.YEAR);
+                    int existingMonth = calendar.get(Calendar.MONTH);
+                    int existingDay = calendar.get(Calendar.DATE);
+                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+                    date = calendar.getTime();
+                }
+                
+                if (!isTime2SetByUser && date2 != null) {
+                    // set the default time for the date to end of the day
+                    calendar.setTime(date2);
+                    int existingYear = calendar.get(Calendar.YEAR);
+                    int existingMonth = calendar.get(Calendar.MONTH);
+                    int existingDay = calendar.get(Calendar.DATE);
+                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+                    date2 = calendar.getTime();
+                }
             }
         }
     }
