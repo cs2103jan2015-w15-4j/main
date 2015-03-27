@@ -516,17 +516,8 @@ public class Parser {
         
         // check whether the current argument is a keyword for time
         if (firstArg.toLowerCase().equals("pm") || firstArg.toLowerCase().equals("am")) {
-            try {
-                String timeString = dateParts[tokenBeingParsedIndex + 1];
-                return returnDateGivenTime(timeString, year, month, day);
-                
-            } catch (IllegalArgumentException e) {
-                commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_DATE;
-                logger.log(Level.WARNING, "unable to parse time");
-                return createCalendar(year, month, day, 0, 0, 0);
-            }
-            
+            return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, year, month, day); 
+        
         } else {
             // parse as date without regards to time
             try {
@@ -555,22 +546,33 @@ public class Parser {
                 return createCalendar(year, month, day, 0, 0, 0);
             }
         } else {
-            String expectedMonth = dateParts[1];
-            try {
-                month = Integer.parseInt(expectedMonth);
-            } catch (NumberFormatException e) {
-                int monthIndex = months.indexOf(expectedMonth.toLowerCase());
-                // check whether it is found in the list of English month strings
-                if (monthIndex == -1) {
-                    commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_DATE;
-                    logger.log(Level.WARNING, "unable to parse month");
-                    return createCalendar(year, month, day, 0, 0, 0);
-                } else {
-                    month = (monthIndex / 2) + 1;
-                    logger.log(Level.INFO, "month of parsed date: " + month);
+            // now parsing the second token
+            tokenBeingParsedIndex++;
+            String secondArg = dateParts[tokenBeingParsedIndex];
+            
+            // check whether the current argument is a keyword for time
+            if (secondArg.toLowerCase().equals("pm") || secondArg.toLowerCase().equals("am")) {
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, year, month, day); 
+                
+            } else {
+                // parse as date without regards to time
+                try {
+                    month = Integer.parseInt(secondArg);
+                } catch (NumberFormatException e) {
+                    int monthIndex = months.indexOf(secondArg.toLowerCase());
+                    // check whether it is found in the list of English month strings
+                    if (monthIndex == -1) {
+                        commandType = Constants.CommandType.INVALID;
+                        errorType = Constants.ErrorType.INVALID_DATE;
+                        logger.log(Level.WARNING, "unable to parse month");
+                        return createCalendar(year, month, day, 0, 0, 0);
+                    } else {
+                        month = (monthIndex / 2) + 1;
+                        logger.log(Level.INFO, "month of parsed date: " + month);
+                    }
                 }
             }
+            
             
             //Similar check as above, push to next year if month had passed
             if (dateParts.length == 2) {
@@ -582,7 +584,7 @@ public class Parser {
             } else {
                 String expectedYear = dateParts[2];
                 logger.log(Level.INFO, "value expected to be day: " + day);
-                logger.log(Level.INFO, "value expected to be month: " + expectedMonth);
+                logger.log(Level.INFO, "value expected to be month: " + month);
                 logger.log(Level.INFO, "value expected to be year: " + expectedYear);
                 try {
                     year = Integer.parseInt(expectedYear);
@@ -667,17 +669,26 @@ public class Parser {
     }
     
     // parses a string with the expected format "##.##" into a calendar containing the corresponding hour and minute
-    private static Calendar returnDateGivenTime(String timeString, int year, int month, int day) throws IllegalArgumentException {
-        Calendar timeCalendar = Calendar.getInstance();
+    private static Calendar returnDateGivenTime(String[] dateParts, int indexToCheck, int year, int month, int day) {
+        
+        if (indexToCheck > dateParts.length) {
+            commandType = Constants.CommandType.INVALID;
+            errorType = Constants.ErrorType.INVALID_DATE;
+            logger.log(Level.WARNING, "unable to parse time on first argument due to no token after time keyword");
+            return createCalendar(year, month, day, 0, 0, 0);
+        } 
+        String timeString = dateParts[indexToCheck];
         String[] timeParts = timeString.split(".");
         if (timeParts.length != 2) {
-            throw new IllegalArgumentException("argument is not in the format ##.##");
+            commandType = Constants.CommandType.INVALID;
+            errorType = Constants.ErrorType.INVALID_DATE;
+            logger.log(Level.WARNING, "unable to parse time on first argument due to incorrect format");
+            return createCalendar(year, month, day, 0, 0, 0);
         } else {
             int hour = Integer.parseInt(timeParts[0]);
             int min = Integer.parseInt(timeParts[1]);
-            timeCalendar.set(year, month, day, hour, min, 0);
-            return timeCalendar;
-        }        
+            return createCalendar(year, month, day, hour, min, 0);
+        }
     }
     
     //Creates calendar 
