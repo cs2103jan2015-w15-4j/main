@@ -523,11 +523,12 @@ public class Parser {
             } catch (IllegalArgumentException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_DATE;
-                logger.log(Level.WARNING, "unable to parse day");
+                logger.log(Level.WARNING, "unable to parse time");
                 return createCalendar(year, month, day, 0, 0, 0);
             }
             
         } else {
+            // parse as date without regards to time
             try {
                 day = Integer.parseInt(firstArg);
             } catch (NumberFormatException e) {
