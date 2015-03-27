@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.IllegalFormatException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -226,7 +227,7 @@ public class Parser {
                 try {
                     id = Long.parseLong(keywordArgs.split(" ")[0]);
                 } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id in delete");
+                    logger.log(Level.WARNING, "error parsing id in " + keyword);
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_TASK_ID;
                 }
@@ -296,13 +297,13 @@ public class Parser {
             case "on":
             case "date":            
             case "from":
+            case "by":
+            case "due":
                 calendar = parseDate(keywordArgs);
                 date = calendar.getTime();
                 break;
             
             // end date (for timed tasks)
-            case "by":
-            case "due":
             case "until":
             case "to":
                 calendar = parseDate(keywordArgs);
@@ -504,22 +505,45 @@ public class Parser {
         int day = currentTime.get(Calendar.DATE);
         int month = currentTime.get(Calendar.MONTH);
         int year = currentTime.get(Calendar.YEAR);
+        int hour = currentTime.get(Calendar.HOUR);
+        int minute = currentTime.get(Calendar.MINUTE);
+        int tokenBeingParsedIndex = 0;
+        
+        // the tokens that will individually represent day, month etc
         String[] dateParts = arguments.split(" ");
-        String firstArg = dateParts[0];
-        try {
-            day = Integer.parseInt(firstArg);
-        } catch (NumberFormatException e) {
-            
-            //Goes into parseNext when "next" is detected
-            if (firstArg.toLowerCase().trim().equals("next")) {
-                return parseNext(arguments);
-            } else { 
+        assert(dateParts.length > 0);
+        String firstArg = dateParts[tokenBeingParsedIndex];
+        
+        // check whether the current argument is a keyword for time
+        if (firstArg.toLowerCase().equals("pm") || firstArg.toLowerCase().equals("am")) {
+            try {
+                String timeString = dateParts[tokenBeingParsedIndex + 1];
+                return returnDateGivenTime(timeString, year, month, day);
+                
+            } catch (IllegalArgumentException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_DATE;
                 logger.log(Level.WARNING, "unable to parse day");
                 return createCalendar(year, month, day, 0, 0, 0);
             }
+            
+        } else {
+            try {
+                day = Integer.parseInt(firstArg);
+            } catch (NumberFormatException e) {
+                
+                //Goes into parseNext when "next" is the first argument
+                if (firstArg.toLowerCase().trim().equals("next")) {
+                    return parseNext(arguments);
+                } else { 
+                    commandType = Constants.CommandType.INVALID;
+                    errorType = Constants.ErrorType.INVALID_DATE;
+                    logger.log(Level.WARNING, "unable to parse day");
+                    return createCalendar(year, month, day, 0, 0, 0);
+                }
+            }
         }
+        
         
         //Checks whether date information is incomplete, if so checks whether date has passed
         //If so push to next month, else keep the current month
@@ -535,7 +559,7 @@ public class Parser {
                 month = Integer.parseInt(expectedMonth);
             } catch (NumberFormatException e) {
                 int monthIndex = months.indexOf(expectedMonth.toLowerCase());
-                // check whether it is found in the list of month strings
+                // check whether it is found in the list of English month strings
                 if (monthIndex == -1) {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
@@ -634,11 +658,25 @@ public class Parser {
 
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
-            logger.log(Level.WARNING, "unable to parse year");
+            logger.log(Level.WARNING, "unable to parse date");
 
         }
         return createCalendar(year, month, date, 0, 0, 0);
         
+    }
+    
+    // parses a string with the expected format "##.##" into a calendar containing the corresponding hour and minute
+    private static Calendar returnDateGivenTime(String timeString, int year, int month, int day) throws IllegalArgumentException {
+        Calendar timeCalendar = Calendar.getInstance();
+        String[] timeParts = timeString.split(".");
+        if (timeParts.length != 2) {
+            throw new IllegalArgumentException("argument is not in the format ##.##");
+        } else {
+            int hour = Integer.parseInt(timeParts[0]);
+            int min = Integer.parseInt(timeParts[1]);
+            timeCalendar.set(year, month, day, hour, min, 0);
+            return timeCalendar;
+        }        
     }
     
     //Creates calendar 
