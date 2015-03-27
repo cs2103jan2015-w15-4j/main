@@ -517,7 +517,8 @@ public class Parser {
         
         // check whether the current argument is a keyword for time
         if (firstArg.equals("pm") || firstArg.equals("am")) {
-            return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, year, month, day); 
+            return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                       firstArg, year, month, day); 
         
         } else {
             // parse as date without regards to time
@@ -556,8 +557,8 @@ public class Parser {
             
             // check whether the current argument is a keyword for time
             if (secondArg.equals("pm") || secondArg.equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
-                                           year, month, day); 
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                           secondArg, year, month, day); 
                 
             } else {
                 // parse as date without regards to time
@@ -595,8 +596,8 @@ public class Parser {
 
             // check whether the current argument is a keyword for time
             if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
-                                           year, month, day);
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                           thirdArg, year, month, day); 
 
             } else {
                 logger.log(Level.INFO, "value expected to be year: " + thirdArg);
@@ -614,11 +615,10 @@ public class Parser {
         if (dateParts.length == 5) {
             tokenBeingParsedIndex++;
             // expected to be a time keyword
-            String fourthArg = dateParts[3];
-            if (fourthArg.toLowerCase().equals("pm") ||
-                fourthArg.toLowerCase().equals("am")) {
-                return returnDateGivenTime(dateParts,
-                        tokenBeingParsedIndex + 1, year, month, day);
+            String fourthArg = dateParts[3].toLowerCase();
+            if (fourthArg.equals("pm") || fourthArg.equals("am")) {
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                           fourthArg, year, month, day); 
             }
         }
         
@@ -709,14 +709,15 @@ public class Parser {
      */
     
     private static Calendar returnDateGivenTime(String[] dateParts, 
-                                                int indexToCheck, int year, 
+                                                int indexBeingParsed, 
+                                                String pmOrAm, int year, 
                                                 int month, int day) {
-        
+        int indexToCheck = indexBeingParsed + 1;
         // check for a valid argument to be parsed as the time
         if (indexToCheck > dateParts.length) {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
-            logger.log(Level.WARNING, "unable to parse time on first argument due to no token after time keyword");
+            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
             return createCalendar(year, month, day, 0, 0, 0);
         } 
         String timeString = dateParts[indexToCheck];
@@ -726,7 +727,7 @@ public class Parser {
         if (timeParts.length != 2) {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
-            logger.log(Level.WARNING, "unable to parse time on first argument due to incorrect format");
+            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
             return createCalendar(year, month, day, 0, 0, 0);
         } else {
             try {
@@ -736,7 +737,7 @@ public class Parser {
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_DATE;
-                logger.log(Level.WARNING, "error parsing time on first argument");
+                logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
                 return createCalendar(year, month, day, 0, 0, 0);
             }
             
