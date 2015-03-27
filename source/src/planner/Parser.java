@@ -512,6 +512,7 @@ public class Parser {
         // the tokens that will individually represent day, month etc
         String[] dateParts = arguments.split(" ");
         assert(dateParts.length > 0);
+        // may be a representation of the day, or a time keyword, or the next keyword
         String firstArg = dateParts[tokenBeingParsedIndex];
         
         // check whether the current argument is a keyword for time
@@ -520,8 +521,10 @@ public class Parser {
         
         } else {
             // parse as date without regards to time
+            logger.log(Level.INFO, "value expected to be day or next keyword: " + firstArg);
             try {
                 day = Integer.parseInt(firstArg);
+                
             } catch (NumberFormatException e) {
                 
                 //Goes into parseNext when "next" is the first argument
@@ -548,14 +551,17 @@ public class Parser {
         } else {
             // now parsing the second token
             tokenBeingParsedIndex++;
+            // may be a representation of the month, or a time keyword
             String secondArg = dateParts[tokenBeingParsedIndex];
             
             // check whether the current argument is a keyword for time
             if (secondArg.toLowerCase().equals("pm") || secondArg.toLowerCase().equals("am")) {
-                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, year, month, day); 
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
+                                           year, month, day); 
                 
             } else {
                 // parse as date without regards to time
+                logger.log(Level.INFO, "value expected to be month: " + secondArg);
                 try {
                     month = Integer.parseInt(secondArg);
                 } catch (NumberFormatException e) {
@@ -571,33 +577,55 @@ public class Parser {
                         logger.log(Level.INFO, "month of parsed date: " + month);
                     }
                 }
-            }
-            
-            
-            //Similar check as above, push to next year if month had passed
-            if (dateParts.length == 2) {
-                if (month < currentTime.get(Calendar.MONTH)) {
-                    return createCalendar(year + 1, month - 1, day, 0, 0, 0);
-                } else {
-                    return createCalendar(year, month - 1, day, 0, 0, 0);
-                }
+            }            
+        }     
+        
+        // Similar check as above, push to next year if month had passed
+        if (dateParts.length == 2) {
+            if (month < currentTime.get(Calendar.MONTH)) {
+                return createCalendar(year + 1, month - 1, day, 0, 0, 0);
             } else {
-                String expectedYear = dateParts[2];
-                logger.log(Level.INFO, "value expected to be day: " + day);
-                logger.log(Level.INFO, "value expected to be month: " + month);
-                logger.log(Level.INFO, "value expected to be year: " + expectedYear);
+                return createCalendar(year, month - 1, day, 0, 0, 0);
+            }
+        } else {
+            // now parsing the third token
+            tokenBeingParsedIndex++;
+            // may be a representation of the year, or a time keyword
+            String thirdArg = dateParts[2];
+
+            // check whether the current argument is a keyword for time
+            if (thirdArg.toLowerCase().equals("pm") ||
+                thirdArg.toLowerCase().equals("am")) {
+                return returnDateGivenTime(dateParts, tokenBeingParsedIndex + 1, 
+                                           year, month, day);
+
+            } else {
+                logger.log(Level.INFO, "value expected to be year: " + thirdArg);
                 try {
-                    year = Integer.parseInt(expectedYear);
+                    year = Integer.parseInt(thirdArg);
                 } catch (NumberFormatException e) {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse year");
                 }
-                
-                return createCalendar(year, month - 1, day, 0, 0, 0);
+            }            
+        }
+        
+        // user has input year, month, day, as well as time
+        if (dateParts.length == 5) {
+            tokenBeingParsedIndex++;
+            // expected to be a time keyword
+            String fourthArg = dateParts[3];
+            if (fourthArg.toLowerCase().equals("pm") ||
+                fourthArg.toLowerCase().equals("am")) {
+                return returnDateGivenTime(dateParts,
+                        tokenBeingParsedIndex + 1, year, month, day);
             }
         }
+        
+        return createCalendar(year, month - 1, day, 0, 0, 0);
     }
+    
     
     //Parses whatever that comes after "next" is typed
     //Will delete/change bad comments before refactoring the code
@@ -668,8 +696,22 @@ public class Parser {
         
     }
     
-    // parses a string with the expected format "##.##" into a calendar containing the corresponding hour and minute
-    private static Calendar returnDateGivenTime(String[] dateParts, int indexToCheck, int year, int month, int day) {
+    /**
+     *  Takes in an array of strings containing date info and the expected 
+     *  index containing the time string, and returns a Calendar constructed 
+     *  with all the date info.
+     *  
+     *  @param dateParts    string tokens with date info
+     *  @param indexToCheck index of array expected to contain time string
+     *  @param year         year of desired date
+     *  @param month        month of desired date
+     *  @param day          day of desired date
+     *  @return             representation of full date
+     */
+    
+    private static Calendar returnDateGivenTime(String[] dateParts, 
+                                                int indexToCheck, int year, 
+                                                int month, int day) {
         
         if (indexToCheck > dateParts.length) {
             commandType = Constants.CommandType.INVALID;
