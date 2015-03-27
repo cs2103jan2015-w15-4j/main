@@ -535,7 +535,7 @@ public class Parser {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse day");
-                    return createCalendar(year, month, day, 0, 0, 0);
+                    return createCalendar(year, month, day, 0, 0);
                 }
             }
         }
@@ -545,9 +545,9 @@ public class Parser {
         //If so push to next month, else keep the current month
         if (dateParts.length == 1) {
             if (day < currentTime.get(Calendar.DATE)) {
-                return createCalendar(year, month + 1, day, 0, 0, 0); 
+                return createCalendar(year, month + 1, day, 0, 0); 
             } else {
-                return createCalendar(year, month, day, 0, 0, 0);
+                return createCalendar(year, month, day, 0, 0);
             }
         } else {
             // now parsing the second token
@@ -572,7 +572,7 @@ public class Parser {
                         commandType = Constants.CommandType.INVALID;
                         errorType = Constants.ErrorType.INVALID_DATE;
                         logger.log(Level.WARNING, "unable to parse month");
-                        return createCalendar(year, month, day, 0, 0, 0);
+                        return createCalendar(year, month, day, 0, 0);
                     } else {
                         month = (monthIndex / 2) + 1;
                         logger.log(Level.INFO, "month of parsed date: " + month);
@@ -584,9 +584,9 @@ public class Parser {
         // Similar check as above, push to next year if month had passed
         if (dateParts.length == 2) {
             if (month < currentTime.get(Calendar.MONTH)) {
-                return createCalendar(year + 1, month - 1, day, 0, 0, 0);
+                return createCalendar(year + 1, month - 1, day, 0, 0);
             } else {
-                return createCalendar(year, month - 1, day, 0, 0, 0);
+                return createCalendar(year, month - 1, day, 0, 0);
             }
         } else {
             // now parsing the third token
@@ -622,7 +622,7 @@ public class Parser {
             }
         }
         
-        return createCalendar(year, month - 1, day, 0, 0, 0);
+        return createCalendar(year, month - 1, day, 0, 0);
     }
     
     
@@ -639,13 +639,13 @@ public class Parser {
         try {
             switch(secondArg) {
                 case "day":
-                    return createCalendar(year, month, date + 1, 0, 0, 0);
+                    return createCalendar(year, month, date + 1, 0, 0);
                 
                 case "month":
-                    return createCalendar(year, month + 1, 1, 0 ,0 ,0);
+                    return createCalendar(year, month + 1, 1, 0 ,0);
                     
                 case "year":
-                    return createCalendar(year + 1, 0, 1, 0 ,0 ,0);
+                    return createCalendar(year + 1, 0, 1, 0 ,0);
                     
                 case "week": 
                     
@@ -655,7 +655,7 @@ public class Parser {
                     if (daysDifference == 0) {
                         daysDifference = 7;
                     }
-                    return createCalendar(year, month, date + daysDifference, 0 ,0, 0);
+                    return createCalendar(year, month, date + daysDifference, 0 ,0);
                     
                 default:
                     
@@ -677,11 +677,11 @@ public class Parser {
                             //while mon = 1 from arraylist index
                             int dayDifference = 7 + (index / 2) + 1 - (day - 1);
                             System.out.println(day);
-                            return createCalendar(year, month, date + dayDifference , 0, 0, 0);
+                            return createCalendar(year, month, date + dayDifference , 0, 0);
                         }
                     } else {
                         int monthRequested = (index / 2) + 1;
-                        return createCalendar(year + 1, monthRequested - 1, 1, 0, 0, 0);                    
+                        return createCalendar(year + 1, monthRequested - 1, 1, 0, 0);                    
                     }
             }
         } catch (NumberFormatException e) {
@@ -691,8 +691,7 @@ public class Parser {
             logger.log(Level.WARNING, "unable to parse date");
 
         }
-        return createCalendar(year, month, date, 0, 0, 0);
-        
+        return createCalendar(year, month, date, 0, 0);        
     }
     
     /**
@@ -706,8 +705,7 @@ public class Parser {
      *  @param month        month of desired date
      *  @param day          day of desired date
      *  @return             representation of full date
-     */
-    
+     */    
     private static Calendar returnDateGivenTime(String[] dateParts, 
                                                 int indexBeingParsed, 
                                                 String pmOrAm, int year, 
@@ -718,7 +716,7 @@ public class Parser {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
-            return createCalendar(year, month, day, 0, 0, 0);
+            return createCalendar(year, month, day, 0, 0);
         } 
         String timeString = dateParts[indexToCheck];
         String[] timeParts = timeString.split(".");
@@ -728,26 +726,26 @@ public class Parser {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_DATE;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
-            return createCalendar(year, month, day, 0, 0, 0);
+            return createCalendar(year, month, day, 0, 0);
         } else {
             try {
                 int hour = Integer.parseInt(timeParts[0]);
                 int min = Integer.parseInt(timeParts[1]);
-                return createCalendar(year, month, day, hour, min, 0); 
+                return createCalendar(year, month, day, hour, min); 
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_DATE;
                 logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
-                return createCalendar(year, month, day, 0, 0, 0);
+                return createCalendar(year, month, day, 0, 0);
             }
             
         }
     }
     
     //Creates calendar 
-    private static Calendar createCalendar(int year, int month, int date, int hour, int minute, int second) {
+    private static Calendar createCalendar(int year, int month, int date, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, date, hour, minute, second);
+        calendar.set(year, month, date, hour, minute);
         return calendar;
     }
 }
