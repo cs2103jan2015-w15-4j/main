@@ -9,11 +9,11 @@ import org.junit.Test;
 public class ParserTest {
     
     @Test
-    public void testAddCommand() {
-        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 until 6 Mar 2018 priority 5 tag important");
+    public void testAddCommandWithDatesTimesPriorityTag() {
+        ParseResult result = Parser.parse("add important meeting with boss on 5 Mar 2018 am 9.30 until 6 Mar 2018 pm 2.30 priority 5 tag important");
         assertEquals(Constants.CommandType.ADD, result.getCommandType());
-        assertEquals("Mon Mar 05 00:00:00 SGT 2018", result.getDate().toString());
-        assertEquals("Tue Mar 06 00:00:00 SGT 2018", result.getSecondDate().toString()); 
+        assertEquals("Mon Mar 05 09:30:00 SGT 2018", result.getDate().toString());
+        assertEquals("Tue Mar 06 14:30:00 SGT 2018", result.getSecondDate().toString()); 
         assertTrue(result.getDateToRemind() == null);
         assertEquals(5, result.getPriorityLevel());
         assertEquals(Constants.NO_ID_SET, result.getId());
@@ -26,10 +26,10 @@ public class ParserTest {
     }
 
     @Test
-    public void testUpdateCommand() {
-        ParseResult result = Parser.parse("update 123 date 23 June 2015");
+    public void testUpdateCommandWithDateTime() {
+        ParseResult result = Parser.parse("update 123 date 23 June 2015 pm 7.46");
         assertEquals(Constants.CommandType.UPDATE, result.getCommandType());
-        assertEquals("Tue Jun 23 00:00:00 SGT 2015", result.getDate().toString());
+        assertEquals("Tue Jun 23 19:46:00 SGT 2015", result.getDate().toString());
         assertTrue(result.getSecondDate() == null);
         assertTrue(result.getDateToRemind() == null);
         assertEquals(123, result.getId());
@@ -158,7 +158,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSearchCommand() {
+    public void testSearchNameTagDescDateReminddate() {
         ParseResult result = Parser.parse("search sushi bar tag food description delicious on 10 Oct 1528 remind 9 Oct 1528");
         assertEquals(Constants.CommandType.SEARCH, result.getCommandType());
         assertEquals("Sat Oct 10 00:00:00 SGT 1528", result.getDate().toString());
@@ -209,10 +209,10 @@ public class ParserTest {
     
     @Test
     public void testConvertToTimedCommand() {
-        ParseResult result = Parser.parse("convert 275 timed date 15 Jun 1992 until 27 Jun 1992");
+        ParseResult result = Parser.parse("convert 275 timed date 15 Jun 1992 am 3.50 until 27 Jun 1992 am 2.29");
         assertEquals(Constants.CommandType.CONVERT_TIMED, result.getCommandType());
-        assertEquals("Mon Jun 15 00:00:00 SGT 1992", result.getDate().toString());
-        assertEquals("Sat Jun 27 00:00:00 SGT 1992", result.getSecondDate().toString());
+        assertEquals("Mon Jun 15 03:50:00 SGT 1992", result.getDate().toString());
+        assertEquals("Sat Jun 27 02:29:00 SGT 1992", result.getSecondDate().toString());
         assertTrue(result.getDateToRemind() == null);
         assertEquals(275, result.getId());
         assertEquals("", result.getDescription());
@@ -257,9 +257,9 @@ public class ParserTest {
     
     @Test
     public void testConvertToDeadlineCommand() {
-        ParseResult result = Parser.parse("convert 491 deadline date 19 Jun 1992 until 24 Jun 1992");
+        ParseResult result = Parser.parse("convert 491 deadline date 19 Jun 1992 am 4.20 until 24 Jun 1992");
         assertEquals(Constants.CommandType.CONVERT_DEADLINE, result.getCommandType());
-        assertEquals("Fri Jun 19 00:00:00 SGT 1992", result.getDate().toString());
+        assertEquals("Fri Jun 19 04:20:00 SGT 1992", result.getDate().toString());
         assertEquals("Wed Jun 24 00:00:00 SGT 1992", result.getSecondDate().toString());
         assertTrue(result.getDateToRemind() == null);
         assertEquals(491, result.getId());

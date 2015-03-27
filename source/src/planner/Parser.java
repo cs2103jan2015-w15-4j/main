@@ -717,17 +717,17 @@ public class Parser {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_TIME;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
-            return createCalendar(year, month, day, 0, 0);
+            return createCalendar(year, month - 1, day, 0, 0);
         } 
         String timeString = dateParts[indexToCheck];
-        String[] timeParts = timeString.split(".");
+        String[] timeParts = timeString.split("\\.");
         
         // check for appropriate format (##.##)
         if (timeParts.length != 2) {
             commandType = Constants.CommandType.INVALID;
             errorType = Constants.ErrorType.INVALID_TIME;
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
-            return createCalendar(year, month, day, 0, 0);
+            return createCalendar(year, month - 1, day, 0, 0);
         } else {
             try {
                 int hour = Integer.parseInt(timeParts[0]);
@@ -738,16 +738,16 @@ public class Parser {
                     logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
                     return createCalendar(year, month, day, 0, 0);
                 } else if (pmOrAm.equals("pm")) {
-                    return createCalendar(year, month, day, hour + HALF_DAY_IN_HOURS, min); 
+                    return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
                 } else {
-                    return createCalendar(year, month, day, hour, min); 
+                    return createCalendar(year, month - 1, day, hour, min); 
                 }
                 
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
                 errorType = Constants.ErrorType.INVALID_TIME;
                 logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
-                return createCalendar(year, month, day, 0, 0);
+                return createCalendar(year, month - 1, day, 0, 0);
             }
             
         }
