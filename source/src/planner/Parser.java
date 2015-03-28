@@ -106,7 +106,7 @@ public class Parser {
                 break;
                 
             case UNDO:
-                // not yet implemented
+                // no need to process command
                 break;
                 
             case SEARCH:
@@ -123,6 +123,14 @@ public class Parser {
                 
             case CONVERT:
                 processCommand("convert");
+                break;
+                
+            case SAVEWHERE:
+                processCommand("savewhere");
+                break;
+            
+            case SAVEHERE:
+                processCommand("savehere");
                 break;
                 
             default:
@@ -182,6 +190,12 @@ public class Parser {
                 
             case "convert":
                 return CommandType.CONVERT;
+                
+            case "savewhere":
+                return CommandType.SAVEWHERE;
+                
+            case "savehere":
+                return CommandType.SAVEHERE;
 
             default:
                 return CommandType.INVALID;
@@ -212,6 +226,72 @@ public class Parser {
     private static Boolean isKeyword(String word) {
         return keywords.contains(word);
     }
+
+    private static void processCommand(String commandWord) {
+        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
+        String wordBeingProcessed = "";
+        // store previous keyword that was processed
+        String previousKeywordProcessed = "";
+        // to decide what to do with args
+        String keywordBeingProcessed = commandWord;
+
+        while(indexBeingProcessed < commandWords.length) {
+            wordBeingProcessed = commandWords[indexBeingProcessed];
+            if (isKeyword(wordBeingProcessed)) {
+                // all text after the "help" command is ignored
+                if (keywordBeingProcessed.equals("help")) {
+                    break;
+                // all text after the id is ignored for delete
+                } else if (keywordBeingProcessed.equals("delete")) {
+                    break;
+
+                // all text after the id is ignored for done
+                } else if (keywordBeingProcessed.equals("done")) {
+                    break;
+                // all text after the id is ignored for setnotdone   
+                } else if (keywordBeingProcessed.equals("setnotdone")) {
+                    break;
+                
+                // all text is ignored after savewhere   
+                } else if (keywordBeingProcessed.equals("savewhere")) {
+                    break;
+                    
+                 // all text is ignored after savehere and its argument
+                } else if (keywordBeingProcessed.equals("savehere")) {
+                    break;
+                    
+                // all text after the id is ignored for show 
+                } else if (keywordBeingProcessed.equals("show")) {
+                    break;
+                // all text after the date info is ignored for jump
+                } else if (keywordBeingProcessed.equals("jump")) {
+                    // allow users to say use "jump date <date>" as well as "jump <date>"
+                    if (wordBeingProcessed.equals("date")) {
+                        // do nothing
+                    } else {
+                        break;
+                    }                          
+                } else {
+                    // process arguments of the previous command
+                    processArgs(keywordBeingProcessed);
+                    keywordArgs = "";
+                    previousKeywordProcessed = keywordBeingProcessed;
+                    keywordBeingProcessed = wordBeingProcessed;
+                }
+            } else {
+                // add to arguments of previous command
+                keywordArgs += wordBeingProcessed + " ";
+            }
+            indexBeingProcessed++;
+
+        }
+        processArgs(keywordBeingProcessed);
+        checkAddConvertValidFields();
+        setDefaultDatesForAdd();
+        flags = updateResultFlags(flags);
+
+    }
+    
 
     private static void processArgs(String keyword) {
         // remove escape character from arguments since now unneeded
@@ -262,8 +342,9 @@ public class Parser {
                     errorType = Constants.ErrorType.INVALID_TASK_ID;
                 }
                 break;
-
+            
             case "undo":
+                // no arguments, all other text ignored
                 break;
 
             case "search":
@@ -294,8 +375,16 @@ public class Parser {
                 }
                 
                 // determine type to convert to
-                commandType = determineConvertType(convertArgs[1]);
+                commandType = determineConvertType(convertArgs[1]);                
+                break;
                 
+            case "savewhere":
+                // no arguments, all other text ignored
+                break;
+                
+            case "savehere":
+                // desired file path for data storage will be put in name field
+                name = keywordArgs.trim();
                 break;
 
             // non command keywords start here
@@ -306,19 +395,33 @@ public class Parser {
             case "by":
             case "due":
                 calendar = parseDate(keywordArgs, "date1");
-                date = calendar.getTime();
+                if (calendar != null) {
+                    date = calendar.getTime();
+                }                
                 break;
             
             // end date (for timed tasks)
             case "until":
             case "to":
                 calendar = parseDate(keywordArgs, "date2");
-                date2 = calendar.getTime();
+                if (calendar != null) {
+                    date2 = calendar.getTime();
+                }
+                break;
+            
+            // arguments for jump are expected to be date info
+            case "jump":
+                calendar = parseDate(keywordArgs, "jumpdate");
+                if (calendar != null) {
+                    date = calendar.getTime();
+                }
                 break;
 
+            // not yet implemented
             case "every":
                 break;
-
+            
+            // not yet implemented
             case "in":
                 break;
 
@@ -333,7 +436,9 @@ public class Parser {
 
             case "remind":
                 calendar = parseDate(keywordArgs, "dateRemind");
-                dateToRemind = calendar.getTime();
+                if (calendar != null) {
+                    dateToRemind = calendar.getTime();
+                }
                 break;
                 
             case "tag":
@@ -343,55 +448,6 @@ public class Parser {
             default:
                 break;
         }
-    }
-
-    private static void processCommand(String commandWord) {
-        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
-        String wordBeingProcessed = "";
-        // store previous keyword that was processed
-        String previousKeywordProcessed = "";
-        // to decide what to do with args
-        String keywordBeingProcessed = commandWord;
-
-        while(indexBeingProcessed < commandWords.length) {
-            wordBeingProcessed = commandWords[indexBeingProcessed];
-            if (isKeyword(wordBeingProcessed)) {
-                // all text after the "help" command is ignored
-                if (keywordBeingProcessed.equals("help")) {
-                    break;
-                 // all text after the id is ignored for delete
-                } else if (keywordBeingProcessed.equals("delete")) {
-                    break;
-
-                 // all text after the id is ignored for done
-                } else if (keywordBeingProcessed.equals("done")) {
-                    break;
-                 // all text after the id is ignored for setnotdone   
-                } else if (keywordBeingProcessed.equals("setnotdone")) {
-                    break;
-                    
-                // all text after 'show' and its id is ignored for show 
-                } else if (keywordBeingProcessed.equals("show")) {
-                    break;
-                } else {
-                    // process arguments of the previous command
-                    processArgs(keywordBeingProcessed);
-                    keywordArgs = "";
-                    previousKeywordProcessed = keywordBeingProcessed;
-                    keywordBeingProcessed = wordBeingProcessed;
-                }
-            } else {
-                // add to arguments of previous command
-                keywordArgs += wordBeingProcessed + " ";
-            }
-            indexBeingProcessed++;
-
-        }
-        processArgs(keywordBeingProcessed);
-        checkAddConvertValidFields();
-        setDefaultDatesForAdd();
-        flags = updateResultFlags(flags);
-
     }
 
     private static boolean[] updateResultFlags(boolean[] flags) {
@@ -451,9 +507,8 @@ public class Parser {
             case DONE:
                 return CommandType.HELP_DONE;
                 
-            case UNDO:
-                // not yet implemented
-                return CommandType.INVALID;
+            case UNDO:                
+                return CommandType.UNDO;
                 
             case SEARCH:
                 return CommandType.HELP_SEARCH;
@@ -518,7 +573,7 @@ public class Parser {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse day");
-                    return createCalendar(year, month, day, 0, 0);
+                    return null;
                 }
             }
         }
@@ -556,7 +611,7 @@ public class Parser {
                         commandType = Constants.CommandType.INVALID;
                         errorType = Constants.ErrorType.INVALID_DATE;
                         logger.log(Level.WARNING, "unable to parse month");
-                        return createCalendar(year, month, day, 0, 0);
+                        return null;
                     } else {
                         month = (monthIndex / 2) + 1;
                         logger.log(Level.INFO, "month of parsed date: " + month);
@@ -592,6 +647,7 @@ public class Parser {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse year");
+                    return null;
                 }
             }            
         }

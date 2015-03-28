@@ -124,8 +124,8 @@ public class ParserTest {
     }
     
     @Test
-    // test correct usage of undone
-    public void testNotDoneCommand() {
+    // test correct usage of setnotdone
+    public void testSetNotDoneCommand() {
         ParseResult result = Parser.parse("setnotdone 322 date 111 Mar 3917");
         assertEquals(Constants.CommandType.SETNOTDONE, result.getCommandType());
         assertTrue(result.getDate() == null);
@@ -286,4 +286,127 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
+    
+    @Test
+    /**
+     * Tests that Undo correctly sets the command type and processes no other 
+     * arguments
+     */
+    public void testUndoCommand() {
+        ParseResult result = Parser.parse("undo 1242 date 2 may 3018");
+        assertEquals(Constants.CommandType.UNDO, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
+     * Tests that the Jump command correctly sets the command type to JUMP and
+     * has the correct Date value on the valid date argument partition.
+     */
+    public void testValidJumpCommand() {
+        ParseResult result = Parser.parse("jump 15 aug 2217 am 3.20");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Fri Aug 15 03:20:00 SGT 2217", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
+     * Tests that the Jump command correctly sets the command type to JUMP 
+     * and has the correct date value on the alternate command format ("jump 
+     * date <date>" instead of "jump <date>") partition.
+     */
+    public void testAlternateFormatValidJumpCommand() {        
+        ParseResult result = Parser.parse("jump date 22 jan 4563 pm 10.25");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Sat Jan 22 22:25:00 SGT 4563", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
+     * Tests that the Jump command correctly sets the command type to INVALID 
+     * and has no date value on the invalid date argument partition.
+     */
+    public void testInvalidJumpCommand() {
+        ParseResult result = Parser.parse("jump i am a fish");
+        assertEquals(Constants.CommandType.INVALID, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ErrorType.INVALID_DATE, result.getErrorType());
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }    
+    
+    @Test
+    /**
+     * Tests that the savewhere command correctly sets the command type to 
+     * SAVEWHERE and that there are no other valid fields in the parse result.
+     */
+    public void testSaveWhereCommand() {
+        ParseResult result = Parser.parse("savewhere date 3 may 2015 priority 5 tag important desc testsavewherecommand");
+        assertEquals(Constants.CommandType.SAVEWHERE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
+     * Tests that the savehere command correctly sets the command type to 
+     * SAVEHERE and that other than the name field, there are no other valid 
+     * fields in the parse result.
+     */
+    public void testSaveHereCommand() {
+        ParseResult result = Parser.parse("savehere C:\\Program Files date 3 may 2015 priority 5 tag important desc testsavewherecommand");
+        assertEquals(Constants.CommandType.SAVEHERE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, true, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("C:\\Program Files", result.getName());
+    }
+    
 }
