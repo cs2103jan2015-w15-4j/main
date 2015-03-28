@@ -125,6 +125,14 @@ public class Parser {
                 processCommand("convert");
                 break;
                 
+            case SAVEWHERE:
+                processCommand("savewhere");
+                break;
+            
+            case SAVEHERE:
+                processCommand("savehere");
+                break;
+                
             default:
                 errorType = Constants.ErrorType.INVALID_COMMAND;
                 logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
@@ -182,6 +190,12 @@ public class Parser {
                 
             case "convert":
                 return CommandType.CONVERT;
+                
+            case "savewhere":
+                return CommandType.SAVEWHERE;
+                
+            case "savehere":
+                return CommandType.SAVEHERE;
 
             default:
                 return CommandType.INVALID;
@@ -212,6 +226,72 @@ public class Parser {
     private static Boolean isKeyword(String word) {
         return keywords.contains(word);
     }
+
+    private static void processCommand(String commandWord) {
+        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
+        String wordBeingProcessed = "";
+        // store previous keyword that was processed
+        String previousKeywordProcessed = "";
+        // to decide what to do with args
+        String keywordBeingProcessed = commandWord;
+
+        while(indexBeingProcessed < commandWords.length) {
+            wordBeingProcessed = commandWords[indexBeingProcessed];
+            if (isKeyword(wordBeingProcessed)) {
+                // all text after the "help" command is ignored
+                if (keywordBeingProcessed.equals("help")) {
+                    break;
+                // all text after the id is ignored for delete
+                } else if (keywordBeingProcessed.equals("delete")) {
+                    break;
+
+                // all text after the id is ignored for done
+                } else if (keywordBeingProcessed.equals("done")) {
+                    break;
+                // all text after the id is ignored for setnotdone   
+                } else if (keywordBeingProcessed.equals("setnotdone")) {
+                    break;
+                
+                // all text is ignored after savewhere   
+                } else if (keywordBeingProcessed.equals("savewhere")) {
+                    break;
+                    
+                 // all text is ignored after savehere and its argument
+                } else if (keywordBeingProcessed.equals("savehere")) {
+                    break;
+                    
+                // all text after the id is ignored for show 
+                } else if (keywordBeingProcessed.equals("show")) {
+                    break;
+                // all text after the date info is ignored for jump
+                } else if (keywordBeingProcessed.equals("jump")) {
+                    // allow users to say use "jump date <date>" as well as "jump <date>"
+                    if (wordBeingProcessed.equals("date")) {
+                        // do nothing
+                    } else {
+                        break;
+                    }                          
+                } else {
+                    // process arguments of the previous command
+                    processArgs(keywordBeingProcessed);
+                    keywordArgs = "";
+                    previousKeywordProcessed = keywordBeingProcessed;
+                    keywordBeingProcessed = wordBeingProcessed;
+                }
+            } else {
+                // add to arguments of previous command
+                keywordArgs += wordBeingProcessed + " ";
+            }
+            indexBeingProcessed++;
+
+        }
+        processArgs(keywordBeingProcessed);
+        checkAddConvertValidFields();
+        setDefaultDatesForAdd();
+        flags = updateResultFlags(flags);
+
+    }
+    
 
     private static void processArgs(String keyword) {
         // remove escape character from arguments since now unneeded
@@ -295,8 +375,16 @@ public class Parser {
                 }
                 
                 // determine type to convert to
-                commandType = determineConvertType(convertArgs[1]);
+                commandType = determineConvertType(convertArgs[1]);                
+                break;
                 
+            case "savewhere":
+                // no arguments, all other text ignored
+                break;
+                
+            case "savehere":
+                // desired file path for data storage will be put in name field
+                name = keywordArgs.split(" ")[0].trim();
                 break;
 
             // non command keywords start here
@@ -360,63 +448,6 @@ public class Parser {
             default:
                 break;
         }
-    }
-
-    private static void processCommand(String commandWord) {
-        int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
-        String wordBeingProcessed = "";
-        // store previous keyword that was processed
-        String previousKeywordProcessed = "";
-        // to decide what to do with args
-        String keywordBeingProcessed = commandWord;
-
-        while(indexBeingProcessed < commandWords.length) {
-            wordBeingProcessed = commandWords[indexBeingProcessed];
-            if (isKeyword(wordBeingProcessed)) {
-                // all text after the "help" command is ignored
-                if (keywordBeingProcessed.equals("help")) {
-                    break;
-                 // all text after the id is ignored for delete
-                } else if (keywordBeingProcessed.equals("delete")) {
-                    break;
-
-                 // all text after the id is ignored for done
-                } else if (keywordBeingProcessed.equals("done")) {
-                    break;
-                 // all text after the id is ignored for setnotdone   
-                } else if (keywordBeingProcessed.equals("setnotdone")) {
-                    break;
-                    
-                // all text after the id is ignored for show 
-                } else if (keywordBeingProcessed.equals("show")) {
-                    break;
-                // all text after the date info is ignored for jump
-                } else if (keywordBeingProcessed.equals("jump")) {
-                    // allow users to say use "jump date <date>" as well as "jump <date>"
-                    if (wordBeingProcessed.equals("date")) {
-                        // do nothing
-                    } else {
-                        break;
-                    }                       
-                } else {
-                    // process arguments of the previous command
-                    processArgs(keywordBeingProcessed);
-                    keywordArgs = "";
-                    previousKeywordProcessed = keywordBeingProcessed;
-                    keywordBeingProcessed = wordBeingProcessed;
-                }
-            } else {
-                // add to arguments of previous command
-                keywordArgs += wordBeingProcessed + " ";
-            }
-            indexBeingProcessed++;
-
-        }
-        processArgs(keywordBeingProcessed);
-        checkAddConvertValidFields();
-        setDefaultDatesForAdd();
-        flags = updateResultFlags(flags);
-
     }
 
     private static boolean[] updateResultFlags(boolean[] flags) {
