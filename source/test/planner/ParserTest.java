@@ -329,12 +329,32 @@ public class ParserTest {
     
     @Test
     /**
+     * Tests that the Jump command correctly sets the command type to JUMP 
+     * and has the correct date value on the alternate command format ("jump 
+     * date <date>" instead of "jump <date>") partition.
+     */
+    public void testAlternateFormatValidJumpCommand() {        
+        ParseResult result = Parser.parse("jump date 22 jan 4563 pm 10.25");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Sat Jan 22 22:25:00 SGT 4563", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
      * Tests that the Jump command correctly sets the command type to INVALID 
      * and has no date value on the invalid date argument partition.
      */
     public void testInvalidJumpCommand() {
-        System.out.println("invalidjump");
-        ParseResult result = Parser.parse("jump date 15 dec 2172");
+        ParseResult result = Parser.parse("jump i am a fish");
         assertEquals(Constants.CommandType.INVALID, result.getCommandType());
         assertTrue(result.getDate() == null);
         assertTrue(result.getSecondDate() == null);
@@ -346,5 +366,6 @@ public class ParserTest {
         boolean[] flags = {false, false, false, false, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
-    }
+    }    
+    
 }
