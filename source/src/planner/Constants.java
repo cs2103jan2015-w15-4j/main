@@ -48,7 +48,8 @@ public class Constants {
                                                               " Task Done",
                                                               " Tasks Done"};
     
-    public static String CONFIG_FILE_LOCATION = "config";
+    public static String CONFIG_FILE_NAME = "config";
+    public static String DEFAULT_STORAGE_NAME = "data";
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;

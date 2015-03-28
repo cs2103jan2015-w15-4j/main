@@ -22,7 +22,7 @@ public class StorageTest {
         try {
 
             Storage storage = new Storage();
-            File configFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
+            File configFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_NAME);
             configFile.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(configFile));
 
@@ -40,7 +40,7 @@ public class StorageTest {
             Configuration config2 = new Configuration("another.path");
             storage.saveConfiguration(config2);
             
-            File configFile2 = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_LOCATION);
+            File configFile2 = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_NAME);
             BufferedReader br2 = new BufferedReader(new FileReader(configFile2));
             
             String fileContents2 = br2.readLine();

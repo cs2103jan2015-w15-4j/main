@@ -37,11 +37,12 @@ public class Storage {
      */
     //Not tested yet
     public Configuration readConfig() {
-        Configuration result = new Configuration("data");
+        String defaultPath = getSourcePath() + Constants.DEFAULT_STORAGE_NAME;
+        Configuration result = new Configuration(defaultPath);
         BufferedReader br = null;
         try {
             String sourcePath = getSourcePath();
-            String filePath = sourcePath + Constants.CONFIG_FILE_LOCATION;
+            String filePath = sourcePath + Constants.CONFIG_FILE_NAME;
             
             br = new BufferedReader(new FileReader(filePath));
             
@@ -90,7 +91,7 @@ public class Storage {
         
         String sourcePath = getSourcePath();
         writeToFile(sourcePath + 
-                Constants.CONFIG_FILE_LOCATION, config);
+                Constants.CONFIG_FILE_NAME, config);
         
     }
     
@@ -152,7 +153,7 @@ public class Storage {
     public void saveTaskList(String fileName, TaskList tasks) 
             throws IOException {
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
-        writeToFile(getSourcePath() + fileName, taskJsonStrings);
+        writeToFile(fileName, taskJsonStrings);
     }
     
     //Not tested yet
@@ -160,7 +161,7 @@ public class Storage {
         TaskList tasks = new TaskList();
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(getSourcePath() + fileName));
+            br = new BufferedReader(new FileReader(fileName));
             String input;
             while((input = br.readLine()) != null) {
                 tasks.add(convertTaskFromJsonString(input));
