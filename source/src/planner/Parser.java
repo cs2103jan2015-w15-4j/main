@@ -384,7 +384,7 @@ public class Parser {
                 
             case "savehere":
                 // desired file path for data storage will be put in name field
-                name = keywordArgs.split(" ")[0].trim();
+                name = keywordArgs.trim();
                 break;
 
             // non command keywords start here
