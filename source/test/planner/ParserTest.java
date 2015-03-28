@@ -285,6 +285,25 @@ public class ParserTest {
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
-    }    
+    }
     
+    @Test
+    /**
+     * Tests that Undo correctly sets the command type and processes no other 
+     * arguments
+     */
+    public void testUndoCommand() {
+        ParseResult result = Parser.parse("undo 1242 date 2 may 3018");
+        assertEquals(Constants.CommandType.UNDO, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
 }
