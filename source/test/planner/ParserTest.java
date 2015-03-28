@@ -388,4 +388,25 @@ public class ParserTest {
         assertEquals("", result.getName());
     }
     
+    @Test
+    /**
+     * Tests that the savehere command correctly sets the command type to 
+     * SAVEHERE and that other than the name field, there are no other valid 
+     * fields in the parse result.
+     */
+    public void testSaveHereCommand() {
+        ParseResult result = Parser.parse("savehere C:\\Program Files date 3 may 2015 priority 5 tag important desc testsavewherecommand");
+        assertEquals(Constants.CommandType.SAVEHERE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, true, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("C:\\Program Files", result.getName());
+    }
+    
 }
