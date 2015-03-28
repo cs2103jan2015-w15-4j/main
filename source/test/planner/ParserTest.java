@@ -306,4 +306,45 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
+    
+    @Test
+    /**
+     * Tests that the Jump command correctly sets the command type to JUMP and
+     * has the correct Date value on the valid date argument partition.
+     */
+    public void testValidJumpCommand() {
+        ParseResult result = Parser.parse("jump 15 aug 2217 am 3.20");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Fri Aug 15 03:20:00 SGT 2217", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    @Test
+    /**
+     * Tests that the Jump command correctly sets the command type to INVALID and
+     * has the has no date value on the invalid date argument partition.
+     */
+    public void testInvalidJumpCommand() {
+        System.out.println("invalidjump");
+        ParseResult result = Parser.parse("jump date 15 dec 2172");
+        assertEquals(Constants.CommandType.INVALID, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ErrorType.INVALID_DATE, result.getErrorType());
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
 }

@@ -307,20 +307,26 @@ public class Parser {
             case "by":
             case "due":
                 calendar = parseDate(keywordArgs, "date1");
-                date = calendar.getTime();
+                if (calendar != null) {
+                    date = calendar.getTime();
+                }                
                 break;
             
             // end date (for timed tasks)
             case "until":
             case "to":
                 calendar = parseDate(keywordArgs, "date2");
-                date2 = calendar.getTime();
+                if (calendar != null) {
+                    date2 = calendar.getTime();
+                }
                 break;
             
             // arguments for jump are expected to be date info
             case "jump":
                 calendar = parseDate(keywordArgs, "jumpdate");
-                date = calendar.getTime();
+                if (calendar != null) {
+                    date = calendar.getTime();
+                }
                 break;
 
             // not yet implemented
@@ -342,7 +348,9 @@ public class Parser {
 
             case "remind":
                 calendar = parseDate(keywordArgs, "dateRemind");
-                dateToRemind = calendar.getTime();
+                if (calendar != null) {
+                    dateToRemind = calendar.getTime();
+                }
                 break;
                 
             case "tag":
@@ -529,7 +537,7 @@ public class Parser {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse day");
-                    return createCalendar(year, month, day, 0, 0);
+                    return null;
                 }
             }
         }
@@ -567,7 +575,7 @@ public class Parser {
                         commandType = Constants.CommandType.INVALID;
                         errorType = Constants.ErrorType.INVALID_DATE;
                         logger.log(Level.WARNING, "unable to parse month");
-                        return createCalendar(year, month, day, 0, 0);
+                        return null;
                     } else {
                         month = (monthIndex / 2) + 1;
                         logger.log(Level.INFO, "month of parsed date: " + month);
@@ -603,6 +611,7 @@ public class Parser {
                     commandType = Constants.CommandType.INVALID;
                     errorType = Constants.ErrorType.INVALID_DATE;
                     logger.log(Level.WARNING, "unable to parse year");
+                    return null;
                 }
             }            
         }
