@@ -106,7 +106,7 @@ public class Parser {
                 break;
                 
             case UNDO:
-                // not yet implemented
+                // no need to process command
                 break;
                 
             case SEARCH:
@@ -262,8 +262,9 @@ public class Parser {
                     errorType = Constants.ErrorType.INVALID_TASK_ID;
                 }
                 break;
-
+            
             case "undo":
+                // no arguments, all other text ignored
                 break;
 
             case "search":
@@ -451,9 +452,8 @@ public class Parser {
             case DONE:
                 return CommandType.HELP_DONE;
                 
-            case UNDO:
-                // not yet implemented
-                return CommandType.INVALID;
+            case UNDO:                
+                return CommandType.UNDO;
                 
             case SEARCH:
                 return CommandType.HELP_SEARCH;

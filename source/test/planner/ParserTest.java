@@ -124,8 +124,8 @@ public class ParserTest {
     }
     
     @Test
-    // test correct usage of undone
-    public void testNotDoneCommand() {
+    // test correct usage of setnotdone
+    public void testSetNotDoneCommand() {
         ParseResult result = Parser.parse("setnotdone 322 date 111 Mar 3917");
         assertEquals(Constants.CommandType.SETNOTDONE, result.getCommandType());
         assertTrue(result.getDate() == null);
@@ -285,5 +285,6 @@ public class ParserTest {
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
-    }
+    }    
+    
 }
