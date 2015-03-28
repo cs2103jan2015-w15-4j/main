@@ -13,7 +13,7 @@ public class Task {
 	private String taskName, taskDescription, taskTag;
 	private Date dateCreated, dateDue, dateEnd, dateCompleted;
 	private int taskPriority;
-	private boolean taskCompleted, taskFloating, isTimedTask;
+	private boolean taskCompleted, isFloatingTask, isTimedTask;
 	
 	/**
 	* This method is the Task constructor
@@ -33,12 +33,14 @@ public class Task {
 		
 	    ID = id;
         
-        if(name.equals("")) {
-            
+	    if (name == null) {
+            throw new IllegalArgumentException("Task name cannot be null!");
+        } else if (name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
+        } else {
+            taskName = name;
         }
         
-        taskName = name;
         taskDescription = description;
         taskTag = tag;
         dateCreated = new Date(System.currentTimeMillis());
@@ -47,12 +49,12 @@ public class Task {
         if(dueDate != null) {
             
             dateDue = new Date(dueDate.getTime());     // Changed to defensive copy
-            taskFloating = false;
+            isFloatingTask = false;
             
         } else {
             
             dateDue = null;
-            taskFloating = true;
+            isFloatingTask = true;
         }
 		
 		taskPriority = priority;
@@ -83,12 +85,12 @@ public class Task {
             if(anotherTask.getDueDate() != null) {
                 
                 dateDue = new Date(anotherTask.getDueDate().getTime());     // Changed to defensive copy
-                taskFloating = false;
+                isFloatingTask = false;
                 
             } else {
                 
                 dateDue = null;
-                taskFloating = true;
+                isFloatingTask = true;
             }
             
             taskPriority = anotherTask.getPriority();
@@ -103,7 +105,7 @@ public class Task {
             taskTag = "";
             dateCreated = new Date( System.currentTimeMillis() );
             dateDue = null;
-            taskFloating = true;
+            isFloatingTask = true;
             taskPriority = 0;
             taskCompleted = false;
         }
@@ -126,7 +128,19 @@ public class Task {
 	}
 	
 	public Date getDueDate() {
+	    
 		return dateDue;
+		
+	}
+	
+	public Date getStartDate() {
+	    
+	    return dateDue;
+
+	}
+	
+	public Date getEndDate() {
+	    return dateEnd;
 	}
 	
 	public Date getCreatedDate() {
@@ -147,16 +161,24 @@ public class Task {
 	//Not covered by tests yet
 	public boolean isFloating() {
 		
-		return taskFloating;
+		return isFloatingTask;
+	}
+	
+	public boolean isTimed() {
+	    
+	    return isTimedTask;
+	    
 	}
 	
 	public void setName(String newName) throws IllegalArgumentException {
 		
-		if(newName.equals("")) {
+	    if (newName == null) {
+            throw new IllegalArgumentException("Task name cannot be null!");
+        } else if (newName.equals("")) {
 			throw new IllegalArgumentException("Task name cannot be empty!");
+		} else {
+		    taskName = newName;
 		}
-		
-		taskName = newName;
 	}
 	//Not covered by tests yet
 	public void setDescription(String newDescription) {
@@ -179,19 +201,32 @@ public class Task {
 	//Tests needed for null date
 		if(newDueDate != null) {
 			dateDue = newDueDate;
-			taskFloating = false;
+			isFloatingTask = false;
 			
 		} else {
 			dateDue = null;
-			taskFloating = true;
+			isFloatingTask = true;
 		}
 	}
+	
+	public void setEndDate(Date newEndDate) {
+	    if(newEndDate != null) {
+            dateEnd = newEndDate;
+            isTimedTask = true;
+            
+        } else {
+            dateEnd = null;
+            isTimedTask = false;
+        }
+	}
+	
 	//Not covered by tests yet
 	public void configureCreatedDate(Date newCreatedDate) {
 		
 		//Tests needed for null date
 		dateCreated = newCreatedDate;
 	}
+	
 	//Not covered by tests yet
 	public void setDone() {
 		
@@ -235,7 +270,7 @@ public class Task {
 				   dateCheck &&
 				   (taskPriority == anotherTask.getPriority()) &&
 				   (taskCompleted == anotherTask.isDone()) &&
-				   (taskFloating == anotherTask.isFloating());
+				   (isFloatingTask == anotherTask.isFloating());
 			
 		} else{
 			
