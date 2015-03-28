@@ -243,26 +243,56 @@ public class Engine {
         switch (command) {
             case ADD:
                 return addTask(result);
+                
             case UPDATE:
                 return updateTask(result);
+                
             case DELETE:
                 return deleteTask(result);
+                
             case SHOW:
                 //TO BE DONE
                 return Constants.CommandType.SHOW;
+                
             case DONE:
                 return setDoneTask(result);
+                
             case UNDO:
                 return undo();
+                
             case SEARCH:
                 return searchTask(result);
+                
             case SETNOTDONE:
                 return setUndoneTask(result);
+                
             case SAVEWHERE:
                 return fetchStoragePath();
+                
             case HELP:
-                //TO BE DONE
                 return Constants.CommandType.HELP;
+                
+            case HELP_ADD:
+                return Constants.CommandType.HELP_ADD;
+                
+            case HELP_UPDATE:
+                return Constants.CommandType.HELP_UPDATE;
+                
+            case HELP_DELETE:
+                return Constants.CommandType.HELP_DELETE;
+                
+            case HELP_SHOW:
+                return Constants.CommandType.HELP_SHOW;
+                
+            case HELP_DONE:
+                return Constants.CommandType.HELP_DONE;
+                
+            case HELP_UNDO: 
+                return Constants.CommandType.HELP_UNDO;
+                
+            case HELP_SEARCH:
+                return Constants.CommandType.HELP_SEARCH;
+                
             default:
                 return Constants.CommandType.INVALID;
         }
