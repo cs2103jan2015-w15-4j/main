@@ -368,4 +368,24 @@ public class ParserTest {
         assertEquals("", result.getName());
     }    
     
+    @Test
+    /**
+     * Tests that the savewhere command correctly sets the command type to 
+     * SAVEWHERE and that there are no other valid fields in the parse result.
+     */
+    public void testSaveWhereCommand() {
+        ParseResult result = Parser.parse("savewhere date 3 may 2015 priority 5 tag important desc testsavewherecommand");
+        assertEquals(Constants.CommandType.SAVEWHERE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
 }
