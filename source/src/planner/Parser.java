@@ -316,10 +316,18 @@ public class Parser {
                 calendar = parseDate(keywordArgs, "date2");
                 date2 = calendar.getTime();
                 break;
-
-            case "every":
+            
+            // arguments for jump are expected to be date info
+            case "jump":
+                calendar = parseDate(keywordArgs, "jumpdate");
+                date = calendar.getTime();
                 break;
 
+            // not yet implemented
+            case "every":
+                break;
+            
+            // not yet implemented
             case "in":
                 break;
 
@@ -371,9 +379,12 @@ public class Parser {
                 } else if (keywordBeingProcessed.equals("setnotdone")) {
                     break;
                     
-                // all text after 'show' and its id is ignored for show 
+                // all text after the id is ignored for show 
                 } else if (keywordBeingProcessed.equals("show")) {
                     break;
+                // all text after the date info is ignored for jump
+                } else if (keywordBeingProcessed.equals("jump")) {
+                    break;   
                 } else {
                     // process arguments of the previous command
                     processArgs(keywordBeingProcessed);
