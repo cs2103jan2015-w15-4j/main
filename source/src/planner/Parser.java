@@ -392,7 +392,12 @@ public class Parser {
                     break;
                 // all text after the date info is ignored for jump
                 } else if (keywordBeingProcessed.equals("jump")) {
-                    break;   
+                    // allow users to say use "jump date <date>" as well as "jump <date>"
+                    if (wordBeingProcessed.equals("date")) {
+                        // do nothing
+                    } else {
+                        break;
+                    }                       
                 } else {
                     // process arguments of the previous command
                     processArgs(keywordBeingProcessed);

@@ -329,8 +329,8 @@ public class ParserTest {
     
     @Test
     /**
-     * Tests that the Jump command correctly sets the command type to INVALID and
-     * has the has no date value on the invalid date argument partition.
+     * Tests that the Jump command correctly sets the command type to INVALID 
+     * and has no date value on the invalid date argument partition.
      */
     public void testInvalidJumpCommand() {
         System.out.println("invalidjump");
