@@ -220,6 +220,15 @@ public class Engine {
         }
     }
     
+    public static String getStoragePath() {
+        return config.getStoragePath();
+    }
+    
+    private static Constants.CommandType fetchStoragePath() {
+        //System.out.println(config.getStoragePath());
+        return Constants.CommandType.SAVEWHERE;
+    }
+    
     //Not tested yet
     public static Constants.CommandType process(String userInput) {
         
@@ -249,6 +258,8 @@ public class Engine {
                 return searchTask(result);
             case SETNOTDONE:
                 return setUndoneTask(result);
+            case SAVEWHERE:
+                return fetchStoragePath();
             case HELP:
                 //TO BE DONE
                 return Constants.CommandType.HELP;
