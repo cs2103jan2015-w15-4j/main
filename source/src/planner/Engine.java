@@ -478,33 +478,62 @@ public class Engine {
         }
     }
     
+    /**
+     * Gets the list of all Tasks.
+     * 
+     * @return
+     */
     //Not tested yet
     public static TaskList getAllTasks() {
         return allTasks;
     }
     
+    /**
+     * Gets the list of all Tasks marked done.
+     * 
+     * @return
+     */
     //Not tested yet
     public static TaskList getDoneTasks() {
         return doneTasks;
     }
     
+    /**
+     * Gets the list of all Tasks marked not done.
+     * @return
+     */
     //Not tested yet
     public static TaskList getUndoneTasks() {
         return undoneTasks;
     }
     
+    /**
+     * Gets the list of all floating Tasks.
+     * 
+     * @return
+     */
     //Not tested yet
     public static TaskList getTentativeTasks() {
         return tentativeTasks;
     }
     
+    /**
+     * Gets the list of all confirmed Tasks.
+     * 
+     * @return
+     */
     //Not tested yet
     public static TaskList getConfirmedTasks() {
         return normalTasks;
     }
     
+    /**
+     * Gets the list of Tasks in the search results.
+     * @return
+     */
     //Not tested yet
     public static TaskList getSearchResult() {
         return searchResults;
     }
+    
 }
