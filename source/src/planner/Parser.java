@@ -45,6 +45,12 @@ public class Parser {
     };
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
+    private static String[] cmdsWithoutFollowingKeywords = {"help", 
+        "delete", "done", "setnotdone", "savewhere", "savehere", "show"
+    };
+    private static ArrayList<String> commandsWithoutFollowingKeywords =
+            new ArrayList<String>(Arrays.asList(cmdsWithoutFollowingKeywords));
+    
 
     // these fields will be used to construct the parseResult
     private static ErrorType errorType = null;
@@ -234,8 +240,7 @@ public class Parser {
         flags = new boolean[8];
         calendar = null;
         isTimeSetByUser = false;
-        isTime2SetByUser = false;
-        
+        isTime2SetByUser = false;        
     }
 
     private static Boolean isKeyword(String word) {
@@ -263,36 +268,14 @@ public class Parser {
         String previousKeywordProcessed = "";
         // to decide what to do with args
         String keywordBeingProcessed = commandWord;
-        // continue looking for keywords until the end of the command
+        // continue looking for keywords until the end of the command        
         while(indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
             if (isKeyword(wordBeingProcessed)) {
-                // all text after the "help" command is ignored
-                if (keywordBeingProcessed.equals("help")) {
+                /* all text after the help, delete, done, setnotdone, savewhere,
+                   savehere and show commands and their arguments is ignored */
+                if (commandsWithoutFollowingKeywords.contains(keywordBeingProcessed)) {
                     break;
-                // all text after the id is ignored for delete
-                } else if (keywordBeingProcessed.equals("delete")) {
-                    break;
-
-                // all text after the id is ignored for done
-                } else if (keywordBeingProcessed.equals("done")) {
-                    break;
-                // all text after the id is ignored for setnotdone   
-                } else if (keywordBeingProcessed.equals("setnotdone")) {
-                    break;
-                
-                // all text is ignored after savewhere   
-                } else if (keywordBeingProcessed.equals("savewhere")) {
-                    break;
-                    
-                 // all text is ignored after savehere and its argument
-                } else if (keywordBeingProcessed.equals("savehere")) {
-                    break;
-                    
-                // all text after the id is ignored for show 
-                } else if (keywordBeingProcessed.equals("show")) {
-                    break;
-                // all text after the date info is ignored for jump
                 } else if (keywordBeingProcessed.equals("jump")) {
                     // allow users to say use "jump date <date>" as well as "jump <date>"
                     if (wordBeingProcessed.equals("date")) {
