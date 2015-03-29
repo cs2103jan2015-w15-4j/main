@@ -184,16 +184,33 @@ public class Engine {
         return Constants.CommandType.ADD;
     }
     
+    /**
+     * Handles the update command. Update checks for the presences of all
+     * updatable fields and updates the specified task accordingly. Returns
+     * Invalid if the task to be updated is not found, or nothing was updated.
+     * 
+     * @param result
+     * @return
+     */
     private static Constants.CommandType updateTask (ParseResult result) {
+        //Saves previous state
         pushState();
         
         boolean[] flags = result.getCommandFlags();
+        
+        //Flag to check if nothing was updated
         boolean nothing = true;
+        
+        //Gets the ID
         long ID = result.getId();
         Task toBeUpdated = allTasks.getTaskByID(ID);
+        
         if(toBeUpdated == null) {
+            //If no such task was found, command was invalid
             return Constants.CommandType.INVALID;
         }
+        
+        //Checking for fields and setting them if present in command
         if(flags[0]) {
             nothing = false;
             toBeUpdated.setDueDate(result.getDate());
@@ -214,11 +231,17 @@ public class Engine {
             nothing = false;
             toBeUpdated.setTag(result.getTag());
         }
+        
+        //If nothing was changed, command was invalid
         if(nothing) {
             return Constants.CommandType.INVALID;
         }
+        
+        //Refreshes lists for display
         refreshLists();
+        //Records the last updated task
         lastModifiedTask = toBeUpdated.getID();
+        
         return Constants.CommandType.UPDATE;
     }
     
