@@ -9,25 +9,13 @@ public class Logic {
     //Sorts according to due date
     //Assumption: TaskList passed to this method MUST have a non-null due date (Non-tentative tasks).
     //Sort in this order, Due Date > Priority > Name >
-    public static void sortTaskListByDate(TaskList tasks){
-        logger.log(Level.INFO, "pre-sort by date: Starting...");
-        try {
-            SortLogic.sortByDate(tasks);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "sort error encountered", e);
-        }
-        logger.log(Level.INFO, "post-sort by date: No problems encountered");
+    public static TaskList sortTaskListByDate(TaskList tasks){
+        return SortLogic.sortByDate(tasks);
     }
     
     //Sorts according to priority
-    public static void sortTaskListByPriority(TaskList tasks){
-        logger.log(Level.INFO, "pre-sort bypPriority: Starting...");
-        try{
-            SortLogic.sortByPriority(tasks);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "sort error encountered", e);
-        }
-        logger.log(Level.INFO, "post-sort by priority: No problems encountered");
+    public static TaskList sortTaskListByPriority(TaskList tasks){
+        return SortLogic.sortByPriority(tasks);
     }
 
     //Copies confirmed or tentative tasks into their respective TaskLists

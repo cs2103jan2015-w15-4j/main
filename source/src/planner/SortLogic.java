@@ -23,10 +23,10 @@ public class SortLogic {
             else {
                 int priority = task1.getPriority() - task2.getPriority();
                 if (priority > 0) {
-                    return 1;
+                    return -1;
                 }
                 else if (priority < 0) {
-                    return -1;
+                    return 1;
                 }
                 else {
                     String name1 = task1.getName();
@@ -62,10 +62,10 @@ public class SortLogic {
         public int compare(Task task1, Task task2) {
             int result = task1.getPriority() - task2.getPriority();
             if (result > 0) {
-                return 1;
+                return -1;
             }
             else if (result < 0) {
-                return -1;
+                return 1;
             }
             else {
                 Long t1 = task1.getDueDate().getTime();
@@ -103,11 +103,17 @@ public class SortLogic {
         }
     };
     
-    public static void sortByDate(TaskList tasks) {
-        Collections.sort(tasks, dueDateComparator);
+    public static TaskList sortByDate(TaskList tasks) {
+        //ADD LOG
+        TaskList newTasks = new TaskList(tasks);
+        Collections.sort(newTasks, dueDateComparator);
+        return newTasks;
     }
     
-    public static void sortByPriority(TaskList tasks) {
-        Collections.sort(tasks, priorityComparator);
+    public static TaskList sortByPriority(TaskList tasks) {
+        //ADD LOG
+        TaskList newTasks = new TaskList(tasks);
+        Collections.sort(newTasks, priorityComparator);
+        return newTasks;
     }
 }
