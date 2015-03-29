@@ -185,6 +185,16 @@ public class Storage {
         } else {
             taskObject.put("due", task.getDueDate().getTime());
         }
+        if(task.getEndDate() == null) {
+            taskObject.put("end", null);
+        } else {
+            taskObject.put("end", task.getEndDate().getTime());
+        }
+        if(task.getDateCompleted() == null) {
+            taskObject.put("complete", null);
+        } else {
+            taskObject.put("complete", task.getDateCompleted().getTime());
+        }
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
         taskObject.put("id", String.valueOf(task.getID()));
@@ -200,10 +210,22 @@ public class Storage {
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
             Object due = taskJson.get("due");
+            Object end = taskJson.get("end");
+            Object completed = taskJson.get("complete");
             Date dueDate = null;
+            Date endDate = null;
+            Date completedDate = null;
             if(due != null) {
-                dueDate = new Date((Long) taskJson.get("due"));
+                dueDate = new Date((Long) due);
             }
+            
+            if(end != null) {
+                endDate = new Date((Long) end);
+            }
+            if(completed != null) {
+                completedDate = new Date((Long) completed);
+            }
+            
             long ID = Long.valueOf((String)taskJson.get("id"));
             
             
@@ -217,6 +239,9 @@ public class Storage {
             } else {
                 result.setUndone();
             }
+            
+            result.setEndDate(endDate);
+            result.setDateCompleted(completedDate);
             result.configureCreatedDate(createdDate);
             return result;
         } catch (Exception e) {
