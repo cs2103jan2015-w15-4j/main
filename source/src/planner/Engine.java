@@ -325,9 +325,20 @@ public class Engine {
         }
     }
     
+    /**
+     * Handles search commands. Search results starts with all the tasks being
+     * tracked. The presence of each flag from the parse result will indicate
+     * the presences of the criteria and the search space will be pruned 
+     * accordingly.
+     * 
+     * @param result
+     * @return
+     */
     private static Constants.CommandType searchTask(ParseResult result) {
+        
         boolean[] flags = result.getCommandFlags();
         searchResults = new TaskList(allTasks);
+        
         if(flags[0] && flags[7]) {
             searchResults = Logic.searchPeriod(searchResults, result.getDate(), result.getSecondDate());
         }
@@ -343,39 +354,72 @@ public class Engine {
         if(flags[6]) {
             searchResults = Logic.searchTaskByTags(searchResults, result.getTag());
         }
+        
         return Constants.CommandType.SEARCH;
     }
     
+    /**
+     * Handles undo commands. If there was no previous state that was saved the
+     * command is invalid. Otherwise, it will pop the previous state from the
+     * stack of stored states and use it as the current one. Each operation
+     * that mutates the state of tasks should be preceeded by copying the 
+     * TaskList before the change and pushed onto previousStates.
+     * 
+     * @return
+     */
     private static Constants.CommandType undo() {
+        
         if(previousStates.isEmpty()) {
+            //If there were no previous saved states, command is invalid
             return Constants.CommandType.INVALID;
         } else {
             allTasks = previousStates.pop();
             refreshLists();
             return Constants.CommandType.UNDO;
         }
+        
     }
     
+    /**
+     * Gets the storage path stored in the current configuration.
+     * 
+     * @return
+     */
     public static String getStoragePath() {
         return config.getStoragePath();
     }
     
+    /**
+     * Handles savewhere commands. Returns the path of the current storage 
+     * file.
+     * 
+     * @return
+     */
     private static Constants.CommandType fetchStoragePath() {
         //System.out.println(config.getStoragePath());
         return Constants.CommandType.SAVEWHERE;
     }
     
+    /**
+     * The function supplied to UI to call upon receiving user input. Takes
+     * in a string to be processed. Parses and acts on the command accordingly.
+     * 
+     * @param userInput
+     * @return
+     */
     //Not tested yet
     public static Constants.CommandType process(String userInput) {
         
         if(userInput == null){
             
             return Constants.CommandType.INVALID;
+            
         }
+        
         
         ParseResult result = Parser.parse(userInput);
         Constants.CommandType command = result.getCommandType();
-        long ID;
+        
         switch (command) {
             case ADD:
                 return addTask(result);
