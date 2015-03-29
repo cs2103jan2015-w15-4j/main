@@ -76,7 +76,7 @@ public class Parser {
     private static ParseResult process(String command) {
         
         logger.log(Level.INFO, "going to begin processing");
-        commandWords = command.split(" ");
+        commandWords = splitBySpaceDelimiter(command);
         assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[0]);
 
@@ -84,6 +84,10 @@ public class Parser {
         logger.log(Level.INFO, "processing ended. returning result.");
         ParseResult parseResult = createParseResult(commandType);        
         return parseResult;
+    }
+    
+    private static String[] splitBySpaceDelimiter(String input) {
+        return input.split(" ");
     }
 
     private static CommandType extractCommandType(String commandWord) {
