@@ -911,8 +911,10 @@ public class Parser {
      * by date2.
      */
     private static void checkValidDates() {
-        if (date!= null && date2!= null) {
-            if (date.compareTo(date2)!= -1) {
+        if (date != null && date2 != null) {
+            System.out.println(date.toString());
+            System.out.println(date2.toString());
+            if (!(date.compareTo(date2) < 0)) {
                 logger.log(Level.WARNING, "Date 1 not smaller than Date 2");
                 commandType = Constants.CommandType.INVALID;
                 setErrorType(ErrorType.DATE1_NOT_SMALLER_THAN_DATE2);
