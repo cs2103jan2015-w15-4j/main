@@ -273,23 +273,30 @@ public class Engine {
         return Constants.CommandType.DELETE;
     }
     
+    /**
+     * Handles done commands. Finds the task in all tasks and marks it as done.
+     * Command is invalid if task is not found.
+     * 
+     * @param result
+     * @return
+     */
     private static Constants.CommandType setDoneTask(ParseResult result) {
+        //Saves the previous state
         pushState();
         
-        if(!result.getCommandFlags()[3]) {
+        //Finds the task of the right ID
+        long ID = result.getId();
+        Task toBeDone = allTasks.getTaskByID(ID);
+        
+        if(toBeDone == null) {
+            //If Task is not found then command is invalid
             return Constants.CommandType.INVALID;
         } else {
-            long ID = result.getId();
-            Task toBeDone = allTasks.getTaskByID(ID);
-            if(toBeDone == null) {
-                return Constants.CommandType.INVALID;
-            } else {
-                toBeDone.setDone();
-                lastModifiedTask = toBeDone.getID();
-                return Constants.CommandType.DONE;
-            }
-            
+            toBeDone.setDone();
+            lastModifiedTask = toBeDone.getID();
+            return Constants.CommandType.DONE;
         }
+
     }
     
     private static Constants.CommandType setUndoneTask(ParseResult result) {
