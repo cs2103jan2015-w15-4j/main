@@ -125,6 +125,6 @@ public class SortLogic {
     
     public static Set<Map.Entry<Date, DisplayTaskList>> sortListToMapByDate(DisplayTaskList input) {
         TreeMap < Date, DisplayTaskList > sortedDisplayMap = new TreeMap < Date, DisplayTaskList>();
-        //MORE TO BE DONE
+        //ADD MORE STUFF
     }
 }

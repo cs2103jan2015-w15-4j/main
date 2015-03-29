@@ -96,7 +96,7 @@ public class Logic {
     
     public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (TaskList input) {
         DisplayTaskList displayedTasks = SplitLogic.splitTaskListToBeDisplayed(input);
-        //MORE TO BE DONE
+        //ADD MORE STUFF
         
     }
 }
