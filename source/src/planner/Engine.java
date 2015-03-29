@@ -1,78 +1,129 @@
 package planner;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Stack;
 
 /**
+ * This class handles the main flow of the program. It provides an interface
+ * for the UI to interact with the other components. Engine stores the state
+ * of the program, controls the flow of data and commands, and executes the
+ * changes to the data. Provides accessors for GUI to access the different
+ * types of tasks.
  * 
  * @author kohwaikit
  *
  */
 public class Engine {
+    
     private static Configuration config;
+    
     private static TaskList allTasks;
     private static TaskList doneTasks;
     private static TaskList undoneTasks;
     private static TaskList tentativeTasks;
     private static TaskList normalTasks;
     private static TaskList searchResults;
+    
     private static long lastModifiedTask;
+    
     private static Storage storage;
     private static Stack<TaskList> previousStates;
     
+    /**
+     * Returns true if the config was new, i.e. no older config was read or 
+     * found.
+     * 
+     * @return
+     */
     public static boolean isFirstRun() {
         return config.isNew();
     }
     
+    /**
+     * Returns the ID of the last modified task.
+     * 
+     * @return
+     */
     public static long lastModifiedTask() {
         return lastModifiedTask;
     }
     
+    /**
+     * Routine to initialise engine. Reads the storage and prepares the 
+     * TaskLists to be used.
+     * 
+     * @return success of the process
+     */
     //Not tested yet
     public static boolean init() {
         try {
+            //Initiates the storage and read the config and storage files
             storage = new Storage();
             config = storage.readConfig();
             allTasks = storage.readTaskStorage(config.getStoragePath());
+            
             doneTasks = new TaskList();
             undoneTasks = new TaskList();
             tentativeTasks = new TaskList();
             normalTasks = new TaskList();
+            
+            //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
             
+            //Updates the list for display
             refreshLists();
+            
             System.out.println(allTasks.size());
             return true;
-        } catch(Exception e) {
+        } catch(NullPointerException e) {
+            
             System.out.println("read error");
             return false;
+            
         }
     }
     
+    /**
+     * Routine to be executed before quitting the program. This method saves
+     * the configuration and all the tasks and returns status of these save
+     * operations
+     * @return
+     */
     //Not tested yet
     public static boolean exit() {
         try {
+            
             storage.saveConfiguration(config);
             storage.saveTaskList(config.getStoragePath(), allTasks);
+            
             System.out.println(allTasks.size());
             return true;
-        } catch(Exception e) {
+            
+        } catch(IOException e) {
+            
             System.out.println("write error");
             return false;
+            
         }
     }
     
+    /**
+     * This method rebuilds the TaskLists with the latest allTasks such that
+     * the TaskLists that GUI requests will be up to date.
+     */
     //Not tested yet
     private static void refreshLists() {
         
         //Logic.sortTaskListByPriority(allTasks);
         //Logic.sortTaskListByDate(allTasks);
         
+        //Clears TaskLists
         doneTasks.clear();
         undoneTasks.clear();
         normalTasks.clear();
         tentativeTasks.clear();
         
+        //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(undoneTasks);
@@ -80,6 +131,11 @@ public class Engine {
         
     }
     
+    /**
+     * This method copies the current allTasks and pushes the copy into the
+     * previousStates, such that older states of the program is stored and 
+     * can be popped to be used for undo.
+     */
     private static void pushState() {
         previousStates.push(new TaskList(allTasks));
     }
