@@ -62,7 +62,8 @@ public class Parser {
     
     private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
-
+    
+    private static final int COMMAND_WORD_INDEX = 0;
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
     private static final int HALF_DAY_IN_HOURS = 12;
 
@@ -78,7 +79,7 @@ public class Parser {
         logger.log(Level.INFO, "going to begin processing");
         commandWords = splitBySpaceDelimiter(command);
         assert(commandWords.length > 0);
-        commandType = extractCommandType(   commandWords[0]);
+        commandType = extractCommandType(commandWords[COMMAND_WORD_INDEX]);
 
         processDependingOnCommandType(commandType);
         logger.log(Level.INFO, "processing ended. returning result.");
