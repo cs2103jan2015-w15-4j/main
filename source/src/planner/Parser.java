@@ -78,7 +78,7 @@ public class Parser {
         logger.log(Level.INFO, "going to begin processing");
         commandWords = splitBySpaceDelimiter(command);
         assert(commandWords.length > 0);
-        commandType = extractCommandType(commandWords[0]);
+        commandType = extractCommandType(   commandWords[0]);
 
         processDependingOnCommandType(commandType);
         logger.log(Level.INFO, "processing ended. returning result.");
@@ -152,63 +152,67 @@ public class Parser {
     
     private static void processDependingOnCommandType(CommandType commandType) {
         switch(commandType) {
-        case ADD:
-            processCommand("add");
-            break;
+            case ADD:
+                processCommand("add");
+                break;
+                
+            case UPDATE:
+                processCommand("update");
+                break;
+                
+            case DELETE:
+                processCommand("delete");
+                break;
+                
+            case SHOW:
+                processCommand("show");
+                break;
+                
+            case DONE:
+                processCommand("done");
+                break;
             
-        case UPDATE:
-            processCommand("update");
-            break;
+            case SETNOTDONE:
+                processCommand("setnotdone");
+                break;
+                
+            case UNDO:
+                // no need to process command
+                break;
+                
+            case SEARCH:
+                processCommand("search");
+                break;
+                
+            case HELP:
+                processCommand("help");
+                break;
             
-        case DELETE:
-            processCommand("delete");
-            break;
+            case JUMP:
+                processCommand("jump");
+                break;
+                
+            case CONVERT:
+                processCommand("convert");
+                break;
+                
+            case SAVEWHERE:
+                processCommand("savewhere");
+                break;
             
-        case SHOW:
-            processCommand("show");
-            break;
-            
-        case DONE:
-            processCommand("done");
-            break;
-        
-        case SETNOTDONE:
-            processCommand("setnotdone");
-            break;
-            
-        case UNDO:
-            // no need to process command
-            break;
-            
-        case SEARCH:
-            processCommand("search");
-            break;
-            
-        case HELP:
-            processCommand("help");
-            break;
-        
-        case JUMP:
-            processCommand("jump");
-            break;
-            
-        case CONVERT:
-            processCommand("convert");
-            break;
-            
-        case SAVEWHERE:
-            processCommand("savewhere");
-            break;
-        
-        case SAVEHERE:
-            processCommand("savehere");
-            break;
-            
-        default:
-            errorType = Constants.ErrorType.INVALID_COMMAND;
-            logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
-            break;
+            case SAVEHERE:
+                processCommand("savehere");
+                break;
+                
+            default:
+                setErrorType(ErrorType.INVALID_COMMAND);
+                logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
+                break;
+        }
     }
+    
+    private static void setErrorType(ErrorType desiredErrorType) {
+        errorType = desiredErrorType;
     }
 
     private static void resetFields() {
@@ -323,7 +327,7 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in " + keyword);
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_TASK_ID;
+                    setErrorType(ErrorType.INVALID_TASK_ID);
                 }
                 break;
 
@@ -347,7 +351,7 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in done");
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_TASK_ID;
+                    setErrorType(ErrorType.INVALID_TASK_ID);
                 }
                 break;
             
@@ -379,7 +383,7 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id for convert");
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_TASK_ID;
+                    setErrorType(ErrorType.INVALID_TASK_ID);
                 }
                 
                 // determine type to convert to
@@ -522,7 +526,7 @@ public class Parser {
                 return CommandType.HELP_SEARCH;
                 
             default:
-                errorType = Constants.ErrorType.INVALID_COMMAND;
+                setErrorType(ErrorType.INVALID_COMMAND);
                 return CommandType.INVALID;
 
         }
@@ -540,7 +544,7 @@ public class Parser {
                 return CommandType.CONVERT_TIMED;
                
             default:
-                errorType = Constants.ErrorType.INVALID_COMMAND;
+                setErrorType(ErrorType.INVALID_COMMAND);
                 logger.log(Level.WARNING, "unable to determine convert type");
                 return CommandType.INVALID;
         }
@@ -579,7 +583,7 @@ public class Parser {
                     return parseNext(arguments);
                 } else { 
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_DATE;
+                    setErrorType(ErrorType.INVALID_DATE);
                     logger.log(Level.WARNING, "unable to parse day");
                     return null;
                 }
@@ -617,7 +621,7 @@ public class Parser {
                     // check whether it is found in the list of English month strings
                     if (monthIndex == -1) {
                         commandType = Constants.CommandType.INVALID;
-                        errorType = Constants.ErrorType.INVALID_DATE;
+                        setErrorType(ErrorType.INVALID_DATE);
                         logger.log(Level.WARNING, "unable to parse month");
                         return null;
                     } else {
@@ -653,7 +657,7 @@ public class Parser {
                     year = Integer.parseInt(thirdArg);
                 } catch (NumberFormatException e) {
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_DATE;
+                    setErrorType(ErrorType.INVALID_DATE);
                     logger.log(Level.WARNING, "unable to parse year");
                     return null;
                 }
@@ -719,7 +723,7 @@ public class Parser {
                             
                             //report error and return junk calendar values to avoid exception errors 
                             commandType = Constants.CommandType.INVALID;
-                            errorType = Constants.ErrorType.INVALID_DATE;
+                            setErrorType(ErrorType.INVALID_DATE);
                             break;
                         } else {
                             
@@ -737,7 +741,7 @@ public class Parser {
         } catch (NumberFormatException e) {
 
             commandType = Constants.CommandType.INVALID;
-            errorType = Constants.ErrorType.INVALID_DATE;
+            setErrorType(ErrorType.INVALID_DATE);
             logger.log(Level.WARNING, "unable to parse date");
 
         }
@@ -764,7 +768,7 @@ public class Parser {
         // check for a valid argument to be parsed as the time
         if (indexToCheck > dateParts.length) {
             commandType = Constants.CommandType.INVALID;
-            errorType = Constants.ErrorType.INVALID_TIME;
+            setErrorType(ErrorType.INVALID_TIME);
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
             return createCalendar(year, month - 1, day, 0, 0);
         } 
@@ -774,7 +778,7 @@ public class Parser {
         // check for appropriate format (##.##)
         if (timeParts.length != 2) {
             commandType = Constants.CommandType.INVALID;
-            errorType = Constants.ErrorType.INVALID_TIME;
+            setErrorType(ErrorType.INVALID_TIME);
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
             return createCalendar(year, month - 1, day, 0, 0);
         } else {
@@ -783,7 +787,7 @@ public class Parser {
                 int min = Integer.parseInt(timeParts[1]);
                 if (hour < 1 || hour > 12 || min < 0 || min > 59) {
                     commandType = Constants.CommandType.INVALID;
-                    errorType = Constants.ErrorType.INVALID_TIME;
+                    setErrorType(ErrorType.INVALID_TIME);
                     logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
                     return createCalendar(year, month, day, 0, 0);
                 } else if (pmOrAm.equals("pm")) {
@@ -794,7 +798,7 @@ public class Parser {
                 
             } catch (NumberFormatException e) {
                 commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_TIME;
+                setErrorType(ErrorType.INVALID_TIME);
                 logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
                 return createCalendar(year, month - 1, day, 0, 0);
             }
@@ -816,7 +820,7 @@ public class Parser {
         if (commandType.equals(CommandType.ADD)) {
             if (name.equals("")) {
                 commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.BLANK_TASK_NAME;
+                setErrorType(ErrorType.BLANK_TASK_NAME);
             }
             
         // check for two valid dates in the case of the convert timed 
@@ -824,14 +828,14 @@ public class Parser {
             if (date == null || date2 == null) {
                 logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
                 commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
+                setErrorType(ErrorType.INVALID_ARGUMENTS);
             }
          // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
             logger.log(Level.WARNING, "no valid dates for Convert Deadline");
             if (date == null && date2 == null) {
                 commandType = Constants.CommandType.INVALID;
-                errorType = Constants.ErrorType.INVALID_ARGUMENTS;
+                setErrorType(ErrorType.INVALID_ARGUMENTS);
             }
         }
     }
