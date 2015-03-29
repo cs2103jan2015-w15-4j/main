@@ -140,15 +140,21 @@ public class Engine {
         previousStates.push(new TaskList(allTasks));
     }
     
+    
     private static Constants.CommandType addTask (ParseResult result) {
+        
         pushState();
         
         boolean[] flags = result.getCommandFlags();
         Task newTask;
         if(!flags[0] && flags[7]) {
-            newTask = new Task(result.getName(), result.getDescription(), result.getSecondDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
+            newTask = new Task(result.getName(), result.getDescription(), 
+                    result.getSecondDate(), result.getPriorityLevel(), 
+                    result.getTag(), config.getNewTaskNumber());
         } else {
-            newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
+            newTask = new Task(result.getName(), result.getDescription(), 
+                    result.getDate(), result.getPriorityLevel(), 
+                    result.getTag(), config.getNewTaskNumber());
             if(flags[7]) {
                 newTask.setEndDate(result.getSecondDate());
             }
