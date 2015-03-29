@@ -29,25 +29,25 @@ public class Constants {
     }
     
     public enum DisplayStateFlag {
-        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID
+        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID, SETTINGS
     }
     
-    public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",
-                                                              "Tutorial",
-                                                              " Quick key used",
+    public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
+                                                              "Previous View",                  // F2
+                                                              "Tutorial",                       // F3
+                                                              " Quick key used",                // F4
                                                               " Quick keys used",
-                                                              " Task due today",
+                                                              " Task due today",                // F5
                                                               " Tasks due today",
-                                                              " Task in total",
+                                                              " Task in total",                 // F6
                                                               " Tasks in total",
-                                                              " Tentative Task",
+                                                              " Tentative Task",                // F7
                                                               " Tentative Tasks",
-                                                              " Overdue Task",
+                                                              " Overdue Task",                  // F8
                                                               " Overdue Tasks",
-                                                              " Recurring Task",
-                                                              " Recurring Tasks",
-                                                              " Task Done",
-                                                              " Tasks Done"};
+                                                              " Task Done",                     // F9
+                                                              " Tasks Done",
+                                                              "YOPO's Settings"};               // F10
     
     public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
                                            new Color( 244, 132, 57 ),
