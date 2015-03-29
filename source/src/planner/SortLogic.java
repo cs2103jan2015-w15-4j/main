@@ -2,6 +2,10 @@ package planner;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.Map;
+import java.util.Date;
+import java.util.TreeMap;
 
 public class SortLogic {
     
@@ -12,8 +16,10 @@ public class SortLogic {
         public int compare(Task task1, Task task2) {
             Long t1 = task1.getDueDate().getTime();
             Long t2 = task2.getDueDate().getTime();
-            assert (t1 != null);    //Assertion that date cannot be null
-            assert (t2 != null);
+            if (t1 == null || t2 == null) {
+                //ADD PART LATER
+            }
+            
             if (t1>t2) {
                 return 1;
             }
@@ -115,5 +121,10 @@ public class SortLogic {
         TaskList newTasks = new TaskList(tasks);
         Collections.sort(newTasks, priorityComparator);
         return newTasks;
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> sortListToMapByDate(DisplayTaskList input) {
+        TreeMap < Date, DisplayTaskList > sortedDisplayMap = new TreeMap < Date, DisplayTaskList>();
+        //MORE TO BE DONE
     }
 }

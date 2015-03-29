@@ -2,6 +2,9 @@ package planner;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
@@ -89,5 +92,11 @@ public class Logic {
     
     public static TaskList searchNotDone(TaskList input) {
         return SearchLogic.searchNotDone(input);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (TaskList input) {
+        DisplayTaskList displayedTasks = SplitLogic.splitTaskListToBeDisplayed(input);
+        //MORE TO BE DONE
+        
     }
 }
