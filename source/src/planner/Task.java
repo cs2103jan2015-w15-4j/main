@@ -219,6 +219,19 @@ public class Task {
 	    return dateEnd;
 	}
 	
+	// Added this setterr method - jia jun
+	public void setEndDate( Date anotherDate ){
+	    
+	    if( anotherDate != null ){
+	        
+	        dateEnd = new Date( anotherDate.getTime() );
+	        
+	    } else{
+	        
+	        dateEnd = null;
+	    }
+	}
+	
 	@Override
 	public boolean equals( Object obj ){
 		
