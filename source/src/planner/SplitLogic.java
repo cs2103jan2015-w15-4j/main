@@ -4,45 +4,73 @@ import java.util.Date;
 import java.util.Calendar;
 
 public class SplitLogic {
+    
     private static long ID;
-    private static final int MILLISECONDS = 1000;
-    private static final int SECONDS = 60;
-    private static final int MINUTES = 60;
-    private static final int HOURS = 24;
-    
-    
-    
-    public static DisplayTaskList splitTaskListToBeDisplayed(TaskList input) {
+  
+    public static DisplayTaskList splitAllTaskList(TaskList input) {
+        
         ID = 0;
+        
         DisplayTaskList outputList = new DisplayTaskList();
-        for (int i = 0; i < input.size(); i++) {
+        
+        for (int i = 0; i < input.size(); i++) {           
             addNewDisplayTask(outputList, input.get(i));
         }
+        
         return outputList;
     }
     
-    public static void addNewDisplayTask(DisplayTaskList outputList, Task inputTask) {
+    private static void addNewDisplayTask(DisplayTaskList outputList, Task inputTask) {
+        
         if (inputTask.isFloating()) {
-            DisplayTask newTask = new DisplayTask(ID, null, null, inputTask);
-            outputList.add(newTask);
-            ID++;
+            
+            createNewDisplayTask(outputList, null , null, inputTask);
+            
         } else if (inputTask.getEndDate() == null) {
-            DisplayTask newTask = new DisplayTask(ID, inputTask.getDueDate(), null, inputTask);
-            outputList.add(newTask);
-            ID++;
+            
+            createNewDisplayTask(outputList, inputTask.getDueDate(), null, inputTask);
+            
         } else {
-            int dayDifference = (int) (inputTask.getEndDate().getTime() - 
-                    inputTask.getDueDate().getTime() / 
-                    (MILLISECONDS * SECONDS * MINUTES * HOURS));
+            
             Calendar dueDate = Calendar.getInstance();
+            dueDate.setTime(inputTask.getDueDate());
             int dueDateDay = dueDate.get(Calendar.DATE);
+            
             Calendar endDate = Calendar.getInstance();
+            endDate.setTime(inputTask.getEndDate());
             int endDateDay = endDate.get(Calendar.DATE);
             
-            if ((dueDateDay != endDateDay) && (dayDifference == 0)) {
+            int DateDifference = endDateDay - dueDateDay;
+            
+            if (DateDifference == 0) {
                 
+                createNewDisplayTask(outputList, inputTask.getDueDate(), 
+                        inputTask.getEndDate(), inputTask);
+                
+            } else {
+            
+                for (int j = 0; j <= DateDifference; j++) {
+                
+                    if (j == 0) {
+                    
+                        createNewDisplayTask(outputList, inputTask.getDueDate(), null, inputTask);
+                    
+                    } else {
+                    
+                        createNewDisplayTask(outputList, null, inputTask.getEndDate(), inputTask);
+                    }
+                    
+                }
             }
-        }
+        }     
+    }
+    
+    private static void createNewDisplayTask(DisplayTaskList outputList, Date from, Date to, Task inputTask) {
         
+        DisplayTask newTask = new DisplayTask(ID, from, to, inputTask);
+        
+        outputList.add(newTask);
+        
+        ID++;
     }
 }

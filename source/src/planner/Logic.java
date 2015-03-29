@@ -94,8 +94,11 @@ public class Logic {
         return SearchLogic.searchNotDone(input);
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (TaskList input) {
-        DisplayTaskList displayedTasks = SplitLogic.splitTaskListToBeDisplayed(input);
+    public static DisplayTaskList splitAllTask (TaskList input) {
+        return SplitLogic.splitAllTaskList(input);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (DisplayTaskList input) {
         //ADD MORE STUFF
         
     }
