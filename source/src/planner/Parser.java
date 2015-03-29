@@ -282,7 +282,8 @@ public class Parser {
                         // do nothing
                     } else {
                         break;
-                    }                          
+                    }
+                // no special case
                 } else {
                     // process arguments of the previous command
                     processArgs(keywordBeingProcessed);
@@ -302,7 +303,7 @@ public class Parser {
     private static void processArgs(String keyword) {  
         // remove escape character from arguments since now unneeded
         keywordArgs = removeEscapeCharacterInstances(keywordArgs);
-        // split again for later use
+        // split for later use in cases
         String[] keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
         
         switch(keyword) {
@@ -313,6 +314,8 @@ public class Parser {
 
             case "update":
             case "delete":
+            case "setnotdone":
+            case "done":
                 try {
                     id = Long.parseLong(keywordArgsArray[0]);
                 } catch (NumberFormatException e) {
@@ -332,17 +335,6 @@ public class Parser {
                 } catch (NumberFormatException e) {
                     logger.log(Level.INFO, "no id parsed, show all tasks");
                     setCommandType(CommandType.SHOW_ALL);
-                }
-                break;
-                
-            case "setnotdone":
-            case "done":
-                try {
-                    id = Long.parseLong(keywordArgsArray[0]);
-                } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id in done");
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_TASK_ID);
                 }
                 break;
             
@@ -908,8 +900,6 @@ public class Parser {
      */
     private static void checkValidDates() {
         if (date != null && date2 != null) {
-            System.out.println(date.toString());
-            System.out.println(date2.toString());
             if (!(date.compareTo(date2) < 0)) {
                 logger.log(Level.WARNING, "Date 1 not smaller than Date 2");
                 setCommandType(CommandType.INVALID);
