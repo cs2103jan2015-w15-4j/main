@@ -74,8 +74,7 @@ public class Parser {
         return result;
     }    
     
-    private static ParseResult process(String command) {
-        
+    private static ParseResult process(String command) {        
         logger.log(Level.INFO, "going to begin processing");
         commandWords = splitBySpaceDelimiter(command);
         assert(commandWords.length > 0);
@@ -243,6 +242,7 @@ public class Parser {
         processKeywordsAndArgs(commandWord);        
         checkAddConvertValidFields();
         setDefaultDatesForAdd();
+        checkValidDates();
         flags = updateResultFlags(flags);
     }
     
@@ -902,6 +902,20 @@ public class Parser {
                     calendar.set(existingYear, existingMonth, existingDay, 23, 59);
                     date2 = calendar.getTime();
                 }
+            }
+        }
+    }
+    
+    /**
+     * Checks that the date represented by date1 is before the date represented
+     * by date2.
+     */
+    private static void checkValidDates() {
+        if (date!= null && date2!= null) {
+            if (date.compareTo(date2)!= -1) {
+                logger.log(Level.WARNING, "Date 1 not smaller than Date 2");
+                commandType = Constants.CommandType.INVALID;
+                setErrorType(ErrorType.DATE1_NOT_SMALLER_THAN_DATE2);
             }
         }
     }
