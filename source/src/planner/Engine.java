@@ -201,7 +201,7 @@ public class Engine {
         //Flag to check if nothing was updated
         boolean nothing = true;
         
-        //Gets the ID
+        //Finds the task of the right ID
         long ID = result.getId();
         Task toBeUpdated = allTasks.getTaskByID(ID);
         
@@ -245,12 +245,31 @@ public class Engine {
         return Constants.CommandType.UPDATE;
     }
     
+    /**
+     * Handles the delete command. Finds the task in all tasks and deletes.
+     * Command is invalid if task is not found.
+     * 
+     * @param result
+     * @return
+     */
     private static Constants.CommandType deleteTask(ParseResult result) {
+        //Saves the previous state
         pushState();
         
+        //Finds the task of the right ID
         long ID = result.getId();
-        allTasks.remove(allTasks.getTaskByID(ID));
+        Task toBeDeleted = allTasks.getTaskByID(ID);
+        
+        if(toBeDeleted == null) {
+            //If such a task is not found, command was invalid
+            return Constants.CommandType.INVALID;
+        } else {
+            allTasks.remove(allTasks.getTaskByID(ID));
+        }
+        
+        //Refreshes the display lists
         refreshLists();
+        
         return Constants.CommandType.DELETE;
     }
     
