@@ -108,7 +108,7 @@ public class Engine {
     }
     
     /**
-     * This method rebuilds the TaskLists with the latest allTasks such that
+     * Rebuilds the TaskLists with the latest allTasks such that
      * the TaskLists that GUI requests will be up to date.
      */
     //Not tested yet
@@ -132,7 +132,7 @@ public class Engine {
     }
     
     /**
-     * This method copies the current allTasks and pushes the copy into the
+     * Copies the current allTasks and pushes the copy into the
      * previousStates, such that older states of the program is stored and 
      * can be popped to be used for undo.
      */
@@ -140,14 +140,27 @@ public class Engine {
         previousStates.push(new TaskList(allTasks));
     }
     
-    
+    /**
+     * Handles the add command. If the first date is missing but second date
+     * is present, the second date will be promoted to the first date, and 
+     * the task is treated as a deadline task. Otherwise the first date is
+     * is used to create the task object. If date is null then the task is
+     * a floating task. Otherwise second date is checked and if present
+     * end date of the task is set and the task is a timed task.
+     * 
+     * @param result
+     * @return
+     */
     private static Constants.CommandType addTask (ParseResult result) {
-        
+        //Previous state is saved
         pushState();
+        
         
         boolean[] flags = result.getCommandFlags();
         Task newTask;
+        
         if(!flags[0] && flags[7]) {
+            //If first date is absent but second is present
             newTask = new Task(result.getName(), result.getDescription(), 
                     result.getSecondDate(), result.getPriorityLevel(), 
                     result.getTag(), config.getNewTaskNumber());
@@ -156,13 +169,18 @@ public class Engine {
                     result.getDate(), result.getPriorityLevel(), 
                     result.getTag(), config.getNewTaskNumber());
             if(flags[7]) {
+                //If second date is present
                 newTask.setEndDate(result.getSecondDate());
             }
         }
         
+        //Add the task
         allTasks.add(newTask);
+        //Refresh the lists for display
         refreshLists();
+        //Record the last updated task
         lastModifiedTask = newTask.getID();
+        
         return Constants.CommandType.ADD;
     }
     
