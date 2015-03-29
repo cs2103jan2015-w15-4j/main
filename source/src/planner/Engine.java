@@ -1,6 +1,7 @@
 package planner;
 
 import java.io.File;
+import java.util.Stack;
 
 /**
  * 
@@ -17,6 +18,7 @@ public class Engine {
     private static TaskList searchResults;
     private static long lastModifiedTask;
     private static Storage storage;
+    private static Stack<TaskList> previousStates;
     
     public static boolean isFirstRun() {
         return config.isNew();
@@ -36,11 +38,13 @@ public class Engine {
             undoneTasks = new TaskList();
             tentativeTasks = new TaskList();
             normalTasks = new TaskList();
+            previousStates = new Stack<TaskList>();
             
             refreshLists();
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
+            System.out.println("read error");
             return false;
         }
     }
@@ -53,6 +57,7 @@ public class Engine {
             System.out.println(allTasks.size());
             return true;
         } catch(Exception e) {
+            System.out.println("write error");
             return false;
         }
     }
@@ -60,14 +65,13 @@ public class Engine {
     //Not tested yet
     private static void refreshLists() {
         
+        //Logic.sortTaskListByPriority(allTasks);
+        //Logic.sortTaskListByDate(allTasks);
         
         doneTasks.clear();
         undoneTasks.clear();
         normalTasks.clear();
         tentativeTasks.clear();
-        
-        //Logic.splitTaskByDone(allTasks, doneTasks, undoneTasks);
-        //Logic.splitTasksByTentative(undoneTasks, normalTasks, tentativeTasks);
         
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
@@ -76,8 +80,24 @@ public class Engine {
         
     }
     
+    private static void pushState() {
+        previousStates.push(new TaskList(allTasks));
+    }
+    
     private static Constants.CommandType addTask (ParseResult result) {
-        Task newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
+        pushState();
+        
+        boolean[] flags = result.getCommandFlags();
+        Task newTask;
+        if(!flags[0] && flags[7]) {
+            newTask = new Task(result.getName(), result.getDescription(), result.getSecondDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
+        } else {
+            newTask = new Task(result.getName(), result.getDescription(), result.getDate(), result.getPriorityLevel(), result.getTag(), config.getNewTaskNumber());
+            if(flags[7]) {
+                newTask.setEndDate(result.getSecondDate());
+            }
+        }
+        
         allTasks.add(newTask);
         refreshLists();
         lastModifiedTask = newTask.getID();
@@ -85,6 +105,8 @@ public class Engine {
     }
     
     private static Constants.CommandType updateTask (ParseResult result) {
+        pushState();
+        
         boolean[] flags = result.getCommandFlags();
         boolean nothing = true;
         long ID = result.getId();
@@ -121,6 +143,8 @@ public class Engine {
     }
     
     private static Constants.CommandType deleteTask(ParseResult result) {
+        pushState();
+        
         long ID = result.getId();
         allTasks.remove(allTasks.getTaskByID(ID));
         refreshLists();
@@ -128,6 +152,8 @@ public class Engine {
     }
     
     private static Constants.CommandType setDoneTask(ParseResult result) {
+        pushState();
+        
         if(!result.getCommandFlags()[3]) {
             return Constants.CommandType.INVALID;
         } else {
@@ -145,6 +171,8 @@ public class Engine {
     }
     
     private static Constants.CommandType setUndoneTask(ParseResult result) {
+        pushState();
+        
         if(!result.getCommandFlags()[3]) {
             return Constants.CommandType.INVALID;
         } else {
@@ -182,6 +210,25 @@ public class Engine {
         return Constants.CommandType.SEARCH;
     }
     
+    private static Constants.CommandType undo() {
+        if(previousStates.isEmpty()) {
+            return Constants.CommandType.INVALID;
+        } else {
+            allTasks = previousStates.pop();
+            refreshLists();
+            return Constants.CommandType.UNDO;
+        }
+    }
+    
+    public static String getStoragePath() {
+        return config.getStoragePath();
+    }
+    
+    private static Constants.CommandType fetchStoragePath() {
+        //System.out.println(config.getStoragePath());
+        return Constants.CommandType.SAVEWHERE;
+    }
+    
     //Not tested yet
     public static Constants.CommandType process(String userInput) {
         
@@ -196,25 +243,56 @@ public class Engine {
         switch (command) {
             case ADD:
                 return addTask(result);
+                
             case UPDATE:
                 return updateTask(result);
+                
             case DELETE:
                 return deleteTask(result);
+                
             case SHOW:
                 //TO BE DONE
                 return Constants.CommandType.SHOW;
+                
             case DONE:
                 return setDoneTask(result);
+                
             case UNDO:
-                //TO BE DONE
-                return Constants.CommandType.UNDO;
+                return undo();
+                
             case SEARCH:
                 return searchTask(result);
+                
             case SETNOTDONE:
                 return setUndoneTask(result);
+                
+            case SAVEWHERE:
+                return fetchStoragePath();
+                
             case HELP:
-                //TO BE DONE
                 return Constants.CommandType.HELP;
+                
+            case HELP_ADD:
+                return Constants.CommandType.HELP_ADD;
+                
+            case HELP_UPDATE:
+                return Constants.CommandType.HELP_UPDATE;
+                
+            case HELP_DELETE:
+                return Constants.CommandType.HELP_DELETE;
+                
+            case HELP_SHOW:
+                return Constants.CommandType.HELP_SHOW;
+                
+            case HELP_DONE:
+                return Constants.CommandType.HELP_DONE;
+                
+            case HELP_UNDO: 
+                return Constants.CommandType.HELP_UNDO;
+                
+            case HELP_SEARCH:
+                return Constants.CommandType.HELP_SEARCH;
+                
             default:
                 return Constants.CommandType.INVALID;
         }

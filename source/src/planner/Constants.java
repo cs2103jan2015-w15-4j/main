@@ -16,12 +16,12 @@ public class Constants {
         ADD, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, SETNOTDONE, UNDO, SEARCH,
         HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_SHOW, HELP_DONE,
         HELP_UNDO, HELP_SEARCH, JUMP, CONVERT, CONVERT_FLOATING, 
-        CONVERT_DEADLINE, CONVERT_TIMED, INVALID
+        CONVERT_DEADLINE, CONVERT_TIMED, SAVEWHERE, SAVEHERE, INVALID
     };
     
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
-        INVALID_ARGUMENTS
+        INVALID_ARGUMENTS, INVALID_TIME,
     };
     
     public enum TipType{
@@ -57,7 +57,8 @@ public class Constants {
                                            new Color( 242, 141, 236 ),
                                            new Color( 245, 142, 142 ) };
     
-    public static String CONFIG_FILE_LOCATION = "config";
+    public static String CONFIG_FILE_NAME = "config";
+    public static String DEFAULT_STORAGE_NAME = "data";
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;
@@ -71,5 +72,6 @@ public class Constants {
         errorMessages.put(ErrorType.INVALID_TASK_ID, "a number must be entered for the task id");
         errorMessages.put(ErrorType.BLANK_TASK_NAME, "the name of the task added cannot be blank");
         errorMessages.put(ErrorType.INVALID_DATE, "Unable to parse date");
+        errorMessages.put(ErrorType.INVALID_TIME, "Unable to parse time");
     }
 }

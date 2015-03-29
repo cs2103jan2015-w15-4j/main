@@ -2,7 +2,6 @@ package planner;
 
 import static org.junit.Assert.*;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class TaskTest {
     public void createTest() {
         String taskName = "entry1";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 1;
@@ -29,7 +28,7 @@ public class TaskTest {
     public void throwsIllegalArgumentExceptionIfTaskNameIsEmpty() {
         String emptyTask = "";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 3;
@@ -41,7 +40,7 @@ public class TaskTest {
     public void testGetName() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 4;
@@ -51,7 +50,7 @@ public class TaskTest {
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 400;
@@ -64,7 +63,7 @@ public class TaskTest {
     public void testGetDescription() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 4;
@@ -74,7 +73,7 @@ public class TaskTest {
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 5;
@@ -87,7 +86,7 @@ public class TaskTest {
     public void testGetTag() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 4;
@@ -97,7 +96,7 @@ public class TaskTest {
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 41;
@@ -110,7 +109,7 @@ public class TaskTest {
     public void testGetPriority() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 8;
@@ -120,7 +119,7 @@ public class TaskTest {
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 4103;
@@ -133,7 +132,7 @@ public class TaskTest {
     public void testGetDueDate() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 4;
@@ -152,11 +151,12 @@ public class TaskTest {
         assertEquals("Task due date should be "+taskDueDate2, taskDueDate2, another.getDueDate());
     }
     
+    /*This is a typical case for setting name*/
     @Test
     public void testSetName() {
         String taskName = "getTask";
         String taskDescription = "testing";
-        Timestamp taskDueDate = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         long ID = 4;
@@ -169,7 +169,7 @@ public class TaskTest {
         
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
-        Timestamp taskDueDate2 = new Timestamp(System.currentTimeMillis());
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         long ID2 = 24;
@@ -179,5 +179,52 @@ public class TaskTest {
         String newName2 = "modifiedTask";
         another.setName(newName2);
         assertEquals("New task name should be "+newName2, newName2, another.getName());
+    }
+    
+    /*This is a boundary case where name is null*/
+    @Test(expected=IllegalArgumentException.class)
+    public void throwsIllegalArgumentExceptionIfNameIsSetNull() {
+        String emptyTask = "name";
+        String taskDescription = "testing";
+        Date taskDueDate = new Date(System.currentTimeMillis());
+        String taskTag = "nothing";
+        int taskPriority = 5;
+        long ID = 3;
+        
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
+        
+        empty.setName(null);
+    }
+    
+    /*This is a boundary case where name is an empty string*/
+    @Test(expected=IllegalArgumentException.class)
+    public void throwsIllegalArgumentExceptionIfNameIsSetEmpty() {
+        String emptyTask = "name";
+        String taskDescription = "testing";
+        Date taskDueDate = new Date(System.currentTimeMillis());
+        String taskTag = "nothing";
+        int taskPriority = 5;
+        long ID = 3;
+        
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
+        
+        empty.setName("");
+    }
+    
+    /*This is a boundary case where name is a string with only 1 character*/
+    @Test
+    public void testSetNameToShortString() {
+        String emptyTask = "name";
+        String taskDescription = "testing";
+        Date taskDueDate = new Date(System.currentTimeMillis());
+        String taskTag = "nothing";
+        int taskPriority = 5;
+        long ID = 3;
+        
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
+        
+        String shortName = "a";
+        empty.setName(shortName);
+        assertEquals("New task name should be "+shortName, shortName, empty.getName());
     }
 }
