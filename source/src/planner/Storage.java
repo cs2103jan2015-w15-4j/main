@@ -187,7 +187,13 @@ public class Storage {
             }
         }
     }
-    
+
+    /**
+     * Converts a task to the string of its JSON representation
+     * 
+     * @param task to be converted
+     * @return String ready to be saved
+     */
     private String convertTaskToJsonString(Task task) {
         JSONObject taskObject = new JSONObject();
         taskObject.put("name", task.getName());
@@ -215,6 +221,13 @@ public class Storage {
         return taskObject.toJSONString();
     }
     
+    /**
+     * Converts a string representation of a task, typically stored in the 
+     * storage file, into a JSON object, then into a Task object.
+     * 
+     * @param taskString String of a JSON object representation of a task
+     * @return converted Task
+     */
     private Task convertTaskFromJsonString(String taskString) {
         try {
             JSONParser parser = new JSONParser();
@@ -258,12 +271,17 @@ public class Storage {
             result.setDateCompleted(completedDate);
             result.configureCreatedDate(createdDate);
             return result;
-        } catch (Exception e) {
-            System.out.println(e);
+        } catch (ParseException e) {
             return null;
         }
     }
     
+    /**
+     * Gets the String representation of the path of where the program was ran 
+     * from
+     * 
+     * @return
+     */
     private String getSourcePath() {
         CodeSource cs = getClass().getProtectionDomain().getCodeSource();
         return cs.getLocation().getPath();
