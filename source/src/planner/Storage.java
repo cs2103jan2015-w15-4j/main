@@ -156,6 +156,14 @@ public class Storage {
         writeToFile(fileName, taskJsonStrings);
     }
     
+    /**
+     * Reads the storage file that is stored at fileName. Returns empty 
+     * TaskList if reading fails. Each line in the storage file represents a 
+     * Task, so each line is read and converted.
+     * 
+     * @param fileName
+     * @return Resultant taskList 
+     */
     //Not tested yet
     public TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
@@ -169,8 +177,14 @@ public class Storage {
             
             br.close();
             return tasks;
-        } catch (Exception e){
+        } catch (IOException e) {
             return tasks;
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                
+            }
         }
     }
     
