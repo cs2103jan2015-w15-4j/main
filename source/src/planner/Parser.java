@@ -263,13 +263,13 @@ public class Parser {
      */
     private static void processKeywordsAndArgs(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
-        String wordBeingProcessed = "";
-        // store previous keyword that was processed
+        String wordBeingProcessed = "";        
         String previousKeywordProcessed = "";
         // to decide what to do with args
         String keywordBeingProcessed = commandWord;
+        
         // continue looking for keywords until the end of the command        
-        while(indexBeingProcessed < commandWords.length) {
+        while (indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
             if (isKeyword(wordBeingProcessed)) {
                 /* all text after the help, delete, done, setnotdone, savewhere,
@@ -295,21 +295,15 @@ public class Parser {
                 keywordArgs += wordBeingProcessed + " ";
             }
             indexBeingProcessed++;
-
         }
         processArgs(keywordBeingProcessed);
     }
 
-    private static void processArgs(String keyword) {
+    private static void processArgs(String keyword) {  
         // remove escape character from arguments since now unneeded
-        String[] keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
-        StringBuilder sb = new StringBuilder(keywordArgs.length());
-        for (String s: keywordArgsArray) {
-            sb.append(s.replaceFirst("/", "") + " ");
-        }
-        keywordArgs = sb.toString().trim();
+        keywordArgs = removeEscapeCharacterInstances(keywordArgs);
         // split again for later use
-        keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
+        String[] keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
         
         switch(keyword) {
             // command keywords start here
@@ -457,6 +451,23 @@ public class Parser {
             default:
                 break;
         }
+    }
+    
+    /**
+     * Remove all instances of the escape character '/' from the given input 
+     * string, which is expected to be the arguments of a keyword.
+     * 
+     * @param  inputString Arguments of the keyword being processed
+     * @return             The input string with the character removed
+     */
+    private static String removeEscapeCharacterInstances(String inputString) {     
+        String[] keywordArgsArray = splitBySpaceDelimiter(inputString);
+        StringBuilder sb = new StringBuilder(inputString.length());
+        for (String s: keywordArgsArray) {
+            sb.append(s.replaceFirst("/", "") + " ");
+        }
+        String keywordArgs = sb.toString().trim();
+        return keywordArgs;
     }
 
     private static boolean[] updateResultFlags(boolean[] flags) {
