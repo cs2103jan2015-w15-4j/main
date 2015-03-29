@@ -307,12 +307,14 @@ public class Parser {
 
     private static void processArgs(String keyword) {
         // remove escape character from arguments since now unneeded
-        String[] keywordArgsArray = keywordArgs.split(" ");
+        String[] keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
         StringBuilder sb = new StringBuilder(keywordArgs.length());
         for (String s: keywordArgsArray) {
             sb.append(s.replaceFirst("/", "") + " ");
         }
         keywordArgs = sb.toString().trim();
+        // split again for later use
+        keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
         
         switch(keyword) {
             // command keywords start here
@@ -323,7 +325,7 @@ public class Parser {
             case "update":
             case "delete":
                 try {
-                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    id = Long.parseLong(keywordArgsArray[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in " + keyword);
                     commandType = Constants.CommandType.INVALID;
@@ -334,7 +336,7 @@ public class Parser {
             case "show":
                 try {
                     // check whether next token is an id of the task to show
-                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    id = Long.parseLong(keywordArgsArray[0]);
                     logger.log(Level.INFO, "successfully parsed id, show" + 
                                "specific task");
                     commandType = Constants.CommandType.SHOW_ONE;
@@ -347,7 +349,7 @@ public class Parser {
             case "setnotdone":
             case "done":
                 try {
-                    id = Long.parseLong(keywordArgs.split(" ")[0]);
+                    id = Long.parseLong(keywordArgsArray[0]);
                 } catch (NumberFormatException e) {
                     logger.log(Level.WARNING, "error parsing id in done");
                     commandType = Constants.CommandType.INVALID;
@@ -365,7 +367,7 @@ public class Parser {
 
             case "help":
                 // check whether the user needs help with specific command
-                String cmdToHelpWith = keywordArgs.split(" ")[0];
+                String cmdToHelpWith = keywordArgsArray[0];
                 CommandType cmdToHelpWithType = extractCommandType(cmdToHelpWith);
                 if (cmdToHelpWithType.equals(Constants.CommandType.INVALID)) {
                     logger.log(Level.INFO, "show general help");
@@ -376,7 +378,7 @@ public class Parser {
                 break;
             
             case "convert":
-                String[] convertArgs = keywordArgs.split(" ");
+                String[] convertArgs = keywordArgsArray;
                 // get id of task to convert
                 try {
                     id = Long.parseLong(convertArgs[0]);
@@ -438,7 +440,7 @@ public class Parser {
                 break;
 
             case "priority":
-                priorityLevel = Integer.parseInt(keywordArgs.split(" ")[0]);
+                priorityLevel = Integer.parseInt(keywordArgsArray[0]);
                 break;
 
             case "desc":
@@ -559,7 +561,7 @@ public class Parser {
         int tokenBeingParsedIndex = 0;
         
         // the tokens that will individually represent day, month etc
-        String[] dateParts = arguments.split(" ");
+        String[] dateParts = splitBySpaceDelimiter(arguments);
         assert(dateParts.length > 0);
         // may be a representation of the day, or a time keyword, or the next keyword
         String firstArg = dateParts[tokenBeingParsedIndex].toLowerCase();
@@ -683,7 +685,7 @@ public class Parser {
     //Parses whatever that comes after "next" is typed
     //Will delete/change bad comments before refactoring the code
     private static Calendar parseNext(String arguments) {
-        String[] dateParts = arguments.split(" ");
+        String[] dateParts = splitBySpaceDelimiter(arguments);
         String secondArg = dateParts[1].toLowerCase().trim();
         Calendar currentTime = Calendar.getInstance();
         int year = currentTime.get(Calendar.YEAR);
