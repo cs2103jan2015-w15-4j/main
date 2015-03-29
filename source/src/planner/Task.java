@@ -65,39 +65,22 @@ public class Task {
     public Task( Task anotherTask ) throws IllegalArgumentException {
         
         if( anotherTask != null ){
-            
             ID = anotherTask.getID();
-            
-            if(anotherTask.getName().equals("")) {
-                
-                throw new IllegalArgumentException("Task name cannot be empty!");
+            if(anotherTask.getName() == null) {
+                taskName = anotherTask.getName();
             }
-            
-            taskName = anotherTask.getName();
-            
-            taskDescription = anotherTask.getDescription();
-            
+            taskDescription  = anotherTask.getDescription();
             taskTag = anotherTask.getTag();
-            
             dateCreated = new Date(anotherTask.getCreatedDate().getTime());
-            
-            //Tests needed for null date
-            if(anotherTask.getDueDate() != null) {
-                
-                dateDue = new Date(anotherTask.getDueDate().getTime());     // Changed to defensive copy
-                isFloatingTask = false;
-                
-            } else {
-                
-                dateDue = null;
-                isFloatingTask = true;
-            }
-            
+            dateDue = new Date(anotherTask.getDueDate().getTime());
+            dateEnd = new Date(anotherTask.getEndDate().getTime()); 
+            dateCompleted = new Date(anotherTask.getDateCompleted().getTime());
             taskPriority = anotherTask.getPriority();
-            
             taskCompleted = anotherTask.isDone();
+            isFloatingTask = anotherTask.isFloating();
+            isTimedTask = anotherTask.isTimed();
             
-        } else{
+        } else {
             
             ID = 0;
             taskName = "Insert task Name here";
