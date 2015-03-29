@@ -80,8 +80,8 @@ public class Parser {
         commandWords = splitBySpaceDelimiter(command);
         assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[COMMAND_WORD_INDEX]);
-
         processDependingOnCommandType(commandType);
+        
         logger.log(Level.INFO, "processing ended. returning result.");
         ParseResult parseResult = createParseResult(commandType);        
         return parseResult;
@@ -147,7 +147,6 @@ public class Parser {
 
             default:
                 return CommandType.INVALID;
-
         }
     }
     
@@ -240,14 +239,27 @@ public class Parser {
         return keywords.contains(word);
     }
 
-    private static void processCommand(String commandWord) {
+    private static void processCommand(String commandWord) {        
+        processKeywordsAndArgs(commandWord);        
+        checkAddConvertValidFields();
+        setDefaultDatesForAdd();
+        flags = updateResultFlags(flags);
+    }
+    
+    /**
+     * Searches the user input for keywords and processes each keyword and its 
+     * arguments in succession.
+     * 
+     * @param commandWord The initial keyword representing the command type
+     */
+    private static void processKeywordsAndArgs(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
         String wordBeingProcessed = "";
         // store previous keyword that was processed
         String previousKeywordProcessed = "";
         // to decide what to do with args
         String keywordBeingProcessed = commandWord;
-
+        // continue looking for keywords until the end of the command
         while(indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
             if (isKeyword(wordBeingProcessed)) {
@@ -299,12 +311,7 @@ public class Parser {
 
         }
         processArgs(keywordBeingProcessed);
-        checkAddConvertValidFields();
-        setDefaultDatesForAdd();
-        flags = updateResultFlags(flags);
-
     }
-    
 
     private static void processArgs(String keyword) {
         // remove escape character from arguments since now unneeded
