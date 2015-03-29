@@ -80,64 +80,7 @@ public class Parser {
         assert(commandWords.length > 0);
         commandType = extractCommandType(commandWords[0]);
 
-        switch(commandType) {
-            case ADD:
-                processCommand("add");
-                break;
-                
-            case UPDATE:
-                processCommand("update");
-                break;
-                
-            case DELETE:
-                processCommand("delete");
-                break;
-                
-            case SHOW:
-                processCommand("show");
-                break;
-                
-            case DONE:
-                processCommand("done");
-                break;
-            
-            case SETNOTDONE:
-                processCommand("setnotdone");
-                break;
-                
-            case UNDO:
-                // no need to process command
-                break;
-                
-            case SEARCH:
-                processCommand("search");
-                break;
-                
-            case HELP:
-                processCommand("help");
-                break;
-            
-            case JUMP:
-                processCommand("jump");
-                break;
-                
-            case CONVERT:
-                processCommand("convert");
-                break;
-                
-            case SAVEWHERE:
-                processCommand("savewhere");
-                break;
-            
-            case SAVEHERE:
-                processCommand("savehere");
-                break;
-                
-            default:
-                errorType = Constants.ErrorType.INVALID_COMMAND;
-                logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
-                break;
-        }
+        processDependingOnCommandType(commandType);
         logger.log(Level.INFO, "processing ended. returning result.");
         ParseResult parseResult = createParseResult(commandType);        
         return parseResult;
@@ -201,6 +144,67 @@ public class Parser {
                 return CommandType.INVALID;
 
         }
+    }
+    
+    private static void processDependingOnCommandType(CommandType commandType) {
+        switch(commandType) {
+        case ADD:
+            processCommand("add");
+            break;
+            
+        case UPDATE:
+            processCommand("update");
+            break;
+            
+        case DELETE:
+            processCommand("delete");
+            break;
+            
+        case SHOW:
+            processCommand("show");
+            break;
+            
+        case DONE:
+            processCommand("done");
+            break;
+        
+        case SETNOTDONE:
+            processCommand("setnotdone");
+            break;
+            
+        case UNDO:
+            // no need to process command
+            break;
+            
+        case SEARCH:
+            processCommand("search");
+            break;
+            
+        case HELP:
+            processCommand("help");
+            break;
+        
+        case JUMP:
+            processCommand("jump");
+            break;
+            
+        case CONVERT:
+            processCommand("convert");
+            break;
+            
+        case SAVEWHERE:
+            processCommand("savewhere");
+            break;
+        
+        case SAVEHERE:
+            processCommand("savehere");
+            break;
+            
+        default:
+            errorType = Constants.ErrorType.INVALID_COMMAND;
+            logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
+            break;
+    }
     }
 
     private static void resetFields() {
