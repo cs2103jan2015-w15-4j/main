@@ -24,6 +24,28 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("important meeting with boss", result.getName());        
     }
+    
+    @Test
+    /**
+     * Tests that inputting on the 'date1 that is not earlier than date2' 
+     * partition results in an invalid command type and the correct error 
+     * message.
+     */
+    public void testAddCommandWithDate1NotEarlierThanDate2() {
+        ParseResult result = Parser.parse("add holiday /in bali date 3 Jun 1123 until 2 Jun 1123");
+        assertEquals(Constants.CommandType.INVALID, result.getCommandType());
+        assertEquals("Sun Jun 03 00:00:00 SGT 1123", result.getDate().toString());
+        assertEquals("Sat Jun 02 23:59:00 SGT 1123", result.getSecondDate().toString()); 
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getPriorityLevel());
+        assertEquals(Constants.NO_ID_SET, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ErrorType.DATE1_NOT_SMALLER_THAN_DATE2, result.getErrorType());
+        boolean[] flags = {true, false, false, false, true, false, false, true};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("holiday in bali", result.getName());   
+    }
 
     @Test
     public void testUpdateCommandWithDateTime() {

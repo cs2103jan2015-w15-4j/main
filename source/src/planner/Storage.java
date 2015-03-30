@@ -156,6 +156,14 @@ public class Storage {
         writeToFile(fileName, taskJsonStrings);
     }
     
+    /**
+     * Reads the storage file that is stored at fileName. Returns empty 
+     * TaskList if reading fails. Each line in the storage file represents a 
+     * Task, so each line is read and converted.
+     * 
+     * @param fileName
+     * @return Resultant taskList 
+     */
     //Not tested yet
     public TaskList readTaskStorage(String fileName) {
         TaskList tasks = new TaskList();
@@ -169,11 +177,23 @@ public class Storage {
             
             br.close();
             return tasks;
-        } catch (Exception e){
+        } catch (IOException e) {
             return tasks;
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                
+            }
         }
     }
-    
+
+    /**
+     * Converts a task to the string of its JSON representation
+     * 
+     * @param task to be converted
+     * @return String ready to be saved
+     */
     private String convertTaskToJsonString(Task task) {
         JSONObject taskObject = new JSONObject();
         taskObject.put("name", task.getName());
@@ -185,12 +205,29 @@ public class Storage {
         } else {
             taskObject.put("due", task.getDueDate().getTime());
         }
+        if(task.getEndDate() == null) {
+            taskObject.put("end", null);
+        } else {
+            taskObject.put("end", task.getEndDate().getTime());
+        }
+        if(task.getDateCompleted() == null) {
+            taskObject.put("complete", null);
+        } else {
+            taskObject.put("complete", task.getDateCompleted().getTime());
+        }
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
         taskObject.put("id", String.valueOf(task.getID()));
         return taskObject.toJSONString();
     }
     
+    /**
+     * Converts a string representation of a task, typically stored in the 
+     * storage file, into a JSON object, then into a Task object.
+     * 
+     * @param taskString String of a JSON object representation of a task
+     * @return converted Task
+     */
     private Task convertTaskFromJsonString(String taskString) {
         try {
             JSONParser parser = new JSONParser();
@@ -200,10 +237,22 @@ public class Storage {
             String tag = (String) taskJson.get("tag");
             int priority = Integer.valueOf((String)taskJson.get("priority"));
             Object due = taskJson.get("due");
+            Object end = taskJson.get("end");
+            Object completed = taskJson.get("complete");
             Date dueDate = null;
+            Date endDate = null;
+            Date completedDate = null;
             if(due != null) {
-                dueDate = new Date((Long) taskJson.get("due"));
+                dueDate = new Date((Long) due);
             }
+            
+            if(end != null) {
+                endDate = new Date((Long) end);
+            }
+            if(completed != null) {
+                completedDate = new Date((Long) completed);
+            }
+            
             long ID = Long.valueOf((String)taskJson.get("id"));
             
             
@@ -217,14 +266,22 @@ public class Storage {
             } else {
                 result.setUndone();
             }
+            
+            result.setEndDate(endDate);
+            result.setDateCompleted(completedDate);
             result.configureCreatedDate(createdDate);
             return result;
-        } catch (Exception e) {
-            System.out.println(e);
+        } catch (ParseException e) {
             return null;
         }
     }
     
+    /**
+     * Gets the String representation of the path of where the program was ran 
+     * from
+     * 
+     * @return
+     */
     private String getSourcePath() {
         CodeSource cs = getClass().getProtectionDomain().getCodeSource();
         return cs.getLocation().getPath();

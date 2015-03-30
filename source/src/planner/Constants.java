@@ -20,7 +20,7 @@ public class Constants {
     
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
-        INVALID_ARGUMENTS, INVALID_TIME,
+        INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
     };
     
     public enum TipType{

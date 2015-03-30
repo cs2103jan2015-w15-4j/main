@@ -66,15 +66,26 @@ public class Task {
         
         if( anotherTask != null ){
             ID = anotherTask.getID();
-            if(anotherTask.getName() == null) {
-                taskName = anotherTask.getName();
+            
+            if(anotherTask.getName().equals("") || anotherTask.getName() == null) {
+                throw new IllegalArgumentException("Task name cannot be empty!");
             }
+            
+            taskName = anotherTask.getName();
             taskDescription  = anotherTask.getDescription();
             taskTag = anotherTask.getTag();
-            dateCreated = new Date(anotherTask.getCreatedDate().getTime());
-            dateDue = new Date(anotherTask.getDueDate().getTime());
-            dateEnd = new Date(anotherTask.getEndDate().getTime()); 
-            dateCompleted = new Date(anotherTask.getDateCompleted().getTime());
+            if(anotherTask.getCreatedDate() != null) {
+                dateCreated = new Date(anotherTask.getCreatedDate().getTime());
+            }
+            if(anotherTask.getDueDate() != null) {
+                dateDue = new Date(anotherTask.getDueDate().getTime());
+            }
+            if(anotherTask.getEndDate() != null) {
+                dateEnd = new Date(anotherTask.getEndDate().getTime()); 
+            }
+            if(anotherTask.getDateCompleted() != null) {
+                dateCompleted = new Date(anotherTask.getDateCompleted().getTime());
+            }
             taskPriority = anotherTask.getPriority();
             taskCompleted = anotherTask.isDone();
             isFloatingTask = anotherTask.isFloating();
@@ -232,6 +243,9 @@ public class Task {
 	    
 	}
 	
+	public void setDateCompleted(Date date) {
+	    dateCompleted = date;
+	}
 	@Override
 	public boolean equals( Object obj ){
 		
