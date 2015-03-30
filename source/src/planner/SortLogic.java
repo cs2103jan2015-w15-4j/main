@@ -1,5 +1,7 @@
 package planner;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
@@ -10,121 +12,196 @@ import java.util.TreeMap;
 public class SortLogic {
     
     //Comparator for sorting tasks according to due date
-    //Sort in this order, Due Date > Priority > Name > ID
-    private static Comparator<Task> dueDateComparator = new Comparator<Task>() {
+    //Sort in this order, 
+    private static Comparator<DisplayTask> DateComparator = new Comparator<DisplayTask>() {
+        
         @Override
-        public int compare(Task task1, Task task2) {
-            Long t1 = task1.getDueDate().getTime();
-            Long t2 = task2.getDueDate().getTime();
-            if (t1 == null || t2 == null) {
-                //ADD PART LATER
-            }
+        public int compare(DisplayTask task1, DisplayTask task2) {
             
-            if (t1>t2) {
-                return 1;
-            }
-            else if (t2>t1) {
+            int time1 = getTime(task1);
+            int time2 = getTime(task2);
+            
+            if (time1 < time2) {
+            
                 return -1;
-            }
-            else {
-                int priority = task1.getPriority() - task2.getPriority();
-                if (priority > 0) {
-                    return -1;
-                }
-                else if (priority < 0) {
-                    return 1;
-                }
-                else {
-                    String name1 = task1.getName();
-                    String name2 = task2.getName();
-                    int name = name1.compareTo(name2);
-                    if (name > 0) {
-                        return 1;
-                    }
-                    else if (name < 0) {
-                        return -1;
-                    }
-                    else {
-                        long ID1 = task1.getID();
-                        long ID2 = task2.getID();
-                        if (ID1 > ID2) {
-                            return 1;
-                        }
-                        else if (ID1 < ID2) {
-                            return -1;
-                        }
-                        else {
-                            return 0;
-                        }
-                    }
-                }
+            
+            } else if (time1 > time2) {
+            
+                return 1;
+                
+            } else {
+                return comparePriority(task1, task2);
             }
         }
+        
+        private int getTime (DisplayTask task) {
+            if (task.getDueDate() == null) {
+                
+                SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
+                
+                String endTime = dateFormatter.format(task.getEndDate());
+                String today = dateFormatter.format(task.getShownDate());
+                
+                if (endTime.equals(today)) {
+                    
+                    return getTimeFromDate(task.getEndDate());
+                    
+                } else {
+                    
+                    return 2400;
+                    
+                }    
+            } else {
+                return getTimeFromDate(task.getDueDate());
+            }
+        }
+        
+        private int getTimeFromDate (Date date) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            int hours = cal.get(Calendar.HOUR);
+            int minutes = cal.get(Calendar.MINUTE);
+            int totalTime = (hours * 100) + minutes;
+            return totalTime;
+        }
+    };
+    
+    private static Comparator<Date> dateComparatorForMap = new Comparator<Date>() {
+        
+        @Override
+        public int compare(Date date1, Date date2) {
+            if( date1 != null && date2 != null ){
+                
+                SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
+                
+                String dateOneString = dateFormatter.format(date1);
+                String dateTwoString = dateFormatter.format(date2);
+                
+                if( dateOneString.equals(dateTwoString) ){
+                    
+                    return 0;
+                    
+                } else{
+                    
+                    return date1.compareTo(date2);
+                    
+                }            
+            } else if( date1 != null ){
+                
+                return -1;
+                
+            } else if( date2 != null ){
+                
+                return 1;
+                
+            } else{
+                
+                return 0;
+                
+            }
+        }   
     };
     
     //Comparator for sorting tasks according to priority
-    private static Comparator<Task> priorityComparator = new Comparator<Task>() {
+    private static Comparator<DisplayTask> priorityComparator = new Comparator<DisplayTask>() {
+        
         @Override
-        public int compare(Task task1, Task task2) {
-            int result = task1.getPriority() - task2.getPriority();
-            if (result > 0) {
-                return -1;
-            }
-            else if (result < 0) {
-                return 1;
-            }
-            else {
-                Long t1 = task1.getDueDate().getTime();
-                Long t2 = task2.getDueDate().getTime();
-                if ((t1 == null && t2 == null) || (t1 != null && t2 != null)) {
-                    String name1 = task1.getName();
-                    String name2 = task2.getName();
-                    int name = name1.compareTo(name2);
-                    if (name > 0) {
-                        return 1;
-                    }
-                    else if (name < 0) {
-                        return -1;
-                    } else {
-                        long ID1 = task1.getID();
-                        long ID2 = task2.getID();
-                        if (ID1 > ID2) {
-                            return 1;
-                        }
-                        else if (ID1 < ID2) {
-                            return -1;
-                        }
-                        else {
-                            return 0;
-                        }
-                    }
-                }
-                else if (t1 == null) {
-                    return 1;
-                }
-                else {
-                    return -1;
-                }
-            }
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
+            
+            return comparePriority(displayTask1, displayTask2);
         }
     };
     
-    public static TaskList sortByDate(TaskList tasks) {
+    
+    private static int comparePriority(DisplayTask displayTask1, DisplayTask displayTask2) {
+        Task task1 = displayTask1.getParent();
+        Task task2 = displayTask2.getParent();
+        
+        int result = task1.getPriority() - task2.getPriority();
+        
+        if (result > 0) {
+            
+            return -1;
+            
+        } else if (result < 0) {
+           
+            return 1;
+            
+        } else {
+            
+            String name1 = task1.getName();
+            String name2 = task2.getName();
+            
+            int name = name1.compareTo(name2);
+            
+            if (name > 0) {
+                
+                return 1;
+                
+            } else if (name < 0) {
+                
+                return -1;
+                
+            } else {
+                
+                long ID1 = task1.getID();
+                long ID2 = task2.getID();
+                
+                if (ID1 > ID2) {
+                    
+                    return 1;
+                    
+                } else if (ID1 < ID2) {
+                    
+                   return -1;
+                   
+                } else {
+                    
+                   return 0;
+                }
+            }
+        }
+    }
+    
+    public static DisplayTaskList sortByDate(DisplayTaskList tasks) {
         //ADD LOG
-        TaskList newTasks = new TaskList(tasks);
-        Collections.sort(newTasks, dueDateComparator);
+        DisplayTaskList newTasks = new DisplayTaskList(tasks);
+        Collections.sort(newTasks, DateComparator);
         return newTasks;
     }
     
-    public static TaskList sortByPriority(TaskList tasks) {
+    public static DisplayTaskList sortByPriority(DisplayTaskList tasks) {
         //ADD LOG
-        TaskList newTasks = new TaskList(tasks);
+        DisplayTaskList newTasks = new DisplayTaskList(tasks);
         Collections.sort(newTasks, priorityComparator);
         return newTasks;
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> sortListToMapByDate(DisplayTaskList input) {
-        TreeMap < Date, DisplayTaskList > sortedDisplayMap = new TreeMap < Date, DisplayTaskList>();
-        //ADD MORE STUFF
+    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate(DisplayTaskList input) {
+        TreeMap < Date, DisplayTaskList > displayMap = 
+                new TreeMap < Date, DisplayTaskList>( dateComparatorForMap );
+        for (int i = 0; i < input.size(); i++) {
+            
+            DisplayTask temp = input.get(i);
+            
+            addDisplayTaskToMap(displayMap, temp);
+        }
+        
+        return displayMap;
+    }
+    
+    private static void addDisplayTaskToMap(TreeMap < Date, DisplayTaskList> displayMap, 
+            DisplayTask inputTask) {
+        
+        if (displayMap.containsKey(inputTask.getShownDate())) {
+            
+            displayMap.get(inputTask.getShownDate()).add(inputTask);
+            
+        } else {
+            
+            displayMap.put(inputTask.getShownDate(), new DisplayTaskList());
+            
+            displayMap.get(inputTask.getShownDate()).add(inputTask);
+        }
     }
 }
