@@ -202,4 +202,24 @@ public class DisplayTaskList implements List<DisplayTask>{
     public List<DisplayTask> subList(int fromIndex, int toIndex) {
         return displayTasks.subList(fromIndex, toIndex);
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DisplayTaskList) {
+            
+            DisplayTaskList tasks = (DisplayTaskList) obj;
+            if (this.size() == tasks.size()) {
+                for (int i = 0; i < tasks.size(); i++) {
+                    if (!(this.get(i).equals(tasks.get(i)))) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

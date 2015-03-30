@@ -69,15 +69,40 @@ public class DisplayTask {
         if( obj instanceof DisplayTask ){
             
             DisplayTask anotherTask = (DisplayTask)obj;
-            boolean dateCheck;
+            
+            boolean dueDateCheck, endDateCheck, displayDateCheck;
+            
             if (dueDate == null || anotherTask.getDueDate() == null) {
-                dateCheck = (dueDate == anotherTask.getDueDate());
+            
+                dueDateCheck = (dueDate == anotherTask.getDueDate());
+           
+            } else {               
+           
+                dueDateCheck = dueDate.equals(anotherTask.getDueDate());
+            }
+            
+            if (endDate == null || anotherTask.getEndDate() == null) {
+            
+                endDateCheck = (endDate == anotherTask.getEndDate());
+           
             } else {
-                dateCheck = dueDate.equals(anotherTask.getDueDate());
+                
+                endDateCheck = endDate.equals(anotherTask.getEndDate());
+            }
+            
+            if (displayDate == null || anotherTask.getShownDate() == null) {
+                
+                displayDateCheck = (displayDate == anotherTask.getShownDate());
+                
+            } else {
+                
+                displayDateCheck = displayDate.equals(anotherTask.getShownDate());
             }
             
             return (ID == anotherTask.getID()) &&
-                   dateCheck &&
+                   dueDateCheck &&
+                   endDateCheck &&
+                   displayDateCheck &&
                    (parentTask.equals(anotherTask.getParent()));
             
         } else{
