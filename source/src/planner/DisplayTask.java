@@ -4,11 +4,13 @@ import java.util.Date;
 
 public class DisplayTask {
     private long ID;
+    private Date displayDate;
     private Date dueDate, endDate;
     private Task parentTask;
     
-    public DisplayTask(long id, Date from, Date to, Task parent) {
+    public DisplayTask(long id, Date shownDate, Date from, Date to, Task parent) {
         ID = id;
+        displayDate = shownDate;
         dueDate = from;
         endDate = to;
         parentTask = parent;
@@ -16,13 +18,18 @@ public class DisplayTask {
     
     public DisplayTask(DisplayTask anotherTask) {
         ID = anotherTask.getID();
+        displayDate = anotherTask.getShownDate();
         dueDate = anotherTask.getDueDate();
         endDate = anotherTask.getEndDate();
         parentTask = anotherTask.getParent();
     }
     
     public void setID(long id) {
-        this.ID = id;
+        ID = id;
+    }
+    
+    public void setShownDate(Date shownDate) {
+        displayDate = shownDate;
     }
     
     public void setDueDate(Date date) {
@@ -39,6 +46,10 @@ public class DisplayTask {
     
     public long getID() {
         return this.ID;
+    }
+    
+    public Date getShownDate() {
+        return this.displayDate;
     }
     
     public Date getDueDate() {
