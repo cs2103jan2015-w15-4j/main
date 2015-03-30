@@ -11,18 +11,6 @@ import java.util.Collection;
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
-    //Sorts according to due date
-    //Assumption: TaskList passed to this method MUST have a non-null due date (Non-tentative tasks).
-    //Sort in this order, Due Date > Priority > Name >
-    public static TaskList sortTaskListByDate(TaskList tasks){
-        TaskList sortList = SortLogic.sortByDate(tasks);
-        return sortList;
-    }
-    
-    //Sorts according to priority
-    public static TaskList sortTaskListByPriority(TaskList tasks){
-        return SortLogic.sortByPriority(tasks);
-    }
     
     //Copies searched results into the searchList 
     public static TaskList searchTaskByTags(TaskList input, String tagToLookFor) {
@@ -77,13 +65,25 @@ public class Logic {
         return SplitLogic.splitAllTaskList(input);
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (DisplayTaskList input) {
+    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayAllTask (DisplayTaskList input) {
+        
         TreeMap<Date, DisplayTaskList> allTaskMap = SortLogic.sortListToMapByDate(input);
         
         for (Map.Entry<Date, DisplayTaskList> entry : allTaskMap.entrySet()) {
             DisplayTaskList unsortedList = entry.getValue();
-            DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
+            Date key = entry.getKey();
+            if (key == null) {
+                DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);
+                allTaskMap.remove(key);
+                allTaskMap.put(key, sortedDisplayList);
+            } else {
+                DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
+                allTaskMap.remove(key);
+                allTaskMap.put(key, sortedDisplayList);
+            }
         }
+        
+        return allTaskMap.entrySet();
         
     }
 }
