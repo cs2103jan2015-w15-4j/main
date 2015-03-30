@@ -4,7 +4,9 @@ import java.util.logging.Level;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.TreeMap;
+import java.util.Iterator;
+import java.util.Collection;
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
@@ -13,37 +15,14 @@ public class Logic {
     //Assumption: TaskList passed to this method MUST have a non-null due date (Non-tentative tasks).
     //Sort in this order, Due Date > Priority > Name >
     public static TaskList sortTaskListByDate(TaskList tasks){
-        return SortLogic.sortByDate(tasks);
+        TaskList sortList = SortLogic.sortByDate(tasks);
+        return sortList;
     }
     
     //Sorts according to priority
     public static TaskList sortTaskListByPriority(TaskList tasks){
         return SortLogic.sortByPriority(tasks);
     }
-
-    //Copies confirmed or tentative tasks into their respective TaskLists
-    /*
-    public static void splitTasksByTentative(TaskList input, TaskList confirmed, TaskList tentative) {
-        logger.log(Level.INFO, "split by tentative: Starting...");
-        try {
-            SplitLogic.splitByTentative(input, confirmed, tentative);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "split error encountered", e);
-        }
-        logger.log(Level.INFO, "split by tentative: No problems encountered");
-    }
-    
-    //Copies done and incomplete tasks into their respective TaskLists
-    public static void splitTaskByDone(TaskList input, TaskList done, TaskList notDone) {
-        logger.log(Level.INFO, "split by done: Starting...");
-        try {
-            SplitLogic.splitByDone(input, done, notDone);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "split error encountered", e);
-        }
-        logger.log(Level.INFO, "split by done: No problems encountered");
-    }
-    */
     
     //Copies searched results into the searchList 
     public static TaskList searchTaskByTags(TaskList input, String tagToLookFor) {
@@ -99,7 +78,12 @@ public class Logic {
     }
     
     public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayedTask (DisplayTaskList input) {
-        //ADD MORE STUFF
+        TreeMap<Date, DisplayTaskList> allTaskMap = SortLogic.sortListToMapByDate(input);
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : allTaskMap.entrySet()) {
+            DisplayTaskList unsortedList = entry.getValue();
+            DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
+        }
         
     }
 }

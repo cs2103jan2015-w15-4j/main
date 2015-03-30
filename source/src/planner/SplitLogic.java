@@ -24,11 +24,13 @@ public class SplitLogic {
         
         if (inputTask.isFloating()) {
             
-            createNewDisplayTask(outputList, null , null, inputTask);
+            createNewDisplayTask(outputList, null, null, null, inputTask);
             
         } else if (inputTask.getEndDate() == null) {
             
-            createNewDisplayTask(outputList, inputTask.getDueDate(), null, inputTask);
+            Date shownDate = getShownDate(inputTask.getDueDate());
+            
+            createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), null, inputTask);
             
         } else {
             
@@ -44,20 +46,31 @@ public class SplitLogic {
             
             if (DateDifference == 0) {
                 
-                createNewDisplayTask(outputList, inputTask.getDueDate(), 
+                Date shownDate = getShownDate(inputTask.getDueDate());
+                
+                createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), 
                         inputTask.getEndDate(), inputTask);
                 
             } else {
             
                 for (int j = 0; j <= DateDifference; j++) {
+                    
+                    Date tempDate = null;
                 
                     if (j == 0) {
+                        
+                        tempDate = getShownDate(inputTask.getDueDate());
                     
-                        createNewDisplayTask(outputList, inputTask.getDueDate(), null, inputTask);
+                        createNewDisplayTask(outputList, tempDate, inputTask.getDueDate(), null, inputTask);
                     
                     } else {
-                    
-                        createNewDisplayTask(outputList, null, inputTask.getEndDate(), inputTask);
+                        
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(tempDate);
+                        cal.add(Calendar.DATE, 1);
+                        tempDate = cal.getTime();
+                        
+                        createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
                     }
                     
                 }
@@ -65,12 +78,27 @@ public class SplitLogic {
         }     
     }
     
-    private static void createNewDisplayTask(DisplayTaskList outputList, Date from, Date to, Task inputTask) {
+    private static void createNewDisplayTask(DisplayTaskList outputList,Date shownDate, Date from, Date to, Task inputTask) {
         
-        DisplayTask newTask = new DisplayTask(ID, from, to, inputTask);
+        DisplayTask newTask = new DisplayTask(ID, shownDate, from, to, inputTask);
         
         outputList.add(newTask);
         
         ID++;
+    }
+    
+    private static Date getShownDate(Date day) {
+        
+        Calendar cal = Calendar.getInstance();
+        
+        cal.setTime(day);
+        
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int date = cal.get(Calendar.DATE);
+        
+        cal.set(year, month, date);
+        
+        return cal.getTime();
     }
 }
