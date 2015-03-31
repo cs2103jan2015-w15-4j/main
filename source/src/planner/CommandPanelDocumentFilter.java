@@ -22,6 +22,8 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
     private String commandKeywordRegexPattern;
     private String nonCommandKeywordRegexPattern;
     
+    private boolean isFilterTurnedOff;
+    
     private Style m_originalStyle;
     
     private Color COMMAND_KEYWORD_COLOUR;
@@ -43,6 +45,26 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         
         COMMAND_KEYWORD_COLOUR = new Color( 0, 0, 192 );
         NONCOMMAND_KEYWORD_COLOUR = new Color( 127, 0, 85 );
+        
+        setFilterOn();
+    }
+    
+    public void setFilterOn(){
+        
+        isFilterTurnedOff = false;
+    }
+    
+    public void setFilterOff(){
+        
+        isFilterTurnedOff = true;
+    }
+    
+    public void setTextStyle( Style currentTextStyle ){
+        
+        if( currentTextStyle != null ){
+            
+            m_originalStyle = currentTextStyle;
+        }
     }
     
     public CommandPanelDocumentFilter(){
@@ -62,7 +84,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             super.insertString(filterBypass, offset, str, attribute);
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
@@ -82,7 +104,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             super.replace(filterBypass, offset, strLength, str, attribute);
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
@@ -97,7 +119,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             super.remove( filterBypass, offset, strLength );
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
