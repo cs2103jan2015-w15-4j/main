@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -15,29 +12,24 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
-import sun.util.logging.PlatformLogger.Level;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -83,6 +75,32 @@ public class UserInterface extends JFrame {
                 
                 break;
                 
+            case SEARCH:
+                
+                tempTaskList = Engine.getSearchResult();
+                
+                if( tempTaskList != null && tempTaskList.size() > 0 ){
+                    
+                    command.setText( "Search success" );
+                    
+                    currentList.copyTaskList(tempTaskList);
+                    
+                    displayPane.clearDisplay();
+                    
+                    displayPane.displayByDate(currentList);
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, input, input, null ));
+                    
+                    currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+                    addNavigationBarsToPanel(currentNavigationBars);
+                    
+                } else{
+                    
+                    command.setText( "We cannot find any task containing the search phrase :/" );
+                }
+                
+                break;
+            
             default:
                 
                 handleUnexpectedOperation();
@@ -105,11 +123,17 @@ public class UserInterface extends JFrame {
                 
                 displayPane.clearDisplay();
                 
-                displayPane.addTasksToDisplay(currentList);
+                //displayPane.addTasksToDisplay(currentList);
+                displayPane.displayByDate(currentList);
                 
-                displayPane.selectTask(newTaskNumber);
+                displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
                 
-                System.out.println( "line added = " + newTaskNumber );
+                //displayPane.selectTask(newTaskNumber);
+                
+                //System.out.println( "line added = " + newTaskNumber );
+                
+                currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+                addNavigationBarsToPanel(currentNavigationBars);
                 
         } else{
             
@@ -132,9 +156,16 @@ public class UserInterface extends JFrame {
             
             displayPane.clearDisplay();
             
-            displayPane.addTasksToDisplay(currentList);
+            //displayPane.addTasksToDisplay(currentList);
             
-            displayPane.selectTask(newTaskNumber);
+            //displayPane.selectTask(newTaskNumber);
+            
+            displayPane.displayByDate(currentList);
+            
+            displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
+            
+            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+            addNavigationBarsToPanel(currentNavigationBars);
             
         } else{
             
@@ -154,9 +185,16 @@ public class UserInterface extends JFrame {
                 
             displayPane.clearDisplay();
                 
-            displayPane.addTasksToDisplay(currentList);
+            //displayPane.addTasksToDisplay(currentList);
             
-            displayPane.selectTask( newTaskNumber );
+            //displayPane.selectTask( newTaskNumber );
+            
+            displayPane.displayByDate(currentList);
+            
+            displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
+            
+            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+            addNavigationBarsToPanel(currentNavigationBars);
             
         } else{
             
@@ -172,15 +210,24 @@ public class UserInterface extends JFrame {
             newTaskList.size() < currentList.size() &&
             (newTaskNumber = compareList( currentList, newTaskList )) > 0 ){
             
+            long selectedIdx = displayPane.getCurrentSelectedTaskID();
+            
             command.setText( "Task deleted successfully" );
             
             currentList.copyTaskList(newTaskList);
             
             displayPane.clearDisplay();
             
-            displayPane.addTasksToDisplay(currentList);
+            //displayPane.addTasksToDisplay(currentList);
             
-            displayPane.selectTask( newTaskNumber - 1 );
+            //displayPane.selectTask( newTaskNumber - 1 );
+            
+            displayPane.displayByDate(currentList);
+            
+            displayPane.selectTask( selectedIdx - 1 );
+            
+            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+            addNavigationBarsToPanel(currentNavigationBars);
             
         } else{
             
@@ -195,7 +242,7 @@ public class UserInterface extends JFrame {
     
     public void handleUnexpectedOperation(){
         
-        command.setText( "Feature not supported in V0.1" );
+        command.setText( "Feature not supported in V0.2" );
     }
     ///////////////////////////////////////////////////////////////////// 
     //  PROCESS COMMANDS FUNCTIONS END HERE
@@ -231,11 +278,15 @@ public class UserInterface extends JFrame {
     
     private boolean isMessageDisplayed;
     
-    private DisplayState currentDisplayState;
-    
     private ArrayList<NavigationBar> currentNavigationBars;
     
     private final static Logger userInterfaceLogger = Logger.getLogger(UserInterface.class.getName());
+    
+    private char characterToTransfer;
+    private boolean isBackspacePressed;
+    
+    private DisplayStateStack displayStateStack;
+    private final int maxNumOfDisplayStates = 100;
     
     public static void main(String[] args) {
         
@@ -263,24 +314,24 @@ public class UserInterface extends JFrame {
 
     public UserInterface() {
         
-    	// Initialise engine
-    	if( !Engine.init() ){
-    		
-    		JOptionPane.showMessageDialog(null, "Engine failed to initialise :(", "Error Message", JOptionPane.ERROR_MESSAGE);
-    		
-    		userInterfaceLogger.severe("Fail to intialise engine");
-    		
-    		System.exit(1);
-    	}
-    	
-    	isMessageDisplayed = true;
-    	
+        // Initialise engine
+        if( !Engine.init() ){
+            
+            JOptionPane.showMessageDialog(null, "Engine failed to initialise :(", "Error Message", JOptionPane.ERROR_MESSAGE);
+            
+            userInterfaceLogger.severe("Fail to intialise engine");
+            
+            System.exit(1);
+        }
+        
+        isMessageDisplayed = true;
+        
         // Main frame
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // Adding paintable component to main frame
-        setBounds(100, 100, 781, 587);
+        setBounds(100, 100, 867, 587);
         contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(null);
@@ -353,7 +404,7 @@ public class UserInterface extends JFrame {
 
                 @Override
                 public void keyPressed(KeyEvent event) {
-
+                    
                     handleKeyEvent(event);
                 }
             });
@@ -368,10 +419,42 @@ public class UserInterface extends JFrame {
 
                 @Override
                 public void keyPressed(KeyEvent event) {
-
+                    
                     handleKeyEvent(event);
                 }
             });
+        }
+    }
+    
+    
+    private char filterKeys( char keyCode ){
+        
+        if( (keyCode >= 32 && keyCode <= 126) || keyCode == 8 ){
+            
+            return keyCode;
+            
+        } else{
+            
+            return '\0';
+        }
+    }
+    
+    private void handleKeys( char keyTyped ){
+        
+        if( keyTyped >= 32 && keyTyped <= 126){
+            
+            characterToTransfer = keyTyped;
+            isBackspacePressed = false;
+            
+        } else if( keyTyped == 8 ){
+            
+            characterToTransfer = '\0';
+            isBackspacePressed = true;
+            
+        } else{
+            
+            characterToTransfer = '\0';
+            isBackspacePressed = false;
         }
     }
     
@@ -392,6 +475,22 @@ public class UserInterface extends JFrame {
                 int currentScrollValue = verticalScrollBar.getValue();
                 int tempScrollUnitDifference = (event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -verticalScrollBar.getBlockIncrement(-1) : verticalScrollBar.getBlockIncrement(1));
                 verticalScrollBar.setValue( currentScrollValue + tempScrollUnitDifference );
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
+                    
+                    currentList.copyTaskList(Engine.getAllTasks());
+                    
+                    displayPane.clearDisplay();
+                    displayPane.displayByDate(currentList);
+                    currentDisplayState = new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event );
+                    currentNavigationBars = generateContentForNavigationBars( currentDisplayState );
+                    addNavigationBarsToPanel(currentNavigationBars);
+                }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
                 
@@ -432,23 +531,21 @@ public class UserInterface extends JFrame {
                     currentNavigationBars.size() > 0 && 
                     currentNavigationBars.get(0).isVisible() ){
                     
-                    long taskID = displayPane.getCurrentSelectedTaskID();
+                    Task currentTask = displayPane.getCurrentSelectedTask();
                     
-                    if( taskID >= 0 ){
+                    if( currentTask != null ){
                         
-                        long tempTaskID = currentList.get((int)displayPane.getCurrentSelectedTaskID()).getID();
-                        
-                        currentNavigationBars.get(0).setMessage(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTaskID, "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getID(), "F1");
                     }
                 }
                 
                 if( slidePanel.isVisible() ){
                     
-                    int selectedTaskID = (int)displayPane.getCurrentSelectedTaskID();   //Possible loss of data
+                    Task tempTask = displayPane.getCurrentSelectedTask();
                     
-                    if( selectedTaskID >= 0 && selectedTaskID < currentList.size() ){
+                    if( tempTask != null ){
                         
-                        slidePanel.populateDisplay(currentList.get(selectedTaskID));
+                        slidePanel.populateDisplay(tempTask);
                     }
                 }
                 
@@ -483,24 +580,22 @@ public class UserInterface extends JFrame {
                 if( currentNavigationBars != null && 
                         currentNavigationBars.size() > 0 && 
                         currentNavigationBars.get(0).isVisible() ){
-                        
-                    long taskID = displayPane.getCurrentSelectedTaskID();
                     
-                    if( taskID >= 0 ){
+                    Task currentTask = displayPane.getCurrentSelectedTask();
+                    
+                    if( currentTask != null ){
                         
-                        long tempTaskID = currentList.get((int)displayPane.getCurrentSelectedTaskID()).getID();
-                        
-                        currentNavigationBars.get(0).setMessage(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTaskID, "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getID(), "F1");
                     }
                 }
                 
                 if( slidePanel.isVisible() ){
                     
-                    int selectedTaskID = (int)displayPane.getCurrentSelectedTaskID();   //Possible loss of data
+                    Task tempTask = displayPane.getCurrentSelectedTask();
                     
-                    if( selectedTaskID >= 0 && selectedTaskID < currentList.size() ){
+                    if( tempTask != null ){
                         
-                        slidePanel.populateDisplay(currentList.get(selectedTaskID));
+                        slidePanel.populateDisplay(tempTask);
                     }
                 }
                 
@@ -512,11 +607,11 @@ public class UserInterface extends JFrame {
                     
                     if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                         
-                        int selectedTaskID = (int)displayPane.getCurrentSelectedTaskID();   //Possible loss of data
+                        Task tempTask = displayPane.getCurrentSelectedTask();
                         
-                        if( selectedTaskID >= 0 && selectedTaskID < currentList.size() ){
+                        if( tempTask != null ){
                             
-                            slidePanel.slideOut(currentList.get(selectedTaskID));
+                            slidePanel.slideOut( tempTask );
                         }
                         
                         event.consume();
@@ -525,22 +620,15 @@ public class UserInterface extends JFrame {
                         
                     } else{
                         
+                        characterToTransfer = '\0';
+                        isBackspacePressed = false;
+                        
+                        handleKeys( filterKeys(event.getKeyChar()) );
+                        
                         command.requestFocusInWindow();
+                        
+                        event.consume();
                     }
-                    
-                    /*
-                    if( isMessageDisplayed ){
-                        
-                        Toolkit.getDefaultToolkit().getLockingKeyState(KeyEvent.VK_CAPS_LOCK);
-                        
-                        command.setText("" + ((char)event.getKeyCode()) );
-                        
-                        isMessageDisplayed = false;
-                        
-                    } else{
-                        
-                        command.setText(command.getText() + ((char)event.getKeyCode()));
-                    }*/
                 }
                 
                 if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
@@ -573,28 +661,28 @@ public class UserInterface extends JFrame {
     }
     
     private void prepareSectionTitle(){
-    	
-    	sectionTitle = new JLabel();
-    	sectionTitle.setBounds(6, 36, 381, 33);
-    	sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
-    	sectionTitle.setForeground( new Color( 255,255,255,200 ) );
-    	sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        sectionTitle = new JLabel();
+        sectionTitle.setBounds(6, 30, 497, 33);
+        sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
+        sectionTitle.setForeground( new Color( 255,255,255,200 ) );
+        sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(sectionTitle);
         sectionTitle.setText("All Tasks");
     }
     
     private void prepareSectionTitleLine(){
-    	
-    	sectionTitleLine = new JLabel();
-    	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
-    	sectionTitleLine.setBounds(-142, 35, 539, 33);
-    	contentPane.add(sectionTitleLine);
+        
+        sectionTitleLine = new JLabel();
+        sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
+        sectionTitleLine.setBounds(-142, 28, 643, 33);
+        contentPane.add(sectionTitleLine);
     }
     
     private void prepareSlidePanel(){
         
         slidePanelFrame = new JPanel();
-        slidePanelFrame.setBounds(583, 45, 396, 520);
+        slidePanelFrame.setBounds(670, 45, 396, 520);
         contentPane.add(slidePanelFrame);
         slidePanelFrame.setLayout(null);
         slidePanelFrame.setOpaque(false);
@@ -620,16 +708,15 @@ public class UserInterface extends JFrame {
         
         navigationPanel.setText( "\n\n\n\n\n\n\n\n\n\n\n\n\n" );
         
-        currentNavigationBars = generateContentForNavigationBars( currentDisplayState );
+        currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
         addNavigationBarsToPanel(currentNavigationBars);
     }
     
-    private ArrayList<NavigationBar> generateContentForNavigationBars( DisplayState displayState ){
+    private ArrayList<NavigationBar> generateContentForNavigationBars( DisplayState currentDisplayState ){
         
         ArrayList<NavigationBar> tempList = new ArrayList<NavigationBar>();
         
-        if( displayState != null && 
-            planner.Constants.NAVIGATION_BAR_STRING_CONTENTS_SIZE == planner.Constants.NAVIGATION_BAR_STRING_CONTENTS.length ){
+        if( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS_SIZE == planner.Constants.NAVIGATION_BAR_STRING_CONTENTS.length ){
             
             int key = 1;
             
@@ -638,123 +725,201 @@ public class UserInterface extends JFrame {
             // More info on current task
             if( currentList.size() > 0 ){
                 
-                long taskID = displayPane.getCurrentSelectedTaskID();
+                //long taskID = displayPane.getCurrentSelectedTaskID();
                 
-                if( taskID >= 0 ){
+                Task tempTask = displayPane.getCurrentSelectedTask();
+                
+                //if( taskID >= 0 ){
+                          
+                if( tempTask != null ){
                     
                     tempList.add( new NavigationBar( 
-                            planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentList.get((int)displayPane.getCurrentSelectedTaskID()).getID(), 
+                            planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTask.getID(), 
                             "F" + key ) );
                     
                 } else{
                     
-                    tempList.add( new NavigationBar(null,null) );
+                    tempList.add( new NavigationBar(null) );
                 }
                 
             } else{
                 
-                tempList.add( new NavigationBar(null,null) );
+                tempList.add( new NavigationBar(null) );
+            }
+            ++key;
+            
+            // Previous view
+            if( displayStateStack.size() > 1 ){
+                
+                tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[1], "F" + key ) );
+                
+            } else{
+                
+                tempList.add( new NavigationBar(null) );
             }
             ++key;
             
             // tutorial
-            tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[1], "F" + key ));
+            tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2], "F" + key ));
             ++key;
             
             // Quick keys
-            tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2], "F" + key ));
+            tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
             ++key;
             
             // Today tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+            if( currentDisplayState != null ){
                 
-                tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+                    
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6], "F" + key ));
+                    
+                } else{
+                    
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6] ));
+                }
                 
             } else{
                 
-                tempList.add( new NavigationBar(null,null ) );
+                tempList.add( new NavigationBar(null) );
             }
             ++key;
             
             // all tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
+            if( currentDisplayState != null ){
                 
                 tempTaskList = Engine.getAllTasks();
                 
-                if( tempTaskList.size() <= 1 ){
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8], "F" + key ));
+                    }
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8] ));
+                    }
                 }
                 
             } else{
                 
-                tempList.add( new NavigationBar(null,null ) );
+                tempList.add( new NavigationBar(null) );
             }
             ++key;
             
             // Tentative tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+            if( currentDisplayState != null ){
                 
                 tempTaskList = Engine.getTentativeTasks();
                 
-                if( tempTaskList.size() <= 1 ){
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10], "F" + key ));
+                    }
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10]));
+                    }
                 }
                 
             } else{
                 
-                tempList.add( new NavigationBar(null,null ) );
+                tempList.add( new NavigationBar( null ) );
             }
             ++key;
             
             // Overdue tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
+            if( currentDisplayState != null ){
                 
-                tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10], "F" + key ));
-                
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
+                    
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
+                    
+                } else{
+                    
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12] ));
+                }
+
             } else{
                 
-                tempList.add( new NavigationBar(null,null ) );
-            }
-            ++key;
-            
-            // Recurring tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.RECURRING ){
-                
-                tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
-                
-            } else{
-                
-                tempList.add( new NavigationBar(null,null ) );
+                tempList.add( new NavigationBar( null ) );
             }
             ++key;
             
             // Done tasks
-            if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
+            if( currentDisplayState != null ){
                 
-                tempTaskList = Engine.getTentativeTasks();
+                tempTaskList = Engine.getDoneTasks();
                 
-                if( tempTaskList.size() <= 1 ){
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14], "F" + key ));
+                    }
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14] ));
+                    }
                 }
                 
             } else{
                 
-                tempList.add( new NavigationBar(null,null ) );
+                tempList.add( new NavigationBar( null ) );
+            }
+            ++key;
+            
+            // Settings
+            if( currentDisplayState != null ){
+                
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.SETTINGS ){
+                    
+                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15], "F" + key ));
+                    
+                } else{
+                    
+                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15] ) );
+                }
+                
+            } else{
+                
+                tempList.add( new NavigationBar( null ) );
             }
             ++key;
         }
@@ -768,17 +933,23 @@ public class UserInterface extends JFrame {
             
             if( listOfNavigationBarComponents != null && listOfNavigationBarComponents.size() > 0 ){
 
+                navigationPanel.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                
                 StyledDocument styledDocument = navigationPanel.getStyledDocument();
                 
                 Iterator<NavigationBar> iterator = listOfNavigationBarComponents.iterator();
                 
                 NavigationBar tempNavigationBar;
                 
+                
+                
                 while( iterator.hasNext() ){
                     
                     tempNavigationBar = iterator.next();
                     
                     if( tempNavigationBar.isVisible() ){
+                        
+                        
                         
                         Style style = styledDocument.addStyle("component", null);
                         StyleConstants.setComponent(style, tempNavigationBar);
@@ -796,87 +967,93 @@ public class UserInterface extends JFrame {
         // Adding UI background
         background = new JLabel();
         background.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/UI_Pic.png")));
-        background.setBounds(0, 0, 781, 587);
+        background.setBounds(0, 0, 867, 587);
         contentPane.add(background);
     }
     
-	private void prepareDisplay(){
+    private void prepareDisplay(){
         
-    	displayPane = new DisplayPane();
-        displayPane.setBounds(25, 83, 548, 430);
+        displayPane = new DisplayPane();
+        displayPane.setBounds(25, 83, 630, 430);
         
         contentPane.add(displayPane);
+        
+        displayStateStack = new DisplayStateStack(maxNumOfDisplayStates);
         
         // Copying of all tasks
         currentList = new TaskList( Engine.getAllTasks() );
         
         // Display all tasks as default screen for now
-        displayPane.addTasksToDisplay(currentList);
+        //displayPane.addTasksToDisplay(currentList);
+        displayPane.displayByDate(currentList);
         
         displayPane.requestFocusInWindow();
         
         addKeyBindingsToDisplay(displayPane);
         
-        currentDisplayState = new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, KeyEvent.VK_F4 );
+        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
+                                                new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
+                                                              0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
     }
     
-	private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
-	    
-	    if( currentDisplayPane != null ){
-	        
-	        currentDisplayPane.addKeyListener(new KeyAdapter(){
+    private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
+        
+        if( currentDisplayPane != null ){
+            
+            currentDisplayPane.addKeyListener(new KeyAdapter(){
 
                 @Override
                 public void keyPressed(KeyEvent event) {
                     
                     handleKeyEvent(event);
-                }            
-	        });
-	    }
-	}
-	
-	private long compareList( TaskList originalList, TaskList modifiedList ){
-		
-		if( originalList == null || modifiedList == null ){
-			
-			return -1;
-		}
-		
-		Iterator<Task> iteratorOriginal = originalList.iterator();
-		Iterator<Task> iteratorModified = modifiedList.iterator();
-		
-		Task originalTask;
-		Task modifiedTask;
-		
-		long lineNumber = 1L;
-		while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
-			
-			originalTask = iteratorOriginal.next();
-			modifiedTask = iteratorModified.next();
-			
-			if( !originalTask.equals(modifiedTask) ){
+                    
+                }
+            });
+        }
+    }
+    
+    private long compareList( TaskList originalList, TaskList modifiedList ){
+        
+        if( originalList == null || modifiedList == null ){
+            
+            return -1;
+        }
+        
+        Iterator<Task> iteratorOriginal = originalList.iterator();
+        Iterator<Task> iteratorModified = modifiedList.iterator();
+        
+        Task originalTask;
+        Task modifiedTask;
+        
+        long lineNumber = 1L;
+        while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
+            
+            originalTask = iteratorOriginal.next();
+            modifiedTask = iteratorModified.next();
+            
+            if( !originalTask.equals(modifiedTask) ){
 
-				return lineNumber;
-			}
-			
-			++lineNumber;
-		}
-		
-		if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
-			
-			return lineNumber;
-			
-		} else {
-			
-			return 0L;
-		}
-	}
-	
+                return lineNumber;
+            }
+            
+            ++lineNumber;
+        }
+        
+        if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
+            
+            return lineNumber;
+            
+        } else {
+            
+            return 0L;
+        }
+    }
+    
     private void prepareCommandTextField(){
         
         // Adding command text field
         command = new JTextField();
-        command.setBounds(34, 530, 531, 33);
+        command.setBounds(34, 530, 610, 33);
         contentPane.add(command);
         command.setColumns(10);
         
@@ -889,6 +1066,9 @@ public class UserInterface extends JFrame {
         
         addFocusListenerToCommandTextField(command);
         addKeyBindingsToCommandTextField(command);
+        
+        characterToTransfer = '\0';
+        isBackspacePressed = false;
     }
     
     private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
@@ -897,19 +1077,35 @@ public class UserInterface extends JFrame {
             
             currentCommand.addKeyListener(new KeyListener(){
                 
-                
                 @Override
                 public void keyPressed( KeyEvent e ){
-                    
+                        
                     handleKeyEvent(e);
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
+                    
+                    return;
                 }
         
                 @Override
-                public void keyTyped(KeyEvent e) {}
+                public void keyTyped(KeyEvent e) {
+                    
+                    if( characterToTransfer != '\0' ){
+                        
+                        e.consume();
+                    }
+                    
+                    return;
+                }
         
                 @Override
-                public void keyReleased(KeyEvent e) {}
-                
+                public void keyReleased(KeyEvent e) {
+                    
+                    e.consume();
+                    
+                    return;
+                }
             });
         }
     }
@@ -925,15 +1121,24 @@ public class UserInterface extends JFrame {
                     
                     command.setForeground( new Color( 0,0,0 ) );
                     
+                    String additionalCharacterToAdd = (characterToTransfer != '\0' ? characterToTransfer + "" : "");
+                    
                     if( isMessageDisplayed ){
                         
-                        command.setText("");
+                        command.setText(additionalCharacterToAdd);
                         
                         isMessageDisplayed = false;
                         
                     } else{
                         
-                        command.setText(command.getText());
+                        String finalString = command.getText() + additionalCharacterToAdd;
+                        
+                        if( isBackspacePressed && finalString.length() > 0 ){
+                            
+                            finalString = finalString.substring(0, finalString.length()-1);
+                        }
+                        
+                        command.setText(finalString);
                     }
                 }
 
@@ -954,6 +1159,9 @@ public class UserInterface extends JFrame {
                         
                         command.setText(input);
                     }
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
                 }
             });
         }
@@ -962,7 +1170,7 @@ public class UserInterface extends JFrame {
     private void prepareCloseButton(){
         
         closeButton = new JLabel();
-        closeButton.setBounds(744, 13, 27, 27);
+        closeButton.setBounds(819, 13, 27, 27);
         contentPane.add(closeButton);
         
         closeButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
@@ -992,7 +1200,7 @@ public class UserInterface extends JFrame {
     private void prepareMinimiseButton(){
         
         minimiseButton = new JLabel();
-        minimiseButton.setBounds(707, 12, 28, 28);
+        minimiseButton.setBounds(782, 12, 28, 28);
         contentPane.add(minimiseButton);
         
         minimiseButton.setCursor(new Cursor( Cursor.HAND_CURSOR ));
@@ -1022,7 +1230,7 @@ public class UserInterface extends JFrame {
     private void prepareDragPanel(){
         
         dragPanel = new JLabel();
-        dragPanel.setBounds(0, 0, 781, 587);
+        dragPanel.setBounds(0, 0, 867, 587);
         contentPane.add(dragPanel);
         
         addMouseMovementBindingsToDragPanel(dragPanel);
@@ -1063,4 +1271,6 @@ public class UserInterface extends JFrame {
             });
         }
     }
+    
+   
 }

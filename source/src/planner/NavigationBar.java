@@ -50,7 +50,28 @@ public class NavigationBar extends JComponent{
         StyleConstants.setFontFamily(smallerText, "Calibri");
         StyleConstants.setForeground(smallerText, new Color( 255,255,255 ));
         
-        setMessage( message, navigationKey );
+        setMessageToView( message, navigationKey );
+    }
+    
+    public NavigationBar( String message ){
+        
+        prepareInfoPanel();
+        prepareBackground();
+        
+        boldText = infoPanel.addStyle( "BigBoldText", null );
+        StyleConstants.setBold(boldText, true);
+        StyleConstants.setFontSize(boldText, 13);
+        StyleConstants.setFontFamily(boldText, "Arial");
+        StyleConstants.setForeground(boldText, new Color( 255,255,255 ));
+        
+        smallerText = infoPanel.addStyle( "SmallerText", null );
+        StyleConstants.setBold(smallerText, true);
+        StyleConstants.setItalic(smallerText, true);
+        StyleConstants.setFontSize(smallerText, 12);
+        StyleConstants.setFontFamily(smallerText, "Calibri");
+        StyleConstants.setForeground(smallerText, new Color( 255,255,255 ));
+        
+        setMessageToCurrentView(message);
     }
     
     @Override
@@ -71,7 +92,36 @@ public class NavigationBar extends JComponent{
         add(infoPanel);
     }
     
-    public void setMessage( String message, String navigationKey ){
+    public void setMessageToCurrentView( String message ){
+        
+        StyledDocument doc = infoPanel.getStyledDocument();
+        
+        try{
+            
+            m_isVisible = true;
+            
+            infoPanel.setText("");
+            
+            if(message == null || message.length() <= 0 ){
+                
+                message = "<Insert navigation screen type here>";
+                
+                m_isVisible = false;
+            }
+            
+            doc.insertString(doc.getLength(), message, boldText);
+            
+            doc.insertString(doc.getLength(), "\nCurrently viewing", smallerText );
+            
+            SimpleAttributeSet centerStyle = new SimpleAttributeSet();
+            StyleConstants.setAlignment(centerStyle, StyleConstants.ALIGN_LEFT);
+            StyleConstants.setLineSpacing(centerStyle, -0.2f);
+            doc.setParagraphAttributes(0, doc.getLength(), centerStyle, true);
+            
+        } catch( BadLocationException badLocationException ){}
+    }
+    
+    public void setMessageToView( String message, String navigationKey ){
         
         StyledDocument doc = infoPanel.getStyledDocument();
         

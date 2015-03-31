@@ -122,9 +122,7 @@ public class Task {
 	}
 	
 	public Date getDueDate() {
-	    
 		return dateDue;
-		
 	}
 	
 	public Date getStartDate() {
@@ -240,12 +238,13 @@ public class Task {
 	public Date getDateCompleted() {
 	    
 	    return dateCompleted;
-	    
 	}
 	
+
 	public void setDateCompleted(Date date) {
 	    dateCompleted = date;
 	}
+
 	@Override
 	public boolean equals( Object obj ){
 		

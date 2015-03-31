@@ -1,5 +1,6 @@
 package planner;
 
+import java.awt.Color;
 import java.util.EnumMap;
 import java.util.HashMap;
 
@@ -28,33 +29,47 @@ public class Constants {
     }
     
     public enum DisplayStateFlag {
-        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID
+        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID, SETTINGS
     }
     
-    public static final String[] KEYWORDS = {"add", "new", "update", "edit", 
+    public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", "edit", 
         "change", "del", "delete", "trash", "remove", "show", "display", "done", 
         "completed", "finished", "setnotdone", "undo", "revert", "search", 
-        "find", "help", "sos", "jump", "convert", "savewhere", "savehere", "at",
-        "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
-        "priority", "desc", "description", "remind", "tag"
-    };
+        "find", "help", "sos", "jump", "convert", "savewhere", "savehere" };
     
-    public static final String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",
-                                                              "Tutorial",
-                                                              " Quick key used",
+    public static final String[] NONCOMMAND_KEYWORDS = { "at",
+        "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
+        "priority", "desc", "description", "remind", "tag" };
+    
+    public static final String [][] POSSIBLE_COMMANDS = { {"Add tasks", "add taskname at date", "new taskname at date"},
+                                                          { "Delete tasks", "delete taskid", "del taskid"},
+                                                          { "Update tasks", "update taskid date" }
+                                                        };
+    
+    public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
+                                                              "Previous View",                  // F2
+                                                              "Tutorial",                       // F3
+                                                              " Quick key used",                // F4
                                                               " Quick keys used",
-                                                              " Task due today",
+                                                              " Task due today",                // F5
                                                               " Tasks due today",
-                                                              " Task in total",
+                                                              " Task in total",                 // F6
                                                               " Tasks in total",
-                                                              " Tentative Task",
+                                                              " Tentative Task",                // F7
                                                               " Tentative Tasks",
-                                                              " Overdue Task",
+                                                              " Overdue Task",                  // F8
                                                               " Overdue Tasks",
-                                                              " Recurring Task",
-                                                              " Recurring Tasks",
-                                                              " Task Done",
-                                                              " Tasks Done"};
+                                                              " Task Done",                     // F9
+                                                              " Tasks Done",
+                                                              "YOPO's Settings"};               // F10
+    
+    public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
+                                           new Color( 244, 132, 57 ),
+                                           new Color( 224, 226, 54 ),
+                                           new Color( 47, 244, 237 ),
+                                           new Color( 74, 243, 110 ),
+                                           new Color( 242, 141, 236 ),
+                                           new Color( 245, 142, 142 ) };
     
     public static final String CONFIG_FILE_NAME = "config";
     public static final String DEFAULT_STORAGE_NAME = "data";

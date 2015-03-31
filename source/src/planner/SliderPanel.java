@@ -382,6 +382,17 @@ public class SliderPanel extends JComponent{
                 
                 doc.insertString( doc.getLength(), task.getID() + "\n\n", bigBoldText );
                 
+                doc.insertString( doc.getLength(), "Task Name:\n", bigBoldText );
+                
+                if( task.getName() != null && task.getName().length() > 0 ){
+                    
+                    doc.insertString( doc.getLength(), task.getName() + "\n\n", smallText );
+                    
+                } else{
+                    
+                    doc.insertString( doc.getLength(), "This task has no name :/\n\n", smallText );
+                }
+                
                 doc.insertString( doc.getLength(), "Description:\n", bigBoldText );
                 
                 if( task.getDescription() != null && task.getDescription().length() > 0 ){
@@ -390,8 +401,11 @@ public class SliderPanel extends JComponent{
                     
                 } else{
                     
-                    doc.insertString( doc.getLength(), "No de\n\n\n\n\n\n\n\n\nscription is ent\n\n\n\n\n\n\n\nered for th\n\n\n\n\nis task", smallText );
+                    doc.insertString( doc.getLength(), "No description is entered for this task and testing wrapping text\n\n", smallText );
                 }
+                
+                doc.insertString( doc.getLength(), "From: " + (task.getDueDate() != null ? task.getDueDate() : "null") + "\n\n", bigBoldText );
+                doc.insertString( doc.getLength(), "To: " + (task.getEndDate() != null ? task.getEndDate() : "null") + "\n\n", bigBoldText );
                 
                 infoPanel.setCaretPosition(0);
                 

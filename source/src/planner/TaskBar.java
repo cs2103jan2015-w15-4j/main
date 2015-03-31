@@ -3,53 +3,51 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.Point;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 
 import java.awt.Color;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import java.text.SimpleDateFormat;
 
 public class TaskBar extends JComponent {
 
     private Insets componentCoordinates;
 	
-	private final int m_width = 515;
-	private final int m_height = 82;
+	private final int m_width = 597;
+	private final int m_height = 50;
 	
 	private JLabel taskBarBackground;
-	private JLabel taskPriorityBar;
-	private JLabel taskTimeCounter;
-	private JLabel taskTimeCounterLabel;
-	private JLabel taskTagLabel;
 	private JLabel taskCheckBox;
 	private JLabel lineNumberLabel;
+	private JLabel timeDisplayLabel;
+	
+	private JTextPane tagsPane;
 	
 	private FadedTextField taskTitleLabel;
 	
-	private JTextArea taskTimeDataLabel;
-	
-	private DateFormat dateFormatter;
-	
 	private int position;
+	
+	private boolean hasMovedUp;
+	private boolean hasMovedDown;
 	
 	// Helper functions
 	@Override
@@ -71,31 +69,26 @@ public class TaskBar extends JComponent {
 	// End of helper functions
 	
 	public TaskBar() {
-		
+	    
 		this(0);
 	}
 	
 	public TaskBar( int position ){
 		
-		this.position = position;
+		this.position = position >= 0 ? position : 0;
 		
-		dateFormatter = new SimpleDateFormat( "EEE, d MMM yy" );
-		
-		setSize(m_width, m_height);
+		setSize(597, 50);
 		setOpaque(false);
 		setBorder(null);
 		setFocusable(false);
 		componentCoordinates = getInsets();
 		setLayout(null);
 		
-		prepareTaskTimeDataLabel();
-		prepareTaskPriorityBar();
-		prepareTaskTimeCounter();
-		prepareTaskTimeCounterLabel();
-		prepareTaskTagLabel();
 		prepareTaskCheckBox();
 		prepareTaskTitleLabel();
 		prepareLineNumberLabel();
+		prepareTagsPane();
+		prepareTimeDisplayLabel();
 		prepareTaskBarBackground();
 	}
 
@@ -108,129 +101,14 @@ public class TaskBar extends JComponent {
 		
 		this.position = position;
 	}
-	
-	// Task time data label functions
-	private void prepareTaskTimeDataLabel(){
-		
-		taskTimeDataLabel = new JTextArea();
-		taskTimeDataLabel.setEditable(false);
-		taskTimeDataLabel.setBounds(67, 38, 238, 32);
-		taskTimeDataLabel.setOpaque(false);
-		taskTimeDataLabel.setFocusable(false);
-		taskTimeDataLabel.setFont(new Font( "Arial", Font.PLAIN, 11 ));
-		taskTimeDataLabel.setForeground(new Color(238, 238, 238));
-		add(taskTimeDataLabel);
-		taskTimeDataLabel.setText( "Due               :  Sun, 23 May 15 by 03:00:00\nTime needed :  30 days" );
-	}
-	
-	public void setTaskTimeDataLabel( Date dueDate, String timeLeft ){
-		
-		if( dueDate != null && timeLeft != null ){
-			
-			String finalString = "Due               :  " + dateFormatter.format(dueDate) + "\nTime needed :  " + timeLeft;
-			
-			taskTimeDataLabel.setText( finalString );
-		}
-	}
-	
-	// Priority bar functions
-	private void prepareTaskPriorityBar(){
-		
-		taskPriorityBar = new JLabel();
-		taskPriorityBar.setBounds(58, 12, 5, 57);
-		taskPriorityBar.setBackground(new Color( 255, 0, 0 ));
-		
-		taskPriorityBar.setOpaque(true);
-		add(taskPriorityBar);
-		removeMouseListener(taskPriorityBar);
-	}
-	
-	public void setPriorityBarColour( Color colour ){
-		
-		if( colour != null ){
-			
-			taskPriorityBar.setBackground(colour);
-		}
-	}
-	
-	// Task Time Counter functions
-	private void prepareTaskTimeCounter(){
-		
-		taskTimeCounter = new JLabel();
-		taskTimeCounter.setFont(new Font("Arial", Font.BOLD, 20 ));
-		taskTimeCounter.setForeground(new Color(255, 102, 0));
-		taskTimeCounter.setHorizontalAlignment(SwingConstants.CENTER);
-		taskTimeCounter.setFocusable(false);
-		taskTimeCounter.setBounds(310, 15, 145, 24);
-		add(taskTimeCounter);
-		taskTimeCounter.setText("12");
-		removeMouseListener(taskTimeCounter);
-	}
-	
-	public void setTimeCounter( String time ){
-		
-		try{
-			
-			taskTimeCounter.setText( Integer.parseInt(time) + "" );
-			
-		} catch( NumberFormatException numberFormatException ){
-			
-			
-		}
-	}
-	
-	// Task Time Counter Label functions
-	private void prepareTaskTimeCounterLabel(){
-		
-		taskTimeCounterLabel = new JLabel();
-		taskTimeCounterLabel.setFont(new Font("Arial", Font.BOLD, 15 ));
-		taskTimeCounterLabel.setForeground(new Color(238, 238, 238));
-		taskTimeCounterLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		taskTimeCounterLabel.setFocusable(false);
-		taskTimeCounterLabel.setBounds(310, 38, 145, 14);
-		add(taskTimeCounterLabel);
-		taskTimeCounterLabel.setText("Days Left");
-		removeMouseListener(taskTimeCounterLabel);
-	}
-	
-	// will change this to Left or Overdue. And time unit will be an enum value
-	public void prepareTaskTimeCounterLabel( String timeUnit ){
-		
-		if( timeUnit != null ){
-			
-			taskTimeCounterLabel.setText( timeUnit + " Left" );
-		}
-	}
-	
-	// Task tag functions
-	private void prepareTaskTagLabel(){
-		
-		taskTagLabel = new JLabel();
-		taskTagLabel.setFont(new Font("Arial", Font.BOLD, 12 ));
-		taskTagLabel.setForeground(new Color(31, 190, 214));
-		taskTagLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		taskTagLabel.setFocusable(false);
-		taskTagLabel.setBounds(310, 54, 145, 14);
-		add(taskTagLabel);
-		taskTagLabel.setText("#Work #Important #Final");
-		removeMouseListener(taskTagLabel);
-	}
-	
-	public void setTaskTags( String tags ){
-		
-		if( tags != null ){
-			
-			taskTagLabel.setText(tags);
-		}
-	}
-	
+
 	// Check box functions
 	private void prepareTaskCheckBox(){
 		
 		taskCheckBox = new JLabel();
 		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/NotDoneCheckBox.png")));
 		taskCheckBox.setFocusable(false);
-		taskCheckBox.setBounds(460, 23, 35, 35);
+		taskCheckBox.setBounds(562, 12, 26, 26);
 		add(taskCheckBox);
 		removeMouseListener(taskCheckBox);
 	}
@@ -253,12 +131,15 @@ public class TaskBar extends JComponent {
 	// Title label functions
 	private void prepareTaskTitleLabel(){
 		
-		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(0,0,0,0), new Color(0,0,0,0), 24, 23);
-		taskTitleLabel.setBounds(67, 12, 228, 25);
+		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(0,0,0,0), new Color(0,0,0,0), 45, 45);
+		taskTitleLabel.setBounds(60, 17, 330, 20);
 		taskTitleLabel.setFocusable(false);
 		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 14));
 		add(taskTitleLabel);
-		taskTitleLabel.setText("This is a sample text testing one two");
+		taskTitleLabel.setText("This is a sample text testing one two three four five");
+		
+		hasMovedDown = true;
+		hasMovedUp = false;
 	}
 	
 	public void setTaskTitle( String taskTitle ){
@@ -269,13 +150,23 @@ public class TaskBar extends JComponent {
 		}
 	}
 	
+	private void moveTitleLabelVertically( int relativeIncrements ){
+	    
+	    Point currentLocation = taskTitleLabel.getLocation();
+	    
+	    if( currentLocation != null ){
+	        
+	        taskTitleLabel.setLocation(currentLocation.x, currentLocation.y + relativeIncrements);
+	    }
+	}
+	
 	// Line number label functions
 	private void prepareLineNumberLabel(){
 		
-		lineNumberLabel = new JLabel("#0");
-		lineNumberLabel.setBounds(10, 12, 42, 57);
-		lineNumberLabel.setForeground(new Color( 255,255,255,220 ));
-		lineNumberLabel.setFont(new Font( "Arial", Font.BOLD, 15 ));
+		lineNumberLabel = new JLabel("#11111");
+		lineNumberLabel.setBounds(5, 3, 50, 45);
+		lineNumberLabel.setForeground(new Color( 255,255,255 ));
+		lineNumberLabel.setFont(new Font( "Arial", Font.BOLD, 12 ));
 		lineNumberLabel.setFocusable(false);
 		lineNumberLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lineNumberLabel);
@@ -288,6 +179,235 @@ public class TaskBar extends JComponent {
 			
 			lineNumberLabel.setText("#"+lineNumber);
 		}
+	}
+	
+	private void prepareTagsPane(){
+	    
+	    tagsPane = new JTextPane();
+        tagsPane.setBounds(56, 25, 335, 17);
+        add(tagsPane);
+        tagsPane.setEditable(false);
+        tagsPane.setHighlighter(null);
+        tagsPane.setFocusable(false);
+        tagsPane.setOpaque(false);
+        tagsPane.setFont( new Font( "Arial", Font.BOLD, 12 ) );
+	}
+	
+	private Color getPriorityColor( Color []colors, int priority, boolean []colorsToExclude ){
+	    
+	    if( colors != null && 
+	        colors.length >= 5 &&
+	        colorsToExclude != null &&
+	        colorsToExclude.length >= 5){
+	        
+	        switch( priority ){
+	        
+	            case 5:
+	            case 4:
+	            case 3:
+	            case 2:
+	                
+	                if( colors[5-priority] != null ){
+	                    
+	                    colorsToExclude[5-priority] = true;
+	                    
+	                    return colors[5-priority];
+	                    
+	                } else{
+	                    
+	                    return new Color( 255, 255, 255 );
+	                }
+	                
+	            default:
+
+	                if( colors[4] != null ){
+                        
+	                    colorsToExclude[4] = true;
+	                    
+                        return colors[4];
+                        
+                    } else{
+                        
+                        return new Color( 255, 255, 255 );
+                    }
+	        }
+	        
+	    } else{
+	        
+	        return new Color( 255, 255, 255 );
+	    }
+	}
+	
+	private void appendColoredStringsToDisplay( StyledDocument doc, Style style, Color color, String str ){
+	    
+	    if( doc != null && style != null && color != null && str != null){
+	        
+	        try{
+	            
+	            StyleConstants.setForeground(style, color);
+                doc.insertString(doc.getLength(), str, style);
+                
+	        } catch( BadLocationException badLocationException ){}
+	    }
+	}
+	
+	private Color getRandomColor( Color []colors, boolean []colorsToExclude ){
+	    
+	    if( colors != null && 
+	        colorsToExclude != null && 
+	        colors.length == colorsToExclude.length ){
+	        
+	        Random random = new Random( System.nanoTime() );
+	        
+	        int numOfColors = colors.length;
+	        
+	        int selectedColorIdx;
+	        
+	        boolean allColorsUnavaliable = true;
+	        for( int i = 0, size = colorsToExclude.length; i < size; ++i ){
+	            
+	            if( !colorsToExclude[i] ){
+	                
+	                allColorsUnavaliable = false;
+	                break;
+	            }
+	        }
+	        
+	        if( allColorsUnavaliable ){
+	            
+	            return new Color( 255, 255, 255 );
+	        }
+	        
+	        while( colorsToExclude[selectedColorIdx = random.nextInt(numOfColors)] );
+	        
+	        if( colors[selectedColorIdx] != null ){
+	            
+	            return colors[selectedColorIdx];
+	            
+	        } else{
+	            
+	            return new Color( 255, 255, 255 );
+	        }
+	        
+	    } else{
+	        
+	        return new Color( 255, 255, 255 );
+	    }
+	}
+	
+	public void setTags( Task task ){
+	    
+	    if( task != null && planner.Constants.COLOR_SERIES != null ){
+	        
+	        boolean hasTags = false;
+	        boolean previousTextExist = false;
+	        
+	        StyledDocument doc = tagsPane.getStyledDocument();
+	        Style colorStyle = tagsPane.addStyle("color", null);
+	        StyleConstants.setItalic(colorStyle, true);
+	        
+	        boolean []colorsToExclude = new boolean[planner.Constants.COLOR_SERIES.length];
+	        
+	        if( task.getPriority() > 0 ){
+	            
+	            int priority = task.getPriority();
+	            priority = (priority <= 5 ? priority : 5);
+	            
+	            appendColoredStringsToDisplay( doc, 
+	                                           colorStyle, 
+	                                           getPriorityColor(planner.Constants.COLOR_SERIES, priority, colorsToExclude), 
+	                                           "priority " + priority + " " );
+	            
+	            System.out.println( "has priority" );
+	            
+	            previousTextExist = true;
+	            
+	            hasTags = true;
+	        }
+	        
+	        if( task.getTag() != null && task.getTag().length() > 0 ){
+	            
+	            String divider = (previousTextExist ? "/ " : "");
+	            
+	            appendColoredStringsToDisplay( doc, 
+	                                           colorStyle, 
+	                                           getRandomColor(planner.Constants.COLOR_SERIES, colorsToExclude), 
+	                                           divider + task.getTag() );
+	            
+	            hasTags = true;
+	        }
+	        
+	        if( hasTags ){
+	            
+	            if( !hasMovedUp ){
+	                
+	                System.out.println( "moved up" );
+	                
+	                moveTitleLabelVertically( -8 );
+	                
+	                hasMovedUp = true;
+	                hasMovedDown = false;
+	            }
+	            
+	        } else{
+	            
+	            if( !hasMovedDown ){
+                    
+	                System.out.println( "moved down" );
+	                
+                    moveTitleLabelVertically( 8 );
+                    
+                    hasMovedDown = true;
+                    hasMovedUp = false;
+                }
+	        }
+	    }
+	}
+	
+	private void prepareTimeDisplayLabel(){
+	    
+	    timeDisplayLabel = new JLabel();
+	    setNotificationImageOn();
+        timeDisplayLabel.setBounds(395, 18, 164, 14);
+        add(timeDisplayLabel);
+        timeDisplayLabel.setForeground(new Color(255,255,255));
+        timeDisplayLabel.setFont( new Font( "Arial", Font.BOLD, 11 ) );
+        timeDisplayLabel.setText("By 11:59PM");
+        timeDisplayLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	}
+	
+	public void setTimeDisplayLabel( Task task ){
+	    
+	    if( task != null ){
+	        
+	        if( task.isFloating() ){
+	            
+	            setNotificationImageOff();
+	            timeDisplayLabel.setText( "No Due Date Set" );
+	            
+	        } else{
+	            
+	            SimpleDateFormat dateFormatter = new SimpleDateFormat( "h:mma" );
+	            
+	            if( task.getDueDate() != null && task.getEndDate() != null ){
+	                
+	                timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) + " to " + dateFormatter.format(task.getEndDate()) );
+	                
+	            } else if( task.getEndDate() != null ){
+	                
+	                timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
+	                
+	            } else if( task.getDueDate() != null ){
+	                
+	                timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate() ) );
+	                
+	            } else{
+	                
+	                setNotificationImageOff();
+	                timeDisplayLabel.setText( "No Due Date Set" );
+	            }
+	        }
+	    }
 	}
 	
 	// task bar functions
@@ -310,5 +430,15 @@ public class TaskBar extends JComponent {
 	public void setUnfocusedTaskBar(){
 		
 		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TaskBar.png")));
+	}
+	
+	public void setNotificationImageOff(){
+	    
+	    timeDisplayLabel.setIcon(null);
+	}
+	
+	public void setNotificationImageOn(){
+	    
+	    timeDisplayLabel.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/Alarm.png")));
 	}
 }
