@@ -66,10 +66,31 @@ public class SortLogic {
         }
     };
     
+    private static Comparator<Integer> priorityComparatorForMap = new Comparator<Integer>() {
+        
+        @Override
+        public int compare(Integer priority1, Integer priority2) {
+            
+            if (priority1 > priority2) {
+            
+                return -1;
+     
+            } else if (priority1 < priority2) {
+            
+                return 1;
+         
+            } else {
+        
+                return 0;
+            }
+        }
+    }
+    
     private static Comparator<Date> dateComparatorForMap = new Comparator<Date>() {
         
         @Override
         public int compare(Date date1, Date date2) {
+            
             if( date1 != null && date2 != null ){
                 
                 SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
@@ -177,7 +198,11 @@ public class SortLogic {
         return newTasks;
     }
     
-    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate(DisplayTaskList input) {
+    public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
+        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap <Integer, DisplayTaskList> (priorityComparatorForMap);
+    }
+    
+    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (DisplayTaskList input) {
         TreeMap < Date, DisplayTaskList > displayMap = 
                 new TreeMap < Date, DisplayTaskList>( dateComparatorForMap );
         for (int i = 0; i < input.size(); i++) {
