@@ -41,10 +41,16 @@ public class Constants {
         "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
         "priority", "desc", "description", "remind", "tag" };
     
+    public static final String [][] POSSIBLE_COMMANDS = { {"Add tasks", "add taskname at date", "new taskname at date"},
+                                                          { "Delete tasks", "delete taskid", "del taskid"},
+                                                          { "Update tasks", "update taskid date" }
+                                                        };
+    
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
                                                               "Tutorial",                       // F3
                                                               " Quick key used",                // F4
+                                                              " Quick keys used",
                                                               " Task due today",                // F5
                                                               " Tasks due today",
                                                               " Task in total",                 // F6
