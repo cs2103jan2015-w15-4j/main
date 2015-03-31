@@ -199,7 +199,32 @@ public class SortLogic {
     }
     
     public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
+        
         TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap <Integer, DisplayTaskList> (priorityComparatorForMap);
+        
+        for (int i = 0; i < input.size(); i++) {
+        
+            DisplayTask temp = input.get(i);
+            
+            addDisplayTaskToMapByPriority(displayMap, temp);
+        }
+        
+        return displayMap;
+    }
+    
+    private static void addDisplayTaskToMapByPriority(TreeMap < Integer, DisplayTaskList> displayMap, 
+            DisplayTask inputTask) {
+        
+        if (displayMap.containsKey(inputTask.getParent().getPriority())) {
+            
+            displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
+            
+        } else {
+            
+            displayMap.put(inputTask.getParent().getPriority(), new DisplayTaskList());
+            
+            displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
+        }
     }
     
     public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (DisplayTaskList input) {
@@ -209,13 +234,13 @@ public class SortLogic {
             
             DisplayTask temp = input.get(i);
             
-            addDisplayTaskToMap(displayMap, temp);
+            addDisplayTaskToMapByDate(displayMap, temp);
         }
         
         return displayMap;
     }
     
-    private static void addDisplayTaskToMap(TreeMap < Date, DisplayTaskList> displayMap, 
+    private static void addDisplayTaskToMapByDate(TreeMap < Date, DisplayTaskList> displayMap, 
             DisplayTask inputTask) {
         
         if (displayMap.containsKey(inputTask.getShownDate())) {
