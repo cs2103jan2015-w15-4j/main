@@ -242,7 +242,7 @@ public class Parser {
         isTime2SetByUser = false;        
     }
 
-    private static Boolean isKeyword(String word) {
+    private static Boolean isNonCmdKeyword(String word) {
         return nonCommandKeywords.contains(word);
     }
 
@@ -270,7 +270,7 @@ public class Parser {
         // continue looking for keywords until the end of the command        
         while (indexBeingProcessed < commandWords.length) {
             wordBeingProcessed = commandWords[indexBeingProcessed];
-            if (isKeyword(wordBeingProcessed)) {
+            if (isNonCmdKeyword(wordBeingProcessed)) {
                 /* all text after the help, delete, done, setnotdone, savewhere,
                    savehere and show commands and their arguments is ignored */
                 if (commandsWithoutFollowingKeywords.contains(keywordBeingProcessed)) {
@@ -305,12 +305,79 @@ public class Parser {
         // split for later use in cases
         String[] keywordArgsArray = splitBySpaceDelimiter(keywordArgs);
         
-        switch(keyword) {
-            // command keywords start here
+        if (isNonCmdKeyword(keyword)) {
+            processNonCmdKeywordArgs(keyword, keywordArgs, keywordArgsArray);
+        } else {
+            processCmdKeywordArgs(keyword, keywordArgs, keywordArgsArray);
+        }           
+    }
+    
+    private static void processNonCmdKeywordArgs(String keyword,
+                                                 String keywordArgs,
+                                                 String[] keywordArgsArray) {
+        switch(keyword) {     
+            case "at":            
+            case "on":
+            case "date":            
+            case "from":
+            case "by":
+            case "due":
+                calendar = parseDate(keywordArgs, "date1");
+                if (calendar != null) {
+                    date = calendar.getTime();
+                }                
+                break;
+            
+            // end date (for timed tasks)
+            case "until":
+            case "to":
+                calendar = parseDate(keywordArgs, "date2");
+                if (calendar != null) {
+                    date2 = calendar.getTime();
+                }
+                break;           
+    
+            // not yet implemented
+            case "every":
+                break;
+            
+            // not yet implemented
+            case "in":
+                break;
+    
+            case "priority":
+                priorityLevel = Integer.parseInt(keywordArgsArray[0]);
+                break;
+    
+            case "desc":
+            case "description":
+                description = keywordArgs.trim();
+                break;
+    
+            case "remind":
+                calendar = parseDate(keywordArgs, "dateRemind");
+                if (calendar != null) {
+                    dateToRemind = calendar.getTime();
+                }
+                break;
+                
+            case "tag":
+                tag = keywordArgs.trim();
+                break;
+    
+            default:
+                break;    
+        }
+    }
+    
+    private static void processCmdKeywordArgs(String keyword, 
+                                              String keywordArgs,
+                                              String[] keywordArgsArray) {
+        switch(keyword) {            
             case "add":
                 name = keywordArgs.trim();
                 break;
-
+    
             case "update":
             case "delete":
             case "setnotdone":
@@ -323,7 +390,7 @@ public class Parser {
                     setErrorType(ErrorType.INVALID_TASK_ID);
                 }
                 break;
-
+    
             case "show":
                 try {
                     // check whether next token is an id of the task to show
@@ -340,11 +407,11 @@ public class Parser {
             case "undo":
                 // no arguments, all other text ignored
                 break;
-
+    
             case "search":
                 name = keywordArgs.trim();
                 break;
-
+    
             case "help":
                 // check whether the user needs help with specific command
                 String cmdToHelpWith = keywordArgsArray[0];
@@ -380,65 +447,15 @@ public class Parser {
                 // desired file path for data storage will be put in name field
                 name = keywordArgs.trim();
                 break;
-
-            // non command keywords start here
-            case "at":            
-            case "on":
-            case "date":            
-            case "from":
-            case "by":
-            case "due":
-                calendar = parseDate(keywordArgs, "date1");
-                if (calendar != null) {
-                    date = calendar.getTime();
-                }                
-                break;
-            
-            // end date (for timed tasks)
-            case "until":
-            case "to":
-                calendar = parseDate(keywordArgs, "date2");
-                if (calendar != null) {
-                    date2 = calendar.getTime();
-                }
-                break;
-            
-            // arguments for jump are expected to be date info
+                
+             // arguments for jump are expected to be date info
             case "jump":
                 calendar = parseDate(keywordArgs, "jumpdate");
                 if (calendar != null) {
                     date = calendar.getTime();
                 }
                 break;
-
-            // not yet implemented
-            case "every":
-                break;
-            
-            // not yet implemented
-            case "in":
-                break;
-
-            case "priority":
-                priorityLevel = Integer.parseInt(keywordArgsArray[0]);
-                break;
-
-            case "desc":
-            case "description":
-                description = keywordArgs.trim();
-                break;
-
-            case "remind":
-                calendar = parseDate(keywordArgs, "dateRemind");
-                if (calendar != null) {
-                    dateToRemind = calendar.getTime();
-                }
-                break;
                 
-            case "tag":
-                tag = keywordArgs.trim();
-                break;
-
             default:
                 break;
         }
