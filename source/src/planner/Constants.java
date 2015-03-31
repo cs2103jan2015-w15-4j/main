@@ -32,12 +32,14 @@ public class Constants {
         ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID, SETTINGS
     }
     
-    public static final String[] KEYWORDS = {"add", "new", "update", "edit", 
+    public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", "edit", 
         "change", "del", "delete", "trash", "remove", "show", "display", "done", 
         "completed", "finished", "setnotdone", "undo", "revert", "search", 
-        "find", "help", "sos", "jump", "convert", "savewhere", "savehere", "at",
+        "find", "help", "sos", "jump", "convert", "savewhere", "savehere" };
+    
+    public static final String[] NONCOMMAND_KEYWORDS = { "at",
         "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
-        "priority", "desc", "description", "remind", "tag"};
+        "priority", "desc", "description", "remind", "tag" };
     
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
