@@ -1,5 +1,6 @@
 package planner;
 
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 
 import planner.Constants.DisplayStateFlag;
@@ -9,13 +10,13 @@ public class DisplayState {
     private DisplayStateFlag displayStateFlag;
     
     private String title;
-    private String command;
+    private String inputCommand;
     
-    private int keyCode;
+    private KeyEvent keyEvent;
     
-    public DisplayState( DisplayStateFlag displayStateFlag, String title, String command, int keyCode ){
+    public DisplayState( DisplayStateFlag currentDisplayStateFlag, String title, String userCommand, KeyEvent event ){
         
-        this.displayStateFlag = displayStateFlag;
+        displayStateFlag = currentDisplayStateFlag;
         
         if( title == null ){
             
@@ -26,16 +27,20 @@ public class DisplayState {
             this.title = title;
         }
         
-        if( command == null ){
-            
-            this.command = "";
-            
-        } else{
-            
-            this.command = command;
-        }
+        inputCommand = null;
+        keyEvent = null;
         
-        this.keyCode = keyCode;
+        if( userCommand!= null && userCommand.length() > 0 ){
+            
+            inputCommand = userCommand;
+            
+        } else if( event != null ){
+            
+            keyEvent = new KeyEvent( (Component)event.getSource(), event.getID(), 
+                                       event.getWhen(), event.getModifiersEx(), 
+                                       event.getKeyCode(), event.getKeyChar(), event.getKeyLocation() );
+            
+        }
     }
     
     public DisplayStateFlag getdisplayStateFlag(){
@@ -50,11 +55,11 @@ public class DisplayState {
     
     public String getCommand(){
         
-        return command;
+        return inputCommand;
     }
     
-    public int getKeyCode(){
+    public KeyEvent getKeyEvent(){
         
-        return keyCode;
+        return keyEvent;
     }
 }
