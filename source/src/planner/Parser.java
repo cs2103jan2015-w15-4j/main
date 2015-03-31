@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.IllegalFormatException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,12 +25,12 @@ public class Parser {
     private static String keywordArgs = "";
 
     private static String[] commandWords = null;
-    private static String[] keywordsArray = {"at", "on", "from", "by",
+    private static String[] nonCommandKeywordsArray = {"at", "on", "from", "by",
         "every", "in", "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"  
     };
-    private static ArrayList<String> keywords =
-            new ArrayList<String>(Arrays.asList(keywordsArray));
+    private static ArrayList<String> nonCommandKeywords =
+            new ArrayList<String>(Arrays.asList(nonCommandKeywordsArray));
     private static String[] monthsArray = {"jan", "january", "feb", "february",
         "mar", "march", "apr", "april", "may", "may", "jun", "june", "jul",
         "july", "aug", "august", "sep", "september", "oct", "october", "nov",
@@ -244,7 +243,7 @@ public class Parser {
     }
 
     private static Boolean isKeyword(String word) {
-        return keywords.contains(word);
+        return nonCommandKeywords.contains(word);
     }
 
     private static void processCommand(String commandWord) {        
