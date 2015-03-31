@@ -31,7 +31,14 @@ public class Constants {
         ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID
     }
     
-    public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",
+    public static final String[] KEYWORDS = {"add", "new", "update", "edit", 
+        "change", "del", "delete", "trash", "remove", "show", "display", "done", 
+        "completed", "finished", "setnotdone", "undo", "revert", "search", 
+        "find", "help", "sos", "jump", "convert", "savewhere", "savehere", "at",
+        "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
+        "priority", "desc", "description", "remind", "tag"};
+    
+    public static final String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",
                                                               "Tutorial",
                                                               " Quick key used",
                                                               " Quick keys used",
@@ -48,8 +55,8 @@ public class Constants {
                                                               " Task Done",
                                                               " Tasks Done"};
     
-    public static String CONFIG_FILE_NAME = "config";
-    public static String DEFAULT_STORAGE_NAME = "data";
+    public static final String CONFIG_FILE_NAME = "config";
+    public static final String DEFAULT_STORAGE_NAME = "data";
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;

@@ -26,7 +26,7 @@ public class Parser {
     private static String keywordArgs = "";
 
     private static String[] commandWords = null;
-    private static String[] keywordsArray = {"at", "on", "by", "tomorrow",
+    private static String[] keywordsArray = {"at", "on", "from", "by",
         "every", "in", "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"
     };
