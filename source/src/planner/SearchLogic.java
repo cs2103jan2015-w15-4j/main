@@ -4,14 +4,11 @@ import java.util.Date;
 
 public class SearchLogic {
     
-    public static TaskList searchAll(TaskList input, String wordToLookFor) {
-        TaskList searchList = new TaskList();
+    public static DisplayTaskList searchName(DisplayTaskList input, String wordToSearch) {
+        DisplayTaskList searchList = new DisplayTaskList();
         try {
             for (int i = 0; i < input.size(); i++) {
-                if (containsSearchedWord(input.get(i).getName(), wordToLookFor)) {
-                    searchList.add(input.get(i));
-                }
-                else if (containsSearchedWord(input.get(i).getDescription(), wordToLookFor)) {
+                if (input.get(i).getParent().getName().contains(wordToSearch)) {
                     searchList.add(input.get(i));
                 }
             }
@@ -21,11 +18,25 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchByTags(TaskList input, String tagToLookFor){
-        TaskList searchList = new TaskList();
+    public static DisplayTaskList searchDesc(DisplayTaskList input, String wordToSearch) {
+        DisplayTaskList searchList = new DisplayTaskList();
+        try {
+            for (int i = 0; i < input.size(); i++) {
+                if (input.get(i).getParent().getDescription().contains(wordToSearch)) {
+                    searchList.add(input.get(i));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Invalid input: " + e.getMessage());
+        }
+        return searchList;
+    }
+    
+    public static DisplayTaskList searchByTags(DisplayTaskList input, String tagToLookFor){
+        DisplayTaskList searchList = new DisplayTaskList();
         try { 
             for (int i = 0; i < input.size(); i++) {
-                if (containsSearchedWord(input.get(i).getTag(), tagToLookFor)) {
+                if (input.get(i).getParent().getTag().contains(tagToLookFor)) {
                     searchList.add(input.get(i));
                 }
             }
