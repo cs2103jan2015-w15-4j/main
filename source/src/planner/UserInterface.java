@@ -4,9 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -14,36 +11,25 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
-import sun.util.logging.PlatformLogger.Level;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -268,7 +254,6 @@ public class UserInterface extends JFrame {
     private SliderPanel slidePanel;
     
     private JTextField command;
-    private CommandTextbox commandPanel;
     
     private DisplayPane displayPane;
     
@@ -329,18 +314,18 @@ public class UserInterface extends JFrame {
 
     public UserInterface() {
         
-    	// Initialise engine
-    	if( !Engine.init() ){
-    		
-    		JOptionPane.showMessageDialog(null, "Engine failed to initialise :(", "Error Message", JOptionPane.ERROR_MESSAGE);
-    		
-    		userInterfaceLogger.severe("Fail to intialise engine");
-    		
-    		System.exit(1);
-    	}
-    	
-    	isMessageDisplayed = true;
-    	
+        // Initialise engine
+        if( !Engine.init() ){
+            
+            JOptionPane.showMessageDialog(null, "Engine failed to initialise :(", "Error Message", JOptionPane.ERROR_MESSAGE);
+            
+            userInterfaceLogger.severe("Fail to intialise engine");
+            
+            System.exit(1);
+        }
+        
+        isMessageDisplayed = true;
+        
         // Main frame
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -676,22 +661,22 @@ public class UserInterface extends JFrame {
     }
     
     private void prepareSectionTitle(){
-    	
-    	sectionTitle = new JLabel();
-    	sectionTitle.setBounds(6, 30, 497, 33);
-    	sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
-    	sectionTitle.setForeground( new Color( 255,255,255,200 ) );
-    	sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        sectionTitle = new JLabel();
+        sectionTitle.setBounds(6, 30, 497, 33);
+        sectionTitle.setFont( new Font( "Arial", Font.BOLD, 24 ) );
+        sectionTitle.setForeground( new Color( 255,255,255,200 ) );
+        sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(sectionTitle);
         sectionTitle.setText("All Tasks");
     }
     
     private void prepareSectionTitleLine(){
-    	
-    	sectionTitleLine = new JLabel();
-    	sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
-    	sectionTitleLine.setBounds(-142, 28, 643, 33);
-    	contentPane.add(sectionTitleLine);
+        
+        sectionTitleLine = new JLabel();
+        sectionTitleLine.setIcon(new ImageIcon(UserInterface.class.getResource("/planner/titleLine.png")));
+        sectionTitleLine.setBounds(-142, 28, 643, 33);
+        contentPane.add(sectionTitleLine);
     }
     
     private void prepareSlidePanel(){
@@ -956,11 +941,15 @@ public class UserInterface extends JFrame {
                 
                 NavigationBar tempNavigationBar;
                 
+                
+                
                 while( iterator.hasNext() ){
                     
                     tempNavigationBar = iterator.next();
                     
                     if( tempNavigationBar.isVisible() ){
+                        
+                        
                         
                         Style style = styledDocument.addStyle("component", null);
                         StyleConstants.setComponent(style, tempNavigationBar);
@@ -982,9 +971,9 @@ public class UserInterface extends JFrame {
         contentPane.add(background);
     }
     
-	private void prepareDisplay(){
+    private void prepareDisplay(){
         
-    	displayPane = new DisplayPane();
+        displayPane = new DisplayPane();
         displayPane.setBounds(25, 83, 630, 430);
         
         contentPane.add(displayPane);
@@ -1007,11 +996,11 @@ public class UserInterface extends JFrame {
                                                               0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
     }
     
-	private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
-	    
-	    if( currentDisplayPane != null ){
-	        
-	        currentDisplayPane.addKeyListener(new KeyAdapter(){
+    private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
+        
+        if( currentDisplayPane != null ){
+            
+            currentDisplayPane.addKeyListener(new KeyAdapter(){
 
                 @Override
                 public void keyPressed(KeyEvent event) {
@@ -1019,52 +1008,48 @@ public class UserInterface extends JFrame {
                     handleKeyEvent(event);
                     
                 }
-	        });
-	    }
-	}
-	
-	private long compareList( TaskList originalList, TaskList modifiedList ){
-		
-		if( originalList == null || modifiedList == null ){
-			
-			return -1;
-		}
-		
-		Iterator<Task> iteratorOriginal = originalList.iterator();
-		Iterator<Task> iteratorModified = modifiedList.iterator();
-		
-		Task originalTask;
-		Task modifiedTask;
-		
-		long lineNumber = 1L;
-		while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
-			
-			originalTask = iteratorOriginal.next();
-			modifiedTask = iteratorModified.next();
-			
-			if( !originalTask.equals(modifiedTask) ){
+            });
+        }
+    }
+    
+    private long compareList( TaskList originalList, TaskList modifiedList ){
+        
+        if( originalList == null || modifiedList == null ){
+            
+            return -1;
+        }
+        
+        Iterator<Task> iteratorOriginal = originalList.iterator();
+        Iterator<Task> iteratorModified = modifiedList.iterator();
+        
+        Task originalTask;
+        Task modifiedTask;
+        
+        long lineNumber = 1L;
+        while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
+            
+            originalTask = iteratorOriginal.next();
+            modifiedTask = iteratorModified.next();
+            
+            if( !originalTask.equals(modifiedTask) ){
 
-				return lineNumber;
-			}
-			
-			++lineNumber;
-		}
-		
-		if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
-			
-			return lineNumber;
-			
-		} else {
-			
-			return 0L;
-		}
-	}
-	
+                return lineNumber;
+            }
+            
+            ++lineNumber;
+        }
+        
+        if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
+            
+            return lineNumber;
+            
+        } else {
+            
+            return 0L;
+        }
+    }
+    
     private void prepareCommandTextField(){
-        
-        // New command
-        
-        
         
         // Adding command text field
         command = new JTextField();
