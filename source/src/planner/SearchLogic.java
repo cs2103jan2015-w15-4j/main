@@ -32,7 +32,7 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static DisplayTaskList searchByTags(DisplayTaskList input, String tagToLookFor){
+    public static DisplayTaskList searchTags(DisplayTaskList input, String tagToLookFor){
         DisplayTaskList searchList = new DisplayTaskList();
         try { 
             for (int i = 0; i < input.size(); i++) {
@@ -67,10 +67,10 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchTentative(TaskList input) {
-        TaskList searchList = new TaskList();
+    public static DisplayTaskList searchFloating(DisplayTaskList input) {
+        DisplayTaskList searchList = new DisplayTaskList();
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).isFloating()) {
+            if (input.get(i).getParent().isFloating()) {
                 searchList.add(input.get(i));
             }
         }
