@@ -28,7 +28,7 @@ public class Parser {
     private static String[] commandWords = null;
     private static String[] keywordsArray = {"at", "on", "from", "by",
         "every", "in", "priority", "desc", "description", "date", "due",
-        "remind", "tag", "until", "to"
+        "remind", "tag", "until", "to"  
     };
     private static ArrayList<String> keywords =
             new ArrayList<String>(Arrays.asList(keywordsArray));
@@ -76,7 +76,7 @@ public class Parser {
     public static ParseResult parse(String command) {
         logger.setLevel(Level.WARNING);
         resetFields();
-        ParseResult result = process(command);
+        ParseResult result = process(command.trim());
         return result;
     }    
     

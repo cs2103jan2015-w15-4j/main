@@ -36,7 +36,8 @@ public class Constants {
         "completed", "finished", "setnotdone", "undo", "revert", "search", 
         "find", "help", "sos", "jump", "convert", "savewhere", "savehere", "at",
         "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
-        "priority", "desc", "description", "remind", "tag"};
+        "priority", "desc", "description", "remind", "tag"
+    };
     
     public static final String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",
                                                               "Tutorial",
