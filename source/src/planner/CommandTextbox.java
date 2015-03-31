@@ -1,6 +1,7 @@
 package planner;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -42,8 +43,10 @@ public class CommandTextbox extends JScrollPane{
     
     private int currentPopupListIndex;
     
+    private CommandPanelDocumentFilter commandPanelDocumentFilter;
+    
     public CommandTextbox( String []commandKeywords, String []nonCommandKeywords, 
-                           Set<Map.Entry<String, ArrayList<String>>> listOfCommands ){
+                           ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands ){
         
         inputCommandBox = new JTextPane();
         
@@ -174,7 +177,7 @@ public class CommandTextbox extends JScrollPane{
     }
     
     private void prepareComboBox( final JTextPane textPane, 
-                                  Set<Map.Entry<String, ArrayList<String>>> listOfCommands){
+                                  ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands){
         
         if( textPane != null && listOfCommands != null ){
         
@@ -336,12 +339,64 @@ public class CommandTextbox extends JScrollPane{
             inputCommandBox.addCaretListener(new CustomCaretListener(2));
             inputCommandBox.setOpaque(false);
             inputCommandBox.setFont( new Font( "Arial", Font.BOLD, 20 ) );
+            inputCommandBox.setForeground(new Color(128,128,128));
             
             originalTextStyle = getStyleOfTextPane(textPane);
             
             AbstractDocument abstractDocument = (AbstractDocument)inputCommandBox.getDocument();
-            abstractDocument.setDocumentFilter(new CommandPanelDocumentFilter( m_commandKeywords, m_nonCommandKeywords, originalTextStyle));
+            commandPanelDocumentFilter = new CommandPanelDocumentFilter( m_commandKeywords, m_nonCommandKeywords, originalTextStyle);
+            abstractDocument.setDocumentFilter(commandPanelDocumentFilter);
         }
+    }
+    
+    public void setText( String text, boolean turnOffFilter ){
+        
+        if( text != null ){
+            
+            if( turnOffFilter ){
+                
+                commandPanelDocumentFilter.setFilterOff();
+            }
+            
+            inputCommandBox.setText(text);
+            
+            if( turnOffFilter ){
+            
+                commandPanelDocumentFilter.setFilterOn();
+            }
+        }
+    }
+    
+    public void setForegroundColor( Color colour ){
+        
+        if( colour != null ){
+            
+            inputCommandBox.setForeground(colour);
+            
+            Style tempStyle = getStyleOfTextPane(inputCommandBox);
+            StyleConstants.setForeground(tempStyle, colour);
+            commandPanelDocumentFilter.setTextStyle(tempStyle);
+        }
+    }
+    
+    public void setFontAttributes( Font newFont ){
+        
+        if( newFont != null ){
+            
+            inputCommandBox.setFont(newFont);
+            
+            Style tempStyle = getStyleOfTextPane(inputCommandBox);
+            StyleConstants.setFontFamily(tempStyle, newFont.getFamily());
+            StyleConstants.setFontSize(tempStyle, newFont.getSize());
+            StyleConstants.setBold(tempStyle, newFont.isBold());
+            StyleConstants.setItalic(tempStyle, newFont.isItalic());
+            commandPanelDocumentFilter.setTextStyle(tempStyle);
+        }
+    }
+    
+    public JTextPane getTextDisplay(){
+        
+        return inputCommandBox;
     }
     
     private Style getStyleOfTextPane( JTextPane textPane ){
