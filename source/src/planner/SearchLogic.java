@@ -1,5 +1,6 @@
 package planner;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class SearchLogic {
@@ -57,14 +58,9 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchPriorityGreaterThan(TaskList input, int priority) {
-        TaskList searchList = new TaskList();
-        for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).getPriority() >= priority) {
-                searchList.add(input.get(i));
-            }
-        }
-        return searchList;
+    public static DisplayTaskList searchOutDated (DisplayTaskList input) {
+        Calendar now = Calendar.getInstance();
+        //WORK ON THIS LATER
     }
     
     public static DisplayTaskList searchFloating(DisplayTaskList input) {
