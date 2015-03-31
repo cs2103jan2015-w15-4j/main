@@ -268,6 +268,7 @@ public class UserInterface extends JFrame {
     private SliderPanel slidePanel;
     
     private JTextField command;
+    private CommandTextbox commandPanel;
     
     private DisplayPane displayPane;
     
@@ -1060,6 +1061,10 @@ public class UserInterface extends JFrame {
 	}
 	
     private void prepareCommandTextField(){
+        
+        // New command
+        
+        
         
         // Adding command text field
         command = new JTextField();

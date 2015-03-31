@@ -21,7 +21,7 @@ public class Constants {
     
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
-        INVALID_ARGUMENTS, INVALID_TIME,
+        INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
     };
     
     public enum TipType{
@@ -32,11 +32,17 @@ public class Constants {
         ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID, SETTINGS
     }
     
+    public static final String[] KEYWORDS = {"add", "new", "update", "edit", 
+        "change", "del", "delete", "trash", "remove", "show", "display", "done", 
+        "completed", "finished", "setnotdone", "undo", "revert", "search", 
+        "find", "help", "sos", "jump", "convert", "savewhere", "savehere", "at",
+        "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
+        "priority", "desc", "description", "remind", "tag"};
+    
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
                                                               "Tutorial",                       // F3
                                                               " Quick key used",                // F4
-                                                              " Quick keys used",
                                                               " Task due today",                // F5
                                                               " Tasks due today",
                                                               " Task in total",                 // F6
@@ -57,8 +63,8 @@ public class Constants {
                                            new Color( 242, 141, 236 ),
                                            new Color( 245, 142, 142 ) };
     
-    public static String CONFIG_FILE_NAME = "config";
-    public static String DEFAULT_STORAGE_NAME = "data";
+    public static final String CONFIG_FILE_NAME = "config";
+    public static final String DEFAULT_STORAGE_NAME = "data";
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;
