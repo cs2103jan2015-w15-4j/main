@@ -3,12 +3,12 @@ package planner;
 import java.util.Date;
 
 public class DisplayTask {
-    private long ID;
+    private int ID;
     private Date displayDate;
     private Date dueDate, endDate;
     private Task parentTask;
     
-    public DisplayTask(long id, Date shownDate, Date from, Date to, Task parent) {
+    public DisplayTask(int id, Date shownDate, Date from, Date to, Task parent) {
         ID = id;
         displayDate = shownDate;
         dueDate = from;
@@ -24,7 +24,7 @@ public class DisplayTask {
         parentTask = anotherTask.getParent();
     }
     
-    public void setID(long id) {
+    public void setID(int id) {
         ID = id;
     }
     
@@ -44,7 +44,7 @@ public class DisplayTask {
         parentTask = parent;
     }
     
-    public long getID() {
+    public int getID() {
         return this.ID;
     }
     
