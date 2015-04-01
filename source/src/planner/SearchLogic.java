@@ -58,12 +58,12 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchOutDated (TaskList input) {
+    public static TaskList searchOverDuedTask (TaskList input) {
         TaskList searchList = new TaskList();
         Date now = new Date();
         long current = now.getTime();
         for (int i = 0; i < input.size(); i++) {
-            if (!(input.get(i).isFloating())) {
+            if (!(input.get(i).isFloating() && !(input.get(i).isDone()))) {
                 if (input.get(i).getEndDate() == null) {
                     long taskDate = input.get(i).getDueDate().getTime();
                     if (current > taskDate) {
