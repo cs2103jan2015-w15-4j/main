@@ -232,8 +232,6 @@ public class CommandTextbox extends JScrollPane{
             currentPopupListIndex = -1;
             popUpBox.setSelectedIndex(currentPopupListIndex);
             
-            //bindActionListener(textPane, popUpBox);
-            
             bindDocumentListener( textPane, popUpBox, popUpList );
             
             textPane.setLayout(new BorderLayout());
@@ -316,7 +314,7 @@ public class CommandTextbox extends JScrollPane{
                                 
                                 if( userInputWords.length > 0 ){
                                 
-                                    String firstWordInUserInput = userInputWords[0];
+                                    String firstWordInUserInput = userInputWords[0].toLowerCase();
                                     String []wordsInCommand;
                                     
                                     for( String currentCommand : possibleCommands ){
@@ -384,11 +382,6 @@ public class CommandTextbox extends JScrollPane{
             }
             
             inputCommandBox.setText(text);
-            
-            if( turnOffFilter ){
-            
-                commandPanelDocumentFilter.setFilterOn();
-            }
         }
     }
     
