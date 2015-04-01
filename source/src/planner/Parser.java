@@ -71,6 +71,9 @@ public class Parser {
     private static final int COMMAND_WORD_INDEX = 0;
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
     private static final int HALF_DAY_IN_HOURS = 12;
+    private static final int DATE_1_INDEX = 1;
+    private static final int DATE_2_INDEX = 2;
+    private static final int DATE_TO_REMIND_INDEX = 3;
 
     public static ParseResult parse(String command) {
         logger.setLevel(Level.WARNING);
@@ -298,7 +301,13 @@ public class Parser {
         }
         processArgs(keywordBeingProcessed);
     }
-
+    
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * what the keyword is.
+     * 
+     * @param keyword The keyword for which the arguments will be processed
+     */
     private static void processArgs(String keyword) {  
         // remove escape character from arguments since now unneeded
         keywordArgs = removeEscapeCharacterInstances(keywordArgs);
@@ -312,6 +321,17 @@ public class Parser {
         }           
     }
     
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * which of the non command keywords the keyword is.
+     * 
+     * @param keyword          The keyword for which the arguments will be 
+     *                         processed
+     * @param keywordArgs      The arguments of the keyword with escape 
+     *                         characters removed
+     * @param keywordArgsArray The tokenized arguments of the keyword with 
+     *                         escape characters removed
+     */
     private static void processNonCmdKeywordArgs(String keyword,
                                                  String keywordArgs,
                                                  String[] keywordArgsArray) {
@@ -322,19 +342,13 @@ public class Parser {
             case "from":
             case "by":
             case "due":
-                calendar = parseDate(keywordArgs, "date1");
-                if (calendar != null) {
-                    date = calendar.getTime();
-                }                
+                updateDate(keywordArgs, DATE_1_INDEX);                          
                 break;
             
             // end date (for timed tasks)
             case "until":
             case "to":
-                calendar = parseDate(keywordArgs, "date2");
-                if (calendar != null) {
-                    date2 = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_2_INDEX);                
                 break;           
     
             // not yet implemented
@@ -355,10 +369,7 @@ public class Parser {
                 break;
     
             case "remind":
-                calendar = parseDate(keywordArgs, "dateRemind");
-                if (calendar != null) {
-                    dateToRemind = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_TO_REMIND_INDEX);  
                 break;
                 
             case "tag":
@@ -370,6 +381,36 @@ public class Parser {
         }
     }
     
+    /**
+     * 
+     * @param keywordArgs
+     * @param parseTarget
+     * @param dateFieldToUpdate
+     */
+    private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
+        calendar = parseDate(keywordArgs, dateFieldToUpdate);
+        if (calendar != null) {
+            if (dateFieldToUpdate == 1) {
+                date = calendar.getTime();
+            } else if (dateFieldToUpdate == 2) {
+                date2 = calendar.getTime();
+            } else {
+                dateToRemind = calendar.getTime();
+            }
+        }      
+    }
+    
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * which of the command keywords the keyword is.
+     * 
+     * @param keyword          The keyword for which the arguments will be 
+     *                         processed
+     * @param keywordArgs      The arguments of the keyword with escape 
+     *                         characters removed
+     * @param keywordArgsArray The tokenized arguments of the keyword with 
+     *                         escape characters removed
+     */
     private static void processCmdKeywordArgs(String keyword, 
                                               String keywordArgs,
                                               String[] keywordArgsArray) {
@@ -450,7 +491,7 @@ public class Parser {
                 
              // arguments for jump are expected to be date info
             case "jump":
-                calendar = parseDate(keywordArgs, "jumpdate");
+                calendar = parseDate(keywordArgs, 1);
                 if (calendar != null) {
                     date = calendar.getTime();
                 }
@@ -566,7 +607,7 @@ public class Parser {
         }
     }
 
-    private static Calendar parseDate(String arguments, String parseTarget) {
+    private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
         Calendar currentTime = Calendar.getInstance();
         int day = currentTime.get(Calendar.DATE);
@@ -582,7 +623,7 @@ public class Parser {
         
         // check whether the current argument is a keyword for time
         if (firstArg.equals("pm") || firstArg.equals("am")) {
-            setTimeSetByUserToTrue(parseTarget);
+            setTimeSetByUserToTrue(dateBeingParsedIndex);
             return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                        firstArg, year, month, day); 
         
@@ -623,7 +664,7 @@ public class Parser {
             
             // check whether the current argument is a keyword for time
             if (secondArg.equals("pm") || secondArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            secondArg, year, month, day); 
                 
@@ -663,7 +704,7 @@ public class Parser {
 
             // check whether the current argument is a keyword for time
             if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            thirdArg, year, month, day); 
 
@@ -686,7 +727,7 @@ public class Parser {
             // expected to be a time keyword
             String fourthArg = dateParts[3].toLowerCase();
             if (fourthArg.equals("pm") || fourthArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            fourthArg, year, month, day); 
             }
@@ -864,10 +905,10 @@ public class Parser {
         }
     }
     
-    private static void setTimeSetByUserToTrue(String targetTime) {
-        if (targetTime.equals("date1")) {
+    private static void setTimeSetByUserToTrue(int targetTimeIndex) {
+        if (targetTimeIndex == 1) {
             isTimeSetByUser = true;
-        } else if (targetTime.equals("date2")) {
+        } else if (targetTimeIndex == 2) {
             isTime2SetByUser = true;
         }
     }
