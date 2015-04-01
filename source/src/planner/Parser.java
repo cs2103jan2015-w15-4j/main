@@ -799,15 +799,25 @@ public class Parser {
             try {
                 int hour = Integer.parseInt(timeParts[0]);
                 int min = Integer.parseInt(timeParts[1]);
-                if (hour < 1 || hour > 12 || min < 0 || min > 59) {
+                if (hour < 0 || hour > 12 || min < 0 || min > 59) {
                     setCommandType(CommandType.INVALID);
                     setErrorType(ErrorType.INVALID_TIME);
                     logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
                     return createCalendar(year, month, day, 0, 0);
                 } else if (pmOrAm.equals("pm")) {
-                    return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
+                    // special case of 12pm
+                    if (hour == 12) {
+                        return createCalendar(year, month - 1, day, hour, min); 
+                    } else {
+                        return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
+                    }                    
                 } else {
-                    return createCalendar(year, month - 1, day, hour, min); 
+                    // special case for 12am
+                    if (hour == 12) {
+                        return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
+                    } else {
+                        return createCalendar(year, month - 1, day, hour, min);  
+                    }                    
                 }
                 
             } catch (NumberFormatException e) {
