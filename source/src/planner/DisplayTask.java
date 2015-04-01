@@ -2,26 +2,39 @@ package planner;
 
 import java.util.Date;
 
+/**
+ * 
+ * @author Ke Jing
+ * displayDate is used for sorting
+ */
 public class DisplayTask {
     private int ID;
     private Date displayDate;
     private Date dueDate, endDate;
     private Task parentTask;
     
-    public DisplayTask(int id, Date shownDate, Date from, Date to, Task parent) {
+    public DisplayTask(int id, Date shownDate, Date from, Date to, Task parent) throws IllegalArgumentException {
         ID = id;
         displayDate = shownDate;
         dueDate = from;
         endDate = to;
-        parentTask = parent;
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = parent;
+        }
     }
     
-    public DisplayTask(DisplayTask anotherTask) {
+    public DisplayTask(DisplayTask anotherTask) throws IllegalArgumentException {
         ID = anotherTask.getID();
         displayDate = anotherTask.getShownDate();
         dueDate = anotherTask.getDueDate();
         endDate = anotherTask.getEndDate();
-        parentTask = anotherTask.getParent();
+        if (anotherTask.getParent() == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = anotherTask.getParent();
+        }
     }
     
     public void setID(int id) {
@@ -40,8 +53,12 @@ public class DisplayTask {
         endDate = date;
     }
     
-    public void setParent(Task parent) {
-        parentTask = parent;
+    public void setParent(Task parent) throws IllegalArgumentException {
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = parent;
+        }
     }
     
     public int getID() {

@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * 
+ * @author Ke Jing
+ * Same as TaskList class
+ */
 public class DisplayTaskList implements List<DisplayTask>{
     
     private ArrayList<DisplayTask> displayTasks;
@@ -169,8 +174,7 @@ public class DisplayTaskList implements List<DisplayTask>{
 
     @Override
     public void add(int index, DisplayTask element) {
-        displayTasks.add(index, element);
-        
+        displayTasks.add(index, element);    
     }
 
     @Override
