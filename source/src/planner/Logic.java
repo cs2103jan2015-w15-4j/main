@@ -8,16 +8,7 @@ import java.util.TreeMap;
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
-    
-    public static TaskList searchConfirmed(TaskList input) {
-        return SearchLogic.searchConfirmed(input);
-    }
-   
-    /**
-     * New methods 
-     * @param input
-     * @return
-     */
+
     
     private static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
@@ -131,6 +122,18 @@ public class Logic {
         TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
         
         return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchConfirmed(TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchConfirmed(taskInput);
+                
+        DisplayTaskList confirmedList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> confirmedMap = SortLogic.sortListToMapByDate(confirmedList);
+
+        return convertTreeMapToSetMapByDate(confirmedMap);
     }
     
     private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
