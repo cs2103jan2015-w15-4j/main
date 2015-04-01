@@ -13,10 +13,6 @@ public class Logic {
         return SearchLogic.searchConfirmed(input);
     }
     
-    public static TaskList searchDone(TaskList input) {
-        return SearchLogic.searchDone(input);
-    }
-    
     public static TaskList searchNotDone(TaskList input) {
         return SearchLogic.searchNotDone(input);
     }
@@ -107,6 +103,17 @@ public class Logic {
         TreeMap<Date, DisplayTaskList> timedMap = SortLogic.sortListToMapByDate(timedList);
         
         return convertTreeMapToSetMapByDate(timedMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchDone(TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchDone(taskInput);
+        
+        DisplayTaskList doneList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> doneMap = SortLogic.sortListToMapByDate(doneList);
+        
+        return convertTreeMapToSetMapByDate(doneMap);
     }
     
     
