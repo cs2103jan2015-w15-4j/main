@@ -2,104 +2,225 @@ package planner;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+/**
+ * 
+ * @author Ke Jing
+ * 
+ * THIS LOGIC CLASS HAS YET TO BE TESTED AS OF NOW
+ * WILL DEFINITELY BE REFACTORED SINCE MOST OF THE METHODS ARE VERY SIMILAR IN STRUCTURE 
+ */
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
-    //Sorts according to due date
-    //Assumption: TaskList passed to this method MUST have a non-null due date (Non-tentative tasks).
-    //Sort in this order, Due Date > Priority > Name >
-    public static void sortTaskListByDate(TaskList tasks){
-        logger.log(Level.INFO, "pre-sort by date: Starting...");
-        try {
-            SortLogic.sortByDate(tasks);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "sort error encountered", e);
-        }
-        logger.log(Level.INFO, "post-sort by date: No problems encountered");
+    /**This method searches for time clashes if found within the TaskList provided
+     * Output: returns -1 if no clashes are found 
+     *         OR
+     *         returns int task ID for tasks that are found to clash
+     *         
+     * WORD OF CAUTION: Assuming a task is 3 months long, this method would report clash
+     *                  for every clash search within this time period
+     */
+    public static int findClash(TaskList taskInput, Date start, Date end) {
+        
+        return SearchLogic.searchForClash(taskInput, start, end);
+        
     }
     
-    //Sorts according to priority
-    public static void sortTaskListByPriority(TaskList tasks){
-        logger.log(Level.INFO, "pre-sort bypPriority: Starting...");
-        try{
-            SortLogic.sortByPriority(tasks);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "sort error encountered", e);
-        }
-        logger.log(Level.INFO, "post-sort by priority: No problems encountered");
+    /**
+     * This method splits TaskList into displayTaskList regardless it is floating or null
+     */
+    private static DisplayTaskList splitAllTask (TaskList input) {
+        return SplitLogic.splitAllTaskList(input);
     }
+    
+    /**
+     * Creates a sorted Set of map entries using an input TaskList
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> displayAllTask (TaskList taskInput) {
+        
+        DisplayTaskList input = splitAllTask(taskInput);
+        
+        TreeMap<Date, DisplayTaskList> allTaskMap = SortLogic.sortListToMapByDate(input);
+        
+        return convertTreeMapToSetMapByDate(allTaskMap);
+        
+    }
+    
+    /**
+     *  The following 3 search methods searches ALL tasks
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInName (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input = SearchLogic.searchName(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList =  splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInDescription (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input =  SearchLogic.searchDesc(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInTag (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input = SearchLogic.searchTags(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    /**
+     * This method returns a set map containing undone, non-floating tasks that are overdue
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchOverDuedTasks (TaskList taskInput) {
+        
+        TaskList input =  SearchLogic.searchOverDuedTask(taskInput);
+        
+        DisplayTaskList outDatedList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> outDatedMap = SortLogic.sortListToMapByDate(outDatedList);
+        
+        return convertTreeMapToSetMapByDate(outDatedMap);
+    }
+    
+    /**
+     * This method returns a set map containing undone, non-floating tasks that are due in the future
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchUpcomingTasks (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchUpcomingTask(taskInput);
+        
+        DisplayTaskList upcomingList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> upcomingMap = SortLogic.sortListToMapByDate(upcomingList);
+        
+        return convertTreeMapToSetMapByDate(upcomingMap);
+    }
+    
+    /**
+     * Searches for timed task
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchTimedTask (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchTimedTask(taskInput);
+        
+        DisplayTaskList timedList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> timedMap = SortLogic.sortListToMapByDate(timedList);
+        
+        return convertTreeMapToSetMapByDate(timedMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchDone(TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchDone(taskInput);
+        
+        DisplayTaskList doneList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> doneMap = SortLogic.sortListToMapByDate(doneList);
+        
+        return convertTreeMapToSetMapByDate(doneMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchNotDone (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchNotDone(taskInput);
+        
+        DisplayTaskList notDoneList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> notDoneMap = SortLogic.sortListToMapByDate(notDoneList);
+        
+        return convertTreeMapToSetMapByDate(notDoneMap);
+    }
+    
+    /**
+     * Searches for floating task and returns a set map that are sorted from 0 to 5 priority int
+     */
+    public static Set<Map.Entry<Integer, DisplayTaskList>> searchFloatingTasks (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchFloating(taskInput);
+        
+        DisplayTaskList floatingList = splitAllTask(input); 
+        
+        TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
+        
+        return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchConfirmed(TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchConfirmed(taskInput);
+                
+        DisplayTaskList confirmedList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> confirmedMap = SortLogic.sortListToMapByDate(confirmedList);
 
-    //Copies confirmed or tentative tasks into their respective TaskLists
-    /*
-    public static void splitTasksByTentative(TaskList input, TaskList confirmed, TaskList tentative) {
-        logger.log(Level.INFO, "split by tentative: Starting...");
-        try {
-            SplitLogic.splitByTentative(input, confirmed, tentative);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "split error encountered", e);
+        return convertTreeMapToSetMapByDate(confirmedMap);
+    }
+    
+    private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
+        
+        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();
+            
+            Integer key = entry.getKey();
+            
+            DisplayTaskList sortedDisplayList = SortLogic.sortByName(unsortedList);
+            
+            map.remove(key);
+                
+            map.put(key, sortedDisplayList);
         }
-        logger.log(Level.INFO, "split by tentative: No problems encountered");
+        
+        return map.entrySet();
     }
     
-    //Copies done and incomplete tasks into their respective TaskLists
-    public static void splitTaskByDone(TaskList input, TaskList done, TaskList notDone) {
-        logger.log(Level.INFO, "split by done: Starting...");
-        try {
-            SplitLogic.splitByDone(input, done, notDone);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "split error encountered", e);
+    private static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();
+            
+            Date key = entry.getKey();
+            
+            if (key == null) {
+            
+                DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);
+                
+                map.remove(key);
+                
+                map.put(key, sortedDisplayList);
+            
+            } else {
+            
+                DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
+                
+                map.remove(key);
+                
+                map.put(key, sortedDisplayList);
+            }
         }
-        logger.log(Level.INFO, "split by done: No problems encountered");
-    }
-    */
-    
-    //Copies searched results into the searchList 
-    public static TaskList searchTaskByTags(TaskList input, String tagToLookFor) {
-        logger.log(Level.INFO, "search by tags: Starting...");
-        TaskList searchList = new TaskList();
-        try {
-             searchList = SearchLogic.searchByTags(input, tagToLookFor);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "search error encountered", e);
-        }
-        logger.log(Level.INFO, "search by tags: No problems encountered");  
-        return searchList;
-    }
-    
-    public static TaskList searchAll(TaskList input, String wordToLookFor) {
-        TaskList searchList = new TaskList();
-        logger.log(Level.INFO, "search all: Starting...");
-        try {
-            searchList = SearchLogic.searchAll(input, wordToLookFor);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "search error encountered", e);
-        }
-        logger.log(Level.INFO, "search all: No problems encountered");  
-        return searchList;
-    }
-    
-    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
-        return SearchLogic.searchPeriod(input, start, end);
-    }
-    
-    public static TaskList searchPriority(TaskList input , int priority) {
-        return SearchLogic.searchPriorityGreaterThan(input, priority);
-    }
-    
-    public static TaskList searchTentative(TaskList input) {
-        return SearchLogic.searchTentative(input);
-    }
-    
-    public static TaskList searchConfirmed(TaskList input) {
-        return SearchLogic.searchConfirmed(input);
-    }
-    
-    public static TaskList searchDone(TaskList input) {
-        return SearchLogic.searchDone(input);
-    }
-    
-    public static TaskList searchNotDone(TaskList input) {
-        return SearchLogic.searchNotDone(input);
+        
+        return map.entrySet();
     }
 }
