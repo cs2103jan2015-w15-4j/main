@@ -57,17 +57,6 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
-        TaskList searchList = new TaskList();
-        for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).getDueDate().compareTo(start) > 0 && 
-                    end.compareTo(input.get(i).getDueDate()) > 0) {
-                searchList.add(input.get(i));
-            }
-        }
-        return searchList;
-    }
-    
     public static TaskList searchOverDuedTask (TaskList input) {
         TaskList searchList = new TaskList();
         Date now = new Date();
@@ -150,6 +139,29 @@ public class SearchLogic {
             }
         }
         return searchList;
+    }
+    
+    public static int searchForClash(TaskList input, Date start, Date end) {
+        long startTime = start.getTime();
+        long endTime = end.getTime();
+        for (int i = 0; i < input.size(); i++) {
+            if (!(input.get(i).isFloating()) {
+                if (input.get(i).getEndDate() == null) {
+                    long inputTime = input.get(i).getDueDate().getTime();
+                    if ((startTime <= inputTime) && (endTime > inputTime)) {
+                        return input.get(i).getID();
+                    }
+                } else {
+                    long inputStartTime = input.get(i).getDueDate().getTime();
+                    long inputEndTime = input.get(i).getDueDate().getTime();
+                    if (!((inputStartTime > endTime) && (inputStartTime > endTime))
+                            && !((inputEndTime < startTime) && (inputEndTime < endTime))) {
+                        return input.get(i).getID();
+                    }
+                }
+            }
+        }
+        return -1;
     }
     
     
