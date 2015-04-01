@@ -6,9 +6,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * 
+ * @author Ke Jing
+ *
+ */
+
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
-
+    
+    /**
+     * 
+     * @param taskInput
+     * @param start
+     * @param end
+     * @return
+     */
+    public static int findClash(TaskList taskInput, Date start, Date end) {
+        
+        return SearchLogic.searchForClash(taskInput, start, end);
+        
+    }
     
     private static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
