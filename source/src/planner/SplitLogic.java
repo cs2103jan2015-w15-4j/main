@@ -3,10 +3,14 @@ package planner;
 import java.util.Date;
 import java.util.Calendar;
 
+/**
+ * @author Ke Jing
+ * SPLITLOGIC CLASS SPLITS TASKLIST INTO DISPLAYTASKLIST FORMAT
+ */
 public class SplitLogic {
     
     private static int ID;
-  
+    
     public static DisplayTaskList splitAllTaskList(TaskList input) {
         
         ID = 0;
@@ -87,6 +91,10 @@ public class SplitLogic {
         ID++;
     }
     
+    /**
+     * Converts specific time into a date that contains only day, month and year
+     * Purpose: Used as keys to sort them into TreeMap<Date, DisplayTaskList>
+     */
     private static Date getShownDate(Date day) {
         
         Calendar cal = Calendar.getInstance();

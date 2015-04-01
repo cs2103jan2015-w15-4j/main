@@ -7,14 +7,16 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.TreeMap;
 
+/**
+ * @author Ke Jing
+ * SORTLOGIC IS USED TO SORT DISPLAYTASKLIST OR TREEMAPS
+ */
 public class SortLogic {
     
     /**
-     * Comparator for DisplayTaskList
+     * Comparators for DisplayTaskList
+     * Order: Time -> priority -> Name -> Task ID
      */
-    
-    //Comparator for sorting tasks according to due date
-    //Sort in this order, 
     private static Comparator<DisplayTask> DateComparator = new Comparator<DisplayTask>() {
         
         @Override

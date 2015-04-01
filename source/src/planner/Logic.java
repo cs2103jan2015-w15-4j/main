@@ -9,18 +9,21 @@ import java.util.TreeMap;
 /**
  * 
  * @author Ke Jing
- *
+ * 
+ * THIS LOGIC CLASS HAS YET TO BE TESTED AS OF NOW
+ * WILL DEFINITELY BE REFACTORED SINCE MOST OF THE METHODS ARE VERY SIMILAR IN STRUCTURE 
  */
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
-    /**
-     * 
-     * @param taskInput
-     * @param start
-     * @param end
-     * @return
+    /**This method searches for time clashes if found within the TaskList provided
+     * Output: returns -1 if no clashes are found 
+     *         OR
+     *         returns int task ID for tasks that are found to clash
+     *         
+     * WORD OF CAUTION: Assuming a task is 3 months long, this method would report clash
+     *                  for every clash search within this time period
      */
     public static int findClash(TaskList taskInput, Date start, Date end) {
         
@@ -28,11 +31,17 @@ public class Logic {
         
     }
     
+    /**
+     * This method splits TaskList into displayTaskList regardless it is floating or null
+     */
     private static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayAllTask (TaskList taskInput) {
+    /**
+     * Creates a sorted Set of map entries using an input TaskList
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> displayAllTask (TaskList taskInput) {
         
         DisplayTaskList input = splitAllTask(taskInput);
         
@@ -42,6 +51,9 @@ public class Logic {
         
     }
     
+    /**
+     *  The following 3 search methods searches ALL tasks
+     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchInName (TaskList taskInput, String wordToSearch) {
         
         TaskList input = SearchLogic.searchName(taskInput, wordToSearch);
@@ -75,7 +87,9 @@ public class Logic {
         return convertTreeMapToSetMapByDate(searchMap);
     }
     
-    
+    /**
+     * This method returns a set map containing undone, non-floating tasks that are overdue
+     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchOverDuedTasks (TaskList taskInput) {
         
         TaskList input =  SearchLogic.searchOverDuedTask(taskInput);
@@ -87,6 +101,9 @@ public class Logic {
         return convertTreeMapToSetMapByDate(outDatedMap);
     }
     
+    /**
+     * This method returns a set map containing undone, non-floating tasks that are due in the future
+     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchUpcomingTasks (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchUpcomingTask(taskInput);
@@ -98,6 +115,9 @@ public class Logic {
         return convertTreeMapToSetMapByDate(upcomingMap);
     }
     
+    /**
+     * Searches for timed task
+     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchTimedTask (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchTimedTask(taskInput);
@@ -131,6 +151,9 @@ public class Logic {
         return convertTreeMapToSetMapByDate(notDoneMap);
     }
     
+    /**
+     * Searches for floating task and returns a set map that are sorted from 0 to 5 priority int
+     */
     public static Set<Map.Entry<Integer, DisplayTaskList>> searchFloatingTasks (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchFloating(taskInput);
