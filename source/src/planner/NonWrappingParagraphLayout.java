@@ -19,6 +19,6 @@ public class NonWrappingParagraphLayout extends ParagraphView{
     @Override
     public float getMinimumSpan( int axis ){
         
-        return super.getMinimumSpan(axis);
+        return super.getPreferredSpan(axis);
     }
 }

@@ -48,6 +48,9 @@ public class CommandTextbox extends JScrollPane{
     public CommandTextbox( String []commandKeywords, String []nonCommandKeywords, 
                            ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands ){
         
+        m_commandKeywords = commandKeywords;
+        m_nonCommandKeywords = nonCommandKeywords;
+        
         inputCommandBox = new JTextPane();
         
         prepareTextPane(inputCommandBox);
@@ -75,15 +78,23 @@ public class CommandTextbox extends JScrollPane{
         prepareComboBox( inputCommandBox, listOfCommands );
     }
     
+    public void setPopupBoxCanModify(){
+        
+        hasPopupBoxChange = false;
+    }
+    
+    public void setPopupBoxCannotModify(){
+        
+        hasPopupBoxChange = true;
+    }
+    
     public boolean handleKeyEvent( KeyEvent keyEvent ){
         
         if( keyEvent != null && popUpBox != null && popUpList != null ){
             
-            hasPopupBoxChange = true;
-            
-            if( popUpBox != null && popUpBox.isPopupVisible() ){
+            if( popUpBox != null && popUpBox.isPopupVisible() && inputCommandBox.isFocusOwner() ){
                 
-                restrictPopupBoxDimensions( inputCommandBox, popUpBox, 50 );
+                restrictPopupBoxDimensions( inputCommandBox, popUpBox, 30 );
                 
                 keyEvent.setSource( popUpBox );
                 popUpBox.dispatchEvent(keyEvent);
@@ -101,8 +112,10 @@ public class CommandTextbox extends JScrollPane{
                     
                 } else if( keyEvent.getKeyCode() == KeyEvent.VK_DOWN ){
                     
+                    
                     currentPopupListIndex = Math.min( currentPopupListIndex + 1, popUpList.getSize() + 1 );
                     popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex , popUpList.getSize() ));
+                    
                     currentPopupListIndex = ( currentPopupListIndex<= popUpList.getSize() ? currentPopupListIndex  : (popUpList.getSize() > 0 ? 0 : -1) );
                     
                     if( popUpBox.getSelectedIndex() < 0 ){
@@ -138,10 +151,9 @@ public class CommandTextbox extends JScrollPane{
                         
                         popUpBox.hidePopup();
                         popUpBox.setPopupVisible(false);
+                        return false;
                     }
                 }
-                    
-                hasPopupBoxChange = false;
                 
                 return true;
                 
@@ -181,7 +193,9 @@ public class CommandTextbox extends JScrollPane{
         
         if( textPane != null && listOfCommands != null ){
         
-            popUpBox = new JComboBox<String>(){
+            popUpList = new DefaultComboBoxModel<String>();
+            
+            popUpBox = new JComboBox<String>(popUpList){
                 
                 @Override
                 public Dimension getPreferredSize(){
@@ -190,9 +204,8 @@ public class CommandTextbox extends JScrollPane{
                 }
             };
             
-            popUpList = new DefaultComboBoxModel<String>();
-            
             popUpBox.setOpaque(false);
+            popUpBox.setFocusable(false);
             
             hasPopupBoxChange = false;
             
@@ -219,7 +232,7 @@ public class CommandTextbox extends JScrollPane{
             currentPopupListIndex = -1;
             popUpBox.setSelectedIndex(currentPopupListIndex);
             
-            bindActionListener(textPane, popUpBox);
+            //bindActionListener(textPane, popUpBox);
             
             bindDocumentListener( textPane, popUpBox, popUpList );
             
@@ -227,6 +240,35 @@ public class CommandTextbox extends JScrollPane{
             textPane.add( popUpBox, BorderLayout.SOUTH );
         }
         
+    }
+    
+    public void setSyntaxFilterOn(){
+        
+        commandPanelDocumentFilter.setFilterOn();
+    }
+    
+    public void setSyntaxFilterOff(){
+        
+        commandPanelDocumentFilter.setFilterOff();
+    }
+    
+    public void hidePopupBox(){
+        
+        if( popUpBox != null ){
+            
+            popUpBox.removeAllItems();
+            popUpBox.setPopupVisible(false);
+            popUpBox.hidePopup();
+        }
+    }
+    
+    public void showPopupBox(){
+        
+        if( popUpBox != null ){
+            
+            popUpBox.setPopupVisible(true);
+            popUpBox.showPopup();
+        }
     }
     
     private void bindDocumentListener( final JTextPane textPane, final JComboBox<String> popupBox, 
@@ -260,39 +302,40 @@ public class CommandTextbox extends JScrollPane{
                     
                     public void updatePopBoxList(){
                         
-                        restrictPopupBoxDimensions( textPane, popupBox, 50 );
+                        if( textPane.isFocusOwner() ){
                         
-                        // Might have to remove all action listeners here
-                        
-                        popupBoxList.removeAllElements();
-                        
-                        String userInput = textPane.getText().trim();
-                        
-                        if( !userInput.isEmpty() ){
+                            restrictPopupBoxDimensions( textPane, popupBox, 30 );
                             
-                            String []userInputWords = userInput.split( " ", 2 );
+                            popupBoxList.removeAllElements();
                             
-                            if( userInputWords.length > 0 ){
+                            String userInput = textPane.getText().trim();
                             
-                                String firstWordInUserInput = userInputWords[0];
-                                String []wordsInCommand;
+                            if( !userInput.isEmpty() ){
                                 
-                                for( String currentCommand : possibleCommands ){
+                                String []userInputWords = userInput.split( " ", 2 );
+                                
+                                if( userInputWords.length > 0 ){
+                                
+                                    String firstWordInUserInput = userInputWords[0];
+                                    String []wordsInCommand;
                                     
-                                    wordsInCommand = currentCommand.split( " ", 2 );
-                                    
-                                    if( wordsInCommand.length > 0 && firstWordInUserInput.startsWith(wordsInCommand[0]) ){
+                                    for( String currentCommand : possibleCommands ){
                                         
-                                        popupBoxList.addElement(currentCommand);
+                                        wordsInCommand = currentCommand.split( " ", 2 );
+                                        
+                                        if( wordsInCommand.length > 0 && firstWordInUserInput.startsWith(wordsInCommand[0]) ){
+                                            
+                                            popupBoxList.addElement(currentCommand);
+                                        }
                                     }
                                 }
                             }
+                            
+                            currentPopupListIndex = -1;
+                            popupBox.setSelectedIndex(currentPopupListIndex);
+                            popupBox.hidePopup();
+                            popupBox.setPopupVisible(popupBoxList.getSize() > 0);
                         }
-                        
-                        currentPopupListIndex = -1;
-                        popupBox.setSelectedIndex(currentPopupListIndex);
-                        popupBox.hidePopup();
-                        popupBox.setPopupVisible(popupBoxList.getSize() > 0);
                     }
                     
                     
@@ -310,24 +353,6 @@ public class CommandTextbox extends JScrollPane{
             tempRectangle.height = 0;
             tempRectangle.y = yCoordinate;
             popupBox.setBounds(tempRectangle);
-        }
-    }
-    
-    private void bindActionListener( final JTextPane textPane, final JComboBox<String> popupBox ){
-        
-        if( textPane != null && popupBox != null ){
-            
-            popupBox.addActionListener(new ActionListener(){
-                
-                @Override
-                public void actionPerformed( ActionEvent event ){
-                    
-                    if( !hasPopupBoxChange && popupBox.getSelectedItem() != null ){
-                        
-                        textPane.setText( popupBox.getSelectedItem().toString() );
-                    }
-                }
-            });
         }
     }
     
@@ -376,6 +401,7 @@ public class CommandTextbox extends JScrollPane{
             Style tempStyle = getStyleOfTextPane(inputCommandBox);
             StyleConstants.setForeground(tempStyle, colour);
             commandPanelDocumentFilter.setTextStyle(tempStyle);
+            commandPanelDocumentFilter.resetTextColor(inputCommandBox.getStyledDocument());
         }
     }
     

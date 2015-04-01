@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -11,25 +14,41 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.text.SimpleDateFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.logging.Logger;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.logging.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
+import planner.Constants.CommandType;
+import planner.Constants.DisplayStateFlag;
+import sun.util.logging.PlatformLogger.Level;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -41,31 +60,29 @@ public class UserInterface extends JFrame {
         
         planner.Constants.CommandType commandType = Engine.process(input);
         
-        TaskList tempTaskList = Engine.getAllTasks();
-        
         switch( commandType ){
         
             case ADD:
                 
-                handleAddOperation(tempTaskList);
+                handleAddOperation();
                 
                 break;
                 
             case UPDATE:
                 
-                handleUpdateOperation(tempTaskList);
+                handleUpdateOperation();
                 
                 break;
                 
             case DELETE:
                 
-                handleDeleteOperation(tempTaskList);
+                handleDeleteOperation();
                 
                 break;
                 
             case DONE:
                     
-                handleDoneOperation(tempTaskList);
+                handleDoneOperation();
                 
                 break;
                 
@@ -77,30 +94,22 @@ public class UserInterface extends JFrame {
                 
             case SEARCH:
                 
-                tempTaskList = Engine.getSearchResult();
-                
-                if( tempTaskList != null && tempTaskList.size() > 0 ){
-                    
-                    command.setText( "Search success" );
-                    
-                    currentList.copyTaskList(tempTaskList);
-                    
-                    displayPane.clearDisplay();
-                    
-                    displayPane.displayByDate(currentList);
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, input, input, null ));
-                    
-                    currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
-                    addNavigationBarsToPanel(currentNavigationBars);
-                    
-                } else{
-                    
-                    command.setText( "We cannot find any task containing the search phrase :/" );
-                }
+                handleSearch( input );
                 
                 break;
             
+            case SETNOTDONE:
+                
+                handleSetNotDone();
+                
+                break;
+                
+            case UNDO:
+                
+                handleUndo();
+                
+                break;
+                
             default:
                 
                 handleUnexpectedOperation();
@@ -109,140 +118,397 @@ public class UserInterface extends JFrame {
         }
     }
     
-    private void handleAddOperation( TaskList newTaskList ){
+    private void handleUndo(){
         
-        long newTaskNumber;
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        if( newTaskList!= null && 
-            newTaskList.size() > currentList.size() &&
-            (newTaskNumber = compareList( currentList, newTaskList )) > 0 ){
-                
-                command.setText( "Task added successfully" );
-                
-                currentList.copyTaskList(newTaskList);
-                
-                displayPane.clearDisplay();
-                
-                //displayPane.addTasksToDisplay(currentList);
-                displayPane.displayByDate(currentList);
-                
-                displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
-                
-                //displayPane.selectTask(newTaskNumber);
-                
-                //System.out.println( "line added = " + newTaskNumber );
-                
-                currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
-                addNavigationBarsToPanel(currentNavigationBars);
-                
-        } else{
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
             
-            command.setText( "Failed to add task" );
+            displayStateStack.push(upcomingDisplayState);
         }
+        
+        updateGUIView( sectionTitleString, currentList, null );
+        
+        commandPanel.setText( "Previous keyboard command undone successfully", true );
     }
     
-    private void handleUpdateOperation( TaskList newTaskList ){
+    private void handleSetNotDone(){
         
-        long newTaskNumber = compareList( currentList, newTaskList );
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        // changed back to newTaskNumber > 0 after fixing bug that caused data of a task in both taskList 
-        // (currentList and tempTaskList) to change even though the program was only changing data of the task 
-        // in only one taskList (tempTaskList)
-        if( newTaskNumber > 0 ){
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        long modifiedTaskID = Engine.lastModifiedTask();
+        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        
+        if( modifiedTask != null ){
             
-            command.setText( "Task updated successfully" );
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
             
-            currentList.copyTaskList(newTaskList);
+            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                TaskList tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList.copyTaskList(tempTaskList);
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Fail to mark task as not done", true );
+                    
+                    return;
+                }
+                
+            } else{
+                
+                commandPanel.setText( "Fail to mark task as not done", true );
+                
+                return;
+            }
+        }
+
+        commandPanel.setText( "Task marked not done successfully", true );
+    }
+    
+    private void handleSearch( String userInput ){
+        
+        TaskList tempTaskList = Engine.getSearchResult();
+        
+        if( tempTaskList != null && tempTaskList.size() > 0 ){
+            
+            commandPanel.setText( "Search success", true );
+            
+            currentList.copyTaskList(tempTaskList);
             
             displayPane.clearDisplay();
             
-            //displayPane.addTasksToDisplay(currentList);
-            
-            //displayPane.selectTask(newTaskNumber);
-            
             displayPane.displayByDate(currentList);
             
-            displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
+            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, userInput, userInput, null ));
             
-            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
-            addNavigationBarsToPanel(currentNavigationBars);
+            updateGUIView(userInput, currentList, displayPane.getCurrentSelectedTask());
             
         } else{
             
-            command.setText( "Failed to update task" );
+            commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
         }
     }
     
-    private void handleDoneOperation( TaskList newTaskList ){
+    private void updateGUIView( String sectionTitleString, TaskList taskList, Task task ){
         
-        long newTaskNumber = compareList( currentList, newTaskList );
+        displayPane.clearDisplay();
         
-        if( newTaskNumber > 0 ){
+        displayPane.displayByDate(taskList);
+        
+        displayPane.selectGivenTask(task);
+        
+        currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+        addNavigationBarsToPanel(currentNavigationBars);
+        
+        if( task != null ){
             
-            command.setText( "Task marked done successfully" );
-            
-            currentList.copyTaskList(newTaskList);
-                
-            displayPane.clearDisplay();
-                
-            //displayPane.addTasksToDisplay(currentList);
-            
-            //displayPane.selectTask( newTaskNumber );
-            
-            displayPane.displayByDate(currentList);
-            
-            displayPane.selectGivenTask(currentList.get((int)newTaskNumber-1));
-            
-            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
-            addNavigationBarsToPanel(currentNavigationBars);
+            slidePanel.populateDisplay(task);
             
         } else{
             
-            command.setText( "Fail to mark task as done" );
+            slidePanel.populateDisplay(displayPane.getCurrentSelectedTask());
+        }
+        
+        if(sectionTitleString != null){
+            
+            sectionTitle.setText(sectionTitleString);
         }
     }
     
-    private void handleDeleteOperation( TaskList newTaskList ){
+    private String getDisplaySectionTitle( DisplayState currentDisplayState ){
         
-        long newTaskNumber;
+        if( currentDisplayState != null ){
         
-        if( newTaskList != null && 
-            newTaskList.size() < currentList.size() &&
-            (newTaskNumber = compareList( currentList, newTaskList )) > 0 ){
+            DisplayStateFlag currentDisplayStateFlag  = currentDisplayState.getdisplayStateFlag();
             
-            long selectedIdx = displayPane.getCurrentSelectedTaskID();
+            switch(currentDisplayStateFlag){
             
-            command.setText( "Task deleted successfully" );
+                case TENTATIVE:
+                    
+                    return "Floating Tasks";
+                    
+                case TODAY:
+                    
+                    return "All tasks due today";
+                    
+                case OVERDUE:
+                    
+                    return "Overdue Tasks";
+                    
+                case DONE:
+                    
+                    return "Completed tasks";
+                    
+                case WORD_SEARCH:
+                case DATE_SEARCH:
+                    
+                    return currentDisplayState.getTitle();
+                    
+                default:
+                    
+                    break;
+            }
+        }
+        
+        return "All Tasks";
+    }
+    
+    private DisplayState updateCurrentList( DisplayState currentDisplayState ){
+        
+        if( currentDisplayState != null ){
             
-            currentList.copyTaskList(newTaskList);
+            DisplayStateFlag currentDisplayStateFlag  = currentDisplayState.getdisplayStateFlag();
             
-            displayPane.clearDisplay();
+            String searchString;
             
-            //displayPane.addTasksToDisplay(currentList);
+            switch(currentDisplayStateFlag){
             
-            //displayPane.selectTask( newTaskNumber - 1 );
+                case TENTATIVE:
+                    
+                    currentList.copyTaskList(Engine.getTentativeTasks());
+                    
+                    return currentDisplayState;
+                    
+                case DONE:
+                    
+                    currentList.copyTaskList(Engine.getDoneTasks());
+                    
+                    return currentDisplayState;
+                    
+                case WORD_SEARCH:
+                case DATE_SEARCH:
+                    
+                    searchString = currentDisplayState.getCommand();
+                    
+                    if ( Engine.process(searchString) == CommandType.SEARCH ){
+                        
+                        currentList.copyTaskList(Engine.getSearchResult());
+                        
+                        return currentDisplayState;
+                    } 
+
+                    break;
+                    
+                default:
+                    
+                    break;
+            }
+        }
             
-            displayPane.displayByDate(currentList);
+        currentList.copyTaskList(Engine.getAllTasks());
+        
+        return new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
+                                 new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
+                                 0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ); 
+    }
+    
+    private void handleAddOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        long modifiedTaskID = Engine.lastModifiedTask();
+        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        
+        if( modifiedTask != null ){
             
-            displayPane.selectTask( selectedIdx - 1 );
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
             
-            currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
-            addNavigationBarsToPanel(currentNavigationBars);
+            updateGUIView( sectionTitleString, currentList, modifiedTask );
             
         } else{
             
-            command.setText( "Failed to delete task" );
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                TaskList tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList.copyTaskList(tempTaskList);
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to add task", true );
+                    
+                    return;
+                }
+                
+            } else{
+                
+                commandPanel.setText( "Failed to add task", true );
+                
+                return;
+            }
         }
+
+        commandPanel.setText( "Task added successfully", true );
+    }
+    
+    private void handleUpdateOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        long modifiedTaskID = Engine.lastModifiedTask();
+        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                TaskList tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList.copyTaskList(tempTaskList);
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to update task", true );
+                    
+                    return;
+                }
+                
+            } else{
+                
+                commandPanel.setText( "Failed to update task", true );
+                
+                return;
+            }
+        }
+
+        commandPanel.setText( "Task updated successfully", true );
+    }
+    
+    private void handleDoneOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        long modifiedTaskID = Engine.lastModifiedTask();
+        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                TaskList tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList.copyTaskList(tempTaskList);
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Fail to mark task as done", true );
+                    
+                    return;
+                }
+                
+            } else{
+                
+                commandPanel.setText( "Fail to mark task as done", true );
+                
+                return;
+            }
+        }
+
+        commandPanel.setText( "Task marked done successfully", true );
+    }
+    
+    private void handleDeleteOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        
+        if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+            
+            displayStateStack.push(upcomingDisplayState);
+        }
+        
+        updateGUIView( sectionTitleString, currentList, null );
+        
+        commandPanel.setText( "Task deleted successfully", true );
     }
     
     private void handleInvalidOperation(){
         
-        command.setText( "Invalid Command" );
+        commandPanel.setText( "Invalid Command", true );
     }
     
     public void handleUnexpectedOperation(){
         
-        command.setText( "Feature not supported in V0.2" );
+        commandPanel.setText( "Feature not supported in V0.3", true );
     }
     ///////////////////////////////////////////////////////////////////// 
     //  PROCESS COMMANDS FUNCTIONS END HERE
@@ -253,7 +519,9 @@ public class UserInterface extends JFrame {
     
     private SliderPanel slidePanel;
     
-    private JTextField command;
+    //private JTextField command;
+    private CommandTextbox commandPanel;
+    private JTextPane commandInputField;
     
     private DisplayPane displayPane;
     
@@ -462,6 +730,17 @@ public class UserInterface extends JFrame {
         
         if( event != null ){
             
+            commandPanel.setPopupBoxCannotModify();
+            
+            if( commandPanel != null ){
+                
+                if( commandPanel.handleKeyEvent(event) ){
+                    
+                    commandPanel.setPopupBoxCanModify();
+                    return;
+                }
+            }
+            
             if( event.getKeyCode() == KeyEvent.VK_PAGE_UP || 
                 event.getKeyCode() == KeyEvent.VK_PAGE_DOWN){
                 
@@ -521,6 +800,7 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
+                        commandPanel.setPopupBoxCanModify();
                         return;
                     }
                 }
@@ -571,6 +851,7 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
+                        commandPanel.setPopupBoxCanModify();
                         return;
                     }
                 }
@@ -603,7 +884,7 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
-                if( !command.isFocusOwner() ){
+                if( !commandInputField.isFocusOwner() ){
                     
                     if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                         
@@ -616,6 +897,7 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
+                        commandPanel.setPopupBoxCanModify();
                         return;
                         
                     } else{
@@ -625,7 +907,7 @@ public class UserInterface extends JFrame {
                         
                         handleKeys( filterKeys(event.getKeyChar()) );
                         
-                        command.requestFocusInWindow();
+                        commandInputField.requestFocusInWindow();
                         
                         event.consume();
                     }
@@ -633,14 +915,14 @@ public class UserInterface extends JFrame {
                 
                 if(event.getKeyCode() == KeyEvent.VK_BACK_SPACE ){
                     
-                    if( command.getText().length() <= 0 ){
+                    if( commandInputField.getText().length() <= 0 ){
                         
                         event.consume();
                     } 
                     
                 } else if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                        
-                    String input = command.getText();
+                    String input = commandInputField.getText();
                     
                     if( input.length() > 0 ){
                         
@@ -657,6 +939,8 @@ public class UserInterface extends JFrame {
                     
                 }
             }
+            
+            commandPanel.setPopupBoxCanModify();
         }
     }
     
@@ -941,15 +1225,11 @@ public class UserInterface extends JFrame {
                 
                 NavigationBar tempNavigationBar;
                 
-                
-                
                 while( iterator.hasNext() ){
                     
                     tempNavigationBar = iterator.next();
                     
                     if( tempNavigationBar.isVisible() ){
-                        
-                        
                         
                         Style style = styledDocument.addStyle("component", null);
                         StyleConstants.setComponent(style, tempNavigationBar);
@@ -1049,8 +1329,66 @@ public class UserInterface extends JFrame {
         }
     }
     
+    private ArrayList<Map.Entry<String, ArrayList<String>>> generateTutorialStringMappings( String [][]possibleCommands ){
+        
+        ArrayList<Map.Entry<String, ArrayList<String>>> mapping = new ArrayList<Map.Entry<String, ArrayList<String>>>();
+        
+        if( possibleCommands != null ){
+            
+            String sectionHeaderString;
+            String []tempStringArray;
+            ArrayList<String> newList = null;
+            for( int i = 0; i < possibleCommands.length; ++i ){
+                
+                tempStringArray = possibleCommands[i];
+                
+                for( int j = 0; j < tempStringArray.length; ++j ){
+                    
+                    if( j > 0 ){
+                        
+                        newList.add(tempStringArray[j]);
+                        
+                    } else{
+                        
+                        newList = new ArrayList<String>();
+                        
+                        sectionHeaderString = tempStringArray[j];
+                        
+                        if( sectionHeaderString != null ){
+                            
+                            mapping.add( new AbstractMap.SimpleEntry<String, ArrayList<String>>( sectionHeaderString, newList ) );
+                            
+                        } else{
+                            
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return mapping;
+    }
+    
     private void prepareCommandTextField(){
         
+        // New command
+        ArrayList<Map.Entry<String, ArrayList<String>>> possibleCommands = generateTutorialStringMappings( Constants.POSSIBLE_COMMANDS );
+        
+        commandPanel = new CommandTextbox( Constants.COMMAND_KEYWORDS, Constants.NONCOMMAND_KEYWORDS, possibleCommands );
+        commandPanel.setBounds(34, 530, 610, 60);
+        contentPane.add(commandPanel);
+        commandInputField = commandPanel.getTextDisplay();
+        commandPanel.setFontAttributes(new Font( "Arial", Font.BOLD, 20 ));
+        commandPanel.setForegroundColor(new Color( 128,128,128 ));
+        commandPanel.setText("Enter commands here", true);
+        
+        addKeyBindingsToCommandTextField(commandInputField);
+        addFocusListenerToCommandTextField( commandPanel, commandInputField );
+        
+        // End of new Command
+        
+        /*
         // Adding command text field
         command = new JTextField();
         command.setBounds(34, 530, 610, 33);
@@ -1065,13 +1403,13 @@ public class UserInterface extends JFrame {
         command.setText("Enter commands here");
         
         addFocusListenerToCommandTextField(command);
-        addKeyBindingsToCommandTextField(command);
+        addKeyBindingsToCommandTextField(command);*/
         
         characterToTransfer = '\0';
         isBackspacePressed = false;
     }
     
-    private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
+    private void addKeyBindingsToCommandTextField( JTextPane currentCommand ){
         
         if( currentCommand != null ){
             
@@ -1110,6 +1448,112 @@ public class UserInterface extends JFrame {
         }
     }
     
+    /*
+    private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
+        
+        if( currentCommand != null ){
+            
+            currentCommand.addKeyListener(new KeyListener(){
+                
+                @Override
+                public void keyPressed( KeyEvent e ){
+                        
+                    handleKeyEvent(e);
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
+                    
+                    return;
+                }
+        
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    
+                    if( characterToTransfer != '\0' ){
+                        
+                        e.consume();
+                    }
+                    
+                    return;
+                }
+        
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    
+                    e.consume();
+                    
+                    return;
+                }
+            });
+        }
+    }*/
+    
+    private void addFocusListenerToCommandTextField( final CommandTextbox commandTextbox, final JTextPane currentCommand ){
+        
+        if(currentCommand != null && commandTextbox != null){
+            
+            currentCommand.addFocusListener(new FocusListener(){
+
+                @Override
+                public void focusGained(FocusEvent e) {
+                    
+                    commandTextbox.setSyntaxFilterOn();
+                    
+                    commandTextbox.setForegroundColor( new Color( 0,0,0 ) );
+                    
+                    String additionalCharacterToAdd = (characterToTransfer != '\0' ? characterToTransfer + "" : "");
+                    
+                    if( isMessageDisplayed ){
+                        
+                        commandTextbox.setText(additionalCharacterToAdd, false);
+                        
+                        isMessageDisplayed = false;
+                        
+                    } else{
+                        
+                        String finalString = currentCommand.getText() + additionalCharacterToAdd;
+                        
+                        if( isBackspacePressed && finalString.length() > 0 ){
+                            
+                            finalString = finalString.substring(0, finalString.length()-1);
+                        }
+                        
+                        commandTextbox.setText(finalString, false);
+                    }
+                }
+
+                @Override
+                public void focusLost(FocusEvent e) {
+                    
+                    commandTextbox.setSyntaxFilterOff();
+                    
+                    commandTextbox.hidePopupBox();
+                    
+                    commandTextbox.setForegroundColor( new Color( 128,128,128 ) );
+                    
+                    String input = currentCommand.getText();
+                    
+            
+                    
+                    if( !isMessageDisplayed && input.length() <= 0 ){
+                        
+                        commandTextbox.setText("Enter commands here", true);
+                        
+                        isMessageDisplayed = true;
+                        
+                    } else{
+                        
+                        commandTextbox.setText(input, true);
+                    }
+                    
+                    characterToTransfer = '\0';
+                    isBackspacePressed = false;
+                }
+            });
+        }
+    }
+    
+    /*
     private void addFocusListenerToCommandTextField( JTextField currentCommand ){
         
         if(currentCommand != null){
@@ -1165,7 +1609,7 @@ public class UserInterface extends JFrame {
                 }
             });
         }
-    }
+    }*/
 
     private void prepareCloseButton(){
         
