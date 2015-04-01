@@ -47,6 +47,16 @@ public class SearchLogic {
         return searchList;
     }
     
+    public static TaskList searchTimedTask (TaskList input) {
+        TaskList searchList = new TaskList();
+        for (int i = 0; i < input.size(); i++) {
+            if (input.get(i).isTimed()) {
+                searchList.add(input.get(i));
+            }
+        }
+        return searchList;
+    }
+    
     public static TaskList searchPeriod(TaskList input, Date start, Date end) {
         TaskList searchList = new TaskList();
         for (int i = 0; i < input.size(); i++) {
@@ -63,7 +73,7 @@ public class SearchLogic {
         Date now = new Date();
         long current = now.getTime();
         for (int i = 0; i < input.size(); i++) {
-            if (!(input.get(i).isFloating() && !(input.get(i).isDone()))) {
+            if (!(input.get(i).isFloating()) && !(input.get(i).isDone())) {
                 if (input.get(i).getEndDate() == null) {
                     long taskDate = input.get(i).getDueDate().getTime();
                     if (current > taskDate) {
@@ -77,6 +87,28 @@ public class SearchLogic {
                 }
             }
          }
+        return searchList;
+    }
+    
+    public static TaskList searchUpcomingTask (TaskList input) {
+        TaskList searchList = new TaskList();
+        Date now = new Date();
+        long current = now.getTime();
+        for (int i = 0; i < input.size(); i++) {
+            if (!(input.get(i).isFloating()) && !(input.get(i).isDone())) {
+                if (input.get(i).getEndDate() == null) {
+                    long taskDate = input.get(i).getDueDate().getTime();
+                    if (current <= taskDate) {
+                        searchList.add(input.get(i));
+                    }
+                } else {
+                    long taskDate = input.get(i).getEndDate().getTime();
+                    if (current <= taskDate) {
+                        searchList.add(input.get(i));
+                    }
+                }
+            } 
+        }
         return searchList;
     }
     
