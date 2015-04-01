@@ -5,7 +5,7 @@ import java.util.Calendar;
 
 public class SplitLogic {
     
-    private static long ID;
+    private static int ID;
   
     public static DisplayTaskList splitAllTaskList(TaskList input) {
         
@@ -101,4 +101,5 @@ public class SplitLogic {
         
         return cal.getTime();
     }
+    
 }

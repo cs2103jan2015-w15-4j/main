@@ -11,6 +11,10 @@ import java.util.TreeMap;
 
 public class SortLogic {
     
+    /**
+     * Comparator for DisplayTaskList
+     */
+    
     //Comparator for sorting tasks according to due date
     //Sort in this order, 
     private static Comparator<DisplayTask> DateComparator = new Comparator<DisplayTask>() {
@@ -51,7 +55,9 @@ public class SortLogic {
                     return 2400;
                     
                 }    
+                
             } else {
+                
                 return getTimeFromDate(task.getDueDate());
             }
         }
@@ -65,6 +71,29 @@ public class SortLogic {
             return totalTime;
         }
     };
+    
+    //Comparator for sorting tasks according to priority
+    private static Comparator<DisplayTask> priorityComparator = new Comparator<DisplayTask>() {
+        
+        @Override
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
+            
+            return comparePriority(displayTask1, displayTask2);
+        }
+    };
+    
+    private static Comparator<DisplayTask> nameComparator = new Comparator<DisplayTask>() {
+        
+        @Override
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
+            
+            return compareName(displayTask1, displayTask2);
+        }
+    };
+    
+    /**
+     * Comparators for Maps
+     */
     
     private static Comparator<Integer> priorityComparatorForMap = new Comparator<Integer>() {
         
@@ -84,7 +113,8 @@ public class SortLogic {
                 return 0;
             }
         }
-    }
+    };
+    
     
     private static Comparator<Date> dateComparatorForMap = new Comparator<Date>() {
         
@@ -123,16 +153,12 @@ public class SortLogic {
         }   
     };
     
-    //Comparator for sorting tasks according to priority
-    private static Comparator<DisplayTask> priorityComparator = new Comparator<DisplayTask>() {
-        
-        @Override
-        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
-            
-            return comparePriority(displayTask1, displayTask2);
-        }
-    };
-    
+    /**
+     * Helper Methods
+     * @param displayTask1
+     * @param displayTask2
+     * @return
+     */
     
     private static int comparePriority(DisplayTask displayTask1, DisplayTask displayTask2) {
         Task task1 = displayTask1.getParent();
@@ -150,36 +176,44 @@ public class SortLogic {
             
         } else {
             
-            String name1 = task1.getName();
-            String name2 = task2.getName();
+            return compareName(displayTask1, displayTask2);
+        }
+    }
+    
+    private static int compareName(DisplayTask displayTask1, DisplayTask displayTask2) {
+        
+        Task task1 = displayTask1.getParent();
+        Task task2 = displayTask1.getParent();
+        
+        String name1 = task1.getName();
+        String name2 = task2.getName();
+        
+        int name = name1.compareTo(name2);
+        
+        if (name > 0) {
             
-            int name = name1.compareTo(name2);
+            return 1;
             
-            if (name > 0) {
+        } else if (name < 0) {
+            
+            return -1;
+            
+        } else {
+            
+            long ID1 = task1.getID();
+            long ID2 = task2.getID();
+            
+            if (ID1 > ID2) {
                 
                 return 1;
                 
-            } else if (name < 0) {
+            } else if (ID1 < ID2) {
                 
-                return -1;
-                
+               return -1;
+               
             } else {
                 
-                long ID1 = task1.getID();
-                long ID2 = task2.getID();
-                
-                if (ID1 > ID2) {
-                    
-                    return 1;
-                    
-                } else if (ID1 < ID2) {
-                    
-                   return -1;
-                   
-                } else {
-                    
-                   return 0;
-                }
+               return 0;
             }
         }
     }
@@ -198,9 +232,17 @@ public class SortLogic {
         return newTasks;
     }
     
+    public static DisplayTaskList sortByName(DisplayTaskList tasks) {
+        
+        DisplayTaskList newTasks = new DisplayTaskList(tasks);
+        Collections.sort(newTasks, nameComparator);
+        return newTasks;
+    }
+    
     public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
         
-        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap <Integer, DisplayTaskList> (priorityComparatorForMap);
+        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
+                <Integer, DisplayTaskList> (priorityComparatorForMap);
         
         for (int i = 0; i < input.size(); i++) {
         
@@ -228,8 +270,10 @@ public class SortLogic {
     }
     
     public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (DisplayTaskList input) {
+    
         TreeMap < Date, DisplayTaskList > displayMap = 
                 new TreeMap < Date, DisplayTaskList>( dateComparatorForMap );
+        
         for (int i = 0; i < input.size(); i++) {
             
             DisplayTask temp = input.get(i);
