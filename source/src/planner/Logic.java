@@ -9,36 +9,6 @@ import java.util.TreeMap;
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
-/*    
-    //Copies searched results into the searchList 
-    public static TaskList searchTaskByTags(TaskList input, String tagToLookFor) {
-        logger.log(Level.INFO, "search by tags: Starting...");
-        TaskList searchList = new TaskList();
-        try {
-             searchList = SearchLogic.searchByTags(input, tagToLookFor);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "search error encountered", e);
-        }
-        logger.log(Level.INFO, "search by tags: No problems encountered");  
-        return searchList;
-    }
-    
-    public static TaskList searchAll(TaskList input, String wordToLookFor) {
-        TaskList searchList = new TaskList();
-        logger.log(Level.INFO, "search all: Starting...");
-        try {
-            searchList = SearchLogic.searchAll(input, wordToLookFor);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "search error encountered", e);
-        }
-        logger.log(Level.INFO, "search all: No problems encountered");  
-        return searchList;
-    }
-*/    
-    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
-        return SearchLogic.searchPeriod(input, start, end);
-    }
-    
     public static TaskList searchConfirmed(TaskList input) {
         return SearchLogic.searchConfirmed(input);
     }
@@ -106,9 +76,9 @@ public class Logic {
     }
     
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> searchOutDatedTasks (TaskList taskInput) {
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchOverDuedTasks (TaskList taskInput) {
         
-        TaskList input =  SearchLogic.searchOutDated(taskInput);
+        TaskList input =  SearchLogic.searchOverDuedTask(taskInput);
         
         DisplayTaskList outDatedList = splitAllTask(input);
         
@@ -116,6 +86,29 @@ public class Logic {
         
         return convertTreeMapToSetMapByDate(outDatedMap);
     }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchUpcomingTasks (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchUpcomingTask(taskInput);
+        
+        DisplayTaskList upcomingList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> upcomingMap = SortLogic.sortListToMapByDate(upcomingList);
+        
+        return convertTreeMapToSetMapByDate(upcomingMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchTimedTask (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchTimedTask(taskInput);
+        
+        DisplayTaskList timedList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> timedMap = SortLogic.sortListToMapByDate(timedList);
+        
+        return convertTreeMapToSetMapByDate(timedMap);
+    }
+    
     
     
     public static Set<Map.Entry<Integer, DisplayTaskList>> searchFloatingTasks (TaskList taskInput) {
