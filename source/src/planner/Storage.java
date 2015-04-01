@@ -182,7 +182,7 @@ public class Storage {
         } finally {
             try {
                 br.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 
             }
         }
