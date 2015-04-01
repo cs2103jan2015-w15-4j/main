@@ -194,8 +194,6 @@ public class UserInterface extends JFrame {
         
         if( tempTaskList != null && tempTaskList.size() > 0 ){
             
-            commandPanel.setText( "Search success", true );
-            
             currentList.copyTaskList(tempTaskList);
             
             displayPane.clearDisplay();
@@ -205,6 +203,8 @@ public class UserInterface extends JFrame {
             displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, userInput, userInput, null ));
             
             updateGUIView(userInput, currentList, displayPane.getCurrentSelectedTask());
+            
+            commandPanel.setText( "Search success", true );
             
         } else{
             
@@ -763,12 +763,8 @@ public class UserInterface extends JFrame {
                     currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                     
                     currentList.copyTaskList(Engine.getAllTasks());
-                    
-                    displayPane.clearDisplay();
-                    displayPane.displayByDate(currentList);
-                    currentDisplayState = new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event );
-                    currentNavigationBars = generateContentForNavigationBars( currentDisplayState );
-                    addNavigationBarsToPanel(currentNavigationBars);
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event ));
+                    updateGUIView( "All Tasks", currentList, null );
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){

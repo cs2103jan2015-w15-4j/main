@@ -86,8 +86,6 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             if( filterBypass != null && m_commandKeywords != null ){
                 
-                System.out.println( "Prineted text = " + str );
-                
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
             
@@ -176,14 +174,18 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                                 
                                 int startIdx;
                                 int endIdx;
+                                String stringInFrontOfMatchedWord;
                                 while( commandStrMatcher.find() ){
                                     
                                     startIdx = commandStrMatcher.start();
                                     endIdx = commandStrMatcher.end();
                                     
-                                    if( startIdx == 0 ){
+                                    stringInFrontOfMatchedWord = text.substring(0, startIdx).trim();
+                                    
+                                    if( stringInFrontOfMatchedWord.length() <= 0 ){
       
                                         changeTextColor( doc, startIdx, endIdx-startIdx, COMMAND_KEYWORD_COLOUR );
+                                        break;
                                     }
                                 }
                                 
