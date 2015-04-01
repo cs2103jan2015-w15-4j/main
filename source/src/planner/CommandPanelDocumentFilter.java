@@ -32,7 +32,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
     public CommandPanelDocumentFilter( String []commandkeywords, String []nonCommandKeywords, Style originalStyle ){
         
         super();
-        
+
         if( commandkeywords != null && nonCommandKeywords != null && originalStyle != null ){
             
             m_commandKeywords = commandkeywords;
@@ -81,10 +81,12 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                 
                 str.replaceAll("\\n", "");
             }
+
+            super.insertString(filterBypass, offset, str, m_originalStyle);
             
-            super.insertString(filterBypass, offset, str, attribute);
-            
-            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
+            if( filterBypass != null && m_commandKeywords != null ){
+                
+                System.out.println( "Prineted text = " + str );
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
@@ -102,9 +104,9 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                 str.replaceAll("\\n", "");
             }
             
-            super.replace(filterBypass, offset, strLength, str, attribute);
+            super.replace(filterBypass, offset, strLength, str, m_originalStyle);
             
-            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
+            if( filterBypass != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
@@ -119,7 +121,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             super.remove( filterBypass, offset, strLength );
             
-            if( !isFilterTurnedOff && filterBypass != null && m_commandKeywords != null ){
+            if( filterBypass != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
@@ -129,7 +131,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
     
     private void changeTextColor( StyledDocument doc, int offset, int stringLength, Color color ){
         
-        if( doc != null && m_originalStyle != null && color != null && offset >= 0 && offset < stringLength && stringLength > 0 ){
+        if( doc != null && m_originalStyle != null && color != null && offset >= 0 && stringLength > 0 ){
             
             Color tempColor = StyleConstants.getForeground(m_originalStyle);
             StyleConstants.setForeground(m_originalStyle, color);
@@ -139,10 +141,10 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         }
     }
     
-    private void resetTextColor( StyledDocument doc ){
+    public void resetTextColor( StyledDocument doc ){
         
         if( doc != null && m_originalStyle != null ){
-            
+
             changeTextColor( doc, 0, doc.getLength(), StyleConstants.getForeground(m_originalStyle) );
         }
     }
@@ -156,43 +158,46 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                 @Override
                 public void run() {
                     
-                    resetTextColor( doc );
+                    if( !isFilterTurnedOff ){
                         
-                    Pattern commandPattern = Pattern.compile(commandKeywordRegexPattern);
-                    Pattern nonCommandPattern = Pattern.compile(nonCommandKeywordRegexPattern);
-                    
-                    try{
+                        resetTextColor( doc );
+                            
+                        Pattern commandPattern = Pattern.compile(commandKeywordRegexPattern);
+                        Pattern nonCommandPattern = Pattern.compile(nonCommandKeywordRegexPattern);
                         
-                        if( doc.getLength() > 0 ){
+                        try{
                             
-                            String text = doc.getText( 0, doc.getLength() );
-                            
-                            Matcher commandStrMatcher = commandPattern.matcher(text);
-                            Matcher nonCommandStrMatcher = nonCommandPattern.matcher(text);
-                            
-                            int startIdx;
-                            int endIdx;
-                            while( commandStrMatcher.find() ){
+                            if( doc.getLength() > 0 ){
                                 
-                                startIdx = commandStrMatcher.start();
-                                endIdx = nonCommandStrMatcher.end();
+                                String text = doc.getText( 0, doc.getLength() ).toLowerCase();
                                 
-                                if( startIdx == 0 ){
+                                Matcher commandStrMatcher = commandPattern.matcher(text);
+                                Matcher nonCommandStrMatcher = nonCommandPattern.matcher(text);
+                                
+                                int startIdx;
+                                int endIdx;
+                                while( commandStrMatcher.find() ){
                                     
-                                    changeTextColor( doc, startIdx, endIdx-startIdx, COMMAND_KEYWORD_COLOUR );
+                                    startIdx = commandStrMatcher.start();
+                                    endIdx = commandStrMatcher.end();
+                                    
+                                    if( startIdx == 0 ){
+      
+                                        changeTextColor( doc, startIdx, endIdx-startIdx, COMMAND_KEYWORD_COLOUR );
+                                    }
+                                }
+                                
+                                while( nonCommandStrMatcher.find() ){
+                                    
+                                    startIdx = nonCommandStrMatcher.start();
+                                    endIdx = nonCommandStrMatcher.end();
+                                    
+                                    changeTextColor( doc, startIdx, endIdx-startIdx, NONCOMMAND_KEYWORD_COLOUR );
                                 }
                             }
                             
-                            while( nonCommandStrMatcher.find() ){
-                                
-                                startIdx = nonCommandStrMatcher.start();
-                                endIdx = nonCommandStrMatcher.end();
-                                
-                                changeTextColor( doc, startIdx, endIdx-startIdx, NONCOMMAND_KEYWORD_COLOUR );
-                            }
-                        }
-                        
-                    } catch( BadLocationException badLocationException ){}
+                        } catch( BadLocationException badLocationException ){}
+                    }
                 }
                 
             });
