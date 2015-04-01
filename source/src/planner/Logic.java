@@ -5,13 +5,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Iterator;
-import java.util.Collection;
 
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
-    
+/*    
     //Copies searched results into the searchList 
     public static TaskList searchTaskByTags(TaskList input, String tagToLookFor) {
         logger.log(Level.INFO, "search by tags: Starting...");
@@ -36,17 +34,9 @@ public class Logic {
         logger.log(Level.INFO, "search all: No problems encountered");  
         return searchList;
     }
-    
+*/    
     public static TaskList searchPeriod(TaskList input, Date start, Date end) {
         return SearchLogic.searchPeriod(input, start, end);
-    }
-    
-    public static TaskList searchPriority(TaskList input , int priority) {
-        return SearchLogic.searchPriorityGreaterThan(input, priority);
-    }
-    
-    public static TaskList searchTentative(TaskList input) {
-        return SearchLogic.searchTentative(input);
     }
     
     public static TaskList searchConfirmed(TaskList input) {
@@ -61,29 +51,128 @@ public class Logic {
         return SearchLogic.searchNotDone(input);
     }
     
-    public static DisplayTaskList splitAllTask (TaskList input) {
+    
+    /**
+     * New methods 
+     * @param input
+     * @return
+     */
+    
+    private static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayAllTask (DisplayTaskList input) {
+    public static Set<Map.Entry<Date, DisplayTaskList>> splitDisplayAllTask (TaskList taskInput) {
+        
+        DisplayTaskList input = splitAllTask(taskInput);
         
         TreeMap<Date, DisplayTaskList> allTaskMap = SortLogic.sortListToMapByDate(input);
         
-        for (Map.Entry<Date, DisplayTaskList> entry : allTaskMap.entrySet()) {
+        return convertTreeMapToSetMapByDate(allTaskMap);
+        
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInName (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input = SearchLogic.searchName(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList =  splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInDescription (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input =  SearchLogic.searchDesc(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchInTag (TaskList taskInput, String wordToSearch) {
+        
+        TaskList input = SearchLogic.searchTags(taskInput, wordToSearch);
+        
+        DisplayTaskList wordList = splitAllTask(input); 
+        
+        TreeMap<Date, DisplayTaskList> searchMap = SortLogic.sortListToMapByDate(wordList);
+        
+        return convertTreeMapToSetMapByDate(searchMap);
+    }
+    
+    
+    public static Set<Map.Entry<Date, DisplayTaskList>> searchOutDatedTasks (TaskList taskInput) {
+        
+        TaskList input =  SearchLogic.searchOutDated(taskInput);
+        
+        DisplayTaskList outDatedList = splitAllTask(input);
+        
+        TreeMap<Date, DisplayTaskList> outDatedMap = SortLogic.sortListToMapByDate(outDatedList);
+        
+        return convertTreeMapToSetMapByDate(outDatedMap);
+    }
+    
+    
+    public static Set<Map.Entry<Integer, DisplayTaskList>> searchFloatingTasks (TaskList taskInput) {
+        
+        TaskList input = SearchLogic.searchFloating(taskInput);
+        
+        DisplayTaskList floatingList = splitAllTask(input); 
+        
+        TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
+        
+        return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
+        
+        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
+            
             DisplayTaskList unsortedList = entry.getValue();
+            
+            Integer key = entry.getKey();
+            
+            DisplayTaskList sortedDisplayList = SortLogic.sortByName(unsortedList);
+            
+            map.remove(key);
+                
+            map.put(key, sortedDisplayList);
+        }
+        
+        return map.entrySet();
+    }
+    
+    private static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();
+            
             Date key = entry.getKey();
+            
             if (key == null) {
+            
                 DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);
-                allTaskMap.remove(key);
-                allTaskMap.put(key, sortedDisplayList);
+                
+                map.remove(key);
+                
+                map.put(key, sortedDisplayList);
+            
             } else {
+            
                 DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
-                allTaskMap.remove(key);
-                allTaskMap.put(key, sortedDisplayList);
+                
+                map.remove(key);
+                
+                map.put(key, sortedDisplayList);
             }
         }
         
-        return allTaskMap.entrySet();
-        
+        return map.entrySet();
     }
 }
