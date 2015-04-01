@@ -5,11 +5,11 @@ import java.util.Date;
 
 public class SearchLogic {
     
-    public static DisplayTaskList searchName(DisplayTaskList input, String wordToSearch) {
-        DisplayTaskList searchList = new DisplayTaskList();
+    public static TaskList searchName(TaskList input, String wordToSearch) {
+        TaskList searchList = new TaskList();
         try {
             for (int i = 0; i < input.size(); i++) {
-                if (input.get(i).getParent().getName().contains(wordToSearch)) {
+                if (input.get(i).getName().contains(wordToSearch)) {
                     searchList.add(input.get(i));
                 }
             }
@@ -19,11 +19,11 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static DisplayTaskList searchDesc(DisplayTaskList input, String wordToSearch) {
-        DisplayTaskList searchList = new DisplayTaskList();
+    public static TaskList searchDesc(TaskList input, String wordToSearch) {
+        TaskList searchList = new TaskList();
         try {
             for (int i = 0; i < input.size(); i++) {
-                if (input.get(i).getParent().getDescription().contains(wordToSearch)) {
+                if (input.get(i).getDescription().contains(wordToSearch)) {
                     searchList.add(input.get(i));
                 }
             }
@@ -33,11 +33,11 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static DisplayTaskList searchTags(DisplayTaskList input, String tagToLookFor){
-        DisplayTaskList searchList = new DisplayTaskList();
+    public static TaskList searchTags(TaskList input, String tagToLookFor){
+        TaskList searchList = new TaskList();
         try { 
             for (int i = 0; i < input.size(); i++) {
-                if (input.get(i).getParent().getTag().contains(tagToLookFor)) {
+                if (input.get(i).getTag().contains(tagToLookFor)) {
                     searchList.add(input.get(i));
                 }
             }
@@ -58,15 +58,32 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static DisplayTaskList searchOutDated (DisplayTaskList input) {
-        Calendar now = Calendar.getInstance();
-        //WORK ON THIS LATER
+    public static TaskList searchOutDated (TaskList input) {
+        TaskList searchList = new TaskList();
+        Date now = new Date();
+        long current = now.getTime();
+        for (int i = 0; i < input.size(); i++) {
+            if (!(input.get(i).isFloating())) {
+                if (input.get(i).getEndDate() == null) {
+                    long taskDate = input.get(i).getDueDate().getTime();
+                    if (current > taskDate) {
+                        searchList.add(input.get(i));
+                    }
+                } else {
+                    long taskDate = input.get(i).getEndDate().getTime();
+                    if (current > taskDate) {
+                        searchList.add(input.get(i));
+                    }
+                }
+            }
+         }
+        return searchList;
     }
     
-    public static DisplayTaskList searchFloating(DisplayTaskList input) {
-        DisplayTaskList searchList = new DisplayTaskList();
+    public static TaskList searchFloating(TaskList input) {
+        TaskList searchList = new TaskList();
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).getParent().isFloating()) {
+            if (input.get(i).isFloating()) {
                 searchList.add(input.get(i));
             }
         }
