@@ -86,8 +86,8 @@ public class Parser {
     public static ParseResult parse(String inputString) {
         logger.setLevel(Level.WARNING);
         resetFields();
-        ParseResult result = process(inputString.trim());
-        return result;
+        process(inputString.trim());
+        return createParseResult(commandType); 
     }    
     
     /**
@@ -97,16 +97,14 @@ public class Parser {
      * @param inputString The user input
      * @return            A result containing information such as command type
      */
-    private static ParseResult process(String inputString) {        
+    private static void process(String inputString) {        
         logger.log(Level.INFO, "going to begin processing");
         inputTokens = splitBySpaceDelimiter(inputString);
         assert(inputTokens.length > 0);
         commandType = extractCommandType(inputTokens[COMMAND_WORD_INDEX]);
         processDependingOnCommandType(commandType);
         
-        logger.log(Level.INFO, "processing ended. returning result.");
-        ParseResult parseResult = createParseResult(commandType);        
-        return parseResult;
+        logger.log(Level.INFO, "processing ended.");
     }
     
     private static String[] splitBySpaceDelimiter(String input) {
