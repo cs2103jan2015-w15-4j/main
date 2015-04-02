@@ -38,6 +38,7 @@ public class SplitLogic {
             
         } else {
             
+            /*
             Calendar dueDate = Calendar.getInstance();
             dueDate.setTime(inputTask.getDueDate());
             int dueDateDay = dueDate.get(Calendar.DATE);
@@ -48,6 +49,14 @@ public class SplitLogic {
             
             int DateDifference = endDateDay - dueDateDay;
             
+            */
+            long dueDateDay = inputTask.getDueDate().getTime();
+            long endDateDay = inputTask.getEndDate().getTime();
+            long dayDiff = endDateDay - dueDateDay;
+            long DateDifference = dayDiff / (24 * 60 * 60 * 1000);
+            
+            //System.out.println(DateDifference);
+            
             if (DateDifference == 0) {
                 
                 Date shownDate = getShownDate(inputTask.getDueDate());
@@ -57,13 +66,11 @@ public class SplitLogic {
                 
             } else {
             
+                Date tempDate = getShownDate(inputTask.getDueDate());
+                
                 for (int j = 0; j <= DateDifference; j++) {
-                    
-                    Date tempDate = null;
                 
                     if (j == 0) {
-                        
-                        tempDate = getShownDate(inputTask.getDueDate());
                     
                         createNewDisplayTask(outputList, tempDate, inputTask.getDueDate(), null, inputTask);
                     
