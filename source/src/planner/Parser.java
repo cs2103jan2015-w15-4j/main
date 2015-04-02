@@ -950,55 +950,54 @@ public class Parser {
                                                 int indexBeingParsed, 
                                                 String pmOrAm, int year, 
                                                 int month, int day) {
-        int indexToCheck = indexBeingParsed + 1;
         // check for a valid argument to be parsed as the time
         if (!isTimeArgExistent(indexBeingParsed, dateParts)) {
             // does not exist, return default date value
-            createCalendar(year, month - 1, day, 0, 0);
-        }
-        String timeString = dateParts[indexToCheck];
-        String[] timeParts = timeString.split("\\.");
-        
-        // check for appropriate format (##.##)
-        if (timeParts.length != 2) {
-            setCommandType(CommandType.INVALID);
-            setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
             return createCalendar(year, month - 1, day, 0, 0);
-        } else {
-            try {
-                int hour = Integer.parseInt(timeParts[0]);
-                int min = Integer.parseInt(timeParts[1]);
-                if (hour < 0 || hour > 12 || min < 0 || min > 59) {
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_TIME);
-                    logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
-                    return createCalendar(year, month, day, 0, 0);
-                } else if (pmOrAm.equals("pm")) {
-                    // special case of 12pm
-                    if (hour == 12) {
-                        return createCalendar(year, month - 1, day, hour, min); 
-                    } else {
-                        return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
-                    }                    
-                } else {
-                    // special case for 12am
-                    if (hour == 12) {
-                        return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
-                    } else {
-                        return createCalendar(year, month - 1, day, hour, min);  
-                    }                    
-                }
-                
-            } catch (NumberFormatException e) {
+        }
+        
+        String timeString = dateParts[indexBeingParsed + 1];
+        String[] timeParts = timeString.split("\\.");  
+        
+        // check for appropriate format (##.##) 
+        if (!isValidTimeFormat(indexBeingParsed, timeParts)) {
+            // invalid date format, return default date value
+            return createCalendar(year, month - 1, day, 0, 0);
+        }       
+
+        try {
+            int hour = Integer.parseInt(timeParts[0]);
+            int min = Integer.parseInt(timeParts[1]);
+            if (hour < 0 || hour > 12 || min < 0 || min > 59) {
                 setCommandType(CommandType.INVALID);
                 setErrorType(ErrorType.INVALID_TIME);
-                logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
-                return createCalendar(year, month - 1, day, 0, 0);
+                logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
+                return createCalendar(year, month, day, 0, 0);
+            } else if (pmOrAm.equals("pm")) {
+                // special case of 12pm
+                if (hour == 12) {
+                    return createCalendar(year, month - 1, day, hour, min); 
+                } else {
+                    return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
+                }                    
+            } else {
+                // special case for 12am
+                if (hour == 12) {
+                    return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
+                } else {
+                    return createCalendar(year, month - 1, day, hour, min);  
+                }                    
             }
             
+        } catch (NumberFormatException e) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TIME);
+            logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
+            return createCalendar(year, month - 1, day, 0, 0);
         }
-    }
+        
+    }    
+
     
     /**
      * Helper method for calcDateGivenTime that validates the presence of an 
@@ -1013,6 +1012,17 @@ public class Parser {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    private static boolean isValidTimeFormat(int indexBeingParsed, String[] timeParts) {  
+        if (timeParts.length != 2) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TIME);
+            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
             return false;
         } else {
             return true;
