@@ -13,9 +13,7 @@ import planner.Constants.ErrorType;
 /**
  * This class contains all the logic for parsing
  * user commands into useful information for
- * the engine.
- * 
- * @author Tham Zheng Yi
+ * the engine. 
  */
 public class Parser {
 
@@ -417,7 +415,7 @@ public class Parser {
                 break;
     
             case "priority":
-                priorityLevel = Integer.parseInt(keywordArgsArray[0]);
+                updatePriorityLevel(keywordArgsArray[0]);                
                 break;
     
             case "desc":
@@ -436,26 +434,6 @@ public class Parser {
             default:
                 break;    
         }
-    }
-    
-    /**
-     * Updates the selected date result field based on the keyword arguments.
-     * 
-     * @param keywordArgs       The arguments of the keyword, expected to be 
-     *                          date data
-     * @param dateFieldToUpdate Index representing which date field to update
-     */
-    private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
-        calendar = parseDate(keywordArgs, dateFieldToUpdate);
-        if (calendar != null) {
-            if (dateFieldToUpdate == 1) {
-                date = calendar.getTime();
-            } else if (dateFieldToUpdate == 2) {
-                date2 = calendar.getTime();
-            } else {
-                dateToRemind = calendar.getTime();
-            }
-        }      
     }
     
     /**
@@ -555,6 +533,44 @@ public class Parser {
             default:
                 break;
         }
+    }    
+    
+    /**
+     * 
+     */
+    private static void updatePriorityLevel(String desiredLevel) {
+        try {
+            priorityLevel = Integer.parseInt(desiredLevel);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "error parsing priority level");
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_PRIORITY_LEVEL);
+        }
+        
+        if (priorityLevel < 1 || priorityLevel > 5) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_PRIORITY_LEVEL);
+        }
+    }
+    
+    /**
+     * Updates the selected date result field based on the keyword arguments.
+     * 
+     * @param keywordArgs       The arguments of the keyword, expected to be 
+     *                          date data
+     * @param dateFieldToUpdate Index representing which date field to update
+     */
+    private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
+        calendar = parseDate(keywordArgs, dateFieldToUpdate);
+        if (calendar != null) {
+            if (dateFieldToUpdate == 1) {
+                date = calendar.getTime();
+            } else if (dateFieldToUpdate == 2) {
+                date2 = calendar.getTime();
+            } else {
+                dateToRemind = calendar.getTime();
+            }
+        }      
     }
     
     /**
@@ -669,7 +685,6 @@ public class Parser {
             default:
                 setErrorType(ErrorType.INVALID_COMMAND);
                 return CommandType.INVALID;
-
         }
     }
     
