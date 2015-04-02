@@ -968,12 +968,12 @@ public class Parser {
         try {
             int hour = Integer.parseInt(timeParts[0]);
             int min = Integer.parseInt(timeParts[1]);
-            if (hour < 0 || hour > 12 || min < 0 || min > 59) {
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.INVALID_TIME);
-                logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to invalid hour/minute given");
+            if (!isValidHour(hour) || !isValidMin(min)) {
+                // hour and/or minute not valid, return default date value
                 return createCalendar(year, month, day, 0, 0);
-            } else if (pmOrAm.equals("pm")) {
+            }
+            
+            if (pmOrAm.equals("pm")) {
                 // special case of 12pm
                 if (hour == 12) {
                     return createCalendar(year, month - 1, day, hour, min); 
@@ -1018,11 +1018,54 @@ public class Parser {
         }
     }
     
+    /**
+     * Helper method for calcDateGivenTime that validates that the time has 
+     * two parts (expected to be hour and minute). Index of time keyword is 
+     * input for logging purposes.
+     * 
+     * @param indexBeingParsed Index of time keyword
+     * @param timeParts        Hour and minute
+     * @return                 Whether there are two parts
+     */
     private static boolean isValidTimeFormat(int indexBeingParsed, String[] timeParts) {  
         if (timeParts.length != 2) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
             logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * Checks whether the input hour is between 0 and 12 inclusive.
+     * 
+     * @param hour Hour of the day
+     * @return     Whether the hour is valid
+     */
+    private static boolean isValidHour(int hour) {
+        if (hour < 0 || hour > 12) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TIME);
+            logger.log(Level.WARNING, "unable to parse time on argument number due to invalid hour given");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * Checks whether the input minute is between 0 and 59 inclusive.
+     * 
+     * @param min Minute of the day
+     * @return    Whether the minute is valid
+     */
+    private static boolean isValidMin(int min) {
+        if (min < 0 || min > 59) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TIME);
+            logger.log(Level.WARNING, "unable to parse time on argument number due to invalid minute given");
             return false;
         } else {
             return true;
