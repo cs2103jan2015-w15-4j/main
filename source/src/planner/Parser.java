@@ -973,21 +973,8 @@ public class Parser {
                 return createCalendar(year, month, day, 0, 0);
             }
             
-            if (pmOrAm.equals("pm")) {
-                // special case of 12pm
-                if (hour == 12) {
-                    return createCalendar(year, month - 1, day, hour, min); 
-                } else {
-                    return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
-                }                    
-            } else {
-                // special case for 12am
-                if (hour == 12) {
-                    return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
-                } else {
-                    return createCalendar(year, month - 1, day, hour, min);  
-                }                    
-            }
+            return calcDateConsideringAmOrPm(pmOrAm, year, month, day, hour, min);
+            
             
         } catch (NumberFormatException e) {
             setCommandType(CommandType.INVALID);
@@ -996,8 +983,7 @@ public class Parser {
             return createCalendar(year, month - 1, day, 0, 0);
         }
         
-    }    
-
+    }
     
     /**
      * Helper method for calcDateGivenTime that validates the presence of an 
@@ -1073,14 +1059,48 @@ public class Parser {
     }
     
     /**
+     * Helper method for calcDateGivenTime that finishes calculating the result
+     * based on the fields calculated so far as well as whether the time given 
+     * is in PM or AM.
+     * 
+     * @param pmOrAm Either "pm" or "am"
+     * @param year   Desired year
+     * @param month  Desired month
+     * @param day    Desired day
+     * @param hour   Desired hour
+     * @param min    Desired min
+     * @return       Resulting date
+     */
+    private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int year, 
+                                                      int month, int day, 
+                                                      int hour, int min) {
+        if (pmOrAm.equals("pm")) {
+            // special case of 12pm
+            if (hour == 12) {
+                return createCalendar(year, month - 1, day, hour, min); 
+            } else {
+                return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
+            }                    
+        } else {
+            // special case for 12am
+            if (hour == 12) {
+                return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
+            } else {
+                return createCalendar(year, month - 1, day, hour, min);  
+            }                    
+        }
+    }
+    
+    /**
      * Creates a calendar with a time given by the input values. The value of the
      * second is always set to 0.
+     * 
      * @param year   Desired year
      * @param month  Desired month
      * @param day    Desired day
      * @param hour   Desired hour
      * @param minute Desired minute
-     * @return
+     * @return       Resulting date
      */
     private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
