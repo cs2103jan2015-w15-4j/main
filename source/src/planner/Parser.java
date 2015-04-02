@@ -309,7 +309,7 @@ public class Parser {
         processKeywordsAndArgs(commandWord);        
         checkAddConvertHaveValidFields();
         setDefaultDatesForAdd();
-        checkValidDates();
+        checkDate1BeforeDate2();
         flags = updateResultFlags(date, dateToRemind, priorityLevel, id, name, 
                                   description, tag, date2);
     }
@@ -996,8 +996,6 @@ public class Parser {
     
     /**
      * Verifies that a command with the type Add or Convert has valid fields:
-     * For Add, there must be a valid name, and for Convert, there may need to
-     * be one or more valid dates depending on the convert type.
      */
     private static void checkAddConvertHaveValidFields() {       
         if (commandType.equals(CommandType.ADD)) {
@@ -1005,14 +1003,17 @@ public class Parser {
          
         // check for two valid dates in the case of convert timed
         } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
-            checkConvertTimedHasValidDates();
+            checkValidDates();
             
         // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
-            checkConvertDeadlineHasValidDate();
+            checkAtLeastOneValidDate();
         }
     }
     
+    /**
+     * Checks that the user provided a valid name.
+     */
     private static void checkAddHasValidName() {
         if (name.equals("")) {
             setCommandType(CommandType.INVALID);
@@ -1020,7 +1021,7 @@ public class Parser {
         }
     }
     
-    private static void checkConvertTimedHasValidDates() {
+    private static void checkValidDates() {
         if (date == null || date2 == null) {
             logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
             setCommandType(CommandType.INVALID);
@@ -1028,7 +1029,7 @@ public class Parser {
         }
     }
     
-    private static void checkConvertDeadlineHasValidDate() {
+    private static void checkAtLeastOneValidDate() {
         logger.log(Level.WARNING, "no valid dates for Convert Deadline");
         if (date == null && date2 == null) {
             setCommandType(CommandType.INVALID);
@@ -1096,7 +1097,7 @@ public class Parser {
      * Checks that the date represented by date1 is before the date represented
      * by date2.
      */
-    private static void checkValidDates() {
+    private static void checkDate1BeforeDate2() {
         if (date != null && date2 != null) {
             if (!(date.compareTo(date2) < 0)) {
                 logger.log(Level.WARNING, "Date 1 not smaller than Date 2");
