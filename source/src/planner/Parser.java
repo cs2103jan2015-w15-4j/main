@@ -24,7 +24,7 @@ public class Parser {
     // stores the arguments for each keyword
     private static String keywordArgs = "";
 
-    private static String[] commandWords = null;
+    private static String[] inputTokens = null;
     private static String[] nonCommandKeywordsArray = {"at", "on", "from", "by",
         "every", "in", "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"  
@@ -44,7 +44,7 @@ public class Parser {
     };
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
-    private static String[] cmdsWithoutFollowingKeywords = {"help", 
+    private static String[] cmdsWithoutFollowingKeywords = {"help", "undo",
         "delete", "done", "setnotdone", "savewhere", "savehere", "show"
     };
     private static ArrayList<String> commandsWithoutFollowingKeywords =
@@ -71,30 +71,59 @@ public class Parser {
     private static final int COMMAND_WORD_INDEX = 0;
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
     private static final int HALF_DAY_IN_HOURS = 12;
-
-    public static ParseResult parse(String command) {
+    private static final int DATE_1_INDEX = 1;
+    private static final int DATE_2_INDEX = 2;
+    private static final int DATE_TO_REMIND_INDEX = 3;
+    
+    /**
+     * Processes a user input string and returns a result object containing
+     * information such as the user's desired command type and the relevant
+     * fields to update.
+     * 
+     * @param inputString The user input
+     * @return            A result containing information such as command type
+     */
+    public static ParseResult parse(String inputString) {
         logger.setLevel(Level.WARNING);
         resetFields();
-        ParseResult result = process(command.trim());
-        return result;
+        process(inputString.trim());
+        return createParseResult(commandType); 
     }    
     
-    private static ParseResult process(String command) {        
+    /**
+     * Processes the input string by updating the result fields based on what 
+     * the command type is.
+     * 
+     * @param inputString The user input
+     * @return            A result containing information such as command type
+     */
+    private static void process(String inputString) {        
         logger.log(Level.INFO, "going to begin processing");
-        commandWords = splitBySpaceDelimiter(command);
-        assert(commandWords.length > 0);
-        commandType = extractCommandType(commandWords[COMMAND_WORD_INDEX]);
+        inputTokens = splitBySpaceDelimiter(inputString);
+        assert(inputTokens.length > 0);
+        commandType = extractCommandType(inputTokens[COMMAND_WORD_INDEX]);
         processDependingOnCommandType(commandType);
         
-        logger.log(Level.INFO, "processing ended. returning result.");
-        ParseResult parseResult = createParseResult(commandType);        
-        return parseResult;
+        logger.log(Level.INFO, "processing ended.");
     }
     
+    /**
+     * Tokenizes a string input.
+     * 
+     * @param input Input string
+     * @return      Array of tokens
+     */
     private static String[] splitBySpaceDelimiter(String input) {
         return input.split(" ");
     }
 
+    /**
+     * Determines the type of command a user wants to execute given the input
+     * token expected to be a valid command keyword.
+     * 
+     * @param commandWord Command keyword
+     * @return            Type of command
+     */
     private static CommandType extractCommandType(String commandWord) {
         switch(commandWord.toLowerCase()) {
             case "add":
@@ -154,6 +183,13 @@ public class Parser {
         }
     }
     
+    /**
+     * Given the command type, processes the rest of the input depending on 
+     * what the command is. The command type is converted to a string for 
+     * convenience in processing.
+     * 
+     * @param commandType Type of command being parsed
+     */
     private static void processDependingOnCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
@@ -181,7 +217,7 @@ public class Parser {
                 break;
                 
             case UNDO:
-                // no need to process command
+                processCommand("undo");
                 break;
                 
             case SEARCH:
@@ -215,18 +251,31 @@ public class Parser {
         }
     }
     
+    /**
+     * Sets the error type result field to the given input.
+     * 
+     * @param desiredErrorType Error that arose from parsing
+     */
     private static void setErrorType(ErrorType desiredErrorType) {
         errorType = desiredErrorType;
     }
     
+    /**
+     * Sets the command type result field to the given input.
+     * 
+     * @param desiredCommandType Command type determined from parsing
+     */
     private static void setCommandType(CommandType desiredCommandType) {
         commandType = desiredCommandType;
     }
 
+    /**
+     * Resets the result fields used to construct the parse result object.
+     */
     private static void resetFields() {
         commandType = null;
         keywordArgs = "";
-        commandWords = null;
+        inputTokens = null;
         date = null;
         date2 = null;
         dateToRemind = null;
@@ -242,16 +291,27 @@ public class Parser {
         isTime2SetByUser = false;        
     }
 
+    /**
+     * Checks whether input word is a non command keyword
+     * @param word Keyword
+     * @return     Whether the keyword is a non command keyword
+     */
     private static Boolean isNonCmdKeyword(String word) {
         return nonCommandKeywords.contains(word);
     }
-
+    
+    /**
+     * Processes the rest of the input given the command word the user used.
+     * 
+     * @param commandWord User's desired command type
+     */
     private static void processCommand(String commandWord) {        
         processKeywordsAndArgs(commandWord);        
-        checkAddConvertValidFields();
-        setDefaultDatesForAdd();
-        checkValidDates();
-        flags = updateResultFlags(flags);
+        checkAddConvertHaveValidFields();
+        setDefaultTimesForAdd();
+        checkDate1BeforeDate2();
+        flags = updateResultFlags(date, dateToRemind, priorityLevel, id, name, 
+                                  description, tag, date2);
     }
     
     /**
@@ -268,8 +328,8 @@ public class Parser {
         String keywordBeingProcessed = commandWord;
         
         // continue looking for keywords until the end of the command        
-        while (indexBeingProcessed < commandWords.length) {
-            wordBeingProcessed = commandWords[indexBeingProcessed];
+        while (indexBeingProcessed < inputTokens.length) {
+            wordBeingProcessed = inputTokens[indexBeingProcessed];
             if (isNonCmdKeyword(wordBeingProcessed)) {
                 /* all text after the help, delete, done, setnotdone, savewhere,
                    savehere and show commands and their arguments is ignored */
@@ -298,7 +358,13 @@ public class Parser {
         }
         processArgs(keywordBeingProcessed);
     }
-
+    
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * what the keyword is.
+     * 
+     * @param keyword The keyword for which the arguments will be processed
+     */
     private static void processArgs(String keyword) {  
         // remove escape character from arguments since now unneeded
         keywordArgs = removeEscapeCharacterInstances(keywordArgs);
@@ -312,6 +378,17 @@ public class Parser {
         }           
     }
     
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * which of the non command keywords the keyword is.
+     * 
+     * @param keyword          The keyword for which the arguments will be 
+     *                         processed
+     * @param keywordArgs      The arguments of the keyword with escape 
+     *                         characters removed
+     * @param keywordArgsArray The tokenized arguments of the keyword with 
+     *                         escape characters removed
+     */
     private static void processNonCmdKeywordArgs(String keyword,
                                                  String keywordArgs,
                                                  String[] keywordArgsArray) {
@@ -322,19 +399,13 @@ public class Parser {
             case "from":
             case "by":
             case "due":
-                calendar = parseDate(keywordArgs, "date1");
-                if (calendar != null) {
-                    date = calendar.getTime();
-                }                
+                updateDate(keywordArgs, DATE_1_INDEX);                          
                 break;
             
             // end date (for timed tasks)
             case "until":
             case "to":
-                calendar = parseDate(keywordArgs, "date2");
-                if (calendar != null) {
-                    date2 = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_2_INDEX);                
                 break;           
     
             // not yet implemented
@@ -355,10 +426,7 @@ public class Parser {
                 break;
     
             case "remind":
-                calendar = parseDate(keywordArgs, "dateRemind");
-                if (calendar != null) {
-                    dateToRemind = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_TO_REMIND_INDEX);  
                 break;
                 
             case "tag":
@@ -370,6 +438,37 @@ public class Parser {
         }
     }
     
+    /**
+     * Updates the selected date result field based on the keyword arguments.
+     * 
+     * @param keywordArgs       The arguments of the keyword, expected to be 
+     *                          date data
+     * @param dateFieldToUpdate Index representing which date field to update
+     */
+    private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
+        calendar = parseDate(keywordArgs, dateFieldToUpdate);
+        if (calendar != null) {
+            if (dateFieldToUpdate == 1) {
+                date = calendar.getTime();
+            } else if (dateFieldToUpdate == 2) {
+                date2 = calendar.getTime();
+            } else {
+                dateToRemind = calendar.getTime();
+            }
+        }      
+    }
+    
+    /**
+     * Processes the existing keywords in the keyword buffer string based on
+     * which of the command keywords the keyword is.
+     * 
+     * @param keyword          The keyword for which the arguments will be 
+     *                         processed
+     * @param keywordArgs      The arguments of the keyword with escape 
+     *                         characters removed
+     * @param keywordArgsArray The tokenized arguments of the keyword with 
+     *                         escape characters removed
+     */
     private static void processCmdKeywordArgs(String keyword, 
                                               String keywordArgs,
                                               String[] keywordArgsArray) {
@@ -450,10 +549,7 @@ public class Parser {
                 
              // arguments for jump are expected to be date info
             case "jump":
-                calendar = parseDate(keywordArgs, "jumpdate");
-                if (calendar != null) {
-                    date = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_1_INDEX);
                 break;
                 
             default:
@@ -478,45 +574,75 @@ public class Parser {
         return keywordArgs;
     }
 
-    private static boolean[] updateResultFlags(boolean[] flags) {
+    /**
+     * Updates the flags that show what useful information the parse result
+     * contains after checking each field.
+     * 
+     * @param date          First date field
+     * @param dateToRemind  Date at which to remind user to do task
+     * @param priorityLevel Priority level
+     * @param id            Task ID
+     * @param name          Task name
+     * @param description   Task description
+     * @param tag           Task tag
+     * @param date2         Second date field, used for timed tasks
+     * @return              Collection of flags showing presence of useful info
+     */
+    private static boolean[] updateResultFlags(Date date, Date dateToRemind, 
+                                               int priorityLevel, long id, 
+                                               String name, String description, 
+                                               String tag, Date date2) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
         //              description, tag
-        assert(flags.length == 8);
+        boolean[] resultFlags = new boolean[8];
+
         if (date != null) {
-            flags[0] = true;
+            resultFlags[0] = true;
         }
         if (dateToRemind != null) {
-            flags[1] = true;
+            resultFlags[1] = true;
         }
         if (priorityLevel != 0) {
-            flags[2] = true;
+            resultFlags[2] = true;
         }
         if (id != 0) {
-            flags[3] = true;
+            resultFlags[3] = true;
         }
         if (!name.equals("")) {
-            flags[4] = true;
+            resultFlags[4] = true;
         }
         if (!description.equals("")) {
-            flags[5] = true;
+            resultFlags[5] = true;
         }
         if (!tag.equals("")) {
-            flags[6] = true;
+            resultFlags[6] = true;
         }
         if (date2 != null) {
-            flags[7] = true;
+            resultFlags[7] = true;
         }
-        return flags;
+        return resultFlags;
     }
 
-    // constructs and returns result based on existing fields
+    /**
+     * Constructs and returns a result object based on the current result 
+     * fields and input command type.
+     * 
+     * @param commandType Type of command the user input
+     * @return            Result of parsing user input string
+     */
     private static ParseResult createParseResult(CommandType commandType) {
         return new ParseResult(commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorType, flags);
     }
     
-    // returns a command type for the result based on what user wants help with
+    /**
+     * Returns a help-related command type for the result based on which 
+     * command the user wants help with.
+     * 
+     * @param commandType Command that user wants help with
+     * @return            Help-related command type
+     */
     private static CommandType determineHelpCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
@@ -530,7 +656,6 @@ public class Parser {
                 
             case SHOW:
                 return CommandType.HELP_SHOW;
-
                 
             case DONE:
                 return CommandType.HELP_DONE;
@@ -548,6 +673,13 @@ public class Parser {
         }
     }
     
+    /**
+     * Returns a convert-related command type for the result based on which 
+     * type of task the user wants to convert his task to.
+     * 
+     * @param convertTypeString Desired type of task to convert to
+     * @return                  Convert-related command type
+     */
     private static CommandType determineConvertType(String convertTypeString) {
         switch (convertTypeString.trim()) {
             case "deadline":
@@ -565,8 +697,17 @@ public class Parser {
                 return CommandType.INVALID;
         }
     }
-
-    private static Calendar parseDate(String arguments, String parseTarget) {
+    
+    /**
+     * Parses the input arguments that are expected to be a date representation
+     * into a consistent Calendar format.
+     * 
+     * @param arguments            String representation of a date
+     * @param dateBeingParsedIndex Index of the date field being updated (e.g. 
+     *                             date, date2)
+     * @return                     Parsed date
+     */
+    private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
         Calendar currentTime = Calendar.getInstance();
         int day = currentTime.get(Calendar.DATE);
@@ -582,7 +723,7 @@ public class Parser {
         
         // check whether the current argument is a keyword for time
         if (firstArg.equals("pm") || firstArg.equals("am")) {
-            setTimeSetByUserToTrue(parseTarget);
+            setTimeSetByUserToTrue(dateBeingParsedIndex);
             return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                        firstArg, year, month, day); 
         
@@ -623,7 +764,7 @@ public class Parser {
             
             // check whether the current argument is a keyword for time
             if (secondArg.equals("pm") || secondArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            secondArg, year, month, day); 
                 
@@ -663,7 +804,7 @@ public class Parser {
 
             // check whether the current argument is a keyword for time
             if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            thirdArg, year, month, day); 
 
@@ -686,7 +827,7 @@ public class Parser {
             // expected to be a time keyword
             String fourthArg = dateParts[3].toLowerCase();
             if (fourthArg.equals("pm") || fourthArg.equals("am")) {
-                setTimeSetByUserToTrue(parseTarget);
+                setTimeSetByUserToTrue(dateBeingParsedIndex);
                 return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
                                            fourthArg, year, month, day); 
             }
@@ -696,8 +837,13 @@ public class Parser {
     }
     
     
-    //Parses whatever that comes after "next" is typed
-    //Will delete/change bad comments before refactoring the code
+    /**
+     * Converts arguments in the form of 'next x time period' (e.g. next 3 
+     * days) into a proper date based on the current time and date.
+     * 
+     * @param arguments String representation of date in form "next ..."
+     * @return          Parsed date
+     */
     private static Calendar parseNext(String arguments) {
         String[] dateParts = splitBySpaceDelimiter(arguments);
         String secondArg = dateParts[1].toLowerCase().trim();
@@ -830,93 +976,150 @@ public class Parser {
         }
     }
     
-    //Creates calendar 
-    private static Calendar createCalendar(int year, int month, int date, int hour, int minute) {
+    /**
+     * Creates a calendar with a time given by the input values. The value of the
+     * second is always set to 0.
+     * @param year   Desired year
+     * @param month  Desired month
+     * @param day    Desired day
+     * @param hour   Desired hour
+     * @param minute Desired minute
+     * @return
+     */
+    private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
         // first set the second to 0
         calendar.set(0, 0, 0, 0, 0, 0);
-        calendar.set(year, month, date, hour, minute);
+        calendar.set(year, month, day, hour, minute);
         return calendar;
     }
     
-    private static void checkAddConvertValidFields() {
-        // check for valid name in the case of the add command
+    /**
+     * Verifies that a command with the type Add or Convert has valid fields:
+     */
+    private static void checkAddConvertHaveValidFields() {       
         if (commandType.equals(CommandType.ADD)) {
-            if (name.equals("")) {
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.BLANK_TASK_NAME);
-            }
-            
-        // check for two valid dates in the case of the convert timed 
+            checkAddHasValidName();         
+         
+        // check for two valid dates in the case of convert timed
         } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
-            if (date == null || date2 == null) {
-                logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.INVALID_ARGUMENTS);
-            }
-         // check for at least one valid date in the case of convert deadline
+            checkValidDates();
+            
+        // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
-            logger.log(Level.WARNING, "no valid dates for Convert Deadline");
-            if (date == null && date2 == null) {
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.INVALID_ARGUMENTS);
-            }
+            checkAtLeastOneValidDate();
         }
     }
     
-    private static void setTimeSetByUserToTrue(String targetTime) {
-        if (targetTime.equals("date1")) {
+    /**
+     * Checks that the user provided a valid name.
+     */
+    private static void checkAddHasValidName() {
+        if (name.equals("")) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.BLANK_TASK_NAME);
+        }
+    }
+    
+    /**
+     * Check that both date1 and date2 fields contain valid dates.
+     */
+    private static void checkValidDates() {
+        if (date == null || date2 == null) {
+            logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_ARGUMENTS);
+        }
+    }
+    /**
+     * Check that there is at least one valid date out of date1 and date2.
+     */
+    private static void checkAtLeastOneValidDate() {
+        logger.log(Level.WARNING, "no valid dates for Convert Deadline");
+        if (date == null && date2 == null) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_ARGUMENTS);
+        }
+    }
+    
+    /**
+     * Sets true the flag showing whether the user has set a particular time 
+     * field.
+     * 
+     * @param targetTimeIndex Index of time field the user has set
+     */
+    private static void setTimeSetByUserToTrue(int targetTimeIndex) {
+        if (targetTimeIndex == 1) {
             isTimeSetByUser = true;
-        } else if (targetTime.equals("date2")) {
+        } else if (targetTimeIndex == 2) {
             isTime2SetByUser = true;
         }
     }
     
-    private static void setDefaultDatesForAdd() {
+    /**
+     * Sets default times for the user in the case that they added a task 
+     * without specifying the times on their own.
+     */
+    private static void setDefaultTimesForAdd() {
         if (commandType.equals(CommandType.ADD)) {
-            Calendar calendar = Calendar.getInstance();
             // case of timed task
             if (date != null && date2 != null) {
-                if (!isTimeSetByUser) {
-                    // set the default time for first date to start of the day
-                    calendar.setTime(date);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 0, 0);
-                    date = calendar.getTime();
-                }
-                if (!isTime2SetByUser) {
-                    // set the default time for second date to end of the day
-                    calendar.setTime(date2);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date2 = calendar.getTime();
-                }
+                setDefaultTimesForTimedAdd();
             // case of deadline task
             } else if (date != null || date2 != null) {
-                if (!isTimeSetByUser && date != null) {
-                    // set the default time for the date to end of the day
-                    calendar.setTime(date);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date = calendar.getTime();
-                }
-                
-                if (!isTime2SetByUser && date2 != null) {
-                    // set the default time for the date to end of the day
-                    calendar.setTime(date2);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date2 = calendar.getTime();
-                }
+                setDefaultTimeForDeadlineAdd();
             }
+        }
+    }
+    
+    /**
+     * Sets default times to the start of the day for the first date and the
+     * end of the day for the second date if they were not set by the user.
+     */
+    private static void setDefaultTimesForTimedAdd() {
+        if (!isTimeSetByUser) {
+            // set the default time for first date to start of the day
+            calendar.setTime(date);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 0, 0);
+            date = calendar.getTime();
+        }
+        if (!isTime2SetByUser) {
+            // set the default time for second date to end of the day
+            calendar.setTime(date2);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = calendar.getTime();
+        }
+    }
+    
+    /**
+     * Sets default time for any of the fields date and date2 to the end of the
+     * day if they were not set by the user.
+     */
+    private static void setDefaultTimeForDeadlineAdd() {
+        if (!isTimeSetByUser && date != null) {
+            // set the default time for the date to end of the day
+            calendar.setTime(date);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date = calendar.getTime();
+        }
+        
+        if (!isTime2SetByUser && date2 != null) {
+            // set the default time for the date to end of the day
+            calendar.setTime(date2);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = calendar.getTime();
         }
     }
     
@@ -924,7 +1127,7 @@ public class Parser {
      * Checks that the date represented by date1 is before the date represented
      * by date2.
      */
-    private static void checkValidDates() {
+    private static void checkDate1BeforeDate2() {
         if (date != null && date2 != null) {
             if (!(date.compareTo(date2) < 0)) {
                 logger.log(Level.WARNING, "Date 1 not smaller than Date 2");
