@@ -939,12 +939,12 @@ public class Parser {
      *  index containing the time string, and returns a Calendar constructed 
      *  with all the date info.
      *  
-     *  @param dateParts    string tokens with date info
-     *  @param indexToCheck index of array expected to contain time string
-     *  @param year         year of desired date
-     *  @param month        month of desired date
-     *  @param day          day of desired date
-     *  @return             representation of full date
+     *  @param dateParts    String tokens with date info
+     *  @param indexToCheck Index expected to contain time string
+     *  @param year         Year of desired date
+     *  @param month        Month of desired date
+     *  @param day          Day of desired date
+     *  @return             Representation of full date
      */    
     private static Calendar calcDateGivenTime(String[] dateParts, 
                                                 int indexBeingParsed, 
@@ -952,12 +952,10 @@ public class Parser {
                                                 int month, int day) {
         int indexToCheck = indexBeingParsed + 1;
         // check for a valid argument to be parsed as the time
-        if (indexToCheck > dateParts.length) {
-            setCommandType(CommandType.INVALID);
-            setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
-            return createCalendar(year, month - 1, day, 0, 0);
-        } 
+        if (!isTimeArgExistent(indexBeingParsed, dateParts)) {
+            // does not exist, return default date value
+            createCalendar(year, month - 1, day, 0, 0);
+        }
         String timeString = dateParts[indexToCheck];
         String[] timeParts = timeString.split("\\.");
         
@@ -999,6 +997,25 @@ public class Parser {
                 return createCalendar(year, month - 1, day, 0, 0);
             }
             
+        }
+    }
+    
+    /**
+     * Helper method for calcDateGivenTime that validates the presence of an 
+     * argument for the time keyword.
+     * 
+     * @param indexBeingParsed Index of time keyword
+     * @param dateParts        String tokens with date info
+     * @return                 Whether the argument exists
+     */
+    private static boolean isTimeArgExistent(int indexBeingParsed, String[] dateParts) {
+        if (indexBeingParsed + 1 > dateParts.length) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TIME);
+            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
+            return false;
+        } else {
+            return true;
         }
     }
     
