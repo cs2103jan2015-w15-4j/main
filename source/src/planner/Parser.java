@@ -44,7 +44,7 @@ public class Parser {
     };
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
-    private static String[] cmdsWithoutFollowingKeywords = {"help", 
+    private static String[] cmdsWithoutFollowingKeywords = {"help", "undo",
         "delete", "done", "setnotdone", "savewhere", "savehere", "show"
     };
     private static ArrayList<String> commandsWithoutFollowingKeywords =
@@ -107,10 +107,23 @@ public class Parser {
         logger.log(Level.INFO, "processing ended.");
     }
     
+    /**
+     * Tokenizes a string input.
+     * 
+     * @param input Input string
+     * @return      Array of tokens
+     */
     private static String[] splitBySpaceDelimiter(String input) {
         return input.split(" ");
     }
 
+    /**
+     * Determines the type of command a user wants to execute given the input
+     * token expected to be a valid command keyword.
+     * 
+     * @param commandWord Command keyword
+     * @return            Type of command
+     */
     private static CommandType extractCommandType(String commandWord) {
         switch(commandWord.toLowerCase()) {
             case "add":
@@ -170,6 +183,13 @@ public class Parser {
         }
     }
     
+    /**
+     * Given the command type, processes the rest of the input depending on 
+     * what the command is. The command type is converted to a string for 
+     * convenience in processing.
+     * 
+     * @param commandType Type of command being parsed
+     */
     private static void processDependingOnCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
@@ -197,7 +217,7 @@ public class Parser {
                 break;
                 
             case UNDO:
-                // no need to process command
+                processCommand("undo");
                 break;
                 
             case SEARCH:
@@ -231,14 +251,27 @@ public class Parser {
         }
     }
     
+    /**
+     * Sets the error type result field to the given input.
+     * 
+     * @param desiredErrorType Error that arose from parsing
+     */
     private static void setErrorType(ErrorType desiredErrorType) {
         errorType = desiredErrorType;
     }
     
+    /**
+     * Sets the command type result field to the given input.
+     * 
+     * @param desiredCommandType Command type determined from parsing
+     */
     private static void setCommandType(CommandType desiredCommandType) {
         commandType = desiredCommandType;
     }
 
+    /**
+     * Resets the result fields used to construct the parse result object.
+     */
     private static void resetFields() {
         commandType = null;
         keywordArgs = "";
@@ -258,16 +291,27 @@ public class Parser {
         isTime2SetByUser = false;        
     }
 
+    /**
+     * Checks whether input word is a non command keyword
+     * @param word Keyword
+     * @return     Whether the keyword is a non command keyword
+     */
     private static Boolean isNonCmdKeyword(String word) {
         return nonCommandKeywords.contains(word);
     }
-
+    
+    /**
+     * Processes the rest of the input given the command word the user used.
+     * 
+     * @param commandWord User's desired command type
+     */
     private static void processCommand(String commandWord) {        
         processKeywordsAndArgs(commandWord);        
-        checkAddConvertValidFields();
+        checkAddConvertHaveValidFields();
         setDefaultDatesForAdd();
         checkValidDates();
-        flags = updateResultFlags(flags);
+        flags = updateResultFlags(date, dateToRemind, priorityLevel, id, name, 
+                                  description, tag, date2);
     }
     
     /**
@@ -530,35 +574,53 @@ public class Parser {
         return keywordArgs;
     }
 
-    private static boolean[] updateResultFlags(boolean[] flags) {
+    /**
+     * Updates the flags that show what useful information the parse result
+     * contains after checking each field.
+     * 
+     * @param date          First date field
+     * @param dateToRemind  Date at which to remind user to do task
+     * @param priorityLevel Priority level
+     * @param id            Task ID
+     * @param name          Task name
+     * @param description   Task description
+     * @param tag           Task tag
+     * @param date2         Second date field, used for timed tasks
+     * @return              Collection of flags showing presence of useful info
+     */
+    private static boolean[] updateResultFlags(Date date, Date dateToRemind, 
+                                               int priorityLevel, long id, 
+                                               String name, String description, 
+                                               String tag, Date date2) {
         // flags order: date, dateToRemind, priorityLevel, id, name,
         //              description, tag
-        assert(flags.length == 8);
+        boolean[] resultFlags = new boolean[8];
+
         if (date != null) {
-            flags[0] = true;
+            resultFlags[0] = true;
         }
         if (dateToRemind != null) {
-            flags[1] = true;
+            resultFlags[1] = true;
         }
         if (priorityLevel != 0) {
-            flags[2] = true;
+            resultFlags[2] = true;
         }
         if (id != 0) {
-            flags[3] = true;
+            resultFlags[3] = true;
         }
         if (!name.equals("")) {
-            flags[4] = true;
+            resultFlags[4] = true;
         }
         if (!description.equals("")) {
-            flags[5] = true;
+            resultFlags[5] = true;
         }
         if (!tag.equals("")) {
-            flags[6] = true;
+            resultFlags[6] = true;
         }
         if (date2 != null) {
-            flags[7] = true;
+            resultFlags[7] = true;
         }
-        return flags;
+        return resultFlags;
     }
 
     // constructs and returns result based on existing fields
@@ -891,7 +953,7 @@ public class Parser {
         return calendar;
     }
     
-    private static void checkAddConvertValidFields() {
+    private static void checkAddConvertHaveValidFields() {
         // check for valid name in the case of the add command
         if (commandType.equals(CommandType.ADD)) {
             if (name.equals("")) {
