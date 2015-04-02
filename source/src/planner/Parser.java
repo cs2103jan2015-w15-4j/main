@@ -771,8 +771,7 @@ public class Parser {
                     return null;
                 }
             }
-        }
-        
+        }        
         
         //Checks whether date information is incomplete, if so checks whether date has passed
         //If so push to next month, else keep the current month
@@ -860,8 +859,7 @@ public class Parser {
         }
         
         return createCalendar(year, month - 1, day, 0, 0);
-    }
-    
+    }    
     
     /**
      * Converts arguments in the form of 'next x time period' (e.g. next 3 
@@ -973,8 +971,7 @@ public class Parser {
                 return createCalendar(year, month, day, 0, 0);
             }
             
-            return calcDateConsideringAmOrPm(pmOrAm, year, month, day, hour, min);
-            
+            return calcDateConsideringAmOrPm(pmOrAm, year, month, day, hour, min);            
             
         } catch (NumberFormatException e) {
             setCommandType(CommandType.INVALID);
@@ -1074,6 +1071,7 @@ public class Parser {
     private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int year, 
                                                       int month, int day, 
                                                       int hour, int min) {
+        assert(pmOrAm.equals("pm") || pmOrAm.equals("am"));
         if (pmOrAm.equals("pm")) {
             // special case of 12pm
             if (hour == 12) {

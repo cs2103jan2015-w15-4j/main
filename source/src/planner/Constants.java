@@ -22,6 +22,7 @@ public class Constants {
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
         INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
+        INVALID_PRIORITY_LEVEL,
     };
     
     public enum TipType{
@@ -87,5 +88,6 @@ public class Constants {
         errorMessages.put(ErrorType.BLANK_TASK_NAME, "the name of the task added cannot be blank");
         errorMessages.put(ErrorType.INVALID_DATE, "Unable to parse date");
         errorMessages.put(ErrorType.INVALID_TIME, "Unable to parse time");
+        errorMessages.put(ErrorType.INVALID_PRIORITY_LEVEL, "Please input a priority level from 1 to 5");
     }
 }
