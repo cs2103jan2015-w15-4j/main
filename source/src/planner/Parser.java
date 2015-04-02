@@ -475,15 +475,7 @@ public class Parser {
                 break;
     
             case "help":
-                // check whether the user needs help with specific command
-                String cmdToHelpWith = keywordArgsArray[0];
-                CommandType cmdToHelpWithType = extractCommandType(cmdToHelpWith);
-                if (cmdToHelpWithType.equals(Constants.CommandType.INVALID)) {
-                    logger.log(Level.INFO, "show general help");
-                } else {
-                    logger.log(Level.INFO, "show help for specific command");
-                    setCommandType(determineHelpCommandType(cmdToHelpWithType));
-                }
+                determineWhatUserNeedsHelpWith(keywordArgsArray[0]);
                 break;
             
             case "convert":
@@ -569,6 +561,27 @@ public class Parser {
                 dateToRemind = calendar.getTime();
             }
         }      
+    }
+    
+    /**
+     * Updates the command type to a help-related command type if the user has
+     * specified a valid command type as an argument.
+     * @param commandType
+     */
+    private static void determineWhatUserNeedsHelpWith(String commandType) {
+        // check whether the user needs help with specific command
+        String cmdToHelpWith = commandType;
+        
+        // determine the type of command the user wants help with
+        CommandType cmdToHelpWithType = extractCommandType(cmdToHelpWith);
+        
+        // user did not ask for help for a valid command type
+        if (cmdToHelpWithType.equals(Constants.CommandType.INVALID)) {
+            logger.log(Level.INFO, "show general help");
+        } else {
+            logger.log(Level.INFO, "show help for specific command");
+            setCommandType(determineHelpCommandType(cmdToHelpWithType));
+        }
     }
     
     /**
