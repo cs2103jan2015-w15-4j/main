@@ -459,26 +459,11 @@ public class Parser {
             case "delete":
             case "setnotdone":
             case "done":
-                try {
-                    id = Long.parseLong(keywordArgsArray[0]);
-                } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id in " + keyword);
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_TASK_ID);
-                }
+                updateId(keywordArgsArray[0], keyword);                
                 break;
     
             case "show":
-                try {
-                    // check whether next token is an id of the task to show
-                    id = Long.parseLong(keywordArgsArray[0]);
-                    logger.log(Level.INFO, "successfully parsed id, show" + 
-                               "specific task");
-                    setCommandType(CommandType.SHOW_ONE);
-                } catch (NumberFormatException e) {
-                    logger.log(Level.INFO, "no id parsed, show all tasks");
-                    setCommandType(CommandType.SHOW_ALL);
-                }
+                // not in use
                 break;
             
             case "undo":
@@ -502,18 +487,11 @@ public class Parser {
                 break;
             
             case "convert":
-                String[] convertArgs = keywordArgsArray;
                 // get id of task to convert
-                try {
-                    id = Long.parseLong(convertArgs[0]);
-                } catch (NumberFormatException e) {
-                    logger.log(Level.WARNING, "error parsing id for convert");
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_TASK_ID);
-                }
+                updateId(keywordArgsArray[0], keyword); 
                 
                 // determine type to convert to
-                setCommandType(determineConvertType(convertArgs[1]));             
+                setCommandType(determineConvertType(keywordArgsArray[1]));             
                 break;
                 
             case "savewhere":
@@ -536,7 +514,10 @@ public class Parser {
     }    
     
     /**
+     * Updates the priority field after processing a string representing the 
+     * desired priority level.
      * 
+     * @param desiredLevel Priority level
      */
     private static void updatePriorityLevel(String desiredLevel) {
         try {
@@ -550,6 +531,23 @@ public class Parser {
         if (priorityLevel < 1 || priorityLevel > 5) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_PRIORITY_LEVEL);
+        }
+    }
+    
+    /**
+     * Updates the ID field after processing a string representing the target
+     * id of the command. Keyword is input for logging purposes.
+     * 
+     * @param targetIdString     Target task of command
+     * @param keywordBeingParsed Keyword being parsed
+     */
+    private static void updateId(String targetIdString, String keywordBeingParsed) {
+        try {
+            id = Long.parseLong(targetIdString);
+        } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "error parsing id in " + keywordBeingParsed);
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_TASK_ID);
         }
     }
     
