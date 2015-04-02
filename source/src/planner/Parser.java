@@ -24,7 +24,7 @@ public class Parser {
     // stores the arguments for each keyword
     private static String keywordArgs = "";
 
-    private static String[] commandWords = null;
+    private static String[] inputTokens = null;
     private static String[] nonCommandKeywordsArray = {"at", "on", "from", "by",
         "every", "in", "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"  
@@ -74,19 +74,34 @@ public class Parser {
     private static final int DATE_1_INDEX = 1;
     private static final int DATE_2_INDEX = 2;
     private static final int DATE_TO_REMIND_INDEX = 3;
-
-    public static ParseResult parse(String command) {
+    
+    /**
+     * Processes a user input string and returns a result object containing
+     * information such as the user's desired command type and the relevant
+     * fields to update.
+     * 
+     * @param inputString The user input
+     * @return            A result containing information such as command type
+     */
+    public static ParseResult parse(String inputString) {
         logger.setLevel(Level.WARNING);
         resetFields();
-        ParseResult result = process(command.trim());
+        ParseResult result = process(inputString.trim());
         return result;
     }    
     
-    private static ParseResult process(String command) {        
+    /**
+     * Processes the input string by updating the result fields based on what 
+     * the command type is.
+     * 
+     * @param inputString The user input
+     * @return            A result containing information such as command type
+     */
+    private static ParseResult process(String inputString) {        
         logger.log(Level.INFO, "going to begin processing");
-        commandWords = splitBySpaceDelimiter(command);
-        assert(commandWords.length > 0);
-        commandType = extractCommandType(commandWords[COMMAND_WORD_INDEX]);
+        inputTokens = splitBySpaceDelimiter(inputString);
+        assert(inputTokens.length > 0);
+        commandType = extractCommandType(inputTokens[COMMAND_WORD_INDEX]);
         processDependingOnCommandType(commandType);
         
         logger.log(Level.INFO, "processing ended. returning result.");
@@ -229,7 +244,7 @@ public class Parser {
     private static void resetFields() {
         commandType = null;
         keywordArgs = "";
-        commandWords = null;
+        inputTokens = null;
         date = null;
         date2 = null;
         dateToRemind = null;
@@ -271,8 +286,8 @@ public class Parser {
         String keywordBeingProcessed = commandWord;
         
         // continue looking for keywords until the end of the command        
-        while (indexBeingProcessed < commandWords.length) {
-            wordBeingProcessed = commandWords[indexBeingProcessed];
+        while (indexBeingProcessed < inputTokens.length) {
+            wordBeingProcessed = inputTokens[indexBeingProcessed];
             if (isNonCmdKeyword(wordBeingProcessed)) {
                 /* all text after the help, delete, done, setnotdone, savewhere,
                    savehere and show commands and their arguments is ignored */
@@ -382,10 +397,11 @@ public class Parser {
     }
     
     /**
+     * Updates the selected date result field based on the keyword arguments.
      * 
-     * @param keywordArgs
-     * @param parseTarget
-     * @param dateFieldToUpdate
+     * @param keywordArgs       The arguments of the keyword, expected to be 
+     *                          date data
+     * @param dateFieldToUpdate Index representing which date field to update
      */
     private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
         calendar = parseDate(keywordArgs, dateFieldToUpdate);
@@ -491,10 +507,7 @@ public class Parser {
                 
              // arguments for jump are expected to be date info
             case "jump":
-                calendar = parseDate(keywordArgs, 1);
-                if (calendar != null) {
-                    date = calendar.getTime();
-                }
+                updateDate(keywordArgs, DATE_1_INDEX);
                 break;
                 
             default:
