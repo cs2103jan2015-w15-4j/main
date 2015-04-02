@@ -623,14 +623,26 @@ public class Parser {
         return resultFlags;
     }
 
-    // constructs and returns result based on existing fields
+    /**
+     * Constructs and returns a result object based on the current result 
+     * fields and input command type.
+     * 
+     * @param commandType Type of command the user input
+     * @return            Result of parsing user input string
+     */
     private static ParseResult createParseResult(CommandType commandType) {
         return new ParseResult(commandType, date, date2, dateToRemind, 
                                priorityLevel, id, name, description, tag, 
                                errorType, flags);
     }
     
-    // returns a command type for the result based on what user wants help with
+    /**
+     * Returns a help-related command type for the result based on which 
+     * command the user wants help with.
+     * 
+     * @param commandType Command that user wants help with
+     * @return            Help-related command type
+     */
     private static CommandType determineHelpCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
@@ -644,7 +656,6 @@ public class Parser {
                 
             case SHOW:
                 return CommandType.HELP_SHOW;
-
                 
             case DONE:
                 return CommandType.HELP_DONE;
@@ -662,6 +673,13 @@ public class Parser {
         }
     }
     
+    /**
+     * Returns a convert-related command type for the result based on which 
+     * type of task the user wants to convert his task to.
+     * 
+     * @param convertTypeString Desired type of task to convert to
+     * @return                  Convert-related command type
+     */
     private static CommandType determineConvertType(String convertTypeString) {
         switch (convertTypeString.trim()) {
             case "deadline":
@@ -679,7 +697,16 @@ public class Parser {
                 return CommandType.INVALID;
         }
     }
-
+    
+    /**
+     * Parses the input arguments that are expected to be a date representation
+     * into a consistent Calendar format.
+     * 
+     * @param arguments            String representation of a date
+     * @param dateBeingParsedIndex Index of the date field being updated (e.g. 
+     *                             date, date2)
+     * @return                     Parsed date
+     */
     private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
         Calendar currentTime = Calendar.getInstance();
@@ -810,8 +837,13 @@ public class Parser {
     }
     
     
-    //Parses whatever that comes after "next" is typed
-    //Will delete/change bad comments before refactoring the code
+    /**
+     * Converts arguments in the form of 'next x time period' (e.g. next 3 
+     * days) into a proper date based on the current time and date.
+     * 
+     * @param arguments String representation of date in form "next ..."
+     * @return          Parsed date
+     */
     private static Calendar parseNext(String arguments) {
         String[] dateParts = splitBySpaceDelimiter(arguments);
         String secondArg = dateParts[1].toLowerCase().trim();
@@ -944,37 +976,63 @@ public class Parser {
         }
     }
     
-    //Creates calendar 
-    private static Calendar createCalendar(int year, int month, int date, int hour, int minute) {
+    /**
+     * Creates a calendar with a time given by the input values. The value of the
+     * second is always set to 0.
+     * @param year   Desired year
+     * @param month  Desired month
+     * @param day    Desired day
+     * @param hour   Desired hour
+     * @param minute Desired minute
+     * @return
+     */
+    private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
         // first set the second to 0
         calendar.set(0, 0, 0, 0, 0, 0);
-        calendar.set(year, month, date, hour, minute);
+        calendar.set(year, month, day, hour, minute);
         return calendar;
     }
     
-    private static void checkAddConvertHaveValidFields() {
-        // check for valid name in the case of the add command
+    /**
+     * Verifies that a command with the type Add or Convert has valid fields:
+     * For Add, there must be a valid name, and for Convert, there may need to
+     * be one or more valid dates depending on the convert type.
+     */
+    private static void checkAddConvertHaveValidFields() {       
         if (commandType.equals(CommandType.ADD)) {
-            if (name.equals("")) {
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.BLANK_TASK_NAME);
-            }
-            
-        // check for two valid dates in the case of the convert timed 
+            checkAddHasValidName();         
+         
+        // check for two valid dates in the case of convert timed
         } else if (commandType.equals(CommandType.CONVERT_TIMED)) {
-            if (date == null || date2 == null) {
-                logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.INVALID_ARGUMENTS);
-            }
-         // check for at least one valid date in the case of convert deadline
+            checkConvertTimedHasValidDates();
+            
+        // check for at least one valid date in the case of convert deadline
         } else if (commandType.equals(CommandType.CONVERT_DEADLINE)) {
-            logger.log(Level.WARNING, "no valid dates for Convert Deadline");
-            if (date == null && date2 == null) {
-                setCommandType(CommandType.INVALID);
-                setErrorType(ErrorType.INVALID_ARGUMENTS);
-            }
+            checkConvertDeadlineHasValidDate();
+        }
+    }
+    
+    private static void checkAddHasValidName() {
+        if (name.equals("")) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.BLANK_TASK_NAME);
+        }
+    }
+    
+    private static void checkConvertTimedHasValidDates() {
+        if (date == null || date2 == null) {
+            logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_ARGUMENTS);
+        }
+    }
+    
+    private static void checkConvertDeadlineHasValidDate() {
+        logger.log(Level.WARNING, "no valid dates for Convert Deadline");
+        if (date == null && date2 == null) {
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_ARGUMENTS);
         }
     }
     
