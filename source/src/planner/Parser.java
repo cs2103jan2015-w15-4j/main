@@ -308,7 +308,7 @@ public class Parser {
     private static void processCommand(String commandWord) {        
         processKeywordsAndArgs(commandWord);        
         checkAddConvertHaveValidFields();
-        setDefaultDatesForAdd();
+        setDefaultTimesForAdd();
         checkDate1BeforeDate2();
         flags = updateResultFlags(date, dateToRemind, priorityLevel, id, name, 
                                   description, tag, date2);
@@ -1021,6 +1021,9 @@ public class Parser {
         }
     }
     
+    /**
+     * Check that both date1 and date2 fields contain valid dates.
+     */
     private static void checkValidDates() {
         if (date == null || date2 == null) {
             logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
@@ -1028,7 +1031,9 @@ public class Parser {
             setErrorType(ErrorType.INVALID_ARGUMENTS);
         }
     }
-    
+    /**
+     * Check that there is at least one valid date out of date1 and date2.
+     */
     private static void checkAtLeastOneValidDate() {
         logger.log(Level.WARNING, "no valid dates for Convert Deadline");
         if (date == null && date2 == null) {
@@ -1037,6 +1042,12 @@ public class Parser {
         }
     }
     
+    /**
+     * Sets true the flag showing whether the user has set a particular time 
+     * field.
+     * 
+     * @param targetTimeIndex Index of time field the user has set
+     */
     private static void setTimeSetByUserToTrue(int targetTimeIndex) {
         if (targetTimeIndex == 1) {
             isTimeSetByUser = true;
@@ -1045,51 +1056,70 @@ public class Parser {
         }
     }
     
-    private static void setDefaultDatesForAdd() {
+    /**
+     * Sets default times for the user in the case that they added a task 
+     * without specifying the times on their own.
+     */
+    private static void setDefaultTimesForAdd() {
         if (commandType.equals(CommandType.ADD)) {
-            Calendar calendar = Calendar.getInstance();
             // case of timed task
             if (date != null && date2 != null) {
-                if (!isTimeSetByUser) {
-                    // set the default time for first date to start of the day
-                    calendar.setTime(date);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 0, 0);
-                    date = calendar.getTime();
-                }
-                if (!isTime2SetByUser) {
-                    // set the default time for second date to end of the day
-                    calendar.setTime(date2);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date2 = calendar.getTime();
-                }
+                setDefaultTimesForTimedAdd();
             // case of deadline task
             } else if (date != null || date2 != null) {
-                if (!isTimeSetByUser && date != null) {
-                    // set the default time for the date to end of the day
-                    calendar.setTime(date);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date = calendar.getTime();
-                }
-                
-                if (!isTime2SetByUser && date2 != null) {
-                    // set the default time for the date to end of the day
-                    calendar.setTime(date2);
-                    int existingYear = calendar.get(Calendar.YEAR);
-                    int existingMonth = calendar.get(Calendar.MONTH);
-                    int existingDay = calendar.get(Calendar.DATE);
-                    calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-                    date2 = calendar.getTime();
-                }
+                setDefaultTimeForDeadlineAdd();
             }
+        }
+    }
+    
+    /**
+     * Sets default times to the start of the day for the first date and the
+     * end of the day for the second date if they were not set by the user.
+     */
+    private static void setDefaultTimesForTimedAdd() {
+        if (!isTimeSetByUser) {
+            // set the default time for first date to start of the day
+            calendar.setTime(date);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 0, 0);
+            date = calendar.getTime();
+        }
+        if (!isTime2SetByUser) {
+            // set the default time for second date to end of the day
+            calendar.setTime(date2);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = calendar.getTime();
+        }
+    }
+    
+    /**
+     * Sets default time for any of the fields date and date2 to the end of the
+     * day if they were not set by the user.
+     */
+    private static void setDefaultTimeForDeadlineAdd() {
+        if (!isTimeSetByUser && date != null) {
+            // set the default time for the date to end of the day
+            calendar.setTime(date);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date = calendar.getTime();
+        }
+        
+        if (!isTime2SetByUser && date2 != null) {
+            // set the default time for the date to end of the day
+            calendar.setTime(date2);
+            int existingYear = calendar.get(Calendar.YEAR);
+            int existingMonth = calendar.get(Calendar.MONTH);
+            int existingDay = calendar.get(Calendar.DATE);
+            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = calendar.getTime();
         }
     }
     
