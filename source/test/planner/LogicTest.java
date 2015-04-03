@@ -231,7 +231,7 @@ public class LogicTest {
          * task5 is a boundary case where the letters have different cases
          */
         
-        Search = Logic.searchTaskByTags(TL1, "work");
+        Search = Logic.searchTag(TL1, "work");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
         assertEquals(Search.get(2), TL2.get(2));
@@ -341,7 +341,7 @@ public class LogicTest {
          * All tasks are standard data participants
          */
         
-        SearchTent = Logic.searchTentative(TL1);
+        SearchTent = Logic.searchFloating(TL1);
         SearchConf = Logic.searchConfirmed(TL1);
         assertEquals(SearchTent.get(0), TL2.get(0));
         assertEquals(SearchTent.get(1), TL2.get(1));

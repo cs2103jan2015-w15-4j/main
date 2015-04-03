@@ -37,17 +37,12 @@ public class SearchLogic {
         TaskList searchList = new TaskList();
     
         try {
-     
             for (int i = 0; i < input.size(); i++) {
-      
                 if (input.get(i).getDescription().contains(wordToSearch)) {
-     
                     searchList.add(input.get(i));
                 }
             }
-   
         } catch (Exception e) {
-     
             System.err.println("Invalid input: " + e.getMessage());
         }
     
@@ -55,29 +50,24 @@ public class SearchLogic {
     }
     
     public static TaskList searchTags(TaskList input, String tagToLookFor){
-      
+        
         TaskList searchList = new TaskList();
-     
+        
         try { 
-         
             for (int i = 0; i < input.size(); i++) {
-           
                 if (input.get(i).getTag().contains(tagToLookFor)) {
-       
                     searchList.add(input.get(i));
                 }
-            }
-     
+            } 
         } catch (Exception e) {
-   
             System.err.println("Invalid input: " + e.getMessage());
-    
         }
      
         return searchList;
     }
     
     public static TaskList searchPeriod(TaskList input, Date start, Date end) {
+        
         TaskList searchList = new TaskList();
         for (int i = 0; i < input.size(); i++) {
             if (input.get(i).getDueDate().compareTo(start) > 0 && 
@@ -187,17 +177,13 @@ public class SearchLogic {
     }
     
     public static TaskList searchFloating(TaskList input) {
-     
         TaskList searchList = new TaskList();
-    
+        
         for (int i = 0; i < input.size(); i++) {
-   
             if (input.get(i).isFloating()) {
-   
                 searchList.add(input.get(i));
             }
         }
-   
         return searchList;
     }
     
