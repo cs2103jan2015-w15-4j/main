@@ -600,8 +600,8 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getAllTasks() {
-        return allTasks;
+    public static Set<Map.Entry<Date, DisplayTaskList>> getAllTasks() {
+        return Logic.displayAllTaskByDate(allTasks);
     }
     
     /**
