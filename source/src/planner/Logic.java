@@ -17,6 +17,26 @@ import java.util.TreeMap;
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
+    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
+        return SearchLogic.searchPeriod(input, start, end);
+    }
+    
+    public static TaskList searchPriority(TaskList input , int priority) {
+        return SearchLogic.searchPriorityGreaterThan(input, priority);
+    }
+    
+    public static TaskList searchName(TaskList input, String name) {
+        return SearchLogic.searchName(input, name);
+    }
+    
+    public static TaskList searchDescription(TaskList input, String desc) {
+        return SearchLogic.searchDesc(input, desc);
+    }
+    
+    public static TaskList searchTag(TaskList input, String tags) {
+        return SearchLogic.searchTags(input, tags);
+    }
+    
     /**This method searches for time clashes if found within the TaskList provided
      * Output: returns -1 if no clashes are found 
      *         OR
@@ -34,7 +54,7 @@ public class Logic {
     /**
      * This method splits TaskList into displayTaskList regardless it is floating or null
      */
-    private static DisplayTaskList splitAllTask (TaskList input) {
+    public static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
     }
     

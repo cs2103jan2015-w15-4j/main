@@ -77,6 +77,27 @@ public class SearchLogic {
         return searchList;
     }
     
+    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
+        TaskList searchList = new TaskList();
+        for (int i = 0; i < input.size(); i++) {
+            if (input.get(i).getDueDate().compareTo(start) > 0 && 
+                    end.compareTo(input.get(i).getDueDate()) > 0) {
+                searchList.add(input.get(i));
+            }
+        }
+        return searchList;
+    }
+    
+    public static TaskList searchPriorityGreaterThan(TaskList input, int priority) {
+        TaskList searchList = new TaskList();
+        for (int i = 0; i < input.size(); i++) {
+            if (input.get(i).getPriority() >= priority) {
+                searchList.add(input.get(i));
+            }
+        }
+        return searchList;
+    }
+    
     public static TaskList searchTimedTask (TaskList input) {
         
         TaskList searchList = new TaskList();
