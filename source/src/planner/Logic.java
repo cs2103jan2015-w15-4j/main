@@ -34,7 +34,7 @@ public class Logic {
     /**
      * This method splits TaskList into displayTaskList regardless it is floating or null
      */
-    private static DisplayTaskList splitAllTask (TaskList input) {
+    public static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
     }
     

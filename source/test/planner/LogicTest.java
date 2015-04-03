@@ -18,25 +18,25 @@ public class LogicTest {
     
     public TaskList initializeList() throws Exception {
         Calendar calFirst = Calendar.getInstance();
-        calFirst.set(2015, 5, 3, 11, 0);
+        calFirst.set(2015, 5, 3, 0, 0);
         
         Calendar calSecond = Calendar.getInstance();
-        calSecond.set(2015, 5, 8, 15, 0);
+        calSecond.set(2015, 5, 8, 23, 59);
         
         Calendar calThird = Calendar.getInstance();
-        calThird.set(2015, 5, 3, 15, 0);
+        calThird.set(2015, 5, 3, 23, 59);
         
         Calendar calFourth = Calendar.getInstance();
         calFourth.set(2015, 5, 10, 23, 59);
 
         Calendar calOverDue = Calendar.getInstance();
-        calOverDue.set(2015, 3, 20, 9, 0);
+        calOverDue.set(2015, 2, 20, 23, 59);
         
         Calendar calOverDue1 = Calendar.getInstance();
-        calOverDue1.set(2015, 4, 3, 8, 30);
+        calOverDue1.set(2015, 3, 3, 0, 0);
         
         Calendar calOverDue2 = Calendar.getInstance();
-        calOverDue2.set(2015, 3, 23, 19, 30);
+        calOverDue2.set(2015, 2, 23, 23, 59);
         
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
@@ -68,8 +68,7 @@ public class LogicTest {
         TL1.add(task8);
         TL1.add(task9);
         TL1.add(task10);
-        
-        
+    
         return TL1;
     }
     
@@ -401,8 +400,14 @@ public class LogicTest {
         initialize();
         TaskList TL1 = initializeList();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
-        
-        assertEquals(displayTest.size(), 16);
+        for (int i = 0; i < displayTest.size(); i++) {
+            if (displayTest.get(i).getShownDate() != null) {
+                System.out.println(displayTest.get(i).getParent().getID() + " " + displayTest.get(i).getShownDate().getDate());
+            } else {
+                System.out.println(displayTest.get(i).getParent().getID());
+            }
+        }
+        assertEquals(displayTest.size(), 32);
         
     }
 }

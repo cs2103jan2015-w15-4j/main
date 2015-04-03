@@ -2,6 +2,7 @@ package planner;
 
 import java.util.Date;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * @author Ke Jing
@@ -38,24 +39,28 @@ public class SplitLogic {
             
         } else {
             
-            /*
+           
             Calendar dueDate = Calendar.getInstance();
             dueDate.setTime(inputTask.getDueDate());
-            int dueDateDay = dueDate.get(Calendar.DATE);
+            long dueDateDay = dueDate.getTimeInMillis();
             
             Calendar endDate = Calendar.getInstance();
             endDate.setTime(inputTask.getEndDate());
-            int endDateDay = endDate.get(Calendar.DATE);
+            long endDateDay = endDate.getTimeInMillis();
             
-            int DateDifference = endDateDay - dueDateDay;
-            
-            */
-            long dueDateDay = inputTask.getDueDate().getTime();
-            long endDateDay = inputTask.getEndDate().getTime();
+            long DateDifference = (endDateDay - dueDateDay) / (24 * 60 * 60 * 1000);
+           
+        /*
+            Date dueDateDay1 = getShownDate(inputTask.getDueDate());
+            Date endDateDay1 = getShownDate(inputTask.getEndDate());
+            long dueDateDay = dueDateDay1.getTime();
+            long endDateDay = endDateDay1.getTime();
             long dayDiff = endDateDay - dueDateDay;
             long DateDifference = dayDiff / (24 * 60 * 60 * 1000);
+        */ 
+            System.out.println(DateDifference);
             
-            //System.out.println(DateDifference);
+            
             
             if (DateDifference == 0) {
                 
@@ -117,4 +122,18 @@ public class SplitLogic {
         return cal.getTime();
     }
     
+    private int getTimeFromDate (Date date) {
+        
+        Calendar cal = Calendar.getInstance();
+        
+        cal.setTime(date);
+        
+        int hours = cal.get(Calendar.HOUR);
+        
+        int minutes = cal.get(Calendar.MINUTE);
+        
+        int totalTime = (hours * 100) + minutes;
+        
+        return totalTime;
+    }
 }
