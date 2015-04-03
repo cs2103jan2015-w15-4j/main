@@ -22,10 +22,10 @@ public class Engine {
     
     private static TaskList allTasks;
     
-    private static Set<Map.Entry<Date, DisplayTaskList>> doneTasks;
-    private static Set<Map.Entry<Date, DisplayTaskList>> undoneTasks;
-    private static Set<Map.Entry<Integer, DisplayTaskList>> floatingTasks;
-    private static Set<Map.Entry<Date, DisplayTaskList>> normalTasks;
+    private static TaskList doneTasks;
+    private static TaskList undoneTasks;
+    private static TaskList floatingTasks;
+    private static TaskList normalTasks;
     
     private static TaskList searchResults;
     
@@ -146,8 +146,8 @@ public class Engine {
         //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
-        normalTasks = Logic.searchConfirmed(allTasks);
-        floatingTasks = Logic.searchFloatingTasks(allTasks);
+        normalTasks = Logic.searchConfirmed(doneTasks);
+        floatingTasks = Logic.searchFloating(doneTasks);
         
     }
     
@@ -436,7 +436,7 @@ public class Engine {
             searchResults = Logic.searchTag(searchResults, result.getTag());
         }
         
-        searchResultsDisplay = Logic.displayAllTask(searchResults);
+        searchResultsDisplay = Logic.displayAllTaskByDate(searchResults);
         
         return Constants.CommandType.SEARCH;
     }
@@ -602,7 +602,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getDoneTasks() {
-        return doneTasks;
+        return Logic.displayAllTaskByDate(doneTasks);
     }
     
     /**
@@ -611,7 +611,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUndoneTasks() {
-        return undoneTasks;
+        return Logic.displayAllTaskByDate(undoneTasks);
     }
     
     /**
@@ -621,7 +621,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getTentativeTasks() {
-        return floatingTasks;
+        return Logic.displayAllTaskByPriority(floatingTasks);
     }
     
     /**
@@ -631,7 +631,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
-        return normalTasks;
+        return Logic.displayAllTaskByDate(normalTasks);
     }
     
     /**
