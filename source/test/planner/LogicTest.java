@@ -6,6 +6,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -72,132 +76,6 @@ public class LogicTest {
         return TL1;
     }
     
-    //Testing sort by dates
-    @Test
-    public void testSort() throws Exception{
-        initialize();
-        Object[] para = new Object[1];
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = dateFormat.parse("2476973463/999999/20155265");
-        Date date2 = dateFormat.parse("22/09/2015");
-        Date date3 = dateFormat.parse("21/09/2015");
-        Date date4 = dateFormat.parse("-1999/-791/0");
-
-        Task task1 = new Task("dummy1", "test", date, 1, "selfie", 1);
-        Task task2 = new Task("dummy2", "test", date2, 1, "hashtags", 1);
-        Task task3 = new Task("dummy3", "test", date3, 1, "merlini", 1);
-        Task task4 = new Task("dummy4", "test", date4, 1, "1 shot", 1);
-        
-        TaskList TL1 = new TaskList();
-        TL1.add(task1);
-        TL1.add(task2);
-        TL1.add(task3);
-        TL1.add(task4);
-        TaskList TL2 = new TaskList();
-        TL2.add(task4);
-        TL2.add(task3);
-        TL2.add(task2);
-        TL2.add(task1);
-        
-        /**
-         * Expected Output:
-         * All tasks are standard data participants 
-         */
-        TaskList TL3 = Logic.sortTaskListByDate(TL1);
-        
-        assertEquals(TL3.get(0).getName(), TL2.get(0).getName());
-        assertEquals(TL3.get(1).getName(), TL2.get(1).getName());
-        assertEquals(TL3.get(2).getName(), TL2.get(2).getName());
-        assertEquals(TL3.get(3).getName(), TL2.get(3).getName());
-    }
-    
-    //Testing dates more deeply
-    //Test cases all have the same date but different priorities and names
-    @Test
-    public void testSortDeepByDate() throws Exception {
-        initialize();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = dateFormat.parse("23/09/2015");
-        
-
-        Task task1 = new Task("ZZZZ", "test", date, 1, "selfie", 1);
-        Task task2 = new Task("~z{|}", "test", date, 9999999, "hashtags", 2);
-        Task task3 = new Task("ABZ", "test", date, 1, "lolqop", 3);
-        Task task4 = new Task("ZBXBZ", "test", date, 1, "alohadance", 4);
-        Task task5 = new Task("ZZZZ", "test", date, 1, "selfie", 5);
-        
-        TaskList TL1 = new TaskList();
-        TL1.add(task1);
-        TL1.add(task2);
-        TL1.add(task3);
-        TL1.add(task4);
-        TL1.add(task5);
-        TaskList TL2 = new TaskList();
-        TL2.add(task2);
-        TL2.add(task3);
-        TL2.add(task4);
-        TL2.add(task1);
-        TL2.add(task5);
-        
-        /**
-         * Expected output: <2, 3, 4, 1>
-         * All tasks are boundary data participants since all the dates are equal
-         */
-        TaskList TL3 = Logic.sortTaskListByDate(TL1);
-        assertEquals(TL3.get(0), TL2.get(0));
-        assertEquals(TL3.get(1), TL2.get(1));
-        assertEquals(TL3.get(2), TL2.get(2));
-        assertEquals(TL3.get(3), TL2.get(3));
-        assertEquals(TL3.get(4), TL2.get(4));        
-        
-    }
-    
-    //Testing sort by priority
-    //Test cases all have different date, priority, name and ID
-    @Test
-    public void testSortDeepByPriority() throws Exception {
-        initialize();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = dateFormat.parse("23/09/2015");
-        Date date2 = dateFormat.parse("23/01/2015");
-        Date date3 = dateFormat.parse("04/04/2004");
-        Date date4 = dateFormat.parse("22/09/2015");
-
-        Task task1 = new Task("ZZZZ", "test", date, 1, "selfie", 1);
-        Task task2 = new Task("AAAAA", "test", date2, 2, "hashtags", 2);
-        Task task3 = new Task("ABZ", "test", date3, 3, "lolqop", 1);
-        Task task4 = new Task("ZBXBZ", "test", date4, 3, "alohadance", 4);
-        Task task5 = new Task("AAAAA", "test", date2, 2, "n0tail", 5);
-        
-        
-        TaskList TL1 = new TaskList();
-        TL1.add(task1);
-        TL1.add(task2);
-        TL1.add(task3);
-        TL1.add(task4);
-        TL1.add(task5);
-        TaskList TL2 = new TaskList();
-        TL2.add(task3);
-        TL2.add(task4);
-        TL2.add(task2);
-        TL2.add(task5);
-        TL2.add(task1);
-        
-        /**
-         * Expected output: <3, 4, 2, 5, 1>
-         * Task 2 and 5, as well as 3 and 4, are all boundary data participants
-         * since their priorities are the same
-         * Task 1, (2, 5), (3, 4) are standard participants as they all have different
-         * priorities
-         */
-        
-        TaskList TL3 = Logic.sortTaskListByPriority(TL1);
-        assertEquals(TL3.get(0), TL2.get(0));
-        assertEquals(TL3.get(1), TL2.get(1));
-        assertEquals(TL3.get(2), TL2.get(2));
-        assertEquals(TL3.get(3), TL2.get(3));
-        assertEquals(TL3.get(4), TL2.get(4));
-    }
     
     //Tests search by tags
     //Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
@@ -222,6 +100,7 @@ public class LogicTest {
         TaskList TL2 = new TaskList();
         TL2.add(task1);
         TL2.add(task2);
+        TL2.add(task3);
         TL2.add(task5);
         
         /**
@@ -235,13 +114,14 @@ public class LogicTest {
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
         assertEquals(Search.get(2), TL2.get(2));
+        assertEquals(Search.get(3), TL2.get(3));
   
     }
     
     //Test search for tags, name and description
     //Test cases include word in name, description and tags in different cases with a combination of all if possible
     @Test 
-    public void testSearchAll() throws Exception{
+    public void testSearchDesc() throws Exception{
         initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
@@ -267,7 +147,7 @@ public class LogicTest {
          * Task
          */
         
-        Search = Logic.searchAll(TL1, "fiNIsH hOMeWORk");
+        Search = Logic.searchDescription(TL1, "fiNIsH hOMeWORk");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
     }
@@ -402,12 +282,70 @@ public class LogicTest {
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
         for (int i = 0; i < displayTest.size(); i++) {
             if (displayTest.get(i).getShownDate() != null) {
-                System.out.println(displayTest.get(i).getParent().getID() + " " + displayTest.get(i).getShownDate().getDate());
+                System.out.println(displayTest.get(i).getParent().getID() + " " + displayTest.get(i).getShownDate());
             } else {
                 System.out.println(displayTest.get(i).getParent().getID());
             }
         }
         assertEquals(displayTest.size(), 32);
+        
+    }
+    
+    @Test
+    public void testConvertToDateTree() throws Exception {
+        initialize();
+        TaskList TL1 = initializeList();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
+            Date current = entry.getKey();
+            System.out.println(current);
+            DisplayTaskList temp = entry.getValue();
+            for (int i = 0; i < temp.size(); i++) {
+                System.out.println(temp.get(i).getParent().getID() + ": " + temp.get(i).getShownDate());
+                
+            }
+        }
+
+    }
+    
+    @Test
+    public void testConvertToFloatingTree() throws Exception {
+        initialize();
+        TaskList TL1 = initializeList();
+        TaskList TL = Logic.searchFloating(TL1);
+        DisplayTaskList displayTest = Logic.splitAllTask(TL);
+        TreeMap <Integer, DisplayTaskList> map = Logic.convertToTreeMapWithPriority(displayTest);
+        
+        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
+            Integer prio = entry.getKey();
+            System.out.println(prio);
+            DisplayTaskList temp = entry.getValue();
+            for (int i = 0; i < temp.size(); i++) {
+                System.out.println(temp.get(i).getParent().getID() + ": " + temp.get(i).getParent().getName());
+            }
+        }
+    
+    }
+    
+    @Test
+    public void sortDateTree() throws Exception {
+        initialize();
+        TaskList TL1 = initializeList();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
+        Set<Map.Entry<Date, DisplayTaskList>> sortedMap = Logic.convertTreeMapToSetMapByDate(map);
+        for (Iterator<Map.Entry<Date, DisplayTaskList>> i = sortedMap.iterator(); i.hasNext();) {
+            Map.Entry<Date, DisplayTaskList> entry = i.next();
+            Date current = entry.getKey();
+            System.out.println(current);
+            DisplayTaskList temp = entry.getValue();
+            for (int j = 0; j < temp.size(); j++) {
+                System.out.println(temp.get(j).getParent().getID() + ": " + temp.get(j).getShownDate());
+                
+            }
+        }
         
     }
 }

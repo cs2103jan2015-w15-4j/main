@@ -232,50 +232,11 @@ public class Logic {
     }
     */
     
-    private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
-        
-        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
-            
-            DisplayTaskList unsortedList = entry.getValue();
-            
-            Integer key = entry.getKey();
-            
-            DisplayTaskList sortedDisplayList = SortLogic.sortByName(unsortedList);
-            
-            map.remove(key);
-                
-            map.put(key, sortedDisplayList);
-        }
-        
-        return map.entrySet();
+    public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
+        return SortLogic.sortTreeMapIntoSetMapByPriority(map);
     }
     
-    private static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
-        
-        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
-            
-            DisplayTaskList unsortedList = entry.getValue();
-            
-            Date key = entry.getKey();
-            
-            if (key == null) {
-            
-                DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);
-                
-                map.remove(key);
-                
-                map.put(key, sortedDisplayList);
-            
-            } else {
-            
-                DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);
-                
-                map.remove(key);
-                
-                map.put(key, sortedDisplayList);
-            }
-        }
-        
-        return map.entrySet();
+    public static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
+        return SortLogic.sortTreeMapIntoSetMapByDate(map);
     }
 }
