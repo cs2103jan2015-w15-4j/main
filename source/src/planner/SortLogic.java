@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
 
 /**
  * @author Ke Jing
@@ -239,6 +241,44 @@ public class SortLogic {
         return newTasks;
     }
     
+    public static Set<Map.Entry<Date, DisplayTaskList>> sortTreeMapIntoSetMapByDate(TreeMap <Date, DisplayTaskList> map) {
+        TreeMap<Date, DisplayTaskList> sortedTree = 
+                new TreeMap<Date, DisplayTaskList>(dateComparatorForMap);
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();     
+            Date key = entry.getKey();
+            
+            if (key == null) {          
+                DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);     
+                sortedTree.put(key, sortedDisplayList);           
+            } else {            
+                DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);       
+                sortedTree.put(key, sortedDisplayList);
+            }        
+        }
+        return sortedTree.entrySet();
+    }
+    
+    public static Set<Map.Entry<Integer, DisplayTaskList>> sortTreeMapIntoSetMapByPriority(TreeMap <Integer, DisplayTaskList> map) {
+        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
+                <Integer, DisplayTaskList> (priorityComparatorForMap);
+        
+        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();
+            
+            Integer key = entry.getKey();
+            
+            DisplayTaskList sortedDisplayList = SortLogic.sortByName(unsortedList);
+                
+            displayMap.put(key, sortedDisplayList);
+        }
+        
+        return displayMap.entrySet();
+    }
+    
     public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
         
         TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
@@ -272,30 +312,27 @@ public class SortLogic {
     public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (DisplayTaskList input) {
     
         TreeMap < Date, DisplayTaskList > displayMap = 
-                new TreeMap < Date, DisplayTaskList>( dateComparatorForMap );
+                new TreeMap < Date, DisplayTaskList>(dateComparatorForMap);
         
-        for (int i = 0; i < input.size(); i++) {
+        for (int i = 0; i < input.size(); i++) {   
             
             DisplayTask temp = input.get(i);
-            
             addDisplayTaskToMapByDate(displayMap, temp);
         }
-        
         return displayMap;
     }
     
-    private static void addDisplayTaskToMapByDate(TreeMap < Date, DisplayTaskList> displayMap, 
+    private static void addDisplayTaskToMapByDate(
+            TreeMap <Date, DisplayTaskList> displayMap, 
             DisplayTask inputTask) {
         
-        if (displayMap.containsKey(inputTask.getShownDate())) {
-            
+        if (displayMap.containsKey(inputTask.getShownDate())) {        
             displayMap.get(inputTask.getShownDate()).add(inputTask);
             
-        } else {
-            
-            displayMap.put(inputTask.getShownDate(), new DisplayTaskList());
-            
+        } else {        
+            displayMap.put(inputTask.getShownDate(), new DisplayTaskList());     
             displayMap.get(inputTask.getShownDate()).add(inputTask);
         }
     }
+    
 }
