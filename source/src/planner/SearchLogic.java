@@ -15,17 +15,13 @@ public class SearchLogic {
         TaskList searchList = new TaskList();
      
         try {
- 
             for (int i = 0; i < input.size(); i++) {
-  
-                if (input.get(i).getName().contains(wordToSearch)) {
-    
+                String name = input.get(i).getName().toLowerCase();
+                if (name.contains(wordToSearch.toLowerCase())) {
                     searchList.add(input.get(i));
                 }
             }
-    
         } catch (Exception e) {
- 
             System.err.println("Invalid input: " + e.getMessage());
         }
  
@@ -38,7 +34,8 @@ public class SearchLogic {
     
         try {
             for (int i = 0; i < input.size(); i++) {
-                if (input.get(i).getDescription().contains(wordToSearch)) {
+                String desc = input.get(i).getDescription().toLowerCase();
+                if (desc.contains(wordToSearch.toLowerCase())) {
                     searchList.add(input.get(i));
                 }
             }
@@ -55,7 +52,8 @@ public class SearchLogic {
         
         try { 
             for (int i = 0; i < input.size(); i++) {
-                if (input.get(i).getTag().contains(tagToLookFor)) {
+                String tags = input.get(i).getTag().toLowerCase();
+                if (tags.contains(tagToLookFor.toLowerCase())) {
                     searchList.add(input.get(i));
                 }
             } 

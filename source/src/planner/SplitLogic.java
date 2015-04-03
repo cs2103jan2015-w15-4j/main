@@ -49,8 +49,6 @@ public class SplitLogic {
             long endDateDay = endDate.getTimeInMillis();
             
             long DateDifference = (endDateDay - dueDateDay) / (24 * 60 * 60 * 1000);
-
-            System.out.println(DateDifference);
        
             if (DateDifference == 0) {
                 
@@ -115,7 +113,7 @@ public class SplitLogic {
         int month = cal.get(Calendar.MONTH);
         int date = cal.get(Calendar.DATE);
         
-        cal.set(year, month, date);
+        cal.set(year, month, date, 0, 0, 0);
         
         return cal.getTime();
     }
