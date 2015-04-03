@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class Task {
 	
-	private final long ID;
+	private final int ID;
 	private String taskName, taskDescription, taskTag;
 	private Date dateCreated, dateDue, dateEnd, dateCompleted;
 	private int taskPriority;
@@ -29,7 +29,7 @@ public class Task {
 	* A string tag on a task.
 	* @throws IllegalArgumentException
 	*/
-	public Task(String name, String description, Date dueDate, int priority, String tag, long id) throws IllegalArgumentException {
+	public Task(String name, String description, Date dueDate, int priority, String tag, int id) throws IllegalArgumentException {
 		
 	    ID = id;
         
@@ -140,7 +140,7 @@ public class Task {
 	}
 	
 	//Not tested yet
-	public long getID() {
+	public int getID() {
 		return ID;
 	}
 	

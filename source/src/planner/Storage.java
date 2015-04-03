@@ -49,7 +49,7 @@ public class Storage {
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
-            long curTaskNum = Long.valueOf((String) taskJson.get("numTasks"));
+            int curTaskNum = Integer.valueOf((String) taskJson.get("numTasks"));
             
             result = new Configuration(path, curTaskNum);
         } catch (FileNotFoundException e) {
@@ -253,7 +253,7 @@ public class Storage {
                 completedDate = new Date((Long) completed);
             }
             
-            long ID = Long.valueOf((String)taskJson.get("id"));
+            int ID = Integer.valueOf((String)taskJson.get("id"));
             
             
             Date createdDate = new Date((Long) taskJson.get("created"));

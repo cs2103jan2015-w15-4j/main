@@ -111,7 +111,7 @@ public class StorageTest {
             Date dueDate = new Date(System.currentTimeMillis());
             int priority = 3;
             String tag = "testing";
-            long ID = 400;
+            int ID = 400;
             
             Task testTask = new Task(name, description, dueDate, priority, tag, ID);
             

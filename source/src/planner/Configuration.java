@@ -13,7 +13,7 @@ public class Configuration {
     
     //Class variables
     private String storagePath;
-    private Long curTaskNum;
+    private int curTaskNum;
     private boolean isNew;
     
     /**
@@ -23,7 +23,7 @@ public class Configuration {
      * @param path The path of the data storage file
      * @param taskNum The number of tasks tracked by the program
      */
-    public Configuration(String path, Long taskNum) {
+    public Configuration(String path, int taskNum) {
         storagePath = path;
         curTaskNum = taskNum;
         isNew = false;
@@ -37,7 +37,7 @@ public class Configuration {
      */
     public Configuration(String path) {
         storagePath = path;
-        curTaskNum = 1l;
+        curTaskNum = 1;
         isNew = true;
     }
     
@@ -53,7 +53,7 @@ public class Configuration {
      * 
      * @return Returns the number of tasks created by the program.
      */
-    public Long getCurTaskNum() {
+    public int getCurTaskNum() {
         return curTaskNum;
     }
     
@@ -63,7 +63,7 @@ public class Configuration {
      * 
      * @return Returns a number to be assigned to a new Task to be created.
      */
-    public Long getNewTaskNumber() {
+    public int getNewTaskNumber() {
         curTaskNum++;
         return curTaskNum - 1;
     }

@@ -1,6 +1,9 @@
 package planner;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -18,11 +21,15 @@ public class Engine {
     private static Configuration config;
     
     private static TaskList allTasks;
-    private static TaskList doneTasks;
-    private static TaskList undoneTasks;
-    private static TaskList tentativeTasks;
-    private static TaskList normalTasks;
+    
+    private static Set<Map.Entry<Date, DisplayTaskList>> doneTasks;
+    private static Set<Map.Entry<Date, DisplayTaskList>> undoneTasks;
+    private static Set<Map.Entry<Integer, DisplayTaskList>> floatingTasks;
+    private static Set<Map.Entry<Date, DisplayTaskList>> normalTasks;
+    
     private static TaskList searchResults;
+    
+    private static Set<Map.Entry<Date, DisplayTaskList>> searchResultsDisplay;
     
     private static long lastModifiedTask;
     
@@ -62,10 +69,7 @@ public class Engine {
             config = storage.readConfig();
             allTasks = storage.readTaskStorage(config.getStoragePath());
             
-            doneTasks = new TaskList();
-            undoneTasks = new TaskList();
-            tentativeTasks = new TaskList();
-            normalTasks = new TaskList();
+
             
             //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -120,13 +124,13 @@ public class Engine {
         doneTasks.clear();
         undoneTasks.clear();
         normalTasks.clear();
-        tentativeTasks.clear();
+        floatingTasks.clear();
         
         //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
-        normalTasks = Logic.searchConfirmed(undoneTasks);
-        tentativeTasks = Logic.searchTentative(undoneTasks);
+        normalTasks = Logic.searchConfirmed(allTasks);
+        floatingTasks = Logic.searchFloatingTasks(allTasks);
         
     }
     
@@ -345,14 +349,16 @@ public class Engine {
             searchResults = Logic.searchPriority(searchResults, result.getPriorityLevel());
         }
         if(flags[4]) {
-            searchResults = Logic.searchAll(searchResults, result.getName());
+            searchResults = Logic.searchName(searchResults, result.getName());
         }
         if(flags[5]) {
-            searchResults = Logic.searchAll(searchResults, result.getDescription());
+            searchResults = Logic.searchDescription(searchResults, result.getDescription());
         }
         if(flags[6]) {
-            searchResults = Logic.searchTaskByTags(searchResults, result.getTag());
+            searchResults = Logic.searchTag(searchResults, result.getTag());
         }
+        
+        searchResultsDisplay = Logic.displayAllTask(searchResults);
         
         return Constants.CommandType.SEARCH;
     }
@@ -493,7 +499,7 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getDoneTasks() {
+    public static Set<Map.Entry<Date, DisplayTaskList>> getDoneTasks() {
         return doneTasks;
     }
     
@@ -502,7 +508,7 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getUndoneTasks() {
+    public static Set<Map.Entry<Date, DisplayTaskList>> getUndoneTasks() {
         return undoneTasks;
     }
     
@@ -512,8 +518,8 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getTentativeTasks() {
-        return tentativeTasks;
+    public static Set<Map.Entry<Integer, DisplayTaskList>> getTentativeTasks() {
+        return floatingTasks;
     }
     
     /**
@@ -522,7 +528,7 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getConfirmedTasks() {
+    public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
         return normalTasks;
     }
     
@@ -531,8 +537,8 @@ public class Engine {
      * @return
      */
     //Not tested yet
-    public static TaskList getSearchResult() {
-        return searchResults;
+    public static Set<Map.Entry<Date, DisplayTaskList>> getSearchResult() {
+        return searchResultsDisplay;
     }
     
 }

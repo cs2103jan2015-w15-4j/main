@@ -12,14 +12,14 @@ public class ConfigurationTest {
 
     @Test
     public void createTest() {
-        Configuration oldConfig = new Configuration("C:/Test/", 35l);
+        Configuration oldConfig = new Configuration("C:/Test/", 35);
         Configuration newConfig = new Configuration("/User/Documents/");
     }
 
     @Test
     public void configShouldReturnCorrectPath() {
         String oldConfigPath = "C:/Test/";
-        long oldConfigId = 35l;
+        int oldConfigId = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigId);
         assertEquals("Config path should be " + oldConfigPath, oldConfigPath, oldConfig.getStoragePath());
         
@@ -31,19 +31,19 @@ public class ConfigurationTest {
     @Test
     public void configShouldReturnCorrectID() {
         String oldConfigPath = "C:/Test/";
-        Long oldConfigID = 35l;
+        int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         assertEquals("Config ID should be " + oldConfigID, oldConfigID, oldConfig.getCurTaskNum());
         
         String newConfigPath = "/User/Documents/";
         Configuration newConfig = new Configuration(newConfigPath);
-        assertEquals("Config ID should be " + newConfigPath, Long.valueOf(1), newConfig.getCurTaskNum());
+        assertEquals("Config ID should be " + newConfigPath, 1, newConfig.getCurTaskNum());
     }
     
     @Test
     public void newConfigShouldReturnTrueIsNew() {
         String oldConfigPath = "C:/Test/";
-        Long oldConfigID = 35l;
+        int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         assertEquals("isNew on an old config should return false", false, oldConfig.isNew());
         
@@ -56,7 +56,7 @@ public class ConfigurationTest {
     public void setStoragePathShouldUpdateStoragePath() {
         String oldConfigPath = "C:/Test/";
         String oldConfigPathUpdate = "C:/Another/Place";
-        Long oldConfigID = 35l;
+        int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         oldConfig.setStoragePath(oldConfigPathUpdate);
         assertEquals("Config path should be " + oldConfigPathUpdate, oldConfigPathUpdate, oldConfig.getStoragePath());
@@ -72,11 +72,11 @@ public class ConfigurationTest {
     public void newTaskNumberShouldIncreaseCurTaskNum() {
         String oldConfigPath = "C:/Test/";
         String oldConfigPathUpdate = "C:/Another/Place";
-        Long oldConfigID = 35l;
+        int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (oldConfigID + i), Long.valueOf(oldConfigID + i), oldConfig.getNewTaskNumber());
-            assertEquals("New num should be " + (oldConfigID + i + 1), Long.valueOf(oldConfigID + i + 1), oldConfig.getCurTaskNum());
+            assertEquals("ID returned should be " + (oldConfigID + i), oldConfigID + i, oldConfig.getNewTaskNumber());
+            assertEquals("New num should be " + (oldConfigID + i + 1), oldConfigID + i + 1, oldConfig.getCurTaskNum());
 
         }
         
@@ -84,8 +84,8 @@ public class ConfigurationTest {
         String newConfigPathUpdate = "/User/Downloads/";
         Configuration newConfig = new Configuration(newConfigPath);
         for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (1 + i), Long.valueOf(1 + i), newConfig.getNewTaskNumber());
-            assertEquals("New num should be " + (1 + i + 1), Long.valueOf(1 + i + 1), newConfig.getCurTaskNum());
+            assertEquals("ID returned should be " + (1 + i), 1 + i, newConfig.getNewTaskNumber());
+            assertEquals("New num should be " + (1 + i + 1), 1 + i + 1, newConfig.getCurTaskNum());
 
         }
     }

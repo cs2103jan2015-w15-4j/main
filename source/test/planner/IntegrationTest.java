@@ -36,7 +36,7 @@ public class IntegrationTest {
         //After save
         assertEquals("Newly added task should have the right name", "junittest", st.getName());
         assertEquals("Task number should increase by 1 after add", 
-                (long)beforeSaveConfig.getCurTaskNum(), afterSaveConfig.getCurTaskNum() -1);
+                (int)beforeSaveConfig.getCurTaskNum(), afterSaveConfig.getCurTaskNum() -1);
         
     }
 
@@ -90,7 +90,7 @@ public class IntegrationTest {
         Configuration beforeSaveConfig = store.readConfig();
         TaskList afterAddList = Engine.getAllTasks();
         Task at = afterAddList.get(afterAddList.size()-1);
-        Long taskID = at.getID();
+        int taskID = at.getID();
         
         //After add
         assertEquals("Newly added task should have the right name", "junittest", at.getName());
