@@ -22,7 +22,8 @@ public class Constants {
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
         INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
-        INVALID_PRIORITY_LEVEL,
+        INVALID_PRIORITY_LEVEL, TASK_NOT_FOUND, CONVERT_TASK_TYPE_IN_UPDATE,
+        UPDATE_NO_CHANGES, NOTHING_TO_UNDO, NO_INPUT
     };
     
     public enum TipType{
@@ -89,5 +90,14 @@ public class Constants {
         errorMessages.put(ErrorType.INVALID_DATE, "Unable to parse date");
         errorMessages.put(ErrorType.INVALID_TIME, "Unable to parse time");
         errorMessages.put(ErrorType.INVALID_PRIORITY_LEVEL, "Please input a priority level from 1 to 5");
+        
+        //Errors from Engine
+        errorMessages.put(ErrorType.TASK_NOT_FOUND, "Task not found!");
+        errorMessages.put(ErrorType.CONVERT_TASK_TYPE_IN_UPDATE, "Conversion of"
+                + " Task type not allowed in update. Use the convert command");
+        errorMessages.put(ErrorType.UPDATE_NO_CHANGES, "No changes in"
+                + " update command!");
+        errorMessages.put(ErrorType.NOTHING_TO_UNDO, "No actions to undo!");
+        errorMessages.put(ErrorType.NO_INPUT, "Please enter a command.");
     }
 }

@@ -248,6 +248,7 @@ public class Engine {
         
         if(toBeUpdated == null) {
             //If no such task was found, command was invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         }
         
@@ -263,6 +264,7 @@ public class Engine {
                 toBeUpdated.setStartDate(result.getDate());
                 toBeUpdated.setEndDate(result.getSecondDate());
             } else {
+                commandErrorType = Constants.ErrorType.CONVERT_TASK_TYPE_IN_UPDATE;
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
@@ -274,6 +276,7 @@ public class Engine {
             if(!toBeUpdated.isFloating()) {
                 toBeUpdated.setDueDate(result.getDate());
             } else {
+                commandErrorType = Constants.ErrorType.CONVERT_TASK_TYPE_IN_UPDATE;
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
@@ -290,6 +293,7 @@ public class Engine {
                     toBeUpdated.setDueDate(result.getSecondDate());
                 }
             } else {
+                commandErrorType = Constants.ErrorType.CONVERT_TASK_TYPE_IN_UPDATE;
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
@@ -315,6 +319,7 @@ public class Engine {
         
         //If nothing was changed, command was invalid
         if(nothing) {
+            commandErrorType = Constants.ErrorType.UPDATE_NO_CHANGES;
             return Constants.CommandType.INVALID;
         }
         
@@ -343,6 +348,7 @@ public class Engine {
         
         if(toBeDeleted == null) {
             //If such a task is not found, command was invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             allTasks.remove(allTasks.getTaskByID(ID));
@@ -371,6 +377,7 @@ public class Engine {
         
         if(toBeDone == null) {
             //If Task is not found then command is invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             toBeDone.setDone();
@@ -398,6 +405,7 @@ public class Engine {
         
         if(toBeDone == null) {
             //If Task is not found then command is invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             toBeDone.setUndone();
@@ -454,6 +462,7 @@ public class Engine {
         
         if(previousStates.isEmpty()) {
             //If there were no previous saved states, command is invalid
+            commandErrorType = Constants.ErrorType.NOTHING_TO_UNDO;
             return Constants.CommandType.INVALID;
         } else {
             allTasks = previousStates.pop();
@@ -518,7 +527,7 @@ public class Engine {
     public static Constants.CommandType process(String userInput) {
         
         if(userInput == null){
-            
+            commandErrorType = Constants.ErrorType.NO_INPUT;
             return Constants.CommandType.INVALID;
             
         }
