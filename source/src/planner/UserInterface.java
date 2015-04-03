@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -556,6 +560,8 @@ public class UserInterface extends JFrame {
     private DisplayStateStack displayStateStack;
     private final int maxNumOfDisplayStates = 100;
     
+    private boolean isWindowCurrentlyActive;
+    
     public static void main(String[] args) {
         
         userInterfaceLogger.setLevel(java.util.logging.Level.SEVERE);
@@ -730,13 +736,10 @@ public class UserInterface extends JFrame {
         
         if( event != null ){
             
-            commandPanel.setPopupBoxCannotModify();
-            
             if( commandPanel != null ){
                 
                 if( commandPanel.handleKeyEvent(event) ){
-                    
-                    commandPanel.setPopupBoxCanModify();
+                   
                     return;
                 }
             }
@@ -795,8 +798,7 @@ public class UserInterface extends JFrame {
                         verticalScrollBar.setValue(currentScrollValue + tempScrollUnitDifference);
                         
                         event.consume();
-                        
-                        commandPanel.setPopupBoxCanModify();
+                       
                         return;
                     }
                 }
@@ -847,7 +849,6 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
-                        commandPanel.setPopupBoxCanModify();
                         return;
                     }
                 }
@@ -893,7 +894,6 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
-                        commandPanel.setPopupBoxCanModify();
                         return;
                         
                     } else{
@@ -935,8 +935,6 @@ public class UserInterface extends JFrame {
                     
                 }
             }
-            
-            commandPanel.setPopupBoxCanModify();
         }
     }
     
