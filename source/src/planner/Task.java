@@ -201,6 +201,19 @@ public class Task {
 		}
 	}
 	
+	public void setStartDate(Date newStartDate) {
+
+	    //Tests needed for null date
+	    if(newStartDate != null) {
+	        dateDue = newStartDate;
+	        isFloatingTask = false;
+
+	    } else {
+	        dateDue = null;
+	        isFloatingTask = true;
+	    }
+	}
+	
 	public void setEndDate(Date newEndDate) {
 	    if(newEndDate != null) {
             dateEnd = newEndDate;
