@@ -37,6 +37,34 @@ public class Logic {
         return SearchLogic.searchTags(input, tags);
     }
     
+    public static TaskList searchOverDuedTasks (TaskList input) {
+        return SearchLogic.searchOverDuedTask(input);
+    }
+    
+    public static TaskList searchUpcomingTasks (TaskList input) {
+        return SearchLogic.searchUpcomingTask(input);
+    }
+    
+    public static TaskList searchTimedTask (TaskList input) {
+        return SearchLogic.searchTimedTask(input);
+    }
+    
+    public static TaskList searchDone (TaskList input) {
+        return SearchLogic.searchDone(input);
+    }
+    
+    public static TaskList searchNotDone (TaskList input) {
+        return SearchLogic.searchNotDone(input);
+    }
+    
+    public static TaskList searchFloating (TaskList input) {
+        return SearchLogic.searchFloating(input);
+    }
+    
+    public static TaskList searchConfirmed (TaskList input) {
+        return SearchLogic.searchConfirmed(input);
+    }
+    
     /**This method searches for time clashes if found within the TaskList provided
      * Output: returns -1 if no clashes are found 
      *         OR
@@ -46,22 +74,35 @@ public class Logic {
      *                  for every clash search within this time period
      */
     public static int findClash(TaskList taskInput, Date start, Date end) {
-        
         return SearchLogic.searchForClash(taskInput, start, end);
-        
     }
     
     /**
      * This method splits TaskList into displayTaskList regardless it is floating or null
+     * Purpose: For testing
      */
     public static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
     }
     
     /**
+     * These methods sorts DisplayTaskLists into TreeMaps
+     * Purpose: For testing
+     * @param taskInput
+     * @return
+     */
+    public static TreeMap<Date, DisplayTaskList> convertToTreeMapWithDate(DisplayTaskList taskInput) {
+        return SortLogic.sortListToMapByDate(taskInput);
+    }
+    
+    public static TreeMap<Integer, DisplayTaskList> convertToTreeMapWithPriority(DisplayTaskList taskInput) {
+        return SortLogic.sortListToMapByPriority(taskInput);
+    }
+    
+    /**
      * Creates a sorted Set of map entries using an input TaskList
      */
-    public static Set<Map.Entry<Date, DisplayTaskList>> displayAllTask (TaskList taskInput) {
+    public static Set<Map.Entry<Date, DisplayTaskList>> displayAllTaskByDate (TaskList taskInput) {
         
         DisplayTaskList input = splitAllTask(taskInput);
         
@@ -71,9 +112,15 @@ public class Logic {
         
     }
     
-    /**
-     *  The following 3 search methods searches ALL tasks
-     */
+    public static Set<Map.Entry<Integer, DisplayTaskList>> displayAllTaskByPriority (TaskList taskInput) {
+        
+        DisplayTaskList floatingList = splitAllTask(taskInput); 
+        
+        TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
+        
+        return convertTreeMapToSetMapByName(floatingMap);
+    }
+/*
     public static Set<Map.Entry<Date, DisplayTaskList>> searchInName (TaskList taskInput, String wordToSearch) {
         
         TaskList input = SearchLogic.searchName(taskInput, wordToSearch);
@@ -106,10 +153,7 @@ public class Logic {
         
         return convertTreeMapToSetMapByDate(searchMap);
     }
-    
-    /**
-     * This method returns a set map containing undone, non-floating tasks that are overdue
-     */
+  
     public static Set<Map.Entry<Date, DisplayTaskList>> searchOverDuedTasks (TaskList taskInput) {
         
         TaskList input =  SearchLogic.searchOverDuedTask(taskInput);
@@ -121,9 +165,6 @@ public class Logic {
         return convertTreeMapToSetMapByDate(outDatedMap);
     }
     
-    /**
-     * This method returns a set map containing undone, non-floating tasks that are due in the future
-     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchUpcomingTasks (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchUpcomingTask(taskInput);
@@ -135,9 +176,6 @@ public class Logic {
         return convertTreeMapToSetMapByDate(upcomingMap);
     }
     
-    /**
-     * Searches for timed task
-     */
     public static Set<Map.Entry<Date, DisplayTaskList>> searchTimedTask (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchTimedTask(taskInput);
@@ -170,10 +208,7 @@ public class Logic {
         
         return convertTreeMapToSetMapByDate(notDoneMap);
     }
-    
-    /**
-     * Searches for floating task and returns a set map that are sorted from 0 to 5 priority int
-     */
+
     public static Set<Map.Entry<Integer, DisplayTaskList>> searchFloatingTasks (TaskList taskInput) {
         
         TaskList input = SearchLogic.searchFloating(taskInput);
@@ -184,8 +219,7 @@ public class Logic {
         
         return convertTreeMapToSetMapByName(floatingMap);
     }
-    
-    
+
     public static Set<Map.Entry<Date, DisplayTaskList>> searchConfirmed(TaskList taskInput) {
         
         TaskList input = SearchLogic.searchConfirmed(taskInput);
@@ -196,6 +230,7 @@ public class Logic {
 
         return convertTreeMapToSetMapByDate(confirmedMap);
     }
+    */
     
     private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
         
