@@ -232,7 +232,7 @@ public class Logic {
     }
     */
     
-    private static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
+    public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
         
         for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
             
@@ -250,7 +250,7 @@ public class Logic {
         return map.entrySet();
     }
     
-    private static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
+    public static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
         
         for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
             
