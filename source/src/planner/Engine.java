@@ -38,6 +38,8 @@ public class Engine {
     
     private static int clashingTask;
     
+    private static Constants.ErrorType commandErrorType;
+    
     /**
      * Returns true if the config was new, i.e. no older config was read or 
      * found.
@@ -85,8 +87,6 @@ public class Engine {
             storage = new Storage();
             config = storage.readConfig();
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            
-
             
             //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -157,7 +157,9 @@ public class Engine {
      * can be popped to be used for undo.
      */
     private static void pushState() {
+        
         previousStates.push(new TaskList(allTasks));
+        
     }
     
     /**
@@ -439,6 +441,30 @@ public class Engine {
     }
     
     /**
+     * Handles invalid/unrecognised commands.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType handleInvalidCommand(ParseResult result) {
+        
+        commandErrorType = result.getErrorType();
+        return Constants.CommandType.INVALID;
+        
+    }
+    
+    /**
+     * Returns error type of previous erroneous command.
+     * 
+     * @return
+     */
+    private static Constants.ErrorType getErrorType() {
+        
+        return commandErrorType;
+        
+    }
+    
+    /**
      * The function supplied to UI to call upon receiving user input. Takes
      * in a string to be processed. Parses and acts on the command accordingly.
      * 
@@ -512,7 +538,7 @@ public class Engine {
                 return Constants.CommandType.HELP_SEARCH;
                 
             default:
-                return Constants.CommandType.INVALID;
+                return handleInvalidCommand(result);
         }
     }
     
