@@ -65,12 +65,31 @@ public class SearchLogic {
     }
     
     public static TaskList searchPeriod(TaskList input, Date start, Date end) {
+        long startTime = start.getTime();
+        long endTime = end.getTime();
         
         TaskList searchList = new TaskList();
+        
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i).getDueDate().compareTo(start) > 0 && 
-                    end.compareTo(input.get(i).getDueDate()) > 0) {
-                searchList.add(input.get(i));
+            if (!(input.get(i).isFloating())) {       
+                if (input.get(i).getEndDate() == null) {
+                    
+                    long inputTime = input.get(i).getDueDate().getTime();   
+                    
+                    if ((startTime <= inputTime) && (endTime > inputTime)) {
+                        searchList.add(input.get(i));
+                    }
+                } else {
+    
+                    long inputStartTime = input.get(i).getDueDate().getTime();
+                    long inputEndTime = input.get(i).getDueDate().getTime();
+  
+                    if (!((inputStartTime > endTime) && (inputStartTime > endTime))
+                            && !((inputEndTime < startTime) && (inputEndTime < endTime))) {
+    
+                        searchList.add(input.get(i));
+                    }
+                }
             }
         }
         return searchList;
