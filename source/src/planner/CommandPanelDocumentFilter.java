@@ -206,7 +206,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         }
     }
     
-    private String generateRegex( String []keywords ){
+    public String generateRegex( String []keywords ){
         
         StringBuilder regex = new StringBuilder("");
         
@@ -216,7 +216,9 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
             
             for( int i = 0, size = keywords.length; i < size; ++i ){
                 
-                regex.append("\\b").append(keywords[i]).append("\\b").append("|");
+                if( keywords[i] != null ){
+                    regex.append("\\b").append(keywords[i]).append("\\b").append("|");
+                }
             }
             
             if( regex.length() > 1 ){
