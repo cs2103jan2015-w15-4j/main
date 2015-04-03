@@ -64,7 +64,7 @@ public class Engine {
     }
     
     /**
-     * 
+     * Returns ID of the first clashing task.
      * 
      * @return
      */
@@ -226,6 +226,9 @@ public class Engine {
      * Handles the update command. Update checks for the presences of all
      * updatable fields and updates the specified task accordingly. Returns
      * Invalid if the task to be updated is not found, or nothing was updated.
+     * No conversion between floating, deadline, and timed tasks allowed in the
+     * update method. Returns invalid if dates are not matching to the task 
+     * type.
      * 
      * @param result
      * @return
@@ -249,10 +252,50 @@ public class Engine {
         }
         
         //Checking for fields and setting them if present in command
-        if(flags[0]) {
+        
+        //Handling of dates for floating, deadline, and timed tasks
+        
+        
+        if(flags[0] && flags[7]) {
+            //If both start and end dates are present
+            //Check if task is a timed task
+            if(toBeUpdated.isTimed()) {
+                toBeUpdated.setStartDate(result.getDate());
+                toBeUpdated.setEndDate(result.getSecondDate());
+            } else {
+                return Constants.CommandType.INVALID;
+            }
             nothing = false;
-            toBeUpdated.setDueDate(result.getDate());
+            
+        } else if(flags[0]) {
+            //If first date is present
+            //Check if task is not floating
+            //In this case updating the due date is always correct
+            if(!toBeUpdated.isFloating()) {
+                toBeUpdated.setDueDate(result.getDate());
+            } else {
+                return Constants.CommandType.INVALID;
+            }
+            nothing = false;
+            
+        } else if(flags[7]) {
+            //If second date is present
+            //Check if task is deadline task
+            if(!toBeUpdated.isFloating()) {
+                //We need to check if the task is timed. 
+                //If so the date belongs in end date.
+                if(toBeUpdated.isTimed()) {
+                    toBeUpdated.setEndDate(result.getSecondDate());
+                } else {
+                    toBeUpdated.setDueDate(result.getSecondDate());
+                }
+            } else {
+                return Constants.CommandType.INVALID;
+            }
+            nothing = false;
+            
         }
+        
         if(flags[2]) {
             nothing = false;
             toBeUpdated.setPriority(result.getPriorityLevel());

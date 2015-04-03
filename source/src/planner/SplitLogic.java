@@ -49,19 +49,9 @@ public class SplitLogic {
             long endDateDay = endDate.getTimeInMillis();
             
             long DateDifference = (endDateDay - dueDateDay) / (24 * 60 * 60 * 1000);
-           
-        /*
-            Date dueDateDay1 = getShownDate(inputTask.getDueDate());
-            Date endDateDay1 = getShownDate(inputTask.getEndDate());
-            long dueDateDay = dueDateDay1.getTime();
-            long endDateDay = endDateDay1.getTime();
-            long dayDiff = endDateDay - dueDateDay;
-            long DateDifference = dayDiff / (24 * 60 * 60 * 1000);
-        */ 
+
             System.out.println(DateDifference);
-            
-            
-            
+       
             if (DateDifference == 0) {
                 
                 Date shownDate = getShownDate(inputTask.getDueDate());
@@ -72,23 +62,31 @@ public class SplitLogic {
             } else {
             
                 Date tempDate = getShownDate(inputTask.getDueDate());
+                Calendar cal = Calendar.getInstance();
                 
                 for (int j = 0; j <= DateDifference; j++) {
                 
                     if (j == 0) {
-                    
                         createNewDisplayTask(outputList, tempDate, inputTask.getDueDate(), null, inputTask);
-                    
-                    } else {
                         
-                        Calendar cal = Calendar.getInstance();
+                    } else {
                         cal.setTime(tempDate);
                         cal.add(Calendar.DATE, 1);
                         tempDate = cal.getTime();
                         
                         createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
-                    }
-                    
+                    }    
+                }
+                
+                cal.setTime(tempDate);
+                cal.add(Calendar.DATE, 1);
+                tempDate = cal.getTime();
+                int finalDate = cal.get(Calendar.DATE);
+                cal.setTime(inputTask.getEndDate());
+                int endTime = cal.get(Calendar.DATE);
+
+                if (finalDate == endTime) {
+                    createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
                 }
             }
         }     
@@ -120,20 +118,5 @@ public class SplitLogic {
         cal.set(year, month, date);
         
         return cal.getTime();
-    }
-    
-    private int getTimeFromDate (Date date) {
-        
-        Calendar cal = Calendar.getInstance();
-        
-        cal.setTime(date);
-        
-        int hours = cal.get(Calendar.HOUR);
-        
-        int minutes = cal.get(Calendar.MINUTE);
-        
-        int totalTime = (hours * 100) + minutes;
-        
-        return totalTime;
     }
 }
