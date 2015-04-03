@@ -31,10 +31,12 @@ public class Engine {
     
     private static Set<Map.Entry<Date, DisplayTaskList>> searchResultsDisplay;
     
-    private static long lastModifiedTask;
+    private static int lastModifiedTask;
     
     private static Storage storage;
     private static Stack<TaskList> previousStates;
+    
+    private static int clashingTask;
     
     /**
      * Returns true if the config was new, i.e. no older config was read or 
@@ -43,7 +45,9 @@ public class Engine {
      * @return
      */
     public static boolean isFirstRun() {
+        
         return config.isNew();
+        
     }
     
     /**
@@ -51,8 +55,21 @@ public class Engine {
      * 
      * @return
      */
-    public static long lastModifiedTask() {
+    public static int lastModifiedTask() {
+        
         return lastModifiedTask;
+        
+    }
+    
+    /**
+     * 
+     * 
+     * @return
+     */
+    public static int getClashingTask() {
+        
+        return clashingTask;
+        
     }
     
     /**
@@ -149,7 +166,10 @@ public class Engine {
      * the task is treated as a deadline task. Otherwise the first date is
      * is used to create the task object. If date is null then the task is
      * a floating task. Otherwise second date is checked and if present
-     * end date of the task is set and the task is a timed task.
+     * end date of the task is set and the task is a timed task. After a new
+     * Task is created and before it is added, it is checked for clashes with
+     * existing tasks. The Task will still be added, but a different return
+     * type will be used to inform the UI of a clash.
      * 
      * @param result
      * @return
@@ -157,16 +177,20 @@ public class Engine {
     private static Constants.CommandType addTask (ParseResult result) {
         //Previous state is saved
         pushState();
-        
-        
+                
         boolean[] flags = result.getCommandFlags();
         Task newTask;
+        
+        clashingTask = -1;
         
         if(!flags[0] && flags[7]) {
             //If first date is absent but second is present
             newTask = new Task(result.getName(), result.getDescription(), 
                     result.getSecondDate(), result.getPriorityLevel(), 
                     result.getTag(), config.getNewTaskNumber());
+            
+            clashingTask = Logic.findClash(allTasks, newTask.getDueDate(),
+                    newTask.getDueDate());
         } else {
             newTask = new Task(result.getName(), result.getDescription(), 
                     result.getDate(), result.getPriorityLevel(), 
@@ -174,6 +198,10 @@ public class Engine {
             if(flags[7]) {
                 //If second date is present
                 newTask.setEndDate(result.getSecondDate());
+                
+                clashingTask = Logic.findClash(allTasks,
+                        newTask.getStartDate(),
+                        newTask.getEndDate());
             }
         }
         
@@ -184,7 +212,12 @@ public class Engine {
         //Record the last updated task
         lastModifiedTask = newTask.getID();
         
-        return Constants.CommandType.ADD;
+        if(clashingTask != -1) {
+            return Constants.CommandType.ADD_CLASH;
+        } else {
+            return Constants.CommandType.ADD;
+        }
+        
     }
     
     /**
