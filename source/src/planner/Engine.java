@@ -22,10 +22,10 @@ public class Engine {
     
     private static TaskList allTasks;
     
-    private static Set<Map.Entry<Date, DisplayTaskList>> doneTasks;
-    private static Set<Map.Entry<Date, DisplayTaskList>> undoneTasks;
-    private static Set<Map.Entry<Integer, DisplayTaskList>> floatingTasks;
-    private static Set<Map.Entry<Date, DisplayTaskList>> normalTasks;
+    private static TaskList doneTasks;
+    private static TaskList undoneTasks;
+    private static TaskList floatingTasks;
+    private static TaskList normalTasks;
     
     private static TaskList searchResults;
     
@@ -37,6 +37,8 @@ public class Engine {
     private static Stack<TaskList> previousStates;
     
     private static int clashingTask;
+    
+    private static Constants.ErrorType commandErrorType;
     
     /**
      * Returns true if the config was new, i.e. no older config was read or 
@@ -85,8 +87,6 @@ public class Engine {
             storage = new Storage();
             config = storage.readConfig();
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            
-
             
             //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -146,8 +146,8 @@ public class Engine {
         //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
-        normalTasks = Logic.searchConfirmed(allTasks);
-        floatingTasks = Logic.searchFloatingTasks(allTasks);
+        normalTasks = Logic.searchConfirmed(doneTasks);
+        floatingTasks = Logic.searchFloating(doneTasks);
         
     }
     
@@ -157,7 +157,9 @@ public class Engine {
      * can be popped to be used for undo.
      */
     private static void pushState() {
+        
         previousStates.push(new TaskList(allTasks));
+        
     }
     
     /**
@@ -434,7 +436,7 @@ public class Engine {
             searchResults = Logic.searchTag(searchResults, result.getTag());
         }
         
-        searchResultsDisplay = Logic.displayAllTask(searchResults);
+        searchResultsDisplay = Logic.displayAllTaskByDate(searchResults);
         
         return Constants.CommandType.SEARCH;
     }
@@ -479,6 +481,30 @@ public class Engine {
     private static Constants.CommandType fetchStoragePath() {
         //System.out.println(config.getStoragePath());
         return Constants.CommandType.SAVEWHERE;
+    }
+    
+    /**
+     * Handles invalid/unrecognised commands.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType handleInvalidCommand(ParseResult result) {
+        
+        commandErrorType = result.getErrorType();
+        return Constants.CommandType.INVALID;
+        
+    }
+    
+    /**
+     * Returns error type of previous erroneous command.
+     * 
+     * @return
+     */
+    private static Constants.ErrorType getErrorType() {
+        
+        return commandErrorType;
+        
     }
     
     /**
@@ -555,7 +581,7 @@ public class Engine {
                 return Constants.CommandType.HELP_SEARCH;
                 
             default:
-                return Constants.CommandType.INVALID;
+                return handleInvalidCommand(result);
         }
     }
     
@@ -576,7 +602,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getDoneTasks() {
-        return doneTasks;
+        return Logic.displayAllTaskByDate(doneTasks);
     }
     
     /**
@@ -585,7 +611,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUndoneTasks() {
-        return undoneTasks;
+        return Logic.displayAllTaskByDate(undoneTasks);
     }
     
     /**
@@ -595,7 +621,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getTentativeTasks() {
-        return floatingTasks;
+        return Logic.displayAllTaskByPriority(floatingTasks);
     }
     
     /**
@@ -605,7 +631,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
-        return normalTasks;
+        return Logic.displayAllTaskByDate(normalTasks);
     }
     
     /**
