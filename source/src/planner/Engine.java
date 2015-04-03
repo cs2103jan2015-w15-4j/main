@@ -60,9 +60,7 @@ public class Engine {
             //Initiates the storage and read the config and storage files
             storage = new Storage();
             config = storage.readConfig();
-            System.out.println("config read");
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            System.out.println("storage read");
             
             doneTasks = new TaskList();
             undoneTasks = new TaskList();
