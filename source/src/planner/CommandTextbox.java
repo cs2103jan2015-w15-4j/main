@@ -37,8 +37,6 @@ public class CommandTextbox extends JScrollPane{
     
     private Style originalTextStyle;
     
-    private boolean hasPopupBoxChange;
-    
     private ArrayList<String> possibleCommands;
     
     private int currentPopupListIndex;
@@ -76,16 +74,6 @@ public class CommandTextbox extends JScrollPane{
         }
         
         prepareComboBox( inputCommandBox, listOfCommands );
-    }
-    
-    public void setPopupBoxCanModify(){
-        
-        hasPopupBoxChange = false;
-    }
-    
-    public void setPopupBoxCannotModify(){
-        
-        hasPopupBoxChange = true;
     }
     
     public boolean handleKeyEvent( KeyEvent keyEvent ){
@@ -206,8 +194,6 @@ public class CommandTextbox extends JScrollPane{
             
             popUpBox.setOpaque(false);
             popUpBox.setFocusable(false);
-            
-            hasPopupBoxChange = false;
             
             possibleCommands = new ArrayList<String>();
             
