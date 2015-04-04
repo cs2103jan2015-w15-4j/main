@@ -1,5 +1,6 @@
 package planner;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -90,37 +91,40 @@ public class DisplayTask {
             boolean dueDateCheck, endDateCheck, displayDateCheck;
             
             if (dueDate == null || anotherTask.getDueDate() == null) {
-            
-                dueDateCheck = (dueDate == anotherTask.getDueDate());
-           
+                dueDateCheck = (dueDate == anotherTask.getDueDate());       
             } else {               
-           
                 dueDateCheck = dueDate.equals(anotherTask.getDueDate());
             }
             
-            if (endDate == null || anotherTask.getEndDate() == null) {
-            
-                endDateCheck = (endDate == anotherTask.getEndDate());
-           
-            } else {
-                
+            if (endDate == null || anotherTask.getEndDate() == null) {   
+                endDateCheck = (endDate == anotherTask.getEndDate());    
+            } else {  
                 endDateCheck = endDate.equals(anotherTask.getEndDate());
             }
             
             if (displayDate == null || anotherTask.getShownDate() == null) {
-                
                 displayDateCheck = (displayDate == anotherTask.getShownDate());
-                
             } else {
                 
                 displayDateCheck = displayDate.equals(anotherTask.getShownDate());
             }
-            
-            return (ID == anotherTask.getID()) &&
+           /* 
+            if (dueDateCheck == false) {
+                System.out.println("false dueDatecheck");
+            }
+            if (endDateCheck == false) {
+                System.out.println("false endDatecheck");
+            }
+            if (displayDateCheck == false) {
+                System.out.println("false displayDatecheck");
+                System.out.println(displayDate + " " + anotherTask.getShownDate());
+            }
+          */  
+            return ((ID == anotherTask.getID()) &&
                    dueDateCheck &&
                    endDateCheck &&
                    displayDateCheck &&
-                   (parentTask.equals(anotherTask.getParent()));
+                   (parentTask.equals(anotherTask.getParent())));
             
         } else{
             
