@@ -91,6 +91,15 @@ public class DisplayTaskList implements List<DisplayTask>{
         return null;
     }
     
+    public DisplayTask getTaskByParentID( int ID ){
+        for(DisplayTask t:displayTasks) {
+            if( t.getParent() != null && t.getParent().getID() == ID ){
+                return t;
+            }
+        }
+        return null;
+    }
+    
     @Override
     public int size() {
         return displayTasks.size();
