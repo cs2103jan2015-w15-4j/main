@@ -26,68 +26,69 @@ public class SplitLogic {
     }
     
     private static void addNewDisplayTask(DisplayTaskList outputList, Task inputTask) {
-        
-        if (inputTask.isFloating()) {
-            
-            createNewDisplayTask(outputList, null, null, null, inputTask);
-            
-        } else if (inputTask.getEndDate() == null) {
-            
-            Date shownDate = getShownDate(inputTask.getDueDate());
-            
-            createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), null, inputTask);
-            
-        } else {
-            
-           
-            Calendar dueDate = Calendar.getInstance();
-            dueDate.setTime(inputTask.getDueDate());
-            long dueDateDay = dueDate.getTimeInMillis();
-            
-            Calendar endDate = Calendar.getInstance();
-            endDate.setTime(inputTask.getEndDate());
-            long endDateDay = endDate.getTimeInMillis();
-            
-            long DateDifference = (endDateDay - dueDateDay) / (24 * 60 * 60 * 1000);
-       
-            if (DateDifference == 0) {
+        if (!inputTask.isDone()) {
+            if (inputTask.isFloating()) {
+                createNewDisplayTask(outputList, null, null, null, inputTask);
                 
+            } else if (inputTask.getEndDate() == null) {  
                 Date shownDate = getShownDate(inputTask.getDueDate());
                 
-                createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), 
-                        inputTask.getEndDate(), inputTask);
+                createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), null, inputTask);
                 
             } else {
-            
-                Date tempDate = getShownDate(inputTask.getDueDate());
-                Calendar cal = Calendar.getInstance();
+                Calendar dueDate = Calendar.getInstance();
+                dueDate.setTime(inputTask.getDueDate());
+                long dueDateDay = dueDate.getTimeInMillis();
                 
-                for (int j = 0; j <= DateDifference; j++) {
+                Calendar endDate = Calendar.getInstance();
+                endDate.setTime(inputTask.getEndDate());
+                long endDateDay = endDate.getTimeInMillis();
                 
-                    if (j == 0) {
-                        createNewDisplayTask(outputList, tempDate, inputTask.getDueDate(), null, inputTask);
-                        
-                    } else {
-                        cal.setTime(tempDate);
-                        cal.add(Calendar.DATE, 1);
-                        tempDate = cal.getTime();
-                        
+                long DateDifference = (endDateDay - dueDateDay) / (24 * 60 * 60 * 1000);
+           
+                if (DateDifference == 0) {
+                    
+                    Date shownDate = getShownDate(inputTask.getDueDate());
+                    
+                    createNewDisplayTask(outputList, shownDate, inputTask.getDueDate(), 
+                            inputTask.getEndDate(), inputTask);
+                    
+                } else {
+                
+                    Date tempDate = getShownDate(inputTask.getDueDate());
+                    Calendar cal = Calendar.getInstance();
+                    
+                    for (int j = 0; j <= DateDifference; j++) {
+                    
+                        if (j == 0) {
+                            createNewDisplayTask(outputList, tempDate, inputTask.getDueDate(), null, inputTask);
+                            
+                        } else {
+                            cal.setTime(tempDate);
+                            cal.add(Calendar.DATE, 1);
+                            tempDate = cal.getTime();
+                            
+                            createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
+                        }    
+                    }
+                    
+                    cal.setTime(tempDate);
+                    cal.add(Calendar.DATE, 1);
+                    tempDate = cal.getTime();
+                    int finalDate = cal.get(Calendar.DATE);
+                    cal.setTime(inputTask.getEndDate());
+                    int endTime = cal.get(Calendar.DATE);
+    
+                    if (finalDate == endTime) {
                         createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
-                    }    
+                    }
                 }
-                
-                cal.setTime(tempDate);
-                cal.add(Calendar.DATE, 1);
-                tempDate = cal.getTime();
-                int finalDate = cal.get(Calendar.DATE);
-                cal.setTime(inputTask.getEndDate());
-                int endTime = cal.get(Calendar.DATE);
-
-                if (finalDate == endTime) {
-                    createNewDisplayTask(outputList, tempDate, null, inputTask.getEndDate(), inputTask);
-                }
-            }
-        }     
+            }  
+        } else {
+            Date doneDate = getShownDate(inputTask.getDateCompleted());
+            
+            createNewDisplayTask(outputList, doneDate, null, inputTask.getDateCompleted(), inputTask);
+        }
     }
     
     private static void createNewDisplayTask(DisplayTaskList outputList,Date shownDate, Date from, Date to, Task inputTask) {
