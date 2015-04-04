@@ -422,9 +422,67 @@ public class LogicTest {
         splitTest.add(dt31);
         splitTest.add(dt32);
         
+        //displayTest.print();
+        //splitTest.print();
+        assertEquals(displayTest, splitTest);
+        
+    }
+    
+    @Test
+    public void testSplitWithDone() throws Exception{
+        TaskList TL1 = initializeList();
+        TL1.get(0).setDone();
+        TL1.get(2).setDone();
+        TL1.get(4).setDone();
+        initializeDisplayList();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        
+        DisplayTaskList splitTest = new DisplayTaskList();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(TL1.get(0).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        
+        DisplayTask done1 = new DisplayTask(0, cal.getTime(), null, TL1.get(0).getDateCompleted(), TL1.get(0));
+        
+        cal.setTime(TL1.get(2).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        DisplayTask done3 = new DisplayTask(7, cal.getTime(), null, TL1.get(2).getDateCompleted(), TL1.get(2));
+        
+        cal.setTime(TL1.get(4).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        DisplayTask done5 = new DisplayTask(9, cal.getTime(), null, TL1.get(4).getDateCompleted(), TL1.get(4));
+        
+        splitTest.add(done1);
+        splitTest.add(dt2);
+        splitTest.add(dt3);
+        splitTest.add(dt4);
+        splitTest.add(dt5);
+        splitTest.add(dt6);
+        splitTest.add(dt7);
+        splitTest.add(done3);
+        splitTest.add(dt9);
+        splitTest.add(done5);
+
+        dt25.setID(10);
+        dt26.setID(11);
+        dt27.setID(12);
+        dt28.setID(13);
+        dt29.setID(14);
+        dt30.setID(15);
+        dt31.setID(16);
+        dt32.setID(17);
+        splitTest.add(dt25);
+        splitTest.add(dt26);
+        splitTest.add(dt27);
+        splitTest.add(dt28);
+        splitTest.add(dt29);
+        splitTest.add(dt30);
+        splitTest.add(dt31);
+        splitTest.add(dt32);
+        
+        assertEquals(displayTest, splitTest);
         displayTest.print();
         splitTest.print();
-        assertEquals(displayTest, splitTest);
         /*
         assertEquals(displayTest.get(0), splitTest.get(0));
         assertEquals(displayTest.get(1), splitTest.get(1));
@@ -434,34 +492,7 @@ public class LogicTest {
         assertEquals(displayTest.get(5), splitTest.get(5));
         assertEquals(displayTest.get(6), splitTest.get(6));
         assertEquals(displayTest.get(7), splitTest.get(7));
-        assertEquals(displayTest.get(8), splitTest.get(8));
-        assertEquals(displayTest.get(9), splitTest.get(9));
-        assertEquals(displayTest.get(10), splitTest.get(10));
-        assertEquals(displayTest.get(11), splitTest.get(11));
-        assertEquals(displayTest.get(12), splitTest.get(12));
-        assertEquals(displayTest.get(13), splitTest.get(13));
-        assertEquals(displayTest.get(14), splitTest.get(14));
-        assertEquals(displayTest.get(15), splitTest.get(15));
-        assertEquals(displayTest.get(16), splitTest.get(16));
-        assertEquals(displayTest.get(17), splitTest.get(17));
-        assertEquals(displayTest.get(18), splitTest.get(18));
-        assertEquals(displayTest.get(19), splitTest.get(19));
-        assertEquals(displayTest.get(20), splitTest.get(20));
-        assertEquals(displayTest.get(21), splitTest.get(21));
-        assertEquals(displayTest.get(22), splitTest.get(22));
-        assertEquals(displayTest.get(23), splitTest.get(23));
-        assertEquals(displayTest.get(24), splitTest.get(24));
-        assertEquals(displayTest.get(25), splitTest.get(25));
-        assertEquals(displayTest.get(26), splitTest.get(26));
-        assertEquals(displayTest.get(27), splitTest.get(27));
-        assertEquals(displayTest.get(28), splitTest.get(28));
-        assertEquals(displayTest.get(29), splitTest.get(29));
-        assertEquals(displayTest.get(30), splitTest.get(30));
-        assertEquals(displayTest.get(31), splitTest.get(31));
         */
-        
-        
-
     }
     
     @Test

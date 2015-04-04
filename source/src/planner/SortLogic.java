@@ -251,10 +251,10 @@ public class SortLogic {
             Date key = entry.getKey();
             
             if (key == null) {          
-                DisplayTaskList sortedDisplayList = SortLogic.sortByPriority(unsortedList);     
+                DisplayTaskList sortedDisplayList = sortByPriority(unsortedList);     
                 sortedTree.put(key, sortedDisplayList);           
             } else {            
-                DisplayTaskList sortedDisplayList = SortLogic.sortByDate(unsortedList);       
+                DisplayTaskList sortedDisplayList = sortByDate(unsortedList);       
                 sortedTree.put(key, sortedDisplayList);
             }        
         }
@@ -271,7 +271,7 @@ public class SortLogic {
             
             Integer key = entry.getKey();
             
-            DisplayTaskList sortedDisplayList = SortLogic.sortByName(unsortedList);
+            DisplayTaskList sortedDisplayList = sortByName(unsortedList);
                 
             displayMap.put(key, sortedDisplayList);
         }
