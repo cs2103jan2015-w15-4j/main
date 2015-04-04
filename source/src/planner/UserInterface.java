@@ -4,10 +4,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -15,22 +11,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.*;
 
 import javax.swing.ImageIcon;
@@ -39,11 +25,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -134,7 +118,7 @@ public class UserInterface extends JFrame {
             displayStateStack.push(upcomingDisplayState);
         }
         
-        updateGUIView( sectionTitleString, currentList, null );
+        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
         commandPanel.setText( "Previous keyboard command undone successfully", true );
     }
@@ -146,8 +130,8 @@ public class UserInterface extends JFrame {
         
         String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
         
-        long modifiedTaskID = Engine.lastModifiedTask();
-        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
         
         if( modifiedTask != null ){
             
@@ -156,23 +140,25 @@ public class UserInterface extends JFrame {
                 displayStateStack.push(upcomingDisplayState);
             }
             
-            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
             
         } else{
             
             if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
                 
-                TaskList tempTaskList = Engine.getAllTasks();
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
                 
-                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
                 
                 if( modifiedTask != null ){
                     
-                    currentList.copyTaskList(tempTaskList);
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
                     
                     displayStateStack.push(upcomingDisplayState);
                     
-                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
                     
                 } else{
                     
@@ -194,19 +180,26 @@ public class UserInterface extends JFrame {
     
     private void handleSearch( String userInput ){
         
-        TaskList tempTaskList = Engine.getSearchResult();
+        Set<Map.Entry<Date, DisplayTaskList>> tempList = Engine.getSearchResult();
+        
+        DisplayTaskList tempTaskList = convertToDisplayTaskList(tempList);
+        Task tempTask;
         
         if( tempTaskList != null && tempTaskList.size() > 0 ){
             
-            currentList.copyTaskList(tempTaskList);
+            currentList = tempTaskList;
+            currentDisplayListForDate = tempList;
+            currentDisplayListForPriority = null;
             
             displayPane.clearDisplay();
             
-            displayPane.displayByDate(currentList);
+            displayPane.displayByDate(currentDisplayListForDate);
             
             displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, userInput, userInput, null ));
             
-            updateGUIView(userInput, currentList, displayPane.getCurrentSelectedTask());
+            tempTask = displayPane.getCurrentSelectedTask() != null ? displayPane.getCurrentSelectedTask().getParent() : null;
+            
+            updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, userInput, tempTask);
             
             commandPanel.setText( "Search success", true );
             
@@ -216,11 +209,66 @@ public class UserInterface extends JFrame {
         }
     }
     
-    private void updateGUIView( String sectionTitleString, TaskList taskList, Task task ){
+    private void handleSearchPriority( String userInput ){
         
-        displayPane.clearDisplay();
+        // Should get priority list
+        /*
+        Set<Map.Entry<Integer, DisplayTaskList>> tempList = Engine.getSearchResult();
         
-        displayPane.displayByDate(taskList);
+        DisplayTaskList tempTaskList = convertToDisplayTaskList(tempList);
+        Task tempTask;
+        
+        if( tempTaskList != null && tempTaskList.size() > 0 ){
+            
+            currentList = tempTaskList;
+            currentDisplayListForDate = null;
+            currentDisplayListForPriority = tempList;
+            
+            displayPane.clearDisplay();
+            
+            displayPane.displayByDate(currentDisplayListForDate);
+            
+            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.PRIORITY_SEARCH, userInput, userInput, null ));
+            
+            tempTask = displayPane.getCurrentSelectedTask() != null ? displayPane.getCurrentSelectedTask().getParent() : null;
+            
+            updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, userInput, tempTask);
+            
+            commandPanel.setText( "Search success", true );
+            
+        } else{
+            
+            commandPanel.setText( "We cannot find any task with indicated priority :/", true );
+        }*/
+    }
+    
+    private void updateGUIView( Set<Map.Entry<Date, DisplayTaskList>> dateDisplayList, 
+                                Set<Map.Entry<Integer, DisplayTaskList>> priorityDisplayList,
+                                String sectionTitleString, Task task){
+        
+        if( dateDisplayList != null ){
+            
+            displayPane.clearDisplay();
+            
+            displayPane.displayByDate(dateDisplayList);
+            
+            updateGUIView( sectionTitleString, task );
+            
+        } else if( priorityDisplayList != null ){
+            
+            displayPane.clearDisplay();
+            
+            displayPane.displayByPriority(priorityDisplayList);
+            
+            updateGUIView( sectionTitleString, task );
+            
+        } else{
+            
+            System.out.println( "ERROR WITH DISPLAYING TASKS" );
+        }
+    }
+    
+    private void updateGUIView( String sectionTitleString, Task task ){
         
         displayPane.selectGivenTask(task);
         
@@ -233,7 +281,10 @@ public class UserInterface extends JFrame {
             
         } else{
             
-            slidePanel.populateDisplay(displayPane.getCurrentSelectedTask());
+            if( displayPane.getCurrentSelectedTask() != null && displayPane.getCurrentSelectedTask().getParent() != null ){
+                
+                slidePanel.populateDisplay(displayPane.getCurrentSelectedTask().getParent());
+            }
         }
         
         if(sectionTitleString != null){
@@ -267,7 +318,7 @@ public class UserInterface extends JFrame {
                     return "Completed tasks";
                     
                 case WORD_SEARCH:
-                case DATE_SEARCH:
+                case PRIORITY_SEARCH:
                     
                     return currentDisplayState.getTitle();
                     
@@ -278,6 +329,61 @@ public class UserInterface extends JFrame {
         }
         
         return "All Tasks";
+    }
+    
+    private <T>DisplayTaskList convertToDisplayTaskList( Set<Map.Entry<T, DisplayTaskList>> displayList ){
+        
+        DisplayTaskList newDisplayTaskList = new DisplayTaskList();
+        
+        if( displayList != null ){
+            
+            DisplayTaskList tempDisplayTaskList;
+            
+            for( Map.Entry<T, DisplayTaskList> entry : displayList ){
+                
+                tempDisplayTaskList = entry.getValue();
+                
+                if( tempDisplayTaskList != null ){
+                    
+                    for( DisplayTask tempDisplayTask : tempDisplayTaskList ){
+                        
+                        if( tempDisplayTask != null ){
+                            
+                            newDisplayTaskList.add(tempDisplayTask);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return newDisplayTaskList;
+    }
+    
+    private <T>DisplayTask getDisplayTaskByParentID( Set<Map.Entry<T, DisplayTaskList>> displayList, int parentID ){
+        
+        if( displayList != null ){
+            
+            DisplayTaskList tempDisplayTaskList;
+            
+            for( Map.Entry<T, DisplayTaskList> entry : displayList ){
+                
+                tempDisplayTaskList = entry.getValue();
+                
+                if( tempDisplayTaskList != null ){
+                    
+                    for( DisplayTask tempDisplayTask : tempDisplayTaskList ){
+                        
+                        if( tempDisplayTask != null && tempDisplayTask.getParent() != null &&
+                            tempDisplayTask.getParent().getID() == parentID){
+                            
+                            return tempDisplayTask;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
     
     private DisplayState updateCurrentList( DisplayState currentDisplayState ){
@@ -292,25 +398,33 @@ public class UserInterface extends JFrame {
             
                 case TENTATIVE:
                     
-                    currentList.copyTaskList(Engine.getTentativeTasks());
+                    currentDisplayListForPriority = Engine.getTentativeTasks();
+                    currentDisplayListForDate = null;
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForPriority );
                     
                     return currentDisplayState;
                     
                 case DONE:
                     
-                    currentList.copyTaskList(Engine.getDoneTasks());
+                    currentDisplayListForPriority = null;
+                    currentDisplayListForDate = Engine.getDoneTasks();
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForDate );
                     
                     return currentDisplayState;
                     
                 case WORD_SEARCH:
-                case DATE_SEARCH:
                     
                     searchString = currentDisplayState.getCommand();
                     
                     if ( Engine.process(searchString) == CommandType.SEARCH ){
                         
-                        currentList.copyTaskList(Engine.getSearchResult());
+                        currentDisplayListForPriority = null;
+                        currentDisplayListForDate = Engine.getSearchResult();
                         
+                        currentList = convertToDisplayTaskList(currentDisplayListForDate);
+
                         return currentDisplayState;
                     } 
 
@@ -322,7 +436,10 @@ public class UserInterface extends JFrame {
             }
         }
             
-        currentList.copyTaskList(Engine.getAllTasks());
+        currentDisplayListForPriority = null;
+        currentDisplayListForDate = Engine.getAllTasks();
+        
+        currentList = convertToDisplayTaskList(currentDisplayListForDate);
         
         return new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
                                  new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
@@ -336,8 +453,8 @@ public class UserInterface extends JFrame {
         
         String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
         
-        long modifiedTaskID = Engine.lastModifiedTask();
-        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
         
         if( modifiedTask != null ){
             
@@ -346,23 +463,25 @@ public class UserInterface extends JFrame {
                 displayStateStack.push(upcomingDisplayState);
             }
             
-            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
             
         } else{
             
             if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
                 
-                TaskList tempTaskList = Engine.getAllTasks();
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
                 
-                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
                 
                 if( modifiedTask != null ){
                     
-                    currentList.copyTaskList(tempTaskList);
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
                     
                     displayStateStack.push(upcomingDisplayState);
                     
-                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
                     
                 } else{
                     
@@ -389,8 +508,8 @@ public class UserInterface extends JFrame {
         
         String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
         
-        long modifiedTaskID = Engine.lastModifiedTask();
-        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
         
         if( modifiedTask != null ){
             
@@ -399,23 +518,25 @@ public class UserInterface extends JFrame {
                 displayStateStack.push(upcomingDisplayState);
             }
             
-            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
             
         } else{
             
             if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
                 
-                TaskList tempTaskList = Engine.getAllTasks();
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
                 
-                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
                 
                 if( modifiedTask != null ){
                     
-                    currentList.copyTaskList(tempTaskList);
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
                     
                     displayStateStack.push(upcomingDisplayState);
                     
-                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
                     
                 } else{
                     
@@ -442,8 +563,8 @@ public class UserInterface extends JFrame {
         
         String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
         
-        long modifiedTaskID = Engine.lastModifiedTask();
-        Task modifiedTask = currentList.getTaskByID(modifiedTaskID);
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
         
         if( modifiedTask != null ){
             
@@ -452,23 +573,25 @@ public class UserInterface extends JFrame {
                 displayStateStack.push(upcomingDisplayState);
             }
             
-            updateGUIView( sectionTitleString, currentList, modifiedTask );
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
             
         } else{
             
             if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
                 
-                TaskList tempTaskList = Engine.getAllTasks();
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
                 
-                modifiedTask = tempTaskList.getTaskByID(modifiedTaskID);
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
                 
                 if( modifiedTask != null ){
                     
-                    currentList.copyTaskList(tempTaskList);
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
                     
                     displayStateStack.push(upcomingDisplayState);
                     
-                    updateGUIView( "All Tasks", currentList, modifiedTask );
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
                     
                 } else{
                     
@@ -500,7 +623,7 @@ public class UserInterface extends JFrame {
             displayStateStack.push(upcomingDisplayState);
         }
         
-        updateGUIView( sectionTitleString, currentList, null );
+        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
         commandPanel.setText( "Task deleted successfully", true );
     }
@@ -546,7 +669,10 @@ public class UserInterface extends JFrame {
     private int mouseXCoordinate;
     private int mouseYCoordinate;
     
-    private TaskList currentList;
+    private DisplayTaskList currentList;
+    
+    private Set<Map.Entry<Integer, DisplayTaskList>> currentDisplayListForPriority;
+    private Set<Map.Entry<Date, DisplayTaskList>> currentDisplayListForDate;
     
     private boolean isMessageDisplayed;
     
@@ -559,8 +685,6 @@ public class UserInterface extends JFrame {
     
     private DisplayStateStack displayStateStack;
     private final int maxNumOfDisplayStates = 100;
-    
-    private boolean isWindowCurrentlyActive;
     
     public static void main(String[] args) {
         
@@ -765,9 +889,14 @@ public class UserInterface extends JFrame {
                 if( currentDisplayState != null &&
                     currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                     
-                    currentList.copyTaskList(Engine.getAllTasks());
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getAllTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
                     displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event ));
-                    updateGUIView( "All Tasks", currentList, null );
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", null );
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
@@ -809,21 +938,21 @@ public class UserInterface extends JFrame {
                     currentNavigationBars.size() > 0 && 
                     currentNavigationBars.get(0).isVisible() ){
                     
-                    Task currentTask = displayPane.getCurrentSelectedTask();
+                    DisplayTask currentTask = displayPane.getCurrentSelectedTask();
                     
-                    if( currentTask != null ){
+                    if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getID(), "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), "F1");
                     }
                 }
                 
                 if( slidePanel.isVisible() ){
                     
-                    Task tempTask = displayPane.getCurrentSelectedTask();
+                    DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                     
-                    if( tempTask != null ){
+                    if( tempTask != null && tempTask.getParent() != null ){
                         
-                        slidePanel.populateDisplay(tempTask);
+                        slidePanel.populateDisplay(tempTask.getParent());
                     }
                 }
                 
@@ -859,21 +988,21 @@ public class UserInterface extends JFrame {
                         currentNavigationBars.size() > 0 && 
                         currentNavigationBars.get(0).isVisible() ){
                     
-                    Task currentTask = displayPane.getCurrentSelectedTask();
+                    DisplayTask currentTask = displayPane.getCurrentSelectedTask();
                     
-                    if( currentTask != null ){
+                    if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getID(), "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), "F1");
                     }
                 }
                 
                 if( slidePanel.isVisible() ){
                     
-                    Task tempTask = displayPane.getCurrentSelectedTask();
+                    DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                     
-                    if( tempTask != null ){
+                    if( tempTask != null && tempTask.getParent() != null ){
                         
-                        slidePanel.populateDisplay(tempTask);
+                        slidePanel.populateDisplay(tempTask.getParent());
                     }
                 }
                 
@@ -885,11 +1014,11 @@ public class UserInterface extends JFrame {
                     
                     if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                         
-                        Task tempTask = displayPane.getCurrentSelectedTask();
+                        DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                         
-                        if( tempTask != null ){
+                        if( tempTask != null && tempTask.getParent() != null ){
                             
-                            slidePanel.slideOut( tempTask );
+                            slidePanel.slideOut( tempTask.getParent() );
                         }
                         
                         event.consume();
@@ -998,21 +1127,21 @@ public class UserInterface extends JFrame {
             
             int key = 1;
             
-            TaskList tempTaskList;
+            DisplayTaskList tempTaskList;
             
             // More info on current task
             if( currentList.size() > 0 ){
                 
                 //long taskID = displayPane.getCurrentSelectedTaskID();
                 
-                Task tempTask = displayPane.getCurrentSelectedTask();
+                DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                 
                 //if( taskID >= 0 ){
                           
-                if( tempTask != null ){
+                if( tempTask != null && tempTask.getParent() != null ){
                     
                     tempList.add( new NavigationBar( 
-                            planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTask.getID(), 
+                            planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTask.getParent().getID(), 
                             "F" + key ) );
                     
                 } else{
@@ -1066,7 +1195,7 @@ public class UserInterface extends JFrame {
             // all tasks
             if( currentDisplayState != null ){
                 
-                tempTaskList = Engine.getAllTasks();
+                tempTaskList = convertToDisplayTaskList(Engine.getAllTasks());
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                     
@@ -1100,7 +1229,7 @@ public class UserInterface extends JFrame {
             // Tentative tasks
             if( currentDisplayState != null ){
                 
-                tempTaskList = Engine.getTentativeTasks();
+                tempTaskList = convertToDisplayTaskList(Engine.getTentativeTasks());
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                     
@@ -1152,7 +1281,7 @@ public class UserInterface extends JFrame {
             // Done tasks
             if( currentDisplayState != null ){
                 
-                tempTaskList = Engine.getDoneTasks();
+                tempTaskList = convertToDisplayTaskList(Engine.getDoneTasks());
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
                     
@@ -1255,11 +1384,14 @@ public class UserInterface extends JFrame {
         displayStateStack = new DisplayStateStack(maxNumOfDisplayStates);
         
         // Copying of all tasks
-        currentList = new TaskList( Engine.getAllTasks() );
+        currentDisplayListForDate = Engine.getAllTasks();
+        currentDisplayListForPriority = null;
+        
+        currentList = convertToDisplayTaskList( currentDisplayListForDate );
         
         // Display all tasks as default screen for now
         //displayPane.addTasksToDisplay(currentList);
-        displayPane.displayByDate(currentList);
+        displayPane.displayByDate(currentDisplayListForDate);
         
         displayPane.requestFocusInWindow();
         
@@ -1286,6 +1418,7 @@ public class UserInterface extends JFrame {
         }
     }
     
+    /*
     private long compareList( TaskList originalList, TaskList modifiedList ){
         
         if( originalList == null || modifiedList == null ){
@@ -1321,7 +1454,7 @@ public class UserInterface extends JFrame {
             
             return 0L;
         }
-    }
+    }*/
     
     private ArrayList<Map.Entry<String, ArrayList<String>>> generateTutorialStringMappings( String [][]possibleCommands ){
         
