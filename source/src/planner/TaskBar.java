@@ -90,14 +90,22 @@ public class TaskBar extends JComponent {
 	    this.position = position >= 0 ? position : 0;
 	    
 	    dateHeader = newDateHeader;
-        
+	    componentCoordinates = getInsets();
+	    
         if( newDateHeader != null ){
             
-            heightOfLabel = newDateHeader.getHeight();
+            //heightOfLabel = newDateHeader.getHeight();
+            
+            heightOfLabel = 20;
+            
+            //dateHeader.getText();
             dateHeader.setBounds(componentCoordinates.left, componentCoordinates.top, m_width, heightOfLabel);
             dateHeader.setPreferredSize(new Dimension(m_width, heightOfLabel));
+            add(dateHeader);
             
         } else{
+            
+            System.out.println("went here");
             
             heightOfLabel = 0;
         }
@@ -106,7 +114,6 @@ public class TaskBar extends JComponent {
         setOpaque(false);
         setBorder(null);
         setFocusable(false);
-        componentCoordinates = getInsets();
         setLayout(null);
         
         prepareTaskCheckBox();
@@ -119,7 +126,7 @@ public class TaskBar extends JComponent {
 	
 	public TaskBar( JLabel newDateHeader ){
 	   
-	    this( null, 0 );
+	    this( newDateHeader, 0 );
 	}
 
 	public int getPosition(){
@@ -465,8 +472,13 @@ public class TaskBar extends JComponent {
 	            
 	        } else if( task.getParent().isDone() ){
 	            
+	            SimpleDateFormat dateFormatter = new SimpleDateFormat( "h:mma" );
+	            
 	            setNotificationImageOff();
-                timeDisplayLabel.setText( "" );
+	            
+	            String time = (task.getParent().getDateCompleted() != null ? ("Completed at " + dateFormatter.format(task.getParent().getDateCompleted())) : "");
+	            
+                timeDisplayLabel.setText( time );
 	            
 	            if( timeDisplayLabelEx != null ){
                     
@@ -516,11 +528,11 @@ public class TaskBar extends JComponent {
     	                
     	                if( !compareByDateOnly( tempDate, currentDate ) ){
                             
-                            timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getDueDate()) );
+                            timeDisplayLabel.setText( "From " + dateFormatterWithDay.format(task.getDueDate()) );
                             
                         } else{
                             
-                            timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate()) );
+                            timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
                         }
     	                
     	            } else{
@@ -593,9 +605,9 @@ public class TaskBar extends JComponent {
                             timeDisplayLabelEx = null;
                         }
                         
-                    } else{
+                    } else if( task.getDueDate() != null ){
                         
-                        timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate()) );
+                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
                         
                         if( timeDisplayLabelEx != null ){
                             
@@ -610,6 +622,11 @@ public class TaskBar extends JComponent {
                             
                             timeDisplayLabelEx = null;
                         }
+                        
+                    } else{
+                        
+                        setNotificationImageOff();
+                        timeDisplayLabel.setText( "No Due Date Set" );
                     }
 	            }
 	        }
