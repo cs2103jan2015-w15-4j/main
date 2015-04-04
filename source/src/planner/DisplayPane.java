@@ -2,6 +2,7 @@ package planner;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -420,7 +421,7 @@ public class DisplayPane extends JScrollPane{
         }
 	    
 	    long taskBarID = listOfTasks.size();
-        
+	    
         TaskBar taskBar = new TaskBar(header);
         
         setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
@@ -541,6 +542,11 @@ public class DisplayPane extends JScrollPane{
                         dateHeaderLabel.setText( "No Priority" );
                     }
                     
+                    dateHeaderLabel.setPreferredSize(new Dimension( 50, 100 ));
+                    dateHeaderLabel.setMaximumSize(new Dimension( 50, 100 ));
+                    dateHeaderLabel.setMinimumSize(new Dimension( 50, 100 ));
+                    dateHeaderLabel.setSize(50, 100);
+                    
                     tempDisplayTask = tempTaskList.get(0);
                     
                     addTaskWithHeaderToDisplayWithoutSelection( null, tempDisplayTask, dateHeaderLabel );
@@ -551,6 +557,13 @@ public class DisplayPane extends JScrollPane{
                     
                     tempTaskList.set(0, tempDisplayTask);
                 }
+                
+                appendString( "\n\n\n\n\n\n", null );
+            }
+            
+            if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
+                
+                selectTask( listOfTasks.get(0L), 0L );
             }
         }
     }
