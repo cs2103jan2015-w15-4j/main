@@ -16,16 +16,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DateFormatter;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
 import java.text.SimpleDateFormat;
 
 public class TaskBar extends JComponent {
@@ -35,10 +38,14 @@ public class TaskBar extends JComponent {
 	private final int m_width = 597;
 	private final int m_height = 50;
 	
+	private int heightOfLabel;
+	
 	private JLabel taskBarBackground;
 	private JLabel taskCheckBox;
 	private JLabel lineNumberLabel;
 	private JLabel timeDisplayLabel;
+	private JLabel timeDisplayLabelEx;
+	private JLabel dateHeader;
 	
 	private JTextPane tagsPane;
 	
@@ -52,7 +59,7 @@ public class TaskBar extends JComponent {
 	// Helper functions
 	@Override
 	public Dimension getPreferredSize() {
-	    return new Dimension(m_width, m_height);
+	    return new Dimension(m_width, m_height+heightOfLabel);
 	}
 	
 	private void removeMouseListener( Component component ){
@@ -75,21 +82,44 @@ public class TaskBar extends JComponent {
 	
 	public TaskBar( int position ){
 		
-		this.position = position >= 0 ? position : 0;
-		
-		setSize(597, 50);
-		setOpaque(false);
-		setBorder(null);
-		setFocusable(false);
-		componentCoordinates = getInsets();
-		setLayout(null);
-		
-		prepareTaskCheckBox();
-		prepareTaskTitleLabel();
-		prepareLineNumberLabel();
-		prepareTagsPane();
-		prepareTimeDisplayLabel();
-		prepareTaskBarBackground();
+	    this(null, position);
+	}
+	
+	public TaskBar( JLabel newDateHeader, int position ){
+	    
+	    this.position = position >= 0 ? position : 0;
+	    
+	    dateHeader = newDateHeader;
+        
+        if( newDateHeader != null ){
+            
+            heightOfLabel = newDateHeader.getHeight();
+            dateHeader.setBounds(componentCoordinates.left, componentCoordinates.top, m_width, heightOfLabel);
+            dateHeader.setPreferredSize(new Dimension(m_width, heightOfLabel));
+            
+        } else{
+            
+            heightOfLabel = 0;
+        }
+        
+        setSize(m_width, m_height+heightOfLabel);
+        setOpaque(false);
+        setBorder(null);
+        setFocusable(false);
+        componentCoordinates = getInsets();
+        setLayout(null);
+        
+        prepareTaskCheckBox();
+        prepareTaskTitleLabel();
+        prepareLineNumberLabel();
+        prepareTagsPane();
+        prepareTimeDisplayLabel();
+        prepareTaskBarBackground();
+	}
+	
+	public TaskBar( JLabel newDateHeader ){
+	   
+	    this( null, 0 );
 	}
 
 	public int getPosition(){
@@ -108,7 +138,7 @@ public class TaskBar extends JComponent {
 		taskCheckBox = new JLabel();
 		taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/NotDoneCheckBox.png")));
 		taskCheckBox.setFocusable(false);
-		taskCheckBox.setBounds(562, 12, 26, 26);
+		taskCheckBox.setBounds(562, 12+heightOfLabel, 26, 26);
 		add(taskCheckBox);
 		removeMouseListener(taskCheckBox);
 	}
@@ -132,7 +162,7 @@ public class TaskBar extends JComponent {
 	private void prepareTaskTitleLabel(){
 		
 		taskTitleLabel = new FadedTextField(new Color(255,255,255), new Color(0,0,0,0), new Color(0,0,0,0), 45, 45);
-		taskTitleLabel.setBounds(60, 17, 330, 20);
+		taskTitleLabel.setBounds(60, 17+heightOfLabel, 330, 20);
 		taskTitleLabel.setFocusable(false);
 		taskTitleLabel.setFont(new Font( "Arial", Font.BOLD, 14));
 		add(taskTitleLabel);
@@ -164,7 +194,7 @@ public class TaskBar extends JComponent {
 	private void prepareLineNumberLabel(){
 		
 		lineNumberLabel = new JLabel("#11111");
-		lineNumberLabel.setBounds(5, 3, 50, 45);
+		lineNumberLabel.setBounds(5, 3+heightOfLabel, 50, 45);
 		lineNumberLabel.setForeground(new Color( 255,255,255 ));
 		lineNumberLabel.setFont(new Font( "Arial", Font.BOLD, 12 ));
 		lineNumberLabel.setFocusable(false);
@@ -184,7 +214,7 @@ public class TaskBar extends JComponent {
 	private void prepareTagsPane(){
 	    
 	    tagsPane = new JTextPane();
-        tagsPane.setBounds(56, 25, 335, 17);
+        tagsPane.setBounds(56, 25+heightOfLabel, 335, 17);
         add(tagsPane);
         tagsPane.setEditable(false);
         tagsPane.setHighlighter(null);
@@ -318,8 +348,6 @@ public class TaskBar extends JComponent {
 	                                           getPriorityColor(planner.Constants.COLOR_SERIES, priority, colorsToExclude), 
 	                                           "priority " + priority + " " );
 	            
-	            System.out.println( "has priority" );
-	            
 	            previousTextExist = true;
 	            
 	            hasTags = true;
@@ -368,43 +396,221 @@ public class TaskBar extends JComponent {
 	    
 	    timeDisplayLabel = new JLabel();
 	    setNotificationImageOn();
-        timeDisplayLabel.setBounds(395, 18, 164, 14);
+        timeDisplayLabel.setBounds(395, 18+heightOfLabel, 164, 14);
         add(timeDisplayLabel);
-        timeDisplayLabel.setForeground(new Color(255,255,255));
-        timeDisplayLabel.setFont( new Font( "Arial", Font.BOLD, 11 ) );
+        setTimeDisplayLabelAttributes(timeDisplayLabel);
         timeDisplayLabel.setText("By 11:59PM");
         timeDisplayLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        timeDisplayLabelEx = null;
 	}
 	
-	public void setTimeDisplayLabel( Task task ){
+	private void setTimeDisplayLabelAttributes( JLabel targetTimeDisplayLabel ){
 	    
-	    if( task != null ){
+	    if( targetTimeDisplayLabel != null ){
 	        
-	        if( task.isFloating() ){
+	        targetTimeDisplayLabel.setForeground(new Color(255,255,255));
+	        targetTimeDisplayLabel.setFont( new Font( "Arial", Font.BOLD, 11 ) );
+	    }
+	}
+	
+	public static boolean compareByDateOnly( Date dateOne, Date dateTwo ){
+	    
+	    if( dateOne != null && dateTwo != null ){
+	        
+	        Calendar c1 = Calendar.getInstance();
+            Calendar c2 = Calendar.getInstance();
+	        
+            c1.setTime(dateOne);
+            c2.setTime(dateTwo);
+            
+            return (c1.get(Calendar.DAY_OF_MONTH) == c2.get(Calendar.DAY_OF_MONTH)) &&
+                   (c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) ) &&
+                   (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR));
+            
+	    } else if( dateOne != null || dateTwo != null ){
+	        
+	        return false;
+	        
+	    } else{
+	        
+	        return true;
+	    }
+	}
+	
+	public void setTimeDisplayLabel( Date currentDate, DisplayTask task ){
+	    
+	    if( task != null && task.getParent() != null ){
+	        
+	        timeDisplayLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	        
+	        if( task.getParent().isFloating() ){
 	            
 	            setNotificationImageOff();
 	            timeDisplayLabel.setText( "No Due Date Set" );
 	            
+	            if( timeDisplayLabelEx != null ){
+                    
+                    Point currentLocation = timeDisplayLabel.getLocation();
+                    
+                    if( currentLocation != null ){
+                        
+                        timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y+8);
+                    }
+                    
+                    remove(timeDisplayLabelEx);
+                    
+                    timeDisplayLabelEx = null;
+                }
+	            
+	        } else if( task.getParent().isDone() ){
+	            
+	            setNotificationImageOff();
+                timeDisplayLabel.setText( "" );
+	            
+	            if( timeDisplayLabelEx != null ){
+                    
+                    Point currentLocation = timeDisplayLabel.getLocation();
+                    
+                    if( currentLocation != null ){
+                        
+                        timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y+8);
+                    }
+                    
+                    remove(timeDisplayLabelEx);
+                    
+                    timeDisplayLabelEx = null;
+                }
+	            
 	        } else{
 	            
 	            SimpleDateFormat dateFormatter = new SimpleDateFormat( "h:mma" );
+                SimpleDateFormat dateFormatterWithDay = new SimpleDateFormat( "d MMM yyyy 'at' h:mma" );
 	            
-	            if( task.getDueDate() != null && task.getEndDate() != null ){
+	            if( currentDate != null ){
 	                
-	                timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) + " to " + dateFormatter.format(task.getEndDate()) );
+	                setNotificationImageOn();
 	                
-	            } else if( task.getEndDate() != null ){
-	                
-	                timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
-	                
-	            } else if( task.getDueDate() != null ){
-	                
-	                timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate() ) );
-	                
+    	            Date tempDate;
+    	            
+    	            if( task.getDueDate() != null && task.getEndDate() != null ){
+    	                
+    	                timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) + " to " + dateFormatter.format(task.getEndDate()) );
+    	                
+    	            } else if( task.getEndDate() != null ){
+    	                
+    	                tempDate = task.getEndDate();
+    	                
+    	                if( !compareByDateOnly( tempDate, currentDate ) ){
+    	                    
+    	                    timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getEndDate()) );
+    	                    
+    	                } else{
+    	                    
+    	                    timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
+    	                }
+    	               
+    	            } else if( task.getDueDate() != null ){
+    	                
+    	                tempDate = task.getDueDate();
+    	                
+    	                if( !compareByDateOnly( tempDate, currentDate ) ){
+                            
+                            timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getDueDate()) );
+                            
+                        } else{
+                            
+                            timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate()) );
+                        }
+    	                
+    	            } else{
+    	                
+    	                setNotificationImageOff();
+    	                timeDisplayLabel.setText( "No Due Date Set" );
+    	            }
+    	            
+    	            if( timeDisplayLabelEx != null ){
+                        
+                        Point currentLocation = timeDisplayLabel.getLocation();
+                        
+                        if( currentLocation != null ){
+                            
+                            timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y+8);
+                        }
+                        
+                        remove(timeDisplayLabelEx);
+                        
+                        timeDisplayLabelEx = null;
+                    }
+    	            
 	            } else{
 	                
+	                timeDisplayLabel.setHorizontalAlignment(SwingConstants.LEFT);
 	                setNotificationImageOff();
-	                timeDisplayLabel.setText( "No Due Date Set" );
+	                
+	                if( task.getDueDate() != null && task.getEndDate() != null ){
+                        
+                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                        
+                        Point currentLocation = timeDisplayLabel.getLocation();
+                        
+                        if( timeDisplayLabelEx == null ){
+                            
+                            if( currentLocation != null ){
+                                
+                                timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y-8);
+                            }
+                            
+                        } else{
+                            
+                            remove(timeDisplayLabelEx);
+                            
+                            timeDisplayLabelEx = null;
+                        }
+                        
+                        timeDisplayLabelEx = new JLabel();
+                        setTimeDisplayLabelAttributes(timeDisplayLabelEx);
+                        timeDisplayLabelEx.setHorizontalAlignment(SwingConstants.LEFT);
+                        timeDisplayLabelEx.setText("To   " + dateFormatter.format(task.getEndDate()) );
+                        timeDisplayLabelEx.setBounds(currentLocation.x, currentLocation.y, timeDisplayLabel.getWidth(), timeDisplayLabel.getHeight());
+                        add(timeDisplayLabelEx);
+                        
+                    } else if( task.getEndDate() != null ){
+                        
+                        timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
+                        
+                        if( timeDisplayLabelEx != null ){
+                            
+                            Point currentLocation = timeDisplayLabel.getLocation();
+                            
+                            if( currentLocation != null ){
+                                
+                                timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y+8);
+                            }
+                            
+                            remove(timeDisplayLabelEx);
+                            
+                            timeDisplayLabelEx = null;
+                        }
+                        
+                    } else{
+                        
+                        timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate()) );
+                        
+                        if( timeDisplayLabelEx != null ){
+                            
+                            Point currentLocation = timeDisplayLabel.getLocation();
+                            
+                            if( currentLocation != null ){
+                                
+                                timeDisplayLabel.setLocation(currentLocation.x, currentLocation.y+8);
+                            }
+                            
+                            remove(timeDisplayLabelEx);
+                            
+                            timeDisplayLabelEx = null;
+                        }
+                    }
 	            }
 	        }
 	    }
@@ -417,7 +623,7 @@ public class TaskBar extends JComponent {
 		taskBarBackground.setBackground(Color.WHITE);
 		taskBarBackground.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TaskBar.png")));
 		taskBarBackground.setFocusable(false);
-		taskBarBackground.setBounds( componentCoordinates.left, componentCoordinates.top, m_width, m_height );
+		taskBarBackground.setBounds( componentCoordinates.left, componentCoordinates.top+heightOfLabel, m_width, m_height );
 		add(taskBarBackground);
 		removeMouseListener(taskBarBackground);
 	}
