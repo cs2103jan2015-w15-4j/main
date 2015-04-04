@@ -1102,9 +1102,7 @@ public class Parser {
      */
     private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
-        // first set the second to 0
-        calendar.set(0, 0, 0, 0, 0, 0);
-        calendar.set(year, month, day, hour, minute);
+        calendar.set(year, month, day, hour, minute, 0);
         return calendar;
     }
     
