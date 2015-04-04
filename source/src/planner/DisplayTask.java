@@ -108,7 +108,7 @@ public class DisplayTask {
                 
                 displayDateCheck = displayDate.equals(anotherTask.getShownDate());
             }
-           /* 
+            
             if (dueDateCheck == false) {
                 System.out.println("false dueDatecheck");
             }
@@ -119,7 +119,7 @@ public class DisplayTask {
                 System.out.println("false displayDatecheck");
                 System.out.println(displayDate + " " + anotherTask.getShownDate());
             }
-          */  
+            
             return ((ID == anotherTask.getID()) &&
                    dueDateCheck &&
                    endDateCheck &&
