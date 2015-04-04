@@ -83,10 +83,18 @@ public class Engine {
     //Not tested yet
     public static boolean init() {
         try {
+            doneTasks =  new TaskList();
+            undoneTasks =  new TaskList();
+            floatingTasks =  new TaskList();
+            normalTasks =  new TaskList();
+            
             //Initiates the storage and read the config and storage files
             storage = new Storage();
+            System.out.println("here");
             config = storage.readConfig();
+            System.out.println("readConfig");
             allTasks = storage.readTaskStorage(config.getStoragePath());
+            System.out.println("readStorage");
             
             //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
