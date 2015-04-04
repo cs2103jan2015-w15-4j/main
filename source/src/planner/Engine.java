@@ -26,6 +26,9 @@ public class Engine {
     private static TaskList undoneTasks;
     private static TaskList floatingTasks;
     private static TaskList normalTasks;
+    private static TaskList todayTasks;
+    private static TaskList upcomingTasks;
+    private static TaskList overdueTasks;
     
     private static TaskList searchResults;
     
@@ -87,6 +90,9 @@ public class Engine {
             undoneTasks =  new TaskList();
             floatingTasks =  new TaskList();
             normalTasks =  new TaskList();
+            todayTasks = new TaskList();
+            upcomingTasks = new TaskList();
+            overdueTasks = new TaskList();
             
             //Initiates the storage and read the config and storage files
             storage = new Storage();
@@ -150,12 +156,18 @@ public class Engine {
         undoneTasks.clear();
         normalTasks.clear();
         floatingTasks.clear();
+        todayTasks.clear();
+        upcomingTasks.clear();
+        overdueTasks.clear();
         
         //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
-        normalTasks = Logic.searchConfirmed(doneTasks);
-        floatingTasks = Logic.searchFloating(doneTasks);
+        normalTasks = Logic.searchConfirmed(allTasks);
+        floatingTasks = Logic.searchFloating(allTasks);
+        todayTasks = allTasks;
+        upcomingTasks = Logic.searchUpcomingTasks(allTasks);
+        overdueTasks = Logic.searchOverDuedTasks(allTasks);
         
     }
     
@@ -649,6 +661,36 @@ public class Engine {
     //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
         return Logic.displayAllTaskByDate(normalTasks);
+    }
+    
+    /**
+     * Gets the list of all Tasks today.
+     * 
+     * @return
+     */
+    //Not tested yet
+    public static Set<Map.Entry<Integer, DisplayTaskList>> getTodayTasks() {
+        return Logic.displayAllTaskByPriority(todayTasks);
+    }
+    
+    /**
+     * Gets the list of all Tasks overdue.
+     * 
+     * @return
+     */
+    //Not tested yet
+    public static Set<Map.Entry<Date, DisplayTaskList>> getOverdueTasks() {
+        return Logic.displayAllTaskByDate(overdueTasks);
+    }
+    
+    /**
+     * Gets the list of all Tasks overdue.
+     * 
+     * @return
+     */
+    //Not tested yet
+    public static Set<Map.Entry<Date, DisplayTaskList>> getUpcomingTasks() {
+        return Logic.displayAllTaskByDate(upcomingTasks);
     }
     
     /**
