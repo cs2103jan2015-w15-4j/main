@@ -31,7 +31,7 @@ public class Constants {
     }
     
     public enum DisplayStateFlag {
-        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, DATE_SEARCH, INVALID, SETTINGS
+        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, PRIORITY_SEARCH, INVALID, SETTINGS
     }
     
     public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", "edit", 
