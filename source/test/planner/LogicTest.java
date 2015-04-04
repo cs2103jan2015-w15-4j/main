@@ -14,7 +14,49 @@ import java.util.TreeMap;
 import org.junit.Test;
 
 public class LogicTest {
-    private Logic targetClass;
+    
+    private static Task task1;
+    private static Task task2;
+    private static Task task3;
+    private static Task task4;
+    private static Task task5;
+    private static Task task6;
+    private static Task task7;
+    private static Task task8;
+    private static Task task9;
+    private static Task task10;
+    private static DisplayTask dt1;
+    private static DisplayTask dt2;
+    private static DisplayTask dt3;
+    private static DisplayTask dt4;
+    private static DisplayTask dt5;
+    private static DisplayTask dt6;
+    private static DisplayTask dt7;
+    private static DisplayTask dt8;
+    private static DisplayTask dt9;
+    private static DisplayTask dt10;
+    private static DisplayTask dt11;
+    private static DisplayTask dt12;
+    private static DisplayTask dt13;
+    private static DisplayTask dt14;
+    private static DisplayTask dt15;
+    private static DisplayTask dt16;
+    private static DisplayTask dt17;
+    private static DisplayTask dt18;
+    private static DisplayTask dt19;
+    private static DisplayTask dt20;
+    private static DisplayTask dt21;
+    private static DisplayTask dt22;
+    private static DisplayTask dt23;
+    private static DisplayTask dt24;
+    private static DisplayTask dt25;
+    private static DisplayTask dt26;
+    private static DisplayTask dt27;
+    private static DisplayTask dt28;
+    private static DisplayTask dt29;
+    private static DisplayTask dt30;
+    private static DisplayTask dt31;
+    private static DisplayTask dt32;
     
     public void initialize(){
         targetClass = new Logic();
@@ -45,16 +87,16 @@ public class LogicTest {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         
-        Task task1 = new Task("THIS IS A DUEDATE TASK", "NOTHING", date, 1, "work", 1);
-        Task task2 = new Task("THIS IS A TIMEDTASK", "SPREAD THROUGHOUT SEVERAL DAYS", calFirst.getTime(), 2, "workload", 2);
-        Task task3 = new Task("THIS IS ANOTHER TIMEDTASK", "WITHIN ONE DAY", calFirst.getTime(), 2, "workload", 3);
-        Task task4 = new Task("THIS IS AN OVERDUED TASK", "DUEDATE TASK", calOverDue.getTime(), 4, "nothing", 4);
-        Task task5 = new Task("THIS IS AN OVERDUED TIMED TASK", "STILL ONGOING", calOverDue.getTime(), 3, "this is a tag", 5);
-        Task task6 = new Task("THIS IS AN OVERDUED TIMED TASK", "LONG PAST", calOverDue.getTime(), 5, "tags cannot be searched can it", 6);
-        Task task7 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "can you find this", 7);
-        Task task8 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "these are tags", 8);
-        Task task9 = new Task("THIS IS A FLOATING TASK", "HIGHEST PRIORITY", null, 5, "can you dig it", 9);
-        Task task10 = new Task("THIS IS A RANDOM DUEDATE TASK", "", calFourth.getTime(), 4, "", 10);
+        task1 = new Task("THIS IS A DUEDATE TASK", "NOTHING", date, 1, "work", 1);
+        task2 = new Task("THIS IS A TIMEDTASK", "SPREAD THROUGHOUT SEVERAL DAYS", calFirst.getTime(), 2, "workload", 2);
+        task3 = new Task("THIS IS ANOTHER TIMEDTASK", "WITHIN ONE DAY", calFirst.getTime(), 2, "workload", 3);
+        task4 = new Task("THIS IS AN OVERDUED TASK", "DUEDATE TASK", calOverDue.getTime(), 4, "nothing", 4);
+        task5 = new Task("THIS IS AN OVERDUED TIMED TASK", "STILL ONGOING", calOverDue.getTime(), 3, "this is a tag", 5);
+        task6 = new Task("THIS IS AN OVERDUED TIMED TASK", "LONG PAST", calOverDue.getTime(), 5, "tags cannot be searched can it", 6);
+        task7 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "can you find this", 7);
+        task8 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "these are tags", 8);
+        task9 = new Task("THIS IS A FLOATING TASK", "HIGHEST PRIORITY", null, 5, "can you dig it", 9);
+        task10 = new Task("THIS IS A RANDOM DUEDATE TASK", "", calFourth.getTime(), 4, "", 10);
         
         task2.setEndDate(calSecond.getTime());
         task3.setEndDate(calThird.getTime());
@@ -76,6 +118,34 @@ public class LogicTest {
         return TL1;
     }
     
+    public static void initializeDisplayList() throws Exception {
+        Calendar calFirst = Calendar.getInstance();
+        calFirst.set(2015, 5, 3, 0, 0);
+        
+        Calendar calSecond = Calendar.getInstance();
+        calSecond.set(2015, 5, 8, 23, 59);
+        
+        Calendar calThird = Calendar.getInstance();
+        calThird.set(2015, 5, 3, 23, 59);
+        
+        Calendar calFourth = Calendar.getInstance();
+        calFourth.set(2015, 5, 10, 23, 59);
+
+        Calendar calOverDue = Calendar.getInstance();
+        calOverDue.set(2015, 2, 20, 23, 59);
+        
+        Calendar calOverDue1 = Calendar.getInstance();
+        calOverDue1.set(2015, 3, 3, 0, 0);
+        
+        Calendar calOverDue2 = Calendar.getInstance();
+        calOverDue2.set(2015, 2, 23, 23, 59);
+        
+        Calendar cal = Calendar.getInstance();
+        cal.set(2015, 8, 23, 0, 0, 0);
+        
+        dt1 = new DisplayTask(0, cal.getTime(), task1.getDueDate(), null, task1);
+        
+    }
     
     //Tests search by tags
     //Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
@@ -346,6 +416,11 @@ public class LogicTest {
                 
             }
         }
+        
+    }
+    
+    @Test
+    public void sortPriorityTree() throws Exception {
         
     }
 }
