@@ -51,19 +51,16 @@ public class Constants {
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
                                                               "Tutorial",                       // F3
-                                                              " Quick key used",                // F4
-                                                              " Quick keys used",
-                                                              " Task due today",                // F5
+                                                              " Task due today",                // F4
                                                               " Tasks due today",
-                                                              " Task in total",                 // F6
+                                                              " Task in total",                 // F5
                                                               " Tasks in total",
-                                                              " Tentative Task",                // F7
+                                                              " Tentative Task",                // F6
                                                               " Tentative Tasks",
-                                                              " Overdue Task",                  // F8
+                                                              " Overdue Task",                  // F7
                                                               " Overdue Tasks",
-                                                              " Task Done",                     // F9
-                                                              " Tasks Done",
-                                                              "YOPO's Settings"};               // F10
+                                                              " Task Done",                     // F8
+                                                              " Tasks Done"};                   // F9
     
     public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
                                            new Color( 244, 132, 57 ),
@@ -78,7 +75,7 @@ public class Constants {
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;
-    public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 16;
+    public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 13;
     public static final int NAVIGATION_BARS_MAX_NUM = 10;
     
     EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
