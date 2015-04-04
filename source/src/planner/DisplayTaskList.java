@@ -99,6 +99,22 @@ public class DisplayTaskList implements List<DisplayTask>{
         }
         return null;
     }
+
+    public void print() {
+        for (int i = 0; i < this.size(); i++) {
+            Task taskPrint = this.get(i).getParent();
+            System.out.println("ID: " +
+                    this.get(i).getID() + " Showned Date: " +
+                    this.get(i).getShownDate() + " Due Date: " +
+                    this.get(i).getDueDate() + " End Date: " +
+                    this.get(i).getEndDate());
+            System.out.println("Task ID: " +
+                    taskPrint.getID() + " Name: " +
+                    taskPrint.getName() + " Priority: " +
+                    taskPrint.getPriority());
+        }
+
+    }
     
     @Override
     public int size() {
@@ -222,6 +238,7 @@ public class DisplayTaskList implements List<DisplayTask>{
             
             DisplayTaskList tasks = (DisplayTaskList) obj;
             if (this.size() == tasks.size()) {
+                //System.out.println("Right size");
                 for (int i = 0; i < tasks.size(); i++) {
                     if (!(this.get(i).equals(tasks.get(i)))) {
                         return false;
@@ -229,6 +246,7 @@ public class DisplayTaskList implements List<DisplayTask>{
                 }
                 return true;
             } else {
+                //System.out.println("Wrong size");
                 return false;
             }
         } else {
