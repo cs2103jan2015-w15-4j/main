@@ -48,6 +48,7 @@ public class SliderPanel extends JComponent{
     private int initialYCoordinate = 0;
     private int parentWidth;
     private int widthNotToMoveInto;
+    private Integer firstXCoordinate = null;
     
     private int currentXCoordinate;
     
@@ -83,8 +84,11 @@ public class SliderPanel extends JComponent{
     
     private void setupTimerForSlideOut(){
         
-        timerSlideOut = new Timer( 1, new ActionListener(){
+        timerSlideOut = new Timer( 2, new ActionListener(){
 
+            private long time = -1;
+            private static final long NANOSECOND_PER_MILLISECOND = 1000000;
+            
             @Override
             public void actionPerformed(ActionEvent arg0) {
 
@@ -93,11 +97,32 @@ public class SliderPanel extends JComponent{
                     setToVisible();
                 }
                 
-                setLocation(--currentXCoordinate, initialYCoordinate );
+                int increments = 1;
+                
+                if( time <= -1 ){
+                    
+                    time = System.nanoTime();
+                    
+                } else{
+                    
+                    long timeDifference = System.nanoTime() - time;
+                    
+                    int multiplier = (int)(timeDifference/(NANOSECOND_PER_MILLISECOND*2));
+                    
+                    multiplier = (multiplier > 0 ? multiplier : 1);
+                    
+                    increments = Math.min(increments*multiplier, currentXCoordinate-widthNotToMoveInto);
+                }
+                
+                currentXCoordinate = currentXCoordinate - increments;
+                
+                setLocation(currentXCoordinate, initialYCoordinate );
                 
                 if( timerSlideIn.isRunning() || currentXCoordinate <= widthNotToMoveInto ){
                     
                     timerSlideOut.stop();
+                    
+                    time = -1;
                 }
             }
             
@@ -106,18 +131,41 @@ public class SliderPanel extends JComponent{
     
     private void setupTimerForSlideIn(){
         
-        timerSlideIn = new Timer( 1, new ActionListener(){
+        timerSlideIn = new Timer( 2, new ActionListener(){
 
+            private long time = -1;
+            private static final long NANOSECOND_PER_MILLISECOND = 1000000;
+            
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 
-                setLocation(++currentXCoordinate, initialYCoordinate );
+                int increments = 1;
+                
+                if( time <= -1 ){
+                    
+                    time = System.nanoTime();
+                    
+                } else{
+                    
+                    long timeDifference = System.nanoTime() - time;
+                    
+                    int multiplier = (int)(timeDifference/(NANOSECOND_PER_MILLISECOND*2));
+                    multiplier = (multiplier > 0 ? multiplier : 1);
+                    
+                    increments = Math.min(increments*multiplier, parentWidth-currentXCoordinate);
+                }
+                
+                currentXCoordinate = currentXCoordinate + increments;
+                
+                setLocation(currentXCoordinate, initialYCoordinate );
                 
                 if( currentXCoordinate >= parentWidth ){
                     
                     setToInvisible();
                     
                     timerSlideIn.stop();
+                    
+                    time = -1;
                     
                     System.out.println( "Slide in stopped" );
                 }
@@ -317,10 +365,20 @@ public class SliderPanel extends JComponent{
         if( task != null ){
             
             Point pointInParent = getLocation();
-            initialXCoordinate = pointInParent != null ? pointInParent.x : 0;
-            initialYCoordinate = pointInParent != null ? pointInParent.y : 0;
             
-            //System.out.printf( "parentWidth = " + parentWidth + "\n" );
+            if( firstXCoordinate != null ){
+                
+                System.out.println("initialXCoordinate = " + initialXCoordinate);
+                
+                initialXCoordinate = firstXCoordinate;
+                
+            } else{
+                
+                firstXCoordinate = (pointInParent != null ? pointInParent.x : null);
+                initialXCoordinate = firstXCoordinate != null ? firstXCoordinate : 0;
+            }
+            
+            initialYCoordinate = pointInParent != null ? pointInParent.y : 0;
             
             if( initialXCoordinate <= widthNotToMoveInto ){
                 
@@ -331,6 +389,12 @@ public class SliderPanel extends JComponent{
             
             currentXCoordinate = initialXCoordinate;
             
+            if( timerSlideOut.isRunning() ){
+                timerSlideOut.stop();
+            }
+            
+            setLocation( currentXCoordinate, initialYCoordinate );
+            
             timerSlideOut.start();
         }
     }
@@ -340,6 +404,12 @@ public class SliderPanel extends JComponent{
         if( currentXCoordinate >= parentWidth ){
             
             return;
+        }
+        
+        setLocation( parentWidth, initialYCoordinate );
+        
+        if( timerSlideIn.isRunning() ){
+            timerSlideIn.stop();
         }
         
         timerSlideIn.start();
