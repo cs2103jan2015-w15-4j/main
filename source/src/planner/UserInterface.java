@@ -443,7 +443,7 @@ public class UserInterface extends JFrame {
         
         return new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
                                  new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
-                                 0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ); 
+                                 0, KeyEvent.VK_F5, '\0', KeyEvent.KEY_LOCATION_STANDARD) ); 
     }
     
     private void handleAddOperation(){
@@ -882,7 +882,41 @@ public class UserInterface extends JFrame {
                 int tempScrollUnitDifference = (event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -verticalScrollBar.getBlockIncrement(-1) : verticalScrollBar.getBlockIncrement(1));
                 verticalScrollBar.setValue( currentScrollValue + tempScrollUnitDifference );
                 
+            } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
+                        
+                        Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getDoneTasks();
+                        currentList = convertToDisplayTaskList(tempTaskList);
+                        currentDisplayListForDate = tempTaskList;
+                        currentDisplayListForPriority = null;
+                        
+                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.DONE, "Completed Tasks", null, event ));
+                        
+                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Completed Tasks", null );
+                }
+                
             } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+                        
+                        Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTentativeTasks();
+                        currentList = convertToDisplayTaskList(tempTaskList);
+                        currentDisplayListForDate = null;
+                        currentDisplayListForPriority = tempTaskList;
+                        
+                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TENTATIVE, "Floating Tasks", null, event ));
+                        
+                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Floating Tasks", null );
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F5 ){
                 
                 DisplayState currentDisplayState = displayStateStack.peek();
                 
@@ -942,7 +976,8 @@ public class UserInterface extends JFrame {
                     
                     if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), 
+                                                                      "F1");
                     }
                 }
                 
@@ -992,7 +1027,8 @@ public class UserInterface extends JFrame {
                     
                     if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), "F1");
+                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), 
+                                                                      "F1");
                     }
                 }
                 
@@ -1170,20 +1206,16 @@ public class UserInterface extends JFrame {
             tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2], "F" + key ));
             ++key;
             
-            // Quick keys
-            tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
-            ++key;
-            
             // Today tasks
             if( currentDisplayState != null ){
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6], "F" + key ));
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6] ));
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4] ));
                 }
                 
             } else{
@@ -1201,22 +1233,22 @@ public class UserInterface extends JFrame {
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[5], "F" + key ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6], "F" + key ));
                     }
                     
                 } else{
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[5] ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[6] ));
                     }
                 }
                 
@@ -1235,22 +1267,22 @@ public class UserInterface extends JFrame {
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7], "F" + key ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8], "F" + key ));
                     }
                     
                 } else{
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[7] ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10]));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8]));
                     }
                 }
                 
@@ -1265,11 +1297,11 @@ public class UserInterface extends JFrame {
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12] ));
+                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9] ));
                 }
 
             } else{
@@ -1287,41 +1319,23 @@ public class UserInterface extends JFrame {
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11], "F" + key ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
                     }
                     
                 } else{
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11] ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12] ));
                     }
-                }
-                
-            } else{
-                
-                tempList.add( new NavigationBar( null ) );
-            }
-            ++key;
-            
-            // Settings
-            if( currentDisplayState != null ){
-                
-                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.SETTINGS ){
-                    
-                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15], "F" + key ));
-                    
-                } else{
-                    
-                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15] ) );
                 }
                 
             } else{
@@ -1399,7 +1413,7 @@ public class UserInterface extends JFrame {
         
         displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
                                                 new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
-                                                              0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
+                                                              0, KeyEvent.VK_F5, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
     }
     
     private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
@@ -1647,6 +1661,15 @@ public class UserInterface extends JFrame {
                         
                         commandTextbox.setText(finalString, false);
                     }
+                    
+                    if( currentNavigationBars.get(0).isVisible() 
+                            && displayPane.getCurrentSelectedTask() != null 
+                            && displayPane.getCurrentSelectedTask().getParent() != null ){
+                           
+                           String messageTitle = planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + displayPane.getCurrentSelectedTask().getParent().getID();
+                           
+                           currentNavigationBars.get(0).setMessageToView(messageTitle, "F1" );
+                       }
                 }
 
                 @Override
@@ -1659,8 +1682,6 @@ public class UserInterface extends JFrame {
                     commandTextbox.setForegroundColor( new Color( 128,128,128 ) );
                     
                     String input = currentCommand.getText();
-                    
-            
                     
                     if( !isMessageDisplayed && input.length() <= 0 ){
                         
@@ -1675,6 +1696,15 @@ public class UserInterface extends JFrame {
                     
                     characterToTransfer = '\0';
                     isBackspacePressed = false;
+                    
+                    if( currentNavigationBars.get(0).isVisible() 
+                            && displayPane.getCurrentSelectedTask() != null 
+                            && displayPane.getCurrentSelectedTask().getParent() != null ){
+                           
+                           String messageTitle = planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + displayPane.getCurrentSelectedTask().getParent().getID();
+                           
+                           currentNavigationBars.get(0).setMessageToView(messageTitle, "F1/Enter" );
+                       }
                 }
             });
         }
