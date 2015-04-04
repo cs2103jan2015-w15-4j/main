@@ -58,36 +58,33 @@ public class LogicTest {
     private static DisplayTask dt31;
     private static DisplayTask dt32;
     
-    public void initialize(){
-        targetClass = new Logic();
-    }
-    
+
     public TaskList initializeList() throws Exception {
         Calendar calFirst = Calendar.getInstance();
-        calFirst.set(2015, 5, 3, 0, 0);
+        calFirst.set(2015, 5, 3, 0, 0, 0);
         
         Calendar calSecond = Calendar.getInstance();
-        calSecond.set(2015, 5, 8, 23, 59);
+        calSecond.set(2015, 5, 8, 23, 59, 0);
         
         Calendar calThird = Calendar.getInstance();
-        calThird.set(2015, 5, 3, 23, 59);
+        calThird.set(2015, 5, 3, 23, 59, 0);
         
         Calendar calFourth = Calendar.getInstance();
-        calFourth.set(2015, 5, 10, 23, 59);
+        calFourth.set(2014, 5, 10, 23, 59, 0);
 
         Calendar calOverDue = Calendar.getInstance();
-        calOverDue.set(2015, 2, 20, 23, 59);
+        calOverDue.set(2015, 2, 20, 23, 59, 0);
         
         Calendar calOverDue1 = Calendar.getInstance();
-        calOverDue1.set(2015, 3, 3, 0, 0);
+        calOverDue1.set(2015, 3, 3, 0, 0, 0);
         
         Calendar calOverDue2 = Calendar.getInstance();
-        calOverDue2.set(2015, 2, 23, 23, 59);
+        calOverDue2.set(2015, 2, 23, 23, 59, 0);
         
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = dateFormat.parse("23/09/2015"); 
+        Calendar calZero = Calendar.getInstance();
+        calZero.set(2015, 8, 23, 0, 0, 0);
         
-        task1 = new Task("THIS IS A DUEDATE TASK", "NOTHING", date, 1, "work", 1);
+        task1 = new Task("THIS IS A DUEDATE TASK", "NOTHING", calZero.getTime(), 1, "work", 1);
         task2 = new Task("THIS IS A TIMEDTASK", "SPREAD THROUGHOUT SEVERAL DAYS", calFirst.getTime(), 2, "workload", 2);
         task3 = new Task("THIS IS ANOTHER TIMEDTASK", "WITHIN ONE DAY", calFirst.getTime(), 2, "workload", 3);
         task4 = new Task("THIS IS AN OVERDUED TASK", "DUEDATE TASK", calOverDue.getTime(), 4, "nothing", 4);
@@ -119,31 +116,75 @@ public class LogicTest {
     }
     
     public static void initializeDisplayList() throws Exception {
-        Calendar calFirst = Calendar.getInstance();
-        calFirst.set(2015, 5, 3, 0, 0);
-        
-        Calendar calSecond = Calendar.getInstance();
-        calSecond.set(2015, 5, 8, 23, 59);
-        
-        Calendar calThird = Calendar.getInstance();
-        calThird.set(2015, 5, 3, 23, 59);
-        
-        Calendar calFourth = Calendar.getInstance();
-        calFourth.set(2015, 5, 10, 23, 59);
-
-        Calendar calOverDue = Calendar.getInstance();
-        calOverDue.set(2015, 2, 20, 23, 59);
-        
-        Calendar calOverDue1 = Calendar.getInstance();
-        calOverDue1.set(2015, 3, 3, 0, 0);
-        
-        Calendar calOverDue2 = Calendar.getInstance();
-        calOverDue2.set(2015, 2, 23, 23, 59);
-        
         Calendar cal = Calendar.getInstance();
         cal.set(2015, 8, 23, 0, 0, 0);
         
         dt1 = new DisplayTask(0, cal.getTime(), task1.getDueDate(), null, task1);
+        
+        cal.set(2015, 5, 3, 0, 0, 0);
+        dt2 = new DisplayTask(1, cal.getTime(), task2.getDueDate(), null, task2);
+        cal.add(Calendar.DATE, 1);
+        dt3 = new DisplayTask(2, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt4 = new DisplayTask(3, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt5 = new DisplayTask(4, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt6 = new DisplayTask(5, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt7 = new DisplayTask(6, cal.getTime(), null, task2.getEndDate(), task2);
+        
+        cal.set(2015, 5, 3, 0, 0, 0);
+        dt8 = new DisplayTask(7, cal.getTime(), task3.getDueDate(), task3.getEndDate(), task3);
+        
+        cal.set(2015, 2, 20, 0, 0, 0);
+        dt9 = new DisplayTask(8, cal.getTime(), task4.getDueDate(), null, task4);
+        
+        dt10 = new DisplayTask(9, cal.getTime(), task5.getDueDate(), null, task5);
+        cal.add(Calendar.DATE, 1);
+        dt11 = new DisplayTask(10, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt12 = new DisplayTask(11, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt13 = new DisplayTask(12, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt14 = new DisplayTask(13, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt15 = new DisplayTask(14, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt16 = new DisplayTask(15, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt17 = new DisplayTask(16, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt18 = new DisplayTask(17, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt19 = new DisplayTask(18, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt20 = new DisplayTask(19, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt21 = new DisplayTask(20, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt22 = new DisplayTask(21, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt23 = new DisplayTask(22, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt24 = new DisplayTask(23, cal.getTime(), null, task5.getEndDate(), task5);
+        
+        cal.set(2015, 2, 20, 0, 0, 0);
+        dt25 = new DisplayTask(24, cal.getTime(), task6.getDueDate(), null, task6);
+        cal.add(Calendar.DATE, 1);
+        dt26 = new DisplayTask(25, cal.getTime(), null, task6.getEndDate(), task6);
+        cal.add(Calendar.DATE, 1);
+        dt27 = new DisplayTask(26, cal.getTime(), null, task6.getEndDate(), task6);
+        cal.add(Calendar.DATE, 1);
+        dt28 = new DisplayTask(27, cal.getTime(), null, task6.getEndDate(), task6);
+        
+        dt29 = new DisplayTask(28, null, null, null, task7);
+        dt30 = new DisplayTask(29, null, null, null, task8);
+        dt31 = new DisplayTask(30, null, null, null, task9);
+        
+        cal.set(2014, 5, 10, 0, 0, 0);
+        dt32 = new DisplayTask(31, cal.getTime(), task10.getDueDate(), null, task10);
         
     }
     
@@ -151,7 +192,6 @@ public class LogicTest {
     //Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
     @Test 
     public void testSearchTags() throws Exception{
-        initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         Task task1 = new Task("dummy1", "test", date, 1, "Can you work", 1);
@@ -192,7 +232,6 @@ public class LogicTest {
     //Test cases include word in name, description and tags in different cases with a combination of all if possible
     @Test 
     public void testSearchDesc() throws Exception{
-        initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
@@ -225,7 +264,6 @@ public class LogicTest {
     //This test determines whether the order of priority search is correct
     @Test
     public void testSearchPriority() throws Exception{
-        initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
@@ -260,7 +298,6 @@ public class LogicTest {
     //is in order
     @Test
     public void testSplitTentative() throws Exception {
-        initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         Date date2 = dateFormat.parse("20/12/9999");
@@ -302,7 +339,6 @@ public class LogicTest {
     
     @Test
     public void testSplitDone() throws Exception {
-        initialize();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = dateFormat.parse("23/09/2015"); 
         Task task1 = new Task("HELLO WORLD", "Need to finish homework on demo video", null, 1, "work", 1);
@@ -347,23 +383,89 @@ public class LogicTest {
     
     @Test
     public void testSplitAllTask() throws Exception {
-        initialize();
+
         TaskList TL1 = initializeList();
+        initializeDisplayList();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
-        for (int i = 0; i < displayTest.size(); i++) {
-            if (displayTest.get(i).getShownDate() != null) {
-                System.out.println(displayTest.get(i).getParent().getID() + " " + displayTest.get(i).getShownDate());
-            } else {
-                System.out.println(displayTest.get(i).getParent().getID());
-            }
-        }
-        assertEquals(displayTest.size(), 32);
+
+        DisplayTaskList splitTest = new DisplayTaskList();
+        splitTest.add(dt1);
+        splitTest.add(dt2);
+        splitTest.add(dt3);
+        splitTest.add(dt4);
+        splitTest.add(dt5);
+        splitTest.add(dt6);
+        splitTest.add(dt7);
+        splitTest.add(dt8);
+        splitTest.add(dt9);
+        splitTest.add(dt10);
+        splitTest.add(dt11);
+        splitTest.add(dt12);
+        splitTest.add(dt13);
+        splitTest.add(dt14);
+        splitTest.add(dt15);
+        splitTest.add(dt16);
+        splitTest.add(dt17);
+        splitTest.add(dt18);
+        splitTest.add(dt19);
+        splitTest.add(dt20);
+        splitTest.add(dt21);
+        splitTest.add(dt22);
+        splitTest.add(dt23);
+        splitTest.add(dt24);
+        splitTest.add(dt25);
+        splitTest.add(dt26);
+        splitTest.add(dt27);
+        splitTest.add(dt28);
+        splitTest.add(dt29);
+        splitTest.add(dt30);
+        splitTest.add(dt31);
+        splitTest.add(dt32);
         
+        displayTest.print();
+        splitTest.print();
+        assertEquals(displayTest, splitTest);
+        /*
+        assertEquals(displayTest.get(0), splitTest.get(0));
+        assertEquals(displayTest.get(1), splitTest.get(1));
+        assertEquals(displayTest.get(2), splitTest.get(2));
+        assertEquals(displayTest.get(3), splitTest.get(3));
+        assertEquals(displayTest.get(4), splitTest.get(4));
+        assertEquals(displayTest.get(5), splitTest.get(5));
+        assertEquals(displayTest.get(6), splitTest.get(6));
+        assertEquals(displayTest.get(7), splitTest.get(7));
+        assertEquals(displayTest.get(8), splitTest.get(8));
+        assertEquals(displayTest.get(9), splitTest.get(9));
+        assertEquals(displayTest.get(10), splitTest.get(10));
+        assertEquals(displayTest.get(11), splitTest.get(11));
+        assertEquals(displayTest.get(12), splitTest.get(12));
+        assertEquals(displayTest.get(13), splitTest.get(13));
+        assertEquals(displayTest.get(14), splitTest.get(14));
+        assertEquals(displayTest.get(15), splitTest.get(15));
+        assertEquals(displayTest.get(16), splitTest.get(16));
+        assertEquals(displayTest.get(17), splitTest.get(17));
+        assertEquals(displayTest.get(18), splitTest.get(18));
+        assertEquals(displayTest.get(19), splitTest.get(19));
+        assertEquals(displayTest.get(20), splitTest.get(20));
+        assertEquals(displayTest.get(21), splitTest.get(21));
+        assertEquals(displayTest.get(22), splitTest.get(22));
+        assertEquals(displayTest.get(23), splitTest.get(23));
+        assertEquals(displayTest.get(24), splitTest.get(24));
+        assertEquals(displayTest.get(25), splitTest.get(25));
+        assertEquals(displayTest.get(26), splitTest.get(26));
+        assertEquals(displayTest.get(27), splitTest.get(27));
+        assertEquals(displayTest.get(28), splitTest.get(28));
+        assertEquals(displayTest.get(29), splitTest.get(29));
+        assertEquals(displayTest.get(30), splitTest.get(30));
+        assertEquals(displayTest.get(31), splitTest.get(31));
+        */
+        
+        
+
     }
     
     @Test
     public void testConvertToDateTree() throws Exception {
-        initialize();
         TaskList TL1 = initializeList();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
         TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
@@ -382,7 +484,7 @@ public class LogicTest {
     
     @Test
     public void testConvertToFloatingTree() throws Exception {
-        initialize();
+
         TaskList TL1 = initializeList();
         TaskList TL = Logic.searchFloating(TL1);
         DisplayTaskList displayTest = Logic.splitAllTask(TL);
@@ -398,10 +500,10 @@ public class LogicTest {
         }
     
     }
-    
+  /*  
     @Test
     public void sortDateTree() throws Exception {
-        initialize();
+
         TaskList TL1 = initializeList();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
         TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
@@ -418,7 +520,7 @@ public class LogicTest {
         }
         
     }
-    
+ */   
     @Test
     public void sortPriorityTree() throws Exception {
         
