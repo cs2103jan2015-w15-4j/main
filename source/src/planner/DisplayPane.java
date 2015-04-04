@@ -34,6 +34,7 @@ import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.JLabel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.ScrollBarUI;
@@ -52,16 +53,18 @@ public class DisplayPane extends JScrollPane{
 	private long currentTaskBarID;
 	
 	private TreeMap<Long, TaskBar> listOfTasks;
-	private TreeMap<Long, Task> tasksList;
-	private TreeMap<Long, Long> taskNumberList;
+	private TreeMap<Long, DisplayTask> tasksList;
+	private TreeMap<Integer, Long> taskNumberList;
+	private TreeMap<Integer, Long> jumpList;
 	
 	private CustomScrollBarUI scrollBarSkin;
 	
 	public DisplayPane(){
 		
 		listOfTasks = new TreeMap<Long, TaskBar>();
-		tasksList = new TreeMap<Long, Task>();
-		taskNumberList = new TreeMap<Long, Long>();
+		tasksList = new TreeMap<Long, DisplayTask>();
+		taskNumberList = new TreeMap<Integer, Long>();
+		jumpList = new TreeMap<Integer, Long>();
 		
 		currentTaskBarID = -1;
 		
@@ -227,30 +230,37 @@ public class DisplayPane extends JScrollPane{
 		}
 	}
 	
-	private void setTaskBarParameters( TaskBar taskBar, Task task, long lineNumber ){
+	private void setTaskBarParameters( Date currentDate, TaskBar taskBar, DisplayTask task, long lineNumber ){
 		
+	    Task parentTask;
+	    
 		if( taskBar != null && task != null ){
 		    
-			// Set Line number
-			if( lineNumber > 0 ){
-				
-				taskBar.setLineNumber(lineNumber);
-			}
-			
-			// Check if task is done
-			if( task.isDone() ){
-				
-				taskBar.setTaskDone();
-			}
-			
-			// set task name	
-			taskBar.setTaskTitle(task.getName());
-			
-			// Set tags
-			taskBar.setTags(task);
-			
-			// Set due date label
-			taskBar.setTimeDisplayLabel(task);
+		    parentTask = task.getParent();
+		    
+		    if(parentTask != null){
+		        
+    			// Set Line number
+    			if( lineNumber > 0 ){
+    				
+    				taskBar.setLineNumber(lineNumber);
+    			}
+    			
+    			// Check if task is done
+    			if( parentTask.isDone() ){
+    				
+    				taskBar.setTaskDone();
+    			}
+    			
+    			// set task name	
+    			taskBar.setTaskTitle(parentTask.getName());
+    			
+    			// Set tags
+    			taskBar.setTags(parentTask);
+    			
+    			// Set due date label
+    			taskBar.setTimeDisplayLabel(currentDate, task);
+		    }
 		}
 	}
 	
@@ -271,24 +281,24 @@ public class DisplayPane extends JScrollPane{
 		}
 	}
 	
-	public boolean addTaskToDisplay( Task task ){
+	public boolean addTaskToDisplay( Date currentDate, DisplayTask task ){
 		
-		if( task == null ){
+		if( task == null || task.getParent() == null ){
 			
 			return false;
 		}
 		
 		long taskBarID = listOfTasks.size();
 		
-		appendString("               ", null);
-		
 		TaskBar taskBar = new TaskBar();
 		
 		//setTaskBarParameters( taskBar, task, taskBarID + 1 );
 		
-		setTaskBarParameters( taskBar, task, task.getID() );
+		setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
 		
 		taskBar.setPosition( display.getCaretPosition() );
+		
+		appendString("               ", null);
 		
 		addComponentToDisplay( taskBar );
 		
@@ -296,7 +306,9 @@ public class DisplayPane extends JScrollPane{
 		
 		tasksList.put(taskBarID, task);
 		
-		taskNumberList.put(task.getID(), taskBarID);
+		taskNumberList.put(task.getParent().getID(), taskBarID);
+		
+		jumpList.put(task.getID(), taskBarID);
 		
 		appendString("\n", null);
 		
@@ -305,9 +317,55 @@ public class DisplayPane extends JScrollPane{
 		return true;
 	}
 	
-	public Task getCurrentSelectedTask(){
+	public DisplayTask getCurrentSelectedTask(){
 	    
 	    return tasksList.get(currentTaskBarID);
+	}
+	
+	public boolean selectGivenJumpID( int jumpID ){
+	    
+	    if( jumpID >= 0 ){
+            
+            Long internalID = jumpList.get(jumpID);
+            
+            if( internalID != null ){
+                
+                TaskBar tempTaskBar = listOfTasks.get(internalID);
+                
+                if(tempTaskBar != null){
+                    
+                    selectTask( tempTaskBar, internalID );
+                    
+                    return true;
+                    
+                }
+            }
+	    }
+            
+        return false;
+	}
+	
+	public boolean selectGivenTaskID( int taskID ){
+	    
+	    if( taskID >= 0 ){
+	        
+	        Long internalID = taskNumberList.get(taskID);
+	        
+	        if( internalID != null ){
+                
+                TaskBar tempTaskBar = listOfTasks.get(internalID);
+                
+                if(tempTaskBar != null){
+                    
+                    selectTask( tempTaskBar, internalID );
+                    
+                    return true;
+                
+                } 
+	        }
+	    }
+	    
+	    return false;
 	}
 	
 	public boolean selectGivenTask( Task task ){
@@ -326,25 +384,17 @@ public class DisplayPane extends JScrollPane{
 	                
 	                return true;
 	                
-	            } else{
-	                
-	                return false;
-	            }
-	            
-	        } else{
-	            
-	            return false;
+	            } 
 	        }
-	        
-	    } else{
-	        
-	        return false;
 	    }
+	        
+	    return false;
 	}
 	
-	public boolean addTasksToDisplay( TaskList taskList ){
+	@SuppressWarnings("unused")
+    private boolean addTasksToDisplay( Date currentDate, DisplayTaskList taskList ){
 		
-		if( !addTasksToDisplayWithoutSelection(taskList) ){
+		if( !addTasksToDisplayWithoutSelection(currentDate, taskList) ){
 		    
 		    return false;
 		}
@@ -362,48 +412,81 @@ public class DisplayPane extends JScrollPane{
 	    return listOfTasks.size();
 	}
 	
-	private boolean addTasksToDisplayWithoutSelection( TaskList taskList ){
+	private boolean addTaskWithHeaderToDisplayWithoutSelection( Date currentDate, DisplayTask task, JLabel header ){
+	    
+	    if( task == null || task.getParent() == null ){
+            
+            return false;
+        }
+	    
+	    long taskBarID = listOfTasks.size();
+        
+        TaskBar taskBar = new TaskBar(header);
+        
+        setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
+        
+        taskBar.setPosition( display.getCaretPosition() );
+        
+        appendString("               ", null);
+        
+        addComponentToDisplay( taskBar );
+        
+        listOfTasks.put( taskBarID, taskBar );
+        
+        tasksList.put(taskBarID, task);
+        
+        taskNumberList.put(task.getParent().getID(), taskBarID);
+        
+        jumpList.put(task.getID(), taskBarID);
+        
+        appendString("\n", null);
+        
+        return true;
+	}
+	
+	private boolean addTasksToDisplayWithoutSelection( Date currentDate, DisplayTaskList taskList ){
 	    
 	    if( taskList == null ){
             
             return false;
         }
         
-        ListIterator<Task> iterator = taskList.listIterator();
-        Task currentTask;
+        ListIterator<DisplayTask> iterator = taskList.listIterator();
+        DisplayTask currentTask;
         
         display.setCaretPosition(display.getStyledDocument().getLength());
         
         long idxForCurrentTaskBar;
+        TaskBar tempTaskBar;
+        
         while( iterator.hasNext() ){
-            
-            appendString("               ", null);
             
             currentTask = iterator.next();
             
-            //System.out.println(currentTask.getID());
+            if( currentTask != null && currentTask.getParent() != null ){
             
-            currentTaskBar = new TaskBar();
-            
-            //setTaskBarParameters( currentTaskBar, currentTask, count + 1 );
-            
-            setTaskBarParameters( currentTaskBar, currentTask, currentTask.getID() );
-
-            currentTaskBar.setPosition( display.getCaretPosition() );
-            
-            //System.out.println( "Position of " + currentTask.getName() + " = " + display.getCaretPosition() );
-            
-            addComponentToDisplay( currentTaskBar );
-            
-            idxForCurrentTaskBar = listOfTasks.size();
-            
-            listOfTasks.put( idxForCurrentTaskBar, currentTaskBar );
-            
-            tasksList.put(idxForCurrentTaskBar, currentTask);
-            
-            taskNumberList.put( currentTask.getID(), idxForCurrentTaskBar );
-            
-            appendString("\n", null);
+                appendString("               ", null);
+                
+                tempTaskBar = new TaskBar();
+                
+                setTaskBarParameters( currentDate, tempTaskBar, currentTask, currentTask.getParent().getID() );
+    
+                tempTaskBar.setPosition( display.getCaretPosition() );
+                
+                addComponentToDisplay( tempTaskBar );
+                
+                idxForCurrentTaskBar = listOfTasks.size();
+                
+                listOfTasks.put( idxForCurrentTaskBar, tempTaskBar );
+                
+                tasksList.put(idxForCurrentTaskBar, currentTask);
+                
+                taskNumberList.put( currentTask.getParent().getID(), idxForCurrentTaskBar );
+                
+                jumpList.put(currentTask.getID(), idxForCurrentTaskBar);
+                
+                appendString("\n", null);
+            }
         }
         
         return true;
@@ -424,6 +507,121 @@ public class DisplayPane extends JScrollPane{
         return display;
     }
     
+    public void displayByPriority( Set<Map.Entry<Integer, DisplayTaskList>> displayList ){
+        
+        if( displayList != null ){
+            
+            Integer priority;
+            DisplayTaskList tempTaskList = null;
+            
+            JLabel dateHeaderLabel;
+            
+            DisplayTask tempDisplayTask;
+            
+            // Iterate through treemap
+            for( Map.Entry<Integer, DisplayTaskList> entry : displayList ){
+                
+                tempTaskList = entry.getValue();
+                
+                if( tempTaskList != null && tempTaskList.size() > 0 ){
+                    
+                    priority = entry.getKey();
+                    
+                    dateHeaderLabel = new JLabel();
+                    dateHeaderLabel.setHorizontalAlignment(SwingConstants.LEFT);
+                    dateHeaderLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                    dateHeaderLabel.setForeground(new Color(255,255,255));
+                    
+                    if( priority != null && priority >= 1 && priority <= 5 ){
+                        
+                        dateHeaderLabel.setText( "Priority " + priority );
+                        
+                    } else{
+                        
+                        dateHeaderLabel.setText( "No Priority" );
+                    }
+                    
+                    tempDisplayTask = tempTaskList.get(0);
+                    
+                    addTaskWithHeaderToDisplayWithoutSelection( null, tempDisplayTask, dateHeaderLabel );
+                    
+                    tempTaskList.set(0, null);
+                    
+                    addTasksToDisplayWithoutSelection( null, tempTaskList );
+                    
+                    tempTaskList.set(0, tempDisplayTask);
+                }
+            }
+        }
+    }
+    
+    public void displayByDate( Set<Map.Entry<Date, DisplayTaskList>> displayList ){
+        
+        if( displayList != null ){
+            
+            Date tempDate;
+            DisplayTaskList tempTaskList = null;
+            
+            Date todayDate = new Date(System.currentTimeMillis());
+            
+            JLabel dateHeaderLabel;
+            
+            DisplayTask tempDisplayTask;
+            
+            SimpleDateFormat dateFormatterForDisplay = new SimpleDateFormat( "EEE, d MMM yyyy" );
+            
+            // Iterate through treemap
+            for( Map.Entry<Date, DisplayTaskList> entry : displayList ){
+                
+                tempTaskList = entry.getValue();
+                
+                if( tempTaskList != null && tempTaskList.size() > 0 ){
+                    
+                    tempDate = entry.getKey();
+                    
+                    dateHeaderLabel = new JLabel();
+                    dateHeaderLabel.setHorizontalAlignment(SwingConstants.LEFT);
+                    dateHeaderLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                    dateHeaderLabel.setForeground(new Color(255,255,255));
+                    
+                    if( tempDate != null ){
+                        
+                        if( !TaskBar.compareByDateOnly(tempDate, todayDate) ){
+                            
+                            dateHeaderLabel.setText(dateFormatterForDisplay.format(tempDate));
+                            
+                        } else{
+                            
+                            dateHeaderLabel.setText("Today");
+                        }
+                        
+                    } else{
+                        
+                        dateHeaderLabel.setText( "Floating Tasks" );
+                    }
+                    
+                    tempDisplayTask = tempTaskList.get(0);
+                    
+                    addTaskWithHeaderToDisplayWithoutSelection( tempDate, tempDisplayTask, dateHeaderLabel );
+                    
+                    tempTaskList.set(0, null);
+                    
+                    addTasksToDisplayWithoutSelection( tempDate, tempTaskList );
+                    
+                    tempTaskList.set(0, tempDisplayTask);
+                }
+                
+                appendString( "\n\n\n\n\n\n", null );
+            }
+            
+            if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
+                
+                selectTask( listOfTasks.get(0L), 0L );
+            }
+        }
+    }
+    
+    /*
     public void displayByDate( Set<Map.Entry<Date, TaskList>> displayList ){
         
         if( displayList != null ){
@@ -540,306 +738,6 @@ public class DisplayPane extends JScrollPane{
                 if( tempTaskBar != null ){
                     
                     tempTaskBar.setPosition(positionOfDateHeader);
-                }
-                
-                appendString( "\n\n\n\n\n\n", null );
-            }
-            
-            if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
-                
-                selectTask( listOfTasks.get(0L), 0L );
-            }
-        }
-    }
-    
-    private Set<Map.Entry<Date, TaskList>> outdatedTasks;
-    private Set<Map.Entry<Date, TaskList>> upcomingTasks;
-    
-    public void getSpecialTasks( TaskList allTaskList ){
-        
-        if( allTaskList != null ){
-            
-            outdatedTasks = null;
-            upcomingTasks = null;
-            
-            TreeMap<Date, TaskList> displayList = new TreeMap<Date, TaskList>( new Comparator<Date>(){
-
-                @Override
-                public int compare(Date firstDate, Date secondDate) {
-                    
-                    if( firstDate != null && secondDate != null ){
-                        
-                        SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
-                        
-                        String dateOneString = dateFormatter.format(firstDate);
-                        String dateTwoString = dateFormatter.format(secondDate);
-                        
-                        if( dateOneString.equals(dateTwoString) ){
-                            
-                            return 0;
-                            
-                        } else{
-                            
-                            return firstDate.compareTo(secondDate);
-                        }
-                        
-                    } else if( firstDate != null ){
-                        
-                        return -1;
-                        
-                    } else if( secondDate != null ){
-                        
-                        return 1;
-                        
-                    } else{
-                        
-                        return 0;
-                    }
-                }
-            });
-            
-            SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
-            
-            Iterator<Task> iterator = allTaskList.listIterator();
-            
-            Task tempTask;
-            Date tempDate;
-            Date endDate;
-            TaskList tempTaskList = null;
-            
-            Calendar calendar = Calendar.getInstance();
-            
-            while( iterator.hasNext() ){
-                
-                tempTask = iterator.next();
-                
-                if( !tempTask.isFloating() ){
-                    
-                    tempDate = tempTask.getDueDate();
-                    endDate = tempTask.getEndDate();
-                    
-                    if( tempDate != null ){
-                        
-                        if( endDate != null ){
-                            
-                            if( endDate.compareTo(tempDate) >= 0 ){
-                                
-                                String startDateString = dateFormatter.format(tempDate);
-                                String endDateString = dateFormatter.format(endDate);
-                                
-                                long count = 0;
-                                while( !startDateString.equals(endDateString) ){
-                                    
-                                    tempTaskList = displayList.get( tempDate );
-                                    
-                                    if( count > 0 ){
-                                        
-                                        tempTask = new Task(tempTask);
-                                        tempTask.setDueDate(null);
-                                        tempTask.setEndDate(tempDate);
-                                    }
-                                    
-                                    if( tempTaskList != null ){
-                                        
-                                        tempTaskList.add(tempTask);
-                                     
-                                    } else{
-                                        
-                                        tempTaskList = new TaskList();
-                                        tempTaskList.add(tempTask);
-                                        displayList.put( tempDate, tempTaskList );
-                                    }
-                                    
-                                    calendar.setTime(tempDate);
-                                    calendar.add(Calendar.DATE, 1);
-                                    tempDate = new Date(calendar.getTime().getTime());
-                                    startDateString = dateFormatter.format(tempDate);
-                                    
-                                    ++count;
-                                }
-                            }
-                            
-                        } else{
-                            
-                            tempTaskList = displayList.get( tempDate );
-                            
-                            if( tempTaskList != null ){
-                                
-                                tempTaskList.add(tempTask);
-                             
-                            } else{
-                                
-                                tempTaskList = new TaskList();
-                                tempTaskList.add(tempTask);
-                                displayList.put( tempDate, tempTaskList );
-                            }
-                        }
-                    }
-                    
-                }
-            }
-            
-            // Iterate through treemap
-            for( Map.Entry<Date, TaskList> entry : displayList.entrySet() ){
-                
-                tempTaskList = entry.getValue();
-                
-                if( tempTaskList == null ){
-                    
-                    continue;
-                }
-                
-                Collections.sort( tempTaskList, new Comparator<Task>(){
-
-                    @Override
-                    public int compare(Task taskOne, Task taskTwo) {
-                        
-                        Date firstDate = taskOne.getDueDate();
-                        Date secondDate = taskTwo.getDueDate();
-                        Date firstEndDate = taskOne.getEndDate();
-                        Date secondEndDate = taskTwo.getEndDate();
-                        
-                        if( firstDate != null && secondDate != null ){
-                            
-                            return firstDate.compareTo(secondDate);
-                            
-                        } else if( firstDate != null && secondEndDate != null ){
-                            
-                            return firstDate.compareTo(secondEndDate);
-                            
-                        } else if( firstDate != null && secondEndDate == null ){
-                            
-                            return 1;
-                            
-                        } else if( secondDate != null && firstEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondDate);
-                            
-                        } else if( secondDate != null && firstEndDate == null ){
-                            
-                            return -1;
-                            
-                        } else if( firstEndDate != null && secondEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondEndDate);
-                            
-                        } else if( firstEndDate != null ){
-                            
-                            return 1;
-                            
-                        } else if( secondEndDate != null ){
-                            
-                            return -1;
-                            
-                        } else{
-                            
-                            return 0;
-                        }
-                    }
-                    
-                });
-            }
-        }
-    }
-    
-    public void displayByPriority( TaskList taskList ){
-        
-        if( taskList != null ){
-           
-            ArrayList<TaskList> displayList = new ArrayList<TaskList>();
-            
-            for( int i = 0; i < 6; ++i ){
-                
-                displayList.add(new TaskList());
-            }
-            
-            Iterator<Task> iterator = taskList.listIterator();
-            
-            Task tempTask;
-            TaskList tempTaskList;
-            int currentTaskPriority;
-            
-            while( iterator.hasNext() ){
-                
-                tempTask = iterator.next();
-                
-                if( tempTask != null ){
-                    
-                    currentTaskPriority = ((tempTask.getPriority() >= 1 && tempTask.getPriority() <= 5) ? tempTask.getPriority() : 0);
-                    
-                    tempTaskList = displayList.get(currentTaskPriority);
-                        
-                    tempTaskList.add(tempTask);
-                }
-            }
-            
-            Style biggerTextStyle = display.addStyle("biggerText", null);
-            StyleConstants.setFontFamily(biggerTextStyle, "Arial");
-            StyleConstants.setBold(biggerTextStyle, true);
-            StyleConstants.setFontSize(biggerTextStyle, 16);
-            StyleConstants.setForeground(biggerTextStyle, new Color(255,255,255));
-            
-            for( int i = 5; i >= 0; --i ){
-                
-                tempTaskList = displayList.get(i);
-                
-                if( tempTaskList == null || tempTaskList.size() <= 0 ){
-                    
-                    continue;
-                }
-                
-                Collections.sort( tempTaskList, new Comparator<Task>(){
-
-                    @Override
-                    public int compare(Task taskOne, Task taskTwo) {
-                        
-                        Date createDateForTaskOne = taskOne.getCreatedDate();
-                        Date createDateForTaskTwo = taskTwo.getCreatedDate();
-                        
-                        if( createDateForTaskOne != null && createDateForTaskTwo != null ){
-                            
-                            return createDateForTaskOne.compareTo(createDateForTaskTwo );
-                            
-                        } else if( createDateForTaskOne != null ){
-                            
-                            return -1;
-                            
-                        } else if( createDateForTaskTwo != null ){
-                            
-                            return 1;
-                            
-                        } else{
-                            
-                            return 0;
-                        }
-                    }
-                    
-                });
-                
-                int positionOfPriorityHeader = display.getCaretPosition();
-                
-                appendString("                  ", null);
-                
-                if( i > 0 ){
-                    
-                    appendString("Priority " + i, biggerTextStyle);
-                    
-                } else{
-                    
-                    appendString("No Priority", biggerTextStyle);
-                }
-                
-                appendString("\n", null);
-                
-                long idxOfFirstTaskUnderNewDateHeader = listOfTasks.size();
-                
-                addTasksToDisplayWithoutSelection(tempTaskList);
-              
-                TaskBar tempTaskBar = listOfTasks.get(idxOfFirstTaskUnderNewDateHeader);
-
-                if( tempTaskBar != null ){
-                    
-                    tempTaskBar.setPosition(positionOfPriorityHeader);
                 }
                 
                 appendString( "\n\n\n\n\n\n", null );
@@ -1104,5 +1002,5 @@ public class DisplayPane extends JScrollPane{
                 selectTask( listOfTasks.get(0L), 0L );
             }
         }
-    }
+    }*/
 }
