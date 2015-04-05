@@ -1,6 +1,7 @@
 package planner;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,12 @@ public class Logic {
     }
     
     public static TaskList searchToday(TaskList input) {
-        return SearchLogic.searchToday(input);
+        Date today = new Date();
+        return SearchLogic.searchDay(input, today);
+    }
+    
+    public static TaskList searchDay(TaskList input, Date day) {
+        return SearchLogic.searchDay(input, day);
     }
     
     public static TaskList searchPriority(TaskList input , int priority) {
