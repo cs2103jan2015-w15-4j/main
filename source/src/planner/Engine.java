@@ -165,7 +165,7 @@ public class Engine {
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(allTasks);
         floatingTasks = Logic.searchFloating(allTasks);
-        todayTasks = allTasks;
+        //todayTasks = allTasks;
         upcomingTasks = Logic.searchUpcomingTasks(allTasks);
         overdueTasks = Logic.searchOverDuedTasks(allTasks);
         
@@ -233,6 +233,7 @@ public class Engine {
         refreshLists();
         //Record the last updated task
         lastModifiedTask = newTask.getID();
+        System.out.println(lastModifiedTask);
         
         if(clashingTask != -1) {
             return Constants.CommandType.ADD_CLASH;
@@ -609,6 +610,7 @@ public class Engine {
             case HELP_SEARCH:
                 return Constants.CommandType.HELP_SEARCH;
                 
+            
             default:
                 return handleInvalidCommand(result);
         }
