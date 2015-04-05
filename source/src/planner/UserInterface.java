@@ -104,6 +104,24 @@ public class UserInterface extends JFrame {
                 
                 break;
                 
+            case CONVERT_FLOATING:
+                
+                handleConvertToFloatingTaskOperation();
+                
+                break;
+                
+            case CONVERT_DEADLINE:
+                
+                handleConvertToDeadlineTaskOperation();
+                
+                break;
+                
+            case CONVERT_TIMED:
+                
+                handleConvertToTimedTaskOperation();
+                
+                break;
+                
             case HELP:
                 
                 showTutorialScreen( -1, input );
@@ -128,12 +146,24 @@ public class UserInterface extends JFrame {
                 
                 break;
              
+            case EXIT:
+                
+                handleExit();
+                
+                break;
+            
             default:
                 
                 handleUnexpectedOperation();
             
                 break;
         }
+    }
+    
+    private void handleExit(){
+        
+        Engine.exit();
+        System.exit(0);
     }
     
     private void handleUndo(){
@@ -239,39 +269,6 @@ public class UserInterface extends JFrame {
         }
     }
     
-    private void handleSearchPriority( String userInput ){
-        
-        // Should get priority list
-        /*
-        Set<Map.Entry<Integer, DisplayTaskList>> tempList = Engine.getSearchResult();
-        
-        DisplayTaskList tempTaskList = convertToDisplayTaskList(tempList);
-        Task tempTask;
-        
-        if( tempTaskList != null && tempTaskList.size() > 0 ){
-            
-            currentList = tempTaskList;
-            currentDisplayListForDate = null;
-            currentDisplayListForPriority = tempList;
-            
-            displayPane.clearDisplay();
-            
-            displayPane.displayByDate(currentDisplayListForDate);
-            
-            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.PRIORITY_SEARCH, userInput, userInput, null ));
-            
-            tempTask = displayPane.getCurrentSelectedTask() != null ? displayPane.getCurrentSelectedTask().getParent() : null;
-            
-            updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, userInput, tempTask);
-            
-            commandPanel.setText( "Search success", true );
-            
-        } else{
-            
-            commandPanel.setText( "We cannot find any task with indicated priority :/", true );
-        }*/
-    }
-    
     private void updateGUIView( Set<Map.Entry<Date, DisplayTaskList>> dateDisplayList, 
                                 Set<Map.Entry<Integer, DisplayTaskList>> priorityDisplayList,
                                 String sectionTitleString, Task task){
@@ -314,45 +311,6 @@ public class UserInterface extends JFrame {
             sectionTitle.setText(sectionTitleString);
         }
     }
-    
-    /*
-    private String getDisplaySectionTitle( DisplayState currentDisplayState ){
-        
-        if( currentDisplayState != null ){
-        
-            DisplayStateFlag currentDisplayStateFlag  = currentDisplayState.getdisplayStateFlag();
-            
-            switch(currentDisplayStateFlag){
-            
-                case TENTATIVE:
-                    
-                    return "Floating Tasks";
-                    
-                case TODAY:
-                    
-                    return "All tasks due today";
-                    
-                case OVERDUE:
-                    
-                    return "Overdue Tasks";
-                    
-                case DONE:
-                    
-                    return "Completed tasks";
-                    
-                case WORD_SEARCH:
-                case PRIORITY_SEARCH:
-                    
-                    return currentDisplayState.getTitle();
-                    
-                default:
-                    
-                    break;
-            }
-        }
-        
-        return "All Tasks";
-    }*/
     
     private <T>DisplayTaskList convertToDisplayTaskList( Set<Map.Entry<T, DisplayTaskList>> displayList ){
         
@@ -579,30 +537,26 @@ public class UserInterface extends JFrame {
     
     private void handlePreviousViewOperation( DisplayStateStack displayStateStack ){
         
-        if( displayStateStack != null ){
+        if( displayStateStack != null && displayStateStack.size() > 1 ){
             
-            System.out.println( "Before size = " +  displayStateStack.size() );
-            
-            DisplayState previousDisplayState = this.displayStateStack.pop();
-            
-            System.out.println( "After size = " +  displayStateStack.size() );
+            DisplayState currentDisplayState = displayStateStack.pop();
+            DisplayState previousDisplayState = displayStateStack.pop();
+            displayStateStack.push(currentDisplayState);
             
             if( previousDisplayState != null ){
+                
+                boolean isValidDisplayState = false;
                 
                 KeyEvent keyEvent = previousDisplayState.getKeyEvent();
                 String userCommand = previousDisplayState.getCommand();
                 
                 if( keyEvent != null ){
                     
-                    System.out.println( "Key event activated" );
-                    
-                    System.out.println( "Key activated = " + KeyEvent.getKeyText(keyEvent.getKeyCode()) );
-                    
                     handleKeyEvent(keyEvent);
                     
-                } else if( userCommand != null ){
+                    isValidDisplayState = true;
                     
-                    System.out.println( "user command event activated" );
+                } else if( userCommand != null ){
                     
                     updateCurrentList(previousDisplayState);
                     
@@ -648,6 +602,24 @@ public class UserInterface extends JFrame {
                             
                             break;
                     }
+                    
+                    isValidDisplayState = true;
+                }
+                
+                if( isValidDisplayState ){
+                    
+                    DisplayState newCurrentDisplayState = displayStateStack.pop();
+                    
+                    // Removed old current state
+                    displayStateStack.pop();
+                    
+                    if( newCurrentDisplayState != null ){
+                        
+                        displayStateStack.push(newCurrentDisplayState);
+                    }
+                    
+                    currentNavigationBars = generateContentForNavigationBars( displayStateStack.peek() );
+                    addNavigationBarsToPanel(currentNavigationBars);
                 }
             }
         }
@@ -706,7 +678,156 @@ public class UserInterface extends JFrame {
             }
         }
 
-        commandPanel.setText( "Task " + modifiedTaskID + " conflicts with an existing task. Enter undo to resolve this conflict", true );
+        int conflictTaskID = Engine.getClashingTask();
+        
+        commandPanel.setText( "Task #" + modifiedTaskID + " conflicts with task #" + conflictTaskID, true );
+    }
+    
+    private void handleConvertToTimedTaskOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to convert task into a deadline task", true );
+                    
+                    return;
+                }
+            }
+        }
+        
+        commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
+    }
+    
+    private void handleConvertToDeadlineTaskOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to convert task into a deadline task", true );
+                    
+                    return;
+                }
+            }
+        }
+        
+        commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
+    }
+    
+    private void handleConvertToFloatingTaskOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        int modifiedTaskID = Engine.lastModifiedTask();
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to convert task into a floating task", true );
+                    
+                    return;
+                }
+            }
+        }
+        
+        commandPanel.setText( "Task #" + modifiedTaskID + " converted into a floating task successfully", true );
     }
     
     private void handleUpdateOperation(){
@@ -1922,44 +2043,6 @@ public class UserInterface extends JFrame {
         }
     }
     
-    /*
-    private long compareList( TaskList originalList, TaskList modifiedList ){
-        
-        if( originalList == null || modifiedList == null ){
-            
-            return -1;
-        }
-        
-        Iterator<Task> iteratorOriginal = originalList.iterator();
-        Iterator<Task> iteratorModified = modifiedList.iterator();
-        
-        Task originalTask;
-        Task modifiedTask;
-        
-        long lineNumber = 1L;
-        while( iteratorOriginal.hasNext() && iteratorModified.hasNext() ){
-            
-            originalTask = iteratorOriginal.next();
-            modifiedTask = iteratorModified.next();
-            
-            if( !originalTask.equals(modifiedTask) ){
-
-                return lineNumber;
-            }
-            
-            ++lineNumber;
-        }
-        
-        if( iteratorModified.hasNext() || iteratorOriginal.hasNext() ){
-            
-            return lineNumber;
-            
-        } else {
-            
-            return 0L;
-        }
-    }*/
-    
     private ArrayList<Map.Entry<String, ArrayList<String>>> generateTutorialStringMappings( String [][]possibleCommands ){
         
         ArrayList<Map.Entry<String, ArrayList<String>>> mapping = new ArrayList<Map.Entry<String, ArrayList<String>>>();
@@ -2017,25 +2100,6 @@ public class UserInterface extends JFrame {
         addKeyBindingsToCommandTextField(commandInputField);
         addFocusListenerToCommandTextField( commandPanel, commandInputField );
         
-        // End of new Command
-        
-        /*
-        // Adding command text field
-        command = new JTextField();
-        command.setBounds(34, 530, 610, 33);
-        contentPane.add(command);
-        command.setColumns(10);
-        
-        // Setting command text field attributes
-        command.setBorder(null);
-        command.setOpaque(false);
-        command.setFont( new Font( "Arial", Font.BOLD, 20 ));
-        command.setForeground(new Color( 128,128,128 ));
-        command.setText("Enter commands here");
-        
-        addFocusListenerToCommandTextField(command);
-        addKeyBindingsToCommandTextField(command);*/
-        
         characterToTransfer = '\0';
         isBackspacePressed = false;
     }
@@ -2078,46 +2142,6 @@ public class UserInterface extends JFrame {
             });
         }
     }
-    
-    /*
-    private void addKeyBindingsToCommandTextField( JTextField currentCommand ){
-        
-        if( currentCommand != null ){
-            
-            currentCommand.addKeyListener(new KeyListener(){
-                
-                @Override
-                public void keyPressed( KeyEvent e ){
-                        
-                    handleKeyEvent(e);
-                    
-                    characterToTransfer = '\0';
-                    isBackspacePressed = false;
-                    
-                    return;
-                }
-        
-                @Override
-                public void keyTyped(KeyEvent e) {
-                    
-                    if( characterToTransfer != '\0' ){
-                        
-                        e.consume();
-                    }
-                    
-                    return;
-                }
-        
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    
-                    e.consume();
-                    
-                    return;
-                }
-            });
-        }
-    }*/
     
     private void addFocusListenerToCommandTextField( final CommandTextbox commandTextbox, final JTextPane currentCommand ){
         
@@ -2199,64 +2223,6 @@ public class UserInterface extends JFrame {
             });
         }
     }
-    
-    /*
-    private void addFocusListenerToCommandTextField( JTextField currentCommand ){
-        
-        if(currentCommand != null){
-            
-            currentCommand.addFocusListener(new FocusListener(){
-
-                @Override
-                public void focusGained(FocusEvent e) {
-                    
-                    command.setForeground( new Color( 0,0,0 ) );
-                    
-                    String additionalCharacterToAdd = (characterToTransfer != '\0' ? characterToTransfer + "" : "");
-                    
-                    if( isMessageDisplayed ){
-                        
-                        command.setText(additionalCharacterToAdd);
-                        
-                        isMessageDisplayed = false;
-                        
-                    } else{
-                        
-                        String finalString = command.getText() + additionalCharacterToAdd;
-                        
-                        if( isBackspacePressed && finalString.length() > 0 ){
-                            
-                            finalString = finalString.substring(0, finalString.length()-1);
-                        }
-                        
-                        command.setText(finalString);
-                    }
-                }
-
-                @Override
-                public void focusLost(FocusEvent e) {
-                    
-                    command.setForeground( new Color( 128,128,128 ) );
-                    
-                    String input = command.getText();
-                    
-                    if( !isMessageDisplayed && input.length() <= 0 ){
-                        
-                        command.setText("Enter commands here");
-                        
-                        isMessageDisplayed = true;
-                        
-                    } else{
-                        
-                        command.setText(input);
-                    }
-                    
-                    characterToTransfer = '\0';
-                    isBackspacePressed = false;
-                }
-            });
-        }
-    }*/
 
     private void prepareCloseButton(){
         
@@ -2280,8 +2246,7 @@ public class UserInterface extends JFrame {
                     
                     if( javax.swing.SwingUtilities.isLeftMouseButton(e) ){
                         
-                        Engine.exit();
-                        System.exit(0);
+                        handleExit();
                     }
                 }
             });
@@ -2362,6 +2327,4 @@ public class UserInterface extends JFrame {
             });
         }
     }
-    
-   
 }
