@@ -122,10 +122,12 @@ public class Logic {
     }
     
     public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
-        return SortLogic.sortTreeMapIntoSetMapByPriority(map);
+        TreeMap <Integer, DisplayTaskList> priorityMap = SortLogic.sortTreeMapIntoSetMapByPriority(map);
+        return priorityMap.entrySet();
     }
     
     public static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
-        return SortLogic.sortTreeMapIntoSetMapByDate(map);
+        TreeMap <Date, DisplayTaskList> dateMap = SortLogic.sortTreeMapIntoSetMapByDate(map);
+        return dateMap.entrySet();
     }
 }
