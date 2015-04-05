@@ -56,6 +56,12 @@ public class UserInterface extends JFrame {
                 
                 break;
                 
+            case ADD_CLASH:
+                
+                handleAddClashOperation();
+                
+                break;
+                
             case UPDATE:
                 
                 handleUpdateOperation();
@@ -98,6 +104,30 @@ public class UserInterface extends JFrame {
                 
                 break;
                 
+            case HELP:
+                
+                showTutorialScreen( -1, input );
+                
+                break;
+                
+            case HELP_ADD:
+            
+                showTutorialScreen( Constants.ADD_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_DELETE:
+                
+                showTutorialScreen( Constants.DELETE_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_UPDATE:
+                
+                showTutorialScreen( Constants.UPDATE_TUTORIAL, input );
+                
+                break;
+             
             default:
                 
                 handleUnexpectedOperation();
@@ -111,7 +141,7 @@ public class UserInterface extends JFrame {
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
             
@@ -128,10 +158,10 @@ public class UserInterface extends JFrame {
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         int modifiedTaskID = Engine.lastModifiedTask();
-        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
         
         if( modifiedTask != null ){
             
@@ -246,26 +276,18 @@ public class UserInterface extends JFrame {
                                 Set<Map.Entry<Integer, DisplayTaskList>> priorityDisplayList,
                                 String sectionTitleString, Task task){
         
+        displayPane.clearDisplay();
+        
         if( dateDisplayList != null ){
-            
-            displayPane.clearDisplay();
             
             displayPane.displayByDate(dateDisplayList);
             
-            updateGUIView( sectionTitleString, task );
-            
         } else if( priorityDisplayList != null ){
             
-            displayPane.clearDisplay();
-            
             displayPane.displayByPriority(priorityDisplayList);
-            
-            updateGUIView( sectionTitleString, task );
-            
-        } else{
-            
-            System.out.println( "ERROR WITH DISPLAYING TASKS" );
-        }
+        } 
+        
+        updateGUIView( sectionTitleString, task );
     }
     
     private void updateGUIView( String sectionTitleString, Task task ){
@@ -293,6 +315,7 @@ public class UserInterface extends JFrame {
         }
     }
     
+    /*
     private String getDisplaySectionTitle( DisplayState currentDisplayState ){
         
         if( currentDisplayState != null ){
@@ -329,7 +352,7 @@ public class UserInterface extends JFrame {
         }
         
         return "All Tasks";
-    }
+    }*/
     
     private <T>DisplayTaskList convertToDisplayTaskList( Set<Map.Entry<T, DisplayTaskList>> displayList ){
         
@@ -405,6 +428,42 @@ public class UserInterface extends JFrame {
                     
                     return currentDisplayState;
                     
+                case TODAY:
+                    
+                    currentDisplayListForPriority = Engine.getTodayTasks();
+                    currentDisplayListForDate = null;
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForPriority );
+                    
+                    return currentDisplayState;
+                    
+                case OVERDUE:
+                    
+                    currentDisplayListForPriority = null;
+                    currentDisplayListForDate = Engine.getOverdueTasks();
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForDate );
+                    
+                    return currentDisplayState;
+                    
+                case UPCOMING:
+                    
+                    currentDisplayListForPriority = null;
+                    currentDisplayListForDate = Engine.getUpcomingTasks();
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForDate );
+                    
+                    return currentDisplayState;
+                    
+                case NOTDONE:
+                    
+                    currentDisplayListForPriority = null;
+                    currentDisplayListForDate = Engine.getUndoneTasks();
+                    
+                    currentList = convertToDisplayTaskList( currentDisplayListForDate );
+                    
+                    return currentDisplayState;
+                
                 case DONE:
                     
                     currentDisplayListForPriority = null;
@@ -430,6 +489,22 @@ public class UserInterface extends JFrame {
 
                     break;
                     
+                case HELP:
+                case HELP_ADD:
+                case HELP_UPDATE:
+                case HELP_DELETE:
+                case HELP_DONE:
+                case HELP_UNDO:
+                case HELP_SEARCH:
+                case HELP_PRIORITY_SEARCH:
+                
+                    currentDisplayListForPriority = null;
+                    currentDisplayListForDate = null;
+                    
+                    currentList = null;
+                    
+                    return currentDisplayState;
+                    
                 default:
                     
                     break;
@@ -451,10 +526,11 @@ public class UserInterface extends JFrame {
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         int modifiedTaskID = Engine.lastModifiedTask();
-        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
+        
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
         
         if( modifiedTask != null ){
             
@@ -501,15 +577,137 @@ public class UserInterface extends JFrame {
         commandPanel.setText( "Task added successfully", true );
     }
     
+    private void handlePreviousViewOperation( DisplayStateStack displayStateStack ){
+        
+        if( displayStateStack != null ){
+            
+            DisplayState previousDisplayState = displayStateStack.pop();
+            
+            if( previousDisplayState != null ){
+                
+                KeyEvent keyEvent = previousDisplayState.getKeyEvent();
+                String userCommand = previousDisplayState.getCommand();
+                
+                if( keyEvent != null ){
+                    
+                    handleKeyEvent(keyEvent);
+                    
+                } else if( userCommand != null ){
+                    
+                    updateCurrentList(previousDisplayState);
+                    
+                    switch( Engine.process(userCommand) ){
+                    
+                        case SEARCH:
+                            
+                            handleSearch(userCommand);
+                            
+                            break;
+                            
+                        case HELP:
+                            
+                            showTutorialScreen(-1, userCommand );
+                            
+                            break;
+                            
+                        case HELP_ADD:
+                            
+                            showTutorialScreen(Constants.ADD_TUTORIAL, userCommand );
+                            
+                            break;
+                            
+                        case HELP_UPDATE:
+                            
+                            showTutorialScreen(Constants.UPDATE_TUTORIAL, userCommand );
+                            
+                            break;
+                            
+                        case HELP_DELETE:
+                            
+                            showTutorialScreen(Constants.DELETE_TUTORIAL, userCommand );
+                            
+                            break;
+                            
+                        case HELP_DONE:
+                        case HELP_UNDO:
+                        case HELP_SEARCH:
+                            
+                            break;
+                            
+                        default:
+                            
+                            break;
+                    }
+                }
+            }
+        }
+    }
+    
+    private void handleAddClashOperation(){
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        int modifiedTaskID = Engine.lastModifiedTask();
+        
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
+        
+        if( modifiedTask != null ){
+            
+            if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
+                
+                displayStateStack.push(upcomingDisplayState);
+            }
+            
+            updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, modifiedTask.getParent() );
+            
+        } else{
+            
+            if( currentDisplayState.getdisplayStateFlag() != DisplayStateFlag.ALL ){
+                
+                Set<Map.Entry<Date, DisplayTaskList>> tempTaskList = Engine.getAllTasks();
+                
+                modifiedTask = getDisplayTaskByParentID(tempTaskList, modifiedTaskID);
+                
+                if( modifiedTask != null ){
+                    
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(upcomingDisplayState);
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", modifiedTask.getParent() );
+                    
+                } else{
+                    
+                    commandPanel.setText( "Failed to add task", true );
+                    
+                    return;
+                }
+                
+            } else{
+                
+                commandPanel.setText( "Failed to add task", true );
+                
+                return;
+            }
+        }
+
+        commandPanel.setText( "Task " + modifiedTaskID + " conflicts with an existing task. Enter undo to resolve this conflict", true );
+    }
+    
     private void handleUpdateOperation(){
         
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         int modifiedTaskID = Engine.lastModifiedTask();
-        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
         
         if( modifiedTask != null ){
             
@@ -561,10 +759,10 @@ public class UserInterface extends JFrame {
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         int modifiedTaskID = Engine.lastModifiedTask();
-        DisplayTask modifiedTask = currentList.getTaskByParentID(modifiedTaskID);
+        DisplayTask modifiedTask = (currentList != null ? currentList.getTaskByParentID(modifiedTaskID) : null);
         
         if( modifiedTask != null ){
             
@@ -616,7 +814,7 @@ public class UserInterface extends JFrame {
         DisplayState currentDisplayState =  displayStateStack.peek();
         DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
         
-        String sectionTitleString = getDisplaySectionTitle( upcomingDisplayState );
+        String sectionTitleString = upcomingDisplayState.getTitle();
         
         if( currentDisplayState.getdisplayStateFlag() != upcomingDisplayState.getdisplayStateFlag() ){
             
@@ -635,7 +833,7 @@ public class UserInterface extends JFrame {
     
     public void handleUnexpectedOperation(){
         
-        commandPanel.setText( "Feature not supported in V0.3", true );
+        commandPanel.setText( "Feature not supported in V0.4", true );
     }
     ///////////////////////////////////////////////////////////////////// 
     //  PROCESS COMMANDS FUNCTIONS END HERE
@@ -756,6 +954,63 @@ public class UserInterface extends JFrame {
         
         setUndecorated(true);
         setLocationRelativeTo(null);
+    }
+    
+    private void showTutorialScreen( int tutorialIndex, String userInput ){
+        
+        currentDisplayListForDate = null;
+        currentDisplayListForPriority = null;
+        
+        switch( tutorialIndex ){
+        
+            case Constants.ADD_TUTORIAL:
+
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_ADD, 
+                        Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.ADD_TUTORIAL);
+                
+                break;
+                
+            case Constants.DELETE_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_DELETE, 
+                        Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.DELETE_TUTORIAL);
+                
+                break;
+                
+            case Constants.UPDATE_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_UPDATE, 
+                        Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.UPDATE_TUTORIAL);
+                
+                break;
+                
+            default:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP, "Tutorial", null, 
+                        new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
+                                      0, KeyEvent.VK_F3, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, "Tutorial", null);
+                
+                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, -1);
+                
+                break;
+        }
     }
     
     private void prepareTaskDisplayPanel( DisplayPane displayPanel ){
@@ -882,21 +1137,88 @@ public class UserInterface extends JFrame {
                 int tempScrollUnitDifference = (event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -verticalScrollBar.getBlockIncrement(-1) : verticalScrollBar.getBlockIncrement(1));
                 verticalScrollBar.setValue( currentScrollValue + tempScrollUnitDifference );
                 
-            } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
+            } else if( event.getKeyCode() == KeyEvent.VK_F10 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.NOTDONE ){
+                        
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUndoneTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.NOTDONE, "Ongoing Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Ongoing Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F9 ){
                 
                 DisplayState currentDisplayState = displayStateStack.peek();
                 
                 if( currentDisplayState != null &&
                     currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
                         
-                        Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getDoneTasks();
-                        currentList = convertToDisplayTaskList(tempTaskList);
-                        currentDisplayListForDate = tempTaskList;
-                        currentDisplayListForPriority = null;
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getDoneTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.DONE, "Completed Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Completed Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
                         
-                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.DONE, "Completed Tasks", null, event ));
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getOverdueTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.OVERDUE, "Overdue Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Overdue Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F7 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                         
-                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Completed Tasks", null );
+                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTentativeTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = null;
+                    currentDisplayListForPriority = tempTaskList;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TENTATIVE, "Floating Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Floating Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
@@ -904,16 +1226,20 @@ public class UserInterface extends JFrame {
                 DisplayState currentDisplayState = displayStateStack.peek();
                 
                 if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.UPCOMING ){
                         
-                        Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTentativeTasks();
-                        currentList = convertToDisplayTaskList(tempTaskList);
-                        currentDisplayListForDate = null;
-                        currentDisplayListForPriority = tempTaskList;
-                        
-                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TENTATIVE, "Floating Tasks", null, event ));
-                        
-                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Floating Tasks", null );
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUpcomingTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.UPCOMING, "Upcoming Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Upcoming Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F5 ){
@@ -931,9 +1257,53 @@ public class UserInterface extends JFrame {
                     displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event ));
                     
                     updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", null );
+                    
+                    event.consume();
+                    
+                    return;
                 }
                 
+            } else if( event.getKeyCode() == KeyEvent.VK_F4 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+                    
+                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTodayTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = null;
+                    currentDisplayListForPriority = tempTaskList;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TODAY, "Tasks due today", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Tasks due today", null );
+                    
+                    event.consume();
+                    
+                    return;
+                }
+                
+            } else if(event.getKeyCode() == KeyEvent.VK_F3){
+                
+                showTutorialScreen( -1, null );
+                
+                event.consume();
+                        
+                return;
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
+                
+                System.out.println( "entered f2" + (displayStateStack.isEmpty() ? "empty" : "not empty") );
+                
+                handlePreviousViewOperation(displayStateStack);
+                
+                event.consume();
+                
+                return;
+                
             } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
+         
                 
                 if( slidePanel.isVisible()){
                     
@@ -1166,7 +1536,7 @@ public class UserInterface extends JFrame {
             DisplayTaskList tempTaskList;
             
             // More info on current task
-            if( currentList.size() > 0 ){
+            if( currentList != null && currentList.size() > 0 ){
                 
                 //long taskID = displayPane.getCurrentSelectedTaskID();
                 
@@ -1203,19 +1573,49 @@ public class UserInterface extends JFrame {
             ++key;
             
             // tutorial
-            tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2], "F" + key ));
+            if( currentDisplayState != null ){
+                
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.HELP ){
+                    
+                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2], "F" + key ));
+                    
+                } else{
+                    
+                    tempList.add( new NavigationBar( planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[2] ) );
+                }
+                
+            } else{
+                
+                tempList.add( new NavigationBar(null) );
+            }
             ++key;
             
             // Today tasks
             if( currentDisplayState != null ){
                 
+                tempTaskList = convertToDisplayTaskList(Engine.getTodayTasks());
+                
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[3], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4], "F" + key ));
+                    }
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4] ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[3] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[4] ));
+                    }
                 }
                 
             } else{
@@ -1258,12 +1658,12 @@ public class UserInterface extends JFrame {
             }
             ++key;
             
-            // Tentative tasks
+            // Upcoming Tasks
             if( currentDisplayState != null ){
                 
-                tempTaskList = convertToDisplayTaskList(Engine.getTentativeTasks());
+                tempTaskList = convertToDisplayTaskList(Engine.getUpcomingTasks());
                 
-                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.UPCOMING ){
                     
                     if( tempTaskList.size() == 1 ){
                         
@@ -1282,7 +1682,41 @@ public class UserInterface extends JFrame {
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8]));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[8] ));
+                    }
+                }
+                
+            } else{
+                
+                tempList.add( new NavigationBar( null ) );
+            }
+            ++key;
+            
+            // Tentative tasks
+            if( currentDisplayState != null ){
+                
+                tempTaskList = convertToDisplayTaskList(Engine.getTentativeTasks());
+                
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+                    
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10], "F" + key ));
+                    }
+                    
+                } else{
+                    
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[10]));
                     }
                 }
                 
@@ -1295,13 +1729,29 @@ public class UserInterface extends JFrame {
             // Overdue tasks
             if( currentDisplayState != null ){
                 
+                tempTaskList = convertToDisplayTaskList(Engine.getOverdueTasks());
+                
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9], "F" + key ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
+                    }
                     
                 } else{
                     
-                    tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[9] ));
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( 0 + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12] ));
+                    }
                 }
 
             } else{
@@ -1319,22 +1769,56 @@ public class UserInterface extends JFrame {
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13], "F" + key ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12], "F" + key ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14], "F" + key ));
                     }
                     
                 } else{
                     
                     if( tempTaskList.size() == 1 ){
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[11] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[13] ));
                         
                     } else{
                         
-                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[12] ));
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[14] ));
+                    }
+                }
+                
+            } else{
+                
+                tempList.add( new NavigationBar( null ) );
+            }
+            ++key;
+            
+            //Undone Tasks
+            if( currentDisplayState != null ){
+                
+                tempTaskList = convertToDisplayTaskList(Engine.getUndoneTasks());
+                
+                if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.NOTDONE ){
+                    
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15], "F" + key ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[16], "F" + key ));
+                    }
+                    
+                } else{
+                    
+                    if( tempTaskList.size() == 1 ){
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[15] ));
+                        
+                    } else{
+                        
+                        tempList.add( new NavigationBar( tempTaskList.size() + planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[16] ));
                     }
                 }
                 
