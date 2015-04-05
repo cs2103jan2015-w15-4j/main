@@ -165,7 +165,7 @@ public class Engine {
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(allTasks);
         floatingTasks = Logic.searchFloating(allTasks);
-        //todayTasks = allTasks;
+        todayTasks = Logic.searchToday(allTasks);
         upcomingTasks = Logic.searchUpcomingTasks(allTasks);
         overdueTasks = Logic.searchOverDuedTasks(allTasks);
         
