@@ -591,7 +591,14 @@ public class TaskBar extends JComponent {
                             
                         } else{
                             
-                            timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                            if( task.getParent().getEndDate() != null ){
+                                
+                                timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                                
+                            } else{
+                                
+                                timeDisplayLabel.setText( "By " + dateFormatter.format(task.getDueDate()) );
+                            }
                         }
     	                
     	            } else{
