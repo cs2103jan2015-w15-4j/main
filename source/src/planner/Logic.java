@@ -89,6 +89,9 @@ public class Logic {
         return SplitLogic.splitAllTaskList(input);
     }
     
+    public static DisplayTaskList splitAllPriorityTask(TaskList input) {
+        return SplitLogic.splitAllPriorityTask(input);
+    }
     /**
      * These methods sorts DisplayTaskLists into TreeMaps
      * Purpose: For testing
@@ -123,6 +126,15 @@ public class Logic {
         TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
         
         return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    public static Set<Map.Entry<Integer, DisplayTaskList>> displaySearchedTaskByPriority (TaskList taskInput) {
+        
+        DisplayTaskList searchedList = splitAllPriorityTask(taskInput);
+        
+        TreeMap<Integer, DisplayTaskList> searchedMap = SortLogic.sortListToMapByPriority(searchedList);
+        
+        return convertTreeMapToSetMapByName(searchedMap);
     }
     
     public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
