@@ -62,4 +62,65 @@ public class DisplayState {
         
         return keyEvent;
     }
+    
+    @Override
+    public boolean equals( Object obj ){
+        
+        if( obj instanceof DisplayState ){
+            
+            DisplayState displayState = (DisplayState)obj;
+            
+            // Compare title
+            boolean isTitleEqual;
+            if( displayState.getTitle() != null && title != null ){
+                
+                isTitleEqual = title.equals(displayState.getTitle());
+                
+            } else if( displayState.getTitle() != null || title != null ){
+                
+                isTitleEqual = false;
+                
+            } else{
+                
+                isTitleEqual = true;
+            }
+            
+            // Compare command
+            boolean isCommandEqual;
+            if( displayState.getCommand() != null && inputCommand != null ){
+                
+                isCommandEqual = inputCommand.equals(displayState.getCommand());
+                
+            } else if( displayState.getCommand() != null || inputCommand != null ){
+                
+                isCommandEqual = false;
+                
+            } else{
+                
+                isCommandEqual = true;
+            }
+            
+            // Compare keyevent
+            boolean isKeyEventEqual;
+            if( displayState.getKeyEvent() != null && keyEvent != null ){
+                
+                isKeyEventEqual = keyEvent.equals(displayState.getKeyEvent());
+                
+            } else if( displayState.getKeyEvent() != null || keyEvent != null ){
+                
+                isKeyEventEqual = false;
+                
+            } else{
+                
+                isKeyEventEqual = true;
+            }
+            
+            return ((displayState.getdisplayStateFlag() == displayStateFlag) &&
+                    isTitleEqual && isCommandEqual && isKeyEventEqual);
+            
+        } else{
+            
+            return false;
+        }
+    }
 }
