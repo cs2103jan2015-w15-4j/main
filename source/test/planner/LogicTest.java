@@ -58,8 +58,32 @@ public class LogicTest {
     private static DisplayTask dt31;
     private static DisplayTask dt32;
     
+    private static DisplayTaskList list1;
+    private static DisplayTaskList list2;
+    private static DisplayTaskList list3;
+    private static DisplayTaskList list4;
+    private static DisplayTaskList list5;
+    private static DisplayTaskList list6;
+    private static DisplayTaskList list7;
+    private static DisplayTaskList list8;
+    private static DisplayTaskList list9;
+    private static DisplayTaskList list10;
+    private static DisplayTaskList list11;
+    private static DisplayTaskList list12;
+    private static DisplayTaskList list13;
+    private static DisplayTaskList list14;
+    private static DisplayTaskList list15;
+    private static DisplayTaskList list16;
+    private static DisplayTaskList list17;
+    private static DisplayTaskList list18;
+    private static DisplayTaskList list19;
+    private static DisplayTaskList list20;
+    private static DisplayTaskList list21;
+    private static DisplayTaskList list22;
+    private static DisplayTaskList list23;
+    private static DisplayTaskList list24;
 
-    public TaskList initializeList() throws Exception {
+    private TaskList initializeList() throws Exception {
         Calendar calFirst = Calendar.getInstance();
         calFirst.set(2015, 5, 3, 0, 0, 0);
         
@@ -115,7 +139,7 @@ public class LogicTest {
         return TL1;
     }
     
-    public static void initializeDisplayList() throws Exception {
+    private void initializeDisplayList() throws Exception {
         Calendar cal = Calendar.getInstance();
         cal.set(2015, 8, 23, 0, 0, 0);
         
@@ -186,6 +210,33 @@ public class LogicTest {
         cal.set(2014, 5, 10, 0, 0, 0);
         dt32 = new DisplayTask(31, cal.getTime(), task10.getDueDate(), null, task10);
         
+    }
+    
+    private void initializeTreeLists() throws Exception{
+        list1 = new DisplayTaskList();
+        list2 = new DisplayTaskList();
+        list3 = new DisplayTaskList();
+        list4 = new DisplayTaskList();
+        list5 = new DisplayTaskList();
+        list6 = new DisplayTaskList();
+        list7 = new DisplayTaskList();
+        list8 = new DisplayTaskList();
+        list9 = new DisplayTaskList();
+        list10 = new DisplayTaskList();
+        list11 = new DisplayTaskList();
+        list12 = new DisplayTaskList();
+        list13 = new DisplayTaskList();
+        list14 = new DisplayTaskList();
+        list15 = new DisplayTaskList();
+        list16 = new DisplayTaskList();
+        list17 = new DisplayTaskList();
+        list18 = new DisplayTaskList();
+        list19 = new DisplayTaskList();
+        list20 = new DisplayTaskList();
+        list21 = new DisplayTaskList();
+        list22 = new DisplayTaskList();
+        list23 = new DisplayTaskList();
+        list24 = new DisplayTaskList();
     }
     
     //Tests search by tags
@@ -422,8 +473,6 @@ public class LogicTest {
         splitTest.add(dt31);
         splitTest.add(dt32);
         
-        //displayTest.print();
-        //splitTest.print();
         assertEquals(displayTest, splitTest);
         
     }
@@ -481,36 +530,74 @@ public class LogicTest {
         splitTest.add(dt32);
         
         assertEquals(displayTest, splitTest);
-        displayTest.print();
-        splitTest.print();
-        /*
-        assertEquals(displayTest.get(0), splitTest.get(0));
-        assertEquals(displayTest.get(1), splitTest.get(1));
-        assertEquals(displayTest.get(2), splitTest.get(2));
-        assertEquals(displayTest.get(3), splitTest.get(3));
-        assertEquals(displayTest.get(4), splitTest.get(4));
-        assertEquals(displayTest.get(5), splitTest.get(5));
-        assertEquals(displayTest.get(6), splitTest.get(6));
-        assertEquals(displayTest.get(7), splitTest.get(7));
-        */
+       
     }
     
     @Test
     public void testConvertToDateTree() throws Exception {
         TaskList TL1 = initializeList();
+        initializeDisplayList();
+        initializeTreeLists();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
         TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
-        
-        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
-            Date current = entry.getKey();
-            System.out.println(current);
-            DisplayTaskList temp = entry.getValue();
-            for (int i = 0; i < temp.size(); i++) {
-                System.out.println(temp.get(i).getParent().getID() + ": " + temp.get(i).getShownDate());
-                
-            }
-        }
 
+        list1.add(dt1);
+        list2.add(dt2);
+        list2.add(dt8);
+        list3.add(dt3);
+        list4.add(dt4);
+        list5.add(dt5);
+        list6.add(dt6);
+        list7.add(dt7);
+        list8.add(dt9);
+        list8.add(dt10);
+        list8.add(dt25);
+        list9.add(dt11);
+        list9.add(dt26);
+        list10.add(dt12);
+        list10.add(dt27);
+        list11.add(dt13);
+        list11.add(dt28);
+        list12.add(dt14);
+        list13.add(dt15);
+        list14.add(dt16);
+        list15.add(dt17);
+        list16.add(dt18);
+        list17.add(dt19);
+        list18.add(dt20);
+        list19.add(dt21);
+        list20.add(dt22);
+        list21.add(dt23);
+        list22.add(dt24);
+        list23.add(dt29);
+        list23.add(dt30);
+        list23.add(dt31);
+        list24.add(dt32);
+        
+        assertEquals(map.get(dt1.getShownDate()), list1);
+        assertEquals(map.get(dt3.getShownDate()), list3);
+        assertEquals(map.get(dt4.getShownDate()), list4);
+        assertEquals(map.get(dt5.getShownDate()), list5);
+        assertEquals(map.get(dt6.getShownDate()), list6);
+        assertEquals(map.get(dt7.getShownDate()), list7);
+        assertEquals(map.get(dt9.getShownDate()), list8);
+        assertEquals(map.get(dt11.getShownDate()), list9);
+        assertEquals(map.get(dt12.getShownDate()), list10);
+        assertEquals(map.get(dt13.getShownDate()), list11);
+        assertEquals(map.get(dt14.getShownDate()), list12);
+        assertEquals(map.get(dt15.getShownDate()), list13);
+        assertEquals(map.get(dt16.getShownDate()), list14);
+        assertEquals(map.get(dt17.getShownDate()), list15);
+        assertEquals(map.get(dt18.getShownDate()), list16);
+        assertEquals(map.get(dt19.getShownDate()), list17);
+        assertEquals(map.get(dt20.getShownDate()), list18);
+        assertEquals(map.get(dt21.getShownDate()), list19);
+        assertEquals(map.get(dt22.getShownDate()), list20);
+        assertEquals(map.get(dt23.getShownDate()), list21);
+        assertEquals(map.get(dt24.getShownDate()), list22);
+        assertEquals(map.get(dt29.getShownDate()), list23);
+        assertEquals(map.get(dt32.getShownDate()), list24);
+        
     }
     
     @Test
@@ -521,37 +608,90 @@ public class LogicTest {
         DisplayTaskList displayTest = Logic.splitAllTask(TL);
         TreeMap <Integer, DisplayTaskList> map = Logic.convertToTreeMapWithPriority(displayTest);
         
-        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
-            Integer prio = entry.getKey();
-            System.out.println(prio);
-            DisplayTaskList temp = entry.getValue();
-            for (int i = 0; i < temp.size(); i++) {
-                System.out.println(temp.get(i).getParent().getID() + ": " + temp.get(i).getParent().getName());
-            }
-        }
-    
+        initializeDisplayList();
+        initializeTreeLists();
+        
+        list1.add(dt29);
+        list1.get(0).setID(0);
+        list1.add(dt30);
+        list1.get(1).setID(1);
+        list2.add(dt31);
+        list2.get(0).setID(2);
+        
+        assertEquals(map.get(dt29.getParent().getPriority()), list1);
+        assertEquals(map.get(dt31.getParent().getPriority()), list2);
     }
-  /*  
+    
     @Test
     public void sortDateTree() throws Exception {
 
         TaskList TL1 = initializeList();
+        initializeDisplayList();
+        initializeTreeLists();
         DisplayTaskList displayTest = Logic.splitAllTask(TL1);
         TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
-        Set<Map.Entry<Date, DisplayTaskList>> sortedMap = Logic.convertTreeMapToSetMapByDate(map);
-        for (Iterator<Map.Entry<Date, DisplayTaskList>> i = sortedMap.iterator(); i.hasNext();) {
-            Map.Entry<Date, DisplayTaskList> entry = i.next();
-            Date current = entry.getKey();
-            System.out.println(current);
-            DisplayTaskList temp = entry.getValue();
-            for (int j = 0; j < temp.size(); j++) {
-                System.out.println(temp.get(j).getParent().getID() + ": " + temp.get(j).getShownDate());
-                
-            }
-        }
+        TreeMap <Date, DisplayTaskList> sortedMap = SortLogic.sortTreeMapIntoSetMapByDate(map);
         
+        list1.add(dt1);
+        list2.add(dt2);
+        list2.add(dt8);
+        list3.add(dt3);
+        list4.add(dt4);
+        list5.add(dt5);
+        list6.add(dt6);
+        list7.add(dt7);
+        list8.add(dt25);
+        list8.add(dt9);
+        list8.add(dt10);
+        list9.add(dt26);
+        list9.add(dt11);
+        list10.add(dt27);
+        list10.add(dt12);
+        list11.add(dt28);
+        list11.add(dt13);
+        list12.add(dt14);
+        list13.add(dt15);
+        list14.add(dt16);
+        list15.add(dt17);
+        list16.add(dt18);
+        list17.add(dt19);
+        list18.add(dt20);
+        list19.add(dt21);
+        list20.add(dt22);
+        list21.add(dt23);
+        list22.add(dt24);
+        list23.add(dt31);
+        list23.add(dt29);
+        list23.add(dt30);
+        list24.add(dt32);
+        
+        assertEquals(sortedMap.get(dt1.getShownDate()), list1);
+        assertEquals(sortedMap.get(dt2.getShownDate()), list2);
+        assertEquals(sortedMap.get(dt3.getShownDate()), list3);
+        assertEquals(sortedMap.get(dt4.getShownDate()), list4);
+        assertEquals(sortedMap.get(dt5.getShownDate()), list5);
+        assertEquals(sortedMap.get(dt6.getShownDate()), list6);
+        assertEquals(sortedMap.get(dt7.getShownDate()), list7);
+        assertEquals(sortedMap.get(dt9.getShownDate()), list8);
+        assertEquals(sortedMap.get(dt11.getShownDate()), list9);
+        assertEquals(sortedMap.get(dt12.getShownDate()), list10);
+        assertEquals(sortedMap.get(dt13.getShownDate()), list11);
+        assertEquals(sortedMap.get(dt14.getShownDate()), list12);
+        assertEquals(sortedMap.get(dt15.getShownDate()), list13);
+        assertEquals(sortedMap.get(dt16.getShownDate()), list14);
+        assertEquals(sortedMap.get(dt17.getShownDate()), list15);
+        assertEquals(sortedMap.get(dt18.getShownDate()), list16);
+        assertEquals(sortedMap.get(dt19.getShownDate()), list17);
+        assertEquals(sortedMap.get(dt20.getShownDate()), list18);
+        assertEquals(sortedMap.get(dt21.getShownDate()), list19);
+        assertEquals(sortedMap.get(dt22.getShownDate()), list20);
+        assertEquals(sortedMap.get(dt23.getShownDate()), list21);
+        assertEquals(sortedMap.get(dt24.getShownDate()), list22);
+        assertEquals(sortedMap.get(dt29.getShownDate()), list23);
+        assertEquals(sortedMap.get(dt32.getShownDate()), list24);
+      
     }
- */   
+    
     @Test
     public void sortPriorityTree() throws Exception {
         
