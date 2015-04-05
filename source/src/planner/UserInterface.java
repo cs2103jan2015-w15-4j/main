@@ -421,7 +421,7 @@ public class UserInterface extends JFrame {
             
                 case TENTATIVE:
                     
-                    currentDisplayListForPriority = Engine.getTentativeTasks();
+                    currentDisplayListForPriority = Engine.getFloatingTasks();
                     currentDisplayListForDate = null;
                     
                     currentList = convertToDisplayTaskList( currentDisplayListForPriority );
@@ -1207,7 +1207,7 @@ public class UserInterface extends JFrame {
                 if( currentDisplayState != null &&
                     currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                         
-                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTentativeTasks();
+                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getFloatingTasks();
                     currentList = convertToDisplayTaskList(tempTaskList);
                     currentDisplayListForDate = null;
                     currentDisplayListForPriority = tempTaskList;
@@ -1695,7 +1695,7 @@ public class UserInterface extends JFrame {
             // Tentative tasks
             if( currentDisplayState != null ){
                 
-                tempTaskList = convertToDisplayTaskList(Engine.getTentativeTasks());
+                tempTaskList = convertToDisplayTaskList(Engine.getFloatingTasks());
                 
                 if( currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
                     
