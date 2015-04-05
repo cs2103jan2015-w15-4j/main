@@ -27,13 +27,11 @@ public class SortLogic {
             int time1 = getTime(task1);
             int time2 = getTime(task2);
             
-            if (time1 < time2) {
-            
-                return -1;
-            
-            } else if (time1 > time2) {
-            
-                return 1;
+            if (time1 < time2) {        
+                return -1;     
+                
+            } else if (time1 > time2) { 
+                return 1;  
                 
             } else {
                 return comparePriority(task1, task2);
@@ -49,13 +47,10 @@ public class SortLogic {
                 String today = dateFormatter.format(task.getShownDate());
                 
                 if (endTime.equals(today)) {
-                    
                     return getTimeFromDate(task.getEndDate());
                     
-                } else {
-                    
-                    return 2400;
-                    
+                } else {     
+                    return 2400;                 
                 }    
                 
             } else {
@@ -241,7 +236,7 @@ public class SortLogic {
         return newTasks;
     }
     
-    public static Set<Map.Entry<Date, DisplayTaskList>> sortTreeMapIntoSetMapByDate(TreeMap <Date, DisplayTaskList> map) {
+    public static TreeMap <Date, DisplayTaskList> sortTreeMapIntoSetMapByDate(TreeMap <Date, DisplayTaskList> map) {
         TreeMap<Date, DisplayTaskList> sortedTree = 
                 new TreeMap<Date, DisplayTaskList>(dateComparatorForMap);
         
@@ -258,10 +253,10 @@ public class SortLogic {
                 sortedTree.put(key, sortedDisplayList);
             }        
         }
-        return sortedTree.entrySet();
+        return sortedTree;
     }
     
-    public static Set<Map.Entry<Integer, DisplayTaskList>> sortTreeMapIntoSetMapByPriority(TreeMap <Integer, DisplayTaskList> map) {
+    public static TreeMap <Integer, DisplayTaskList> sortTreeMapIntoSetMapByPriority(TreeMap <Integer, DisplayTaskList> map) {
         TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
                 <Integer, DisplayTaskList> (priorityComparatorForMap);
         
@@ -276,7 +271,7 @@ public class SortLogic {
             displayMap.put(key, sortedDisplayList);
         }
         
-        return displayMap.entrySet();
+        return displayMap;
     }
     
     public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
