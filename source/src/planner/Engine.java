@@ -720,6 +720,9 @@ public class Engine {
             case HELP_SEARCH:
                 return Constants.CommandType.HELP_SEARCH;
                 
+            case EXIT:
+                return Constants.CommandType.EXIT;
+                
             
             default:
                 return handleInvalidCommand(result);
