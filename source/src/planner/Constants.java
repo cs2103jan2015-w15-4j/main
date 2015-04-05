@@ -120,7 +120,7 @@ public class Constants {
          "Equivalent commands: add/create/new",
          "This command will add the task into YOPO. You can use this command together with description, time, priority and tag.",
          "Example usage: add revise CS2103",
-         "[This will add Ågrevise CS2103Åh as one of the task to complete in YOPO]"
+         "[This will add revise CS2103T as one of the task to complete in YOPO]"
         },
         {"Delete tasks",
          "Equivalent commands: delete/del/trash/remove",
@@ -132,7 +132,7 @@ public class Constants {
          "Equivalent commands: update/edit/change",
          "This command will update the task with the specified id with the information provided.",
          "Example usage: update 143 revise CS2103T",
-         "[This will update item 143 to the name Ågrevise CS2103TÅh]"
+         "[This will update item 143 to the name revise CS2103T]"
         },
         {"Set tasks as done",
          "Equivalent commands: done/completed/finished",
@@ -154,7 +154,7 @@ public class Constants {
          "Equivalent commands: search/find",
          "This command will search all tasks stored in YOPO and display all tasks matching the criteria the user specified.",
          "Example usage: search priority 4 description important",
-         "[This will display all tasks with priority 4 and above and description containing the word ÅeimportantÅf]"
+         "[This will display all tasks with priority 4 and above and description containing the word important]"
         },
         {"Help",
          "Equivalent commands: help/sos",
