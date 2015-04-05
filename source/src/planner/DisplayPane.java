@@ -413,6 +413,84 @@ public class DisplayPane extends JScrollPane{
 	    return listOfTasks.size();
 	}
 	
+	public boolean addInfoToDisplay( String [][]mappings, int idx ){
+	    
+	    if( mappings != null ){
+	        
+	        clearDisplay();
+	        
+	        if( idx >= 0 && idx < mappings.length && mappings[idx].length > 0 ){
+                
+                for( int i = 1, size = mappings[idx].length; i < size; ++i ){
+                        
+                    addInfoToDisplayWithoutSelection( i + ") " + mappings[idx][i], null);
+                }
+                
+	        } else{
+	            
+	            for( int i = 0, size = mappings.length; i < size; ++i ){
+	                
+	                if( mappings[i].length > 0 ){
+	                    
+    	                JLabel headerLabel = new JLabel();
+    	                headerLabel.setHorizontalAlignment(SwingConstants.LEFT);
+    	                headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+    	                headerLabel.setForeground(new Color(255,255,255));
+    	                headerLabel.setText(mappings[i][0]);
+    	                
+    	                for( int j = 1, sizeOfJ = mappings[i].length; j < sizeOfJ; ++j ){
+    	                    
+    	                    if( j > 1 ){
+    	                        
+    	                        addInfoToDisplayWithoutSelection( j + ") " + mappings[i][j], null );
+    	                        
+    	                    } else{
+    	                        
+    	                        addInfoToDisplayWithoutSelection( j + ") " + mappings[i][j], headerLabel );
+    	                    }
+    	                }
+    	                
+    	                appendString( "\n\n\n\n\n\n", null );
+	                }
+	            }
+	        }
+	        
+	        if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
+                
+                selectTask( listOfTasks.get(0L), 0L );
+            }
+	        
+	        return true;
+	        
+	    }   
+	        
+	    return false;
+	}
+	
+	private boolean addInfoToDisplayWithoutSelection( String info, JLabel header){
+	    
+	    if( info == null ){
+	        
+	        return false;
+	    }
+	    
+	    long taskBarID = listOfTasks.size();
+	    
+	    TaskBar infoBar = new TaskBar( header, info );
+	    
+	    infoBar.setPosition(display.getCaretPosition());
+	    
+	    appendString("               ", null);
+	    
+	    addComponentToDisplay(infoBar);
+	    
+	    listOfTasks.put( taskBarID, infoBar );
+	    
+	    appendString("\n", null);
+        
+        return true;
+	}
+	
 	private boolean addTaskWithHeaderToDisplayWithoutSelection( Date currentDate, DisplayTask task, JLabel header ){
 	    
 	    if( task == null || task.getParent() == null ){
