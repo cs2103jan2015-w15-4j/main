@@ -617,7 +617,7 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks.
+     * Gets the display ready data of all Tasks.
      * 
      * @return
      */
@@ -627,7 +627,16 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks marked done.
+     * Returns the size of allTasks TaskList
+     * 
+     * @return
+     */
+    public static int getAllTasksSize() {
+        return allTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all Tasks marked done.
      * 
      * @return
      */
@@ -637,7 +646,17 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks marked not done.
+     * Returns the size of doneTasks TaskList
+     * 
+     * @return
+     */
+    public static int getDoneTasksSize() {
+        return doneTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all Tasks marked not done.
+     * 
      * @return
      */
     //Not tested yet
@@ -646,17 +665,35 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all floating Tasks.
+     * Returns the size of undoneTasks TaskList
+     * 
+     * @return
+     */
+    public static int getUndoneTasksSize() {
+        return undoneTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all floating Tasks.
      * 
      * @return
      */
     //Not tested yet
-    public static Set<Map.Entry<Integer, DisplayTaskList>> getTentativeTasks() {
+    public static Set<Map.Entry<Integer, DisplayTaskList>> getFloatingTasks() {
         return Logic.displayAllTaskByPriority(floatingTasks);
     }
     
     /**
-     * Gets the list of all confirmed Tasks.
+     * Returns the size of floatingTasks TaskList
+     * 
+     * @return
+     */
+    public static int getFloatingTasksSize() {
+        return floatingTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all confirmed Tasks.
      * 
      * @return
      */
@@ -666,7 +703,16 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks today.
+     * Returns size of normalTasks TaskList
+     * 
+     * @return
+     */
+    public static int getConfirmedTasksSize() {
+        return normalTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all Tasks today.
      * 
      * @return
      */
@@ -676,7 +722,16 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks overdue.
+     * Returns size of todayTasks TaskList
+     * 
+     * @return
+     */
+    public static int getTodayTasksSize() {
+        return todayTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all Tasks overdue.
      * 
      * @return
      */
@@ -686,7 +741,16 @@ public class Engine {
     }
     
     /**
-     * Gets the list of all Tasks overdue.
+     * Returns size of overdueTasks TaskList
+     * 
+     * @return
+     */
+    public static int getOverdueTasksSize() {
+        return overdueTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of all Tasks overdue.
      * 
      * @return
      */
@@ -696,7 +760,16 @@ public class Engine {
     }
     
     /**
-     * Gets the list of Tasks in the search results.
+     * Returns size of upcomingTasks TaskList
+     * 
+     * @return
+     */
+    public static int getUpcomingTasksSize() {
+        return upcomingTasks.size();
+    }
+    
+    /**
+     * Gets the display ready data of Tasks in the search results.
      * @return
      */
     //Not tested yet
