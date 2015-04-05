@@ -31,7 +31,8 @@ public class Constants {
     }
     
     public enum DisplayStateFlag {
-        ALL, TODAY, TENTATIVE, OVERDUE, RECURRING, DONE, WORD_SEARCH, PRIORITY_SEARCH, INVALID, SETTINGS
+        ALL, TODAY, TENTATIVE, OVERDUE, UPCOMING, DONE, NOTDONE, WORD_SEARCH, PRIORITY_SEARCH, INVALID,
+        HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_DONE, HELP_UNDO, HELP_SEARCH, HELP_PRIORITY_SEARCH
     }
     
     public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", "edit", 
@@ -47,6 +48,9 @@ public class Constants {
                                                           { "Delete tasks", "delete taskid", "del taskid"},
                                                           { "Update tasks", "update taskid date" }
                                                         };
+    public static final int ADD_TUTORIAL = 0;
+    public static final int DELETE_TUTORIAL = 1;
+    public static final int UPDATE_TUTORIAL = 2;
     
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
@@ -55,12 +59,16 @@ public class Constants {
                                                               " Tasks due today",
                                                               " Task in total",                 // F5
                                                               " Tasks in total",
-                                                              " Tentative Task",                // F6
+                                                              " Upcoming Task",                 // F6
+                                                              " Upcoming Tasks",
+                                                              " Tentative Task",                // F7
                                                               " Tentative Tasks",
-                                                              " Overdue Task",                  // F7
+                                                              " Overdue Task",                  // F8
                                                               " Overdue Tasks",
-                                                              " Task Done",                     // F8
-                                                              " Tasks Done"};                   // F9
+                                                              " Task Done",                     // F9
+                                                              " Tasks Done",
+                                                              " Task not Done",                 // F10
+                                                              " Tasks not Done"};                   
     
     public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
                                            new Color( 244, 132, 57 ),
@@ -75,7 +83,7 @@ public class Constants {
 
     public static final int NO_PRIORITY_LEVEL = 0;
     public static final int NO_ID_SET = 0;
-    public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 13;
+    public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 17;
     public static final int NAVIGATION_BARS_MAX_NUM = 10;
     
     EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
