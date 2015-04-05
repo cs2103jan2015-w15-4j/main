@@ -1254,19 +1254,27 @@ public class UserInterface extends JFrame {
                 }
             }
             
-            if( event.getKeyCode() == KeyEvent.VK_PAGE_UP || 
-                event.getKeyCode() == KeyEvent.VK_PAGE_DOWN){
+            if( event.getKeyCode() == KeyEvent.VK_PAGE_UP ){
                 
                 if( !displayPane.isFocusOwner() ){
                     
                     displayPane.requestFocusInWindow();
                 }
                 
-                JScrollBar verticalScrollBar = displayPane.getVerticalScrollBar();
+                displayPane.selectTaskRelativeToCurrentSelectedTask(-8);
                 
-                int currentScrollValue = verticalScrollBar.getValue();
-                int tempScrollUnitDifference = (event.getKeyCode() == KeyEvent.VK_PAGE_UP ? -verticalScrollBar.getBlockIncrement(-1) : verticalScrollBar.getBlockIncrement(1));
-                verticalScrollBar.setValue( currentScrollValue + tempScrollUnitDifference );
+                event.consume();
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_PAGE_DOWN ){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                displayPane.selectTaskRelativeToCurrentSelectedTask(8);
+                
+                event.consume();
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F10 ){
                 
@@ -1398,19 +1406,30 @@ public class UserInterface extends JFrame {
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F4 ){
                 
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+                if( !event.isAltDown() ){
                     
-                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTodayTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = null;
-                    currentDisplayListForPriority = tempTaskList;
+                    DisplayState currentDisplayState = displayStateStack.peek();
                     
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TODAY, "Tasks due today", null, event ));
+                    if( currentDisplayState != null &&
+                        currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+                        
+                        Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTodayTasks();
+                        currentList = convertToDisplayTaskList(tempTaskList);
+                        currentDisplayListForDate = null;
+                        currentDisplayListForPriority = tempTaskList;
+                        
+                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TODAY, "Tasks due today", null, event ));
+                        
+                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Tasks due today", null );
+                        
+                        event.consume();
+                        
+                        return;
+                    }
                     
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Tasks due today", null );
+                } else{
+                    
+                    handleExit();
                     
                     event.consume();
                     
@@ -1427,8 +1446,6 @@ public class UserInterface extends JFrame {
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
                 
-                System.out.println( "entered f2" + (displayStateStack.isEmpty() ? "empty" : "not empty") );
-                
                 handlePreviousViewOperation(displayStateStack);
                 
                 event.consume();
@@ -1437,7 +1454,6 @@ public class UserInterface extends JFrame {
                 
             } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
          
-                
                 if( slidePanel.isVisible()){
                     
                     slidePanel.slideIn();
