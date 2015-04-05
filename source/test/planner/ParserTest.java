@@ -94,7 +94,7 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
-
+    /*  NOT IN USE
     @Test
     public void testShowAllTasksCommand() {
         ParseResult result = Parser.parse("display for the at 10 Jun 1999");
@@ -126,7 +126,7 @@ public class ParserTest {
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
     }
-    
+ */   
     @Test
     // test correct usage of done
     public void testDoneCommand() {

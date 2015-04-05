@@ -44,13 +44,26 @@ public class Constants {
         "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
         "priority", "desc", "description", "remind", "tag" };
     
-    public static final String [][] POSSIBLE_COMMANDS = { {"Add tasks", "add taskname at date", "new taskname at date"},
-                                                          { "Delete tasks", "delete taskid", "del taskid"},
-                                                          { "Update tasks", "update taskid date" }
-                                                        };
+
     public static final int ADD_TUTORIAL = 0;
     public static final int DELETE_TUTORIAL = 1;
     public static final int UPDATE_TUTORIAL = 2;
+
+    public static final String [][] POSSIBLE_COMMANDS = { 
+        {"Add tasks", 
+         "add <taskname>",
+         "add <taskname> by <date>", 
+         "new <taskname> date <start date> date2 <end date>",
+         "new <taskname> at <date> priority <priority level> desc <description info> tag <tagname>"
+        },
+        {"Delete tasks", 
+         "delete/trash/remove/del <task id>"
+        },
+        {"Update tasks", 
+         "update <task id> date <date to update to>",
+         "edit/change <task id> on <date> priority <priority level> desc <description info> tag <tagname>"
+        },
+    };
     
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
