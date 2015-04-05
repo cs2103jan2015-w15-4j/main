@@ -95,6 +95,16 @@ public class SearchLogic {
         return searchList;
     }
     
+    public static TaskList searchToday(TaskList input) {
+        Calendar start = Calendar.getInstance();
+        start.set(start.get(Calendar.YEAR), start.get(Calendar.MONTH), start.get(Calendar.DATE), 0, 0, 0);
+        Calendar end = Calendar.getInstance();
+        end.set(end.get(Calendar.YEAR), end.get(Calendar.MONTH), end.get(Calendar.DATE), 23, 59, 59);
+        
+        TaskList searchList = searchPeriod(input, start.getTime(), end.getTime());
+        return searchList;
+    }
+    
     public static TaskList searchPriorityGreaterThan(TaskList input, int priority) {
         TaskList searchList = new TaskList();
         for (int i = 0; i < input.size(); i++) {
