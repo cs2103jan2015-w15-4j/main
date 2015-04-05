@@ -43,7 +43,7 @@ public class Parser {
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
     private static String[] cmdsWithoutFollowingKeywords = {"help", "undo",
-        "delete", "done", "setnotdone", "savewhere", "savehere", "show"
+        "delete", "done", "setnotdone", "savewhere", "savehere", "show", "exit"
     };
     private static ArrayList<String> commandsWithoutFollowingKeywords =
             new ArrayList<String>(Arrays.asList(cmdsWithoutFollowingKeywords));
@@ -175,6 +175,9 @@ public class Parser {
                 
             case "savehere":
                 return CommandType.SAVEHERE;
+                
+            case "exit":
+                return CommandType.EXIT;
 
             default:
                 return CommandType.INVALID;
@@ -240,6 +243,10 @@ public class Parser {
             
             case SAVEHERE:
                 processCommand("savehere");
+                break;
+            
+            case EXIT:
+                processCommand("exit");
                 break;
                 
             default:

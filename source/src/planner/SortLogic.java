@@ -19,7 +19,7 @@ public class SortLogic {
      * Comparators for DisplayTaskList
      * Order: Time -> priority -> Name -> Task ID
      */
-    private static Comparator<DisplayTask> DateComparator = new Comparator<DisplayTask>() {
+    private static Comparator<DisplayTask> dateComparator = new Comparator<DisplayTask>() {
         
         @Override
         public int compare(DisplayTask task1, DisplayTask task2) {
@@ -47,14 +47,16 @@ public class SortLogic {
                 String today = dateFormatter.format(task.getShownDate());
                 
                 if (endTime.equals(today)) {
+                    //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + getTimeFromDate(task.getEndDate()));
                     return getTimeFromDate(task.getEndDate());
                     
-                } else {     
+                } else {   
+                    //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + 2400);
                     return 2400;                 
                 }    
                 
             } else {
-                
+                //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + getTimeFromDate(task.getDueDate()));
                 return getTimeFromDate(task.getDueDate());
             }
         }
@@ -62,7 +64,7 @@ public class SortLogic {
         private int getTimeFromDate (Date date) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
-            int hours = cal.get(Calendar.HOUR);
+            int hours = cal.get(Calendar.HOUR_OF_DAY);
             int minutes = cal.get(Calendar.MINUTE);
             int totalTime = (hours * 100) + minutes;
             return totalTime;
@@ -218,7 +220,7 @@ public class SortLogic {
     public static DisplayTaskList sortByDate(DisplayTaskList tasks) {
         //ADD LOG
         DisplayTaskList newTasks = new DisplayTaskList(tasks);
-        Collections.sort(newTasks, DateComparator);
+        Collections.sort(newTasks, dateComparator);
         return newTasks;
     }
     

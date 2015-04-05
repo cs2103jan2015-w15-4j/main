@@ -431,4 +431,24 @@ public class ParserTest {
         assertEquals("C:\\Program Files", result.getName());
     }
     
+    @Test
+    /**
+     * Tests that the exit command correctly sets the command type to 
+     * EXIT and that there are no other valid fields in the parse result.
+     */
+    public void testExitCommand() {
+        ParseResult result = Parser.parse("exit date 15 jun 1346 priority 3 tag sushi desc testexitcommand");
+        assertEquals(Constants.CommandType.EXIT, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
 }

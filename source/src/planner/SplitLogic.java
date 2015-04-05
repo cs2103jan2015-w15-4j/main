@@ -118,4 +118,19 @@ public class SplitLogic {
         
         return cal.getTime();
     }
+    
+    public static DisplayTaskList splitAllPriorityTask(TaskList input) {
+        
+        ID = 0;
+        
+        DisplayTaskList outputList = new DisplayTaskList();
+        
+        for (int i = 0; i < input.size(); i++) {
+            Task temp = input.get(i);
+            createNewDisplayTask(outputList, null, temp.getDueDate(), temp.getEndDate(), input.get(i));
+        }
+        
+        return outputList;
+    }
+   
 }

@@ -1,6 +1,7 @@
 package planner;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,12 @@ public class Logic {
     }
     
     public static TaskList searchToday(TaskList input) {
-        return SearchLogic.searchToday(input);
+        Date today = new Date();
+        return SearchLogic.searchDay(input, today);
+    }
+    
+    public static TaskList searchDay(TaskList input, Date day) {
+        return SearchLogic.searchDay(input, day);
     }
     
     public static TaskList searchPriority(TaskList input , int priority) {
@@ -89,6 +95,9 @@ public class Logic {
         return SplitLogic.splitAllTaskList(input);
     }
     
+    public static DisplayTaskList splitAllPriorityTask(TaskList input) {
+        return SplitLogic.splitAllPriorityTask(input);
+    }
     /**
      * These methods sorts DisplayTaskLists into TreeMaps
      * Purpose: For testing
@@ -123,6 +132,15 @@ public class Logic {
         TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
         
         return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    public static Set<Map.Entry<Integer, DisplayTaskList>> displaySearchedTaskByPriority (TaskList taskInput) {
+        
+        DisplayTaskList searchedList = splitAllPriorityTask(taskInput);
+        
+        TreeMap<Integer, DisplayTaskList> searchedMap = SortLogic.sortListToMapByPriority(searchedList);
+        
+        return convertTreeMapToSetMapByName(searchedMap);
     }
     
     public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {

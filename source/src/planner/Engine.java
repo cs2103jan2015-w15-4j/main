@@ -403,6 +403,8 @@ public class Engine {
         } else {
             toBeDone.setDone();
             lastModifiedTask = toBeDone.getID();
+            //Refreshes the display lists
+            refreshLists();
             return Constants.CommandType.DONE;
         }
 
@@ -431,6 +433,8 @@ public class Engine {
         } else {
             toBeDone.setUndone();
             lastModifiedTask = toBeDone.getID();
+            //Refreshes the display lists
+            refreshLists();
             return Constants.CommandType.SETNOTDONE;
         }
     }
@@ -491,6 +495,103 @@ public class Engine {
             return Constants.CommandType.UNDO;
         }
         
+    }
+    
+    /**
+     * Method handles convert to deadline tasks commands. This command takes in
+     * any tasks and strips off the second date and puts in a first date to 
+     * convert the task into a deadline task.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType convertToDeadline(ParseResult result) {
+      //Saves previous state
+        pushState();
+        
+        //Finds the task of the right ID
+        long ID = result.getId();
+        Task toBeConverted = allTasks.getTaskByID(ID);
+        
+        if(toBeConverted == null) {
+            //If Task is not found then command is invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
+            return Constants.CommandType.INVALID;
+        } else {
+            //CHANGE DATE
+            toBeConverted.setEndDate(null);
+            boolean[] flags = result.getCommandFlags();
+            if(flags[0] == true) {
+                toBeConverted.setDueDate(result.getDate());
+            } else {
+                toBeConverted.setDueDate(result.getSecondDate());
+            }
+            //Refreshes the display lists
+            refreshLists();
+            lastModifiedTask = toBeConverted.getID();
+            return Constants.CommandType.CONVERT_DEADLINE;
+        }
+    }
+    
+    /**
+     * Method handles convert to timed tasks commands. This command takes in
+     * any tasks and adds the start and end date to make it a timed task.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType convertToTimed(ParseResult result) {
+      //Saves previous state
+        pushState();
+        
+        //Finds the task of the right ID
+        long ID = result.getId();
+        Task toBeConverted = allTasks.getTaskByID(ID);
+        
+        if(toBeConverted == null) {
+            //If Task is not found then command is invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
+            return Constants.CommandType.INVALID;
+        } else {
+            //CHANGE DATE
+            toBeConverted.setStartDate(result.getDate());
+            toBeConverted.setEndDate(result.getSecondDate());
+            //Refreshes the display lists
+            refreshLists();
+            lastModifiedTask = toBeConverted.getID();
+            return Constants.CommandType.CONVERT_TIMED;
+        }
+    }
+    
+    /**
+     * Method handles convert to floating tasks commands. This command takes in
+     * any tasks and strips the dates off the task to make it into a floating 
+     * task.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType convertToFloating(ParseResult result) {
+      //Saves previous state
+        pushState();
+        
+        //Finds the task of the right ID
+        long ID = result.getId();
+        Task toBeConverted = allTasks.getTaskByID(ID);
+        
+        if(toBeConverted == null) {
+            //If Task is not found then command is invalid
+            commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
+            return Constants.CommandType.INVALID;
+        } else {
+            //CHANGE DATE
+            toBeConverted.setEndDate(null);
+            toBeConverted.setStartDate(null);
+            //Refreshes the display lists
+            refreshLists();
+            lastModifiedTask = toBeConverted.getID();
+            return Constants.CommandType.CONVERT_FLOATING;
+        }
     }
     
     /**
@@ -580,6 +681,15 @@ public class Engine {
             case SEARCH:
                 return searchTask(result);
                 
+            case CONVERT_FLOATING:
+                return convertToFloating(result);
+                
+            case CONVERT_DEADLINE:
+                return convertToDeadline(result);
+                
+            case CONVERT_TIMED:
+                return convertToTimed(result);
+                
             case SETNOTDONE:
                 return setUndoneTask(result);
                 
@@ -609,6 +719,9 @@ public class Engine {
                 
             case HELP_SEARCH:
                 return Constants.CommandType.HELP_SEARCH;
+                
+            case EXIT:
+                return Constants.CommandType.EXIT;
                 
             
             default:
