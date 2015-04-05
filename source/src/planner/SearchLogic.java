@@ -95,11 +95,13 @@ public class SearchLogic {
         return searchList;
     }
     
-    public static TaskList searchToday(TaskList input) {
+    public static TaskList searchDay(TaskList input, Date day) {
+        Calendar date = Calendar.getInstance();
+        date.setTime(day);
         Calendar start = Calendar.getInstance();
-        start.set(start.get(Calendar.YEAR), start.get(Calendar.MONTH), start.get(Calendar.DATE), 0, 0, 0);
+        start.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), 0, 0, 0);
         Calendar end = Calendar.getInstance();
-        end.set(end.get(Calendar.YEAR), end.get(Calendar.MONTH), end.get(Calendar.DATE), 23, 59, 59);
+        end.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DATE), 23, 59, 59);
         
         TaskList searchList = searchPeriod(input, start.getTime(), end.getTime());
         return searchList;
