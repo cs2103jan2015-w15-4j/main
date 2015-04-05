@@ -21,6 +21,10 @@ public class Logic {
         return SearchLogic.searchPeriod(input, start, end);
     }
     
+    public static TaskList searchToday(TaskList input) {
+        return SearchLogic.searchToday(input);
+    }
+    
     public static TaskList searchPriority(TaskList input , int priority) {
         return SearchLogic.searchPriorityGreaterThan(input, priority);
     }
