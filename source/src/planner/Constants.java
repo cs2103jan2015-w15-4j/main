@@ -16,7 +16,7 @@ public class Constants {
         ADD, ADD_CLASH, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, SETNOTDONE, UNDO, SEARCH,
         HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_SHOW, HELP_DONE,
         HELP_UNDO, HELP_SEARCH, JUMP, CONVERT, CONVERT_FLOATING, 
-        CONVERT_DEADLINE, CONVERT_TIMED, SAVEWHERE, SAVEHERE, INVALID
+        CONVERT_DEADLINE, CONVERT_TIMED, SAVEWHERE, SAVEHERE, INVALID, EXIT
     };
     
     public enum ErrorType {
@@ -35,10 +35,12 @@ public class Constants {
         HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_DONE, HELP_UNDO, HELP_SEARCH, HELP_PRIORITY_SEARCH
     }
     
-    public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", "edit", 
-        "change", "del", "delete", "trash", "remove", "show", "display", "done", 
-        "completed", "finished", "setnotdone", "undo", "revert", "search", 
-        "find", "help", "sos", "jump", "convert", "savewhere", "savehere" };
+    public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", 
+        "edit", "change", "del", "delete", "trash", "remove", "show", "display", 
+        "done", "completed", "finished", "setnotdone", "undo", "revert", 
+        "search", "find", "help", "sos", "jump", "convert", "savewhere", 
+        "savehere", "exit" 
+    };
     
     public static final String[] NONCOMMAND_KEYWORDS = { "at",
         "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
