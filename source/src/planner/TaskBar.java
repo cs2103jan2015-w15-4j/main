@@ -22,6 +22,7 @@ import java.util.Random;
 
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.SimpleAttributeSet;
@@ -48,6 +49,7 @@ public class TaskBar extends JComponent {
 	private JLabel dateHeader;
 	
 	private JTextPane tagsPane;
+	private JTextPane infoPane;
 	
 	private FadedTextField taskTitleLabel;
 	
@@ -92,7 +94,7 @@ public class TaskBar extends JComponent {
 	    dateHeader = newDateHeader;
 	    componentCoordinates = getInsets();
 	    
-        if( newDateHeader != null ){
+        if( dateHeader != null ){
             
             //heightOfLabel = newDateHeader.getHeight();
             
@@ -123,6 +125,63 @@ public class TaskBar extends JComponent {
         prepareTimeDisplayLabel();
         prepareTaskBarBackground();
 	}
+	
+	public TaskBar( JLabel newTitleHeader, String info ){
+	    
+	    this.position = position >= 0 ? position : 0;
+        
+        dateHeader = newTitleHeader;
+        componentCoordinates = getInsets();
+        
+        if( dateHeader != null ){
+            
+            //heightOfLabel = newDateHeader.getHeight();
+            
+            heightOfLabel = 20;
+            
+            //dateHeader.getText();
+            dateHeader.setBounds(componentCoordinates.left, componentCoordinates.top, m_width, heightOfLabel);
+            dateHeader.setPreferredSize(new Dimension(m_width, heightOfLabel));
+            add(dateHeader);
+            
+        } else{
+            
+            System.out.println("went here");
+            
+            heightOfLabel = 0;
+        }
+        
+        setSize(m_width, m_height+heightOfLabel);
+        setOpaque(false);
+        setBorder(null);
+        setFocusable(false);
+        setLayout(null);
+        
+        prepareInfoPane(info);
+        prepareTaskBarBackground();
+	}
+	
+	private void prepareInfoPane( String info ){
+        
+        infoPane = new JTextPane();
+        
+        infoPane.setBounds(40, 13+heightOfLabel, 330, 20);
+        infoPane.setFocusable(false);
+        infoPane.setEditable(false);
+        infoPane.setHighlighter(null);
+        infoPane.setOpaque(false);
+        infoPane.setFont(new Font( "Arial", Font.BOLD, 14));
+        infoPane.setForeground( new Color( 255,255,255 ) );
+        add(infoPane);
+        
+        Style tempStyle = infoPane.addStyle("Original", null);
+        StyleConstants.setFontFamily(tempStyle, "Arial");
+        StyleConstants.setFontSize(tempStyle, 14);
+        StyleConstants.setBold(tempStyle, true);
+        StyleConstants.setForeground(tempStyle, new Color( 255,255,255 ));
+        
+        infoPane.setText(info);
+    }
 	
 	public TaskBar( JLabel newDateHeader ){
 	   
