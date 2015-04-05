@@ -16,7 +16,7 @@ public class DisplayStateStack {
     
     public DisplayState push( DisplayState displayState ){
         
-        if( displayState != null ){
+        if( displayState != null && (displayState.getKeyEvent() != null || displayState.getCommand() != null) ){
             
             while( stack.size() >= maxNumOfStates ){
                 
