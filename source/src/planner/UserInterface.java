@@ -235,7 +235,7 @@ public class UserInterface extends JFrame {
             }
         }
 
-        commandPanel.setText( "Task marked not done successfully", true );
+        commandPanel.setText( "Task #" + modifiedTaskID + " marked not done successfully", true );
     }
     
     private void handleSearch( String userInput ){
@@ -245,28 +245,27 @@ public class UserInterface extends JFrame {
         DisplayTaskList tempTaskList = convertToDisplayTaskList(tempList);
         Task tempTask;
         
-        if( tempTaskList != null && tempTaskList.size() > 0 ){
+        if( tempTaskList != null ){
             
             currentList = tempTaskList;
             currentDisplayListForDate = tempList;
             currentDisplayListForPriority = null;
-            
-            displayPane.clearDisplay();
-            
-            displayPane.displayByDate(currentDisplayListForDate);
             
             displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.WORD_SEARCH, userInput, userInput, null ));
             
             tempTask = displayPane.getCurrentSelectedTask() != null ? displayPane.getCurrentSelectedTask().getParent() : null;
             
             updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, userInput, tempTask);
-            
-            commandPanel.setText( "Search success", true );
-            
-        } else{
-            
-            commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
+           
+            if( displayPane.hasTasksDisplayed() ){
+                
+                commandPanel.setText( "Search success", true );
+                
+                return;
+            }
         }
+            
+        commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
     }
     
     private void updateGUIView( Set<Map.Entry<Date, DisplayTaskList>> dateDisplayList, 
@@ -309,6 +308,11 @@ public class UserInterface extends JFrame {
         if(sectionTitleString != null){
             
             sectionTitle.setText(sectionTitleString);
+        }
+        
+        if( !displayPane.hasTasksDisplayed() ){
+            
+            slidePanel.slideIn();
         }
     }
     
@@ -532,7 +536,7 @@ public class UserInterface extends JFrame {
             }
         }
 
-        commandPanel.setText( "Task added successfully", true );
+        commandPanel.setText( "Task #"+ modifiedTaskID + " added successfully", true );
     }
     
     private void handlePreviousViewOperation( DisplayStateStack displayStateStack ){
@@ -882,7 +886,7 @@ public class UserInterface extends JFrame {
             }
         }
 
-        commandPanel.setText( "Task updated successfully", true );
+        commandPanel.setText( "Task #" + modifiedTaskID + " updated successfully", true );
     }
     
     private void handleDoneOperation(){
@@ -937,7 +941,7 @@ public class UserInterface extends JFrame {
             }
         }
 
-        commandPanel.setText( "Task marked done successfully", true );
+        commandPanel.setText( "Task #" + modifiedTaskID + " marked done successfully", true );
     }
     
     private void handleDeleteOperation(){
@@ -1210,6 +1214,22 @@ public class UserInterface extends JFrame {
         }
     }
     
+    private void updateNavigationBarTaskInfoContents( JTextPane inputField, ArrayList<NavigationBar> navigationBars, DisplayTask currentTask ){
+        
+        if( inputField != null && navigationBars != null && !navigationBars.isEmpty() && 
+            currentTask != null && currentTask.getParent() != null ){
+            
+            NavigationBar tempNavigationBar = navigationBars.get(0);
+            
+            if( tempNavigationBar != null ){
+                
+                String additonalkey = (!inputField.isFocusOwner() ? "/Enter" : "");
+                
+                tempNavigationBar.setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), 
+                        "F1"+additonalkey);
+            }
+        }
+    }
     
     private char filterKeys( char keyCode ){
         
@@ -1495,8 +1515,7 @@ public class UserInterface extends JFrame {
                     
                     if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), 
-                                                                      "F1");
+                        updateNavigationBarTaskInfoContents( commandInputField, currentNavigationBars, currentTask );
                     }
                 }
                 
@@ -1546,8 +1565,7 @@ public class UserInterface extends JFrame {
                     
                     if( currentTask != null && currentTask.getParent() != null ){
                         
-                        currentNavigationBars.get(0).setMessageToView(planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + currentTask.getParent().getID(), 
-                                                                      "F1");
+                        updateNavigationBarTaskInfoContents( commandInputField, currentNavigationBars, currentTask );
                     }
                 }
                 
@@ -1689,9 +1707,11 @@ public class UserInterface extends JFrame {
                           
                 if( tempTask != null && tempTask.getParent() != null ){
                     
+                    String additonalkey = (!commandInputField.isFocusOwner() ? "/Enter" : "");
+                    
                     tempList.add( new NavigationBar( 
                             planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + tempTask.getParent().getID(), 
-                            "F" + key ) );
+                            "F" + key + additonalkey ) );
                     
                 } else{
                     
@@ -2193,13 +2213,11 @@ public class UserInterface extends JFrame {
                     }
                     
                     if( currentNavigationBars.get(0).isVisible() 
-                            && displayPane.getCurrentSelectedTask() != null 
-                            && displayPane.getCurrentSelectedTask().getParent() != null ){
+                        && displayPane.getCurrentSelectedTask() != null 
+                        && displayPane.getCurrentSelectedTask().getParent() != null ){
                            
-                           String messageTitle = planner.Constants.NAVIGATION_BAR_STRING_CONTENTS[0] + displayPane.getCurrentSelectedTask().getParent().getID();
-                           
-                           currentNavigationBars.get(0).setMessageToView(messageTitle, "F1" );
-                       }
+                        updateNavigationBarTaskInfoContents( commandInputField, currentNavigationBars, displayPane.getCurrentSelectedTask() );
+                    }
                 }
 
                 @Override
