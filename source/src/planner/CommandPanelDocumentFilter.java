@@ -191,7 +191,10 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                                     startIdx = nonCommandStrMatcher.start();
                                     endIdx = nonCommandStrMatcher.end();
                                     
-                                    changeTextColor( doc, startIdx, endIdx-startIdx, NONCOMMAND_KEYWORD_COLOUR );
+                                    if( startIdx - 1 < 0 || text.charAt(startIdx - 1) != '/' ){
+                                    
+                                        changeTextColor( doc, startIdx, endIdx-startIdx, NONCOMMAND_KEYWORD_COLOUR );
+                                    }
                                 }
                             }
                             
@@ -203,7 +206,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         }
     }
     
-    public String generateRegex( String []keywords ){
+    public static String generateRegex( String []keywords ){
         
         StringBuilder regex = new StringBuilder("");
         
