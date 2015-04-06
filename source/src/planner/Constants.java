@@ -43,7 +43,7 @@ public class Constants {
     };
     
     public static final String[] NONCOMMAND_KEYWORDS = { "at",
-        "on", "date", "from", "by", "due", "until", "to", "jump", "every", "in",
+        "on", "date", "from", "by", "due", "until", "to", "jump",
         "priority", "desc", "description", "remind", "tag" };
     
 

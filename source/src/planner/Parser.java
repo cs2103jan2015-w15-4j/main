@@ -24,7 +24,7 @@ public class Parser {
 
     private static String[] inputTokens = null;
     private static String[] nonCommandKeywordsArray = {"at", "on", "from", "by",
-        "every", "in", "priority", "desc", "description", "date", "due",
+        "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"  
     };
     private static ArrayList<String> nonCommandKeywords =
