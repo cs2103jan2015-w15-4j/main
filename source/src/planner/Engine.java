@@ -96,11 +96,11 @@ public class Engine {
             
             //Initiates the storage and read the config and storage files
             storage = new Storage();
-            System.out.println("here");
+            //System.out.println("here");
             config = storage.readConfig();
-            System.out.println("readConfig");
+            //System.out.println("readConfig");
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            System.out.println("readStorage");
+            //System.out.println("readStorage");
             
             //Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -455,6 +455,10 @@ public class Engine {
         
         if(flags[0] && flags[7]) {
             searchResults = Logic.searchPeriod(searchResults, result.getDate(), result.getSecondDate());
+        } else if(flags[0]) {
+            searchResults = Logic.searchDay(searchResults, result.getDate());
+        } else if(flags[7]) {
+            searchResults = Logic.searchDay(searchResults, result.getSecondDate());
         }
         if(flags[2]) {
             searchResults = Logic.searchPriority(searchResults, result.getPriorityLevel());
