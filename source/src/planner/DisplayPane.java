@@ -87,6 +87,11 @@ public class DisplayPane extends JScrollPane{
 		verticalScrollBar.setUI( scrollBarSkin );
 	}
 	
+	public boolean hasTasksDisplayed(){
+	    
+	    return (listOfTasks != null && !listOfTasks.isEmpty());
+	}
+	
 	private void prepareDisplay(){
 		
 		display = new JTextPane();
@@ -138,6 +143,35 @@ public class DisplayPane extends JScrollPane{
 			
 			return false;
 		}
+	}
+	
+	public boolean selectTaskRelativeToCurrentSelectedTask( int increments ){
+	    
+	    if( !listOfTasks.isEmpty() ){
+	        
+	        long newCurrentTaskBarID = currentTaskBarID + increments;
+	        
+	        // TODO: May have to check for overflow here
+	        
+	        newCurrentTaskBarID = Math.max( listOfTasks.firstKey(), newCurrentTaskBarID ); 
+	        newCurrentTaskBarID = Math.min( listOfTasks.lastKey(),  newCurrentTaskBarID );
+	        
+	        if( newCurrentTaskBarID == currentTaskBarID ){
+	            
+	            return true;
+	        }
+	        
+	        TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
+	        
+	        if( tempTaskBar != null ){
+	            
+	            selectTask( tempTaskBar, newCurrentTaskBarID );
+                
+                return true;
+	        }
+        } 
+            
+        return false;
 	}
 	
 	public boolean selectPreviousTask(){
@@ -411,6 +445,27 @@ public class DisplayPane extends JScrollPane{
 	public int getNumberOfTasksDisplayed(){
 	    
 	    return listOfTasks.size();
+	}
+	
+	public void showMessageOnDisplay( String msg ){
+	    
+	    if( msg != null ){
+	        
+	        clearDisplay();
+	        
+	        appendString( "\n\n\n\n\n\n\n\n\n\n\n\n\n", null );
+	        
+	        TranslucentTextPane messagePane = new TranslucentTextPane( new Color( 0, 0, 0, 70 ) );
+	        messagePane.setEditable(false);
+	        messagePane.setHighlighter(null);
+	        messagePane.setFocusable(false);
+	        
+	        messagePane.setBounds(0, 0, display.getWidth(), 100);
+	        
+	        messagePane.setText(msg);
+	        
+	        addComponentToDisplay(messagePane);
+	    }
 	}
 	
 	public boolean addInfoToDisplay( String [][]mappings, int idx ){
@@ -711,387 +766,4 @@ public class DisplayPane extends JScrollPane{
             }
         }
     }
-    
-    /*
-    public void displayByDate( Set<Map.Entry<Date, TaskList>> displayList ){
-        
-        if( displayList != null ){
-            
-            Style biggerTextStyle = display.addStyle("biggerText", null);
-            StyleConstants.setFontFamily(biggerTextStyle, "Arial");
-            StyleConstants.setBold(biggerTextStyle, true);
-            StyleConstants.setFontSize(biggerTextStyle, 16);
-            StyleConstants.setForeground(biggerTextStyle, new Color(255,255,255));
-            
-            Date tempDate;
-            TaskList tempTaskList = null;
-            
-            SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
-            
-            String todayDateStr = dateFormatter.format(new Date(System.currentTimeMillis()));
-            
-            // Iterate through treemap
-            for( Map.Entry<Date, TaskList> entry : displayList ){
-                
-                tempTaskList = entry.getValue();
-                
-                if( tempTaskList == null ){
-                    
-                    continue;
-                }
-                
-                Collections.sort( tempTaskList, new Comparator<Task>(){
-
-                    @Override
-                    public int compare(Task taskOne, Task taskTwo) {
-                        
-                        Date firstDate = taskOne.getDueDate();
-                        Date secondDate = taskTwo.getDueDate();
-                        Date firstEndDate = taskOne.getEndDate();
-                        Date secondEndDate = taskTwo.getEndDate();
-                        
-                        if( firstDate != null && secondDate != null ){
-                            
-                            return firstDate.compareTo(secondDate);
-                            
-                        } else if( firstDate != null && secondEndDate != null ){
-                            
-                            return firstDate.compareTo(secondEndDate);
-                            
-                        } else if( firstDate != null && secondEndDate == null ){
-                            
-                            return 1;
-                            
-                        } else if( secondDate != null && firstEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondDate);
-                            
-                        } else if( secondDate != null && firstEndDate == null ){
-                            
-                            return -1;
-                            
-                        } else if( firstEndDate != null && secondEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondEndDate);
-                            
-                        } else if( firstEndDate != null ){
-                            
-                            return 1;
-                            
-                        } else if( secondEndDate != null ){
-                            
-                            return -1;
-                            
-                        } else{
-                            
-                            return 0;
-                        }
-                    }
-                    
-                });
-                
-                tempDate = entry.getKey();
-                
-                SimpleDateFormat dateFormatterForDisplay = new SimpleDateFormat( "EEE, d MMM yyyy" );
-                
-                int positionOfDateHeader = display.getCaretPosition();
-                
-                appendString("                  ", null);
-                
-                if( tempDate != null ){
-                    
-                    String dateStr = dateFormatter.format( tempDate );
-                    
-                    if( !dateStr.equals(todayDateStr) ){
-                        
-                        dateStr = dateFormatterForDisplay.format(tempDate);
-                        
-                        appendString(dateStr, biggerTextStyle);
-                        
-                    } else{
-                        
-                        appendString("Today", biggerTextStyle);
-                    }
-                    
-                } else{
-                    
-                    appendString("Floating tasks", biggerTextStyle);
-                }
-                
-                appendString("\n", null);
-                
-                long idxOfFirstTaskUnderNewDateHeader = listOfTasks.size();
-                
-                addTasksToDisplayWithoutSelection(tempTaskList);
-              
-                TaskBar tempTaskBar = listOfTasks.get(idxOfFirstTaskUnderNewDateHeader);
-
-                if( tempTaskBar != null ){
-                    
-                    tempTaskBar.setPosition(positionOfDateHeader);
-                }
-                
-                appendString( "\n\n\n\n\n\n", null );
-            }
-            
-            if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
-                
-                selectTask( listOfTasks.get(0L), 0L );
-            }
-        }
-    }
-    
-    public void displayByDate( TaskList taskList ){
-        
-        if( taskList != null ){
-            
-            SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
-            
-            String todayDateStr = dateFormatter.format(new Date(System.currentTimeMillis()));
-            
-            TreeMap<Date, TaskList> displayList = new TreeMap<Date, TaskList>( new Comparator<Date>(){
-
-                @Override
-                public int compare(Date firstDate, Date secondDate) {
-                    
-                    if( firstDate != null && secondDate != null ){
-                        
-                        SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
-                        
-                        String dateOneString = dateFormatter.format(firstDate);
-                        String dateTwoString = dateFormatter.format(secondDate);
-                        
-                        if( dateOneString.equals(dateTwoString) ){
-                            
-                            return 0;
-                            
-                        } else{
-                            
-                            return firstDate.compareTo(secondDate);
-                        }
-                        
-                    } else if( firstDate != null ){
-                        
-                        return -1;
-                        
-                    } else if( secondDate != null ){
-                        
-                        return 1;
-                        
-                    } else{
-                        
-                        return 0;
-                    }
-                }
-            });
-            
-            Iterator<Task> iterator = taskList.listIterator();
-            
-            Task tempTask;
-            Date tempDate;
-            Date endDate;
-            TaskList tempTaskList = null;
-            
-            Calendar calendar = Calendar.getInstance();
-            
-            while( iterator.hasNext() ){
-                
-                tempTask = iterator.next();
-                
-                if( !tempTask.isFloating() ){
-                    
-                    tempDate = tempTask.getDueDate();
-                    endDate = tempTask.getEndDate();
-                    
-                    if( tempDate != null ){
-                        
-                        if( endDate != null ){
-                            
-                            if( endDate.compareTo(tempDate) >= 0 ){
-                                
-                                String startDateString = dateFormatter.format(tempDate);
-                                String endDateString = dateFormatter.format(endDate);
-                                
-                                long count = 0;
-                                while( !startDateString.equals(endDateString) ){
-                                    
-                                    tempTaskList = displayList.get( tempDate );
-                                    
-                                    if( count > 0 ){
-                                        
-                                        tempTask = new Task(tempTask);
-                                        tempTask.setDueDate(null);
-                                        tempTask.setEndDate(tempDate);
-                                    }
-                                    
-                                    if( tempTaskList != null ){
-                                        
-                                        tempTaskList.add(tempTask);
-                                     
-                                    } else{
-                                        
-                                        tempTaskList = new TaskList();
-                                        tempTaskList.add(tempTask);
-                                        displayList.put( tempDate, tempTaskList );
-                                    }
-                                    
-                                    calendar.setTime(tempDate);
-                                    calendar.add(Calendar.DATE, 1);
-                                    tempDate = new Date(calendar.getTime().getTime());
-                                    startDateString = dateFormatter.format(tempDate);
-                                    
-                                    ++count;
-                                }
-                            }
-                            
-                        } else{
-                            
-                            tempTaskList = displayList.get( tempDate );
-                            
-                            if( tempTaskList != null ){
-                                
-                                tempTaskList.add(tempTask);
-                             
-                            } else{
-                                
-                                tempTaskList = new TaskList();
-                                tempTaskList.add(tempTask);
-                                displayList.put( tempDate, tempTaskList );
-                            }
-                        }
-                    }
-                    
-                } else{
-                    
-                    tempTaskList = displayList.get(null);
-                    
-                    if( tempTaskList != null ){
-                        
-                        tempTaskList.add(tempTask);
-                        
-                    } else{
-                        
-                        tempTaskList = new TaskList();
-                        tempTaskList.add(tempTask);
-                        displayList.put(null, tempTaskList);
-                    }
-                }
-            }
-            
-            Style biggerTextStyle = display.addStyle("biggerText", null);
-            StyleConstants.setFontFamily(biggerTextStyle, "Arial");
-            StyleConstants.setBold(biggerTextStyle, true);
-            StyleConstants.setFontSize(biggerTextStyle, 16);
-            StyleConstants.setForeground(biggerTextStyle, new Color(255,255,255));
-            
-            // Iterate through treemap
-            for( Map.Entry<Date, TaskList> entry : displayList.entrySet() ){
-                
-                tempTaskList = entry.getValue();
-                
-                if( tempTaskList == null ){
-                    
-                    continue;
-                }
-                
-                Collections.sort( tempTaskList, new Comparator<Task>(){
-
-                    @Override
-                    public int compare(Task taskOne, Task taskTwo) {
-                        
-                        Date firstDate = taskOne.getDueDate();
-                        Date secondDate = taskTwo.getDueDate();
-                        Date firstEndDate = taskOne.getEndDate();
-                        Date secondEndDate = taskTwo.getEndDate();
-                        
-                        if( firstDate != null && secondDate != null ){
-                            
-                            return firstDate.compareTo(secondDate);
-                            
-                        } else if( firstDate != null && secondEndDate != null ){
-                            
-                            return firstDate.compareTo(secondEndDate);
-                            
-                        } else if( firstDate != null && secondEndDate == null ){
-                            
-                            return 1;
-                            
-                        } else if( secondDate != null && firstEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondDate);
-                            
-                        } else if( secondDate != null && firstEndDate == null ){
-                            
-                            return -1;
-                            
-                        } else if( firstEndDate != null && secondEndDate != null ){
-                            
-                            return firstEndDate.compareTo(secondEndDate);
-                            
-                        } else if( firstEndDate != null ){
-                            
-                            return 1;
-                            
-                        } else if( secondEndDate != null ){
-                            
-                            return -1;
-                            
-                        } else{
-                            
-                            return 0;
-                        }
-                    }
-                    
-                });
-                
-                tempDate = entry.getKey();
-                
-                SimpleDateFormat dateFormatterForDisplay = new SimpleDateFormat( "EEE, d MMM yyyy" );
-                
-                int positionOfDateHeader = display.getCaretPosition();
-                
-                appendString("                  ", null);
-                
-                if( tempDate != null ){
-                    
-                    String dateStr = dateFormatter.format( tempDate );
-                    
-                    if( !dateStr.equals(todayDateStr) ){
-                        
-                        dateStr = dateFormatterForDisplay.format(tempDate);
-                        
-                        appendString(dateStr, biggerTextStyle);
-                        
-                    } else{
-                        
-                        appendString("Today", biggerTextStyle);
-                    }
-                    
-                } else{
-                    
-                    appendString("Floating tasks", biggerTextStyle);
-                }
-                
-                appendString("\n", null);
-                
-                long idxOfFirstTaskUnderNewDateHeader = listOfTasks.size();
-                
-                addTasksToDisplayWithoutSelection(tempTaskList);
-              
-                TaskBar tempTaskBar = listOfTasks.get(idxOfFirstTaskUnderNewDateHeader);
-
-                if( tempTaskBar != null ){
-                    
-                    tempTaskBar.setPosition(positionOfDateHeader);
-                }
-                
-                appendString( "\n\n\n\n\n\n", null );
-            }
-            
-            if( !listOfTasks.isEmpty() && currentTaskBarID != 0L ){
-                
-                selectTask( listOfTasks.get(0L), 0L );
-            }
-        }
-    }*/
 }
