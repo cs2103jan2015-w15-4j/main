@@ -122,6 +122,27 @@ public class UserInterface extends JFrame {
                 
                 break;
                 
+            case SAVEWHERE:
+                
+                handleSaveWhere(input);
+                
+                break;
+                
+            case SAVEHERE:
+            case SHOW:
+            case SHOW_ONE:
+            case SHOW_ALL:
+            case JUMP:
+            case HELP_DONE:
+            case HELP_UNDO:
+            case HELP_SEARCH:
+            case HELP_SHOW:
+            case CONVERT:
+                
+                handleSaveWhere(input);
+                
+                break;
+            
             case HELP:
                 
                 showTutorialScreen( -1, input );
@@ -164,6 +185,26 @@ public class UserInterface extends JFrame {
         
         Engine.exit();
         System.exit(0);
+    }
+    
+    private void handleSaveWhere( String userInput ){
+        
+        System.out.println("Reached save where");
+        
+        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
+                "YOPO's settings", 
+                userInput, null ) );
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
+        
+        String fileSavePath = Engine.getStoragePath();
+        
+        displayPane.showMessageOnDisplay("YOPO's File Storage Location:\n\n" + fileSavePath);
     }
     
     private void handleUndo(){
@@ -459,7 +500,8 @@ public class UserInterface extends JFrame {
                 case HELP_UNDO:
                 case HELP_SEARCH:
                 case HELP_PRIORITY_SEARCH:
-                
+                case SETTINGS:
+                    
                     currentDisplayListForPriority = null;
                     currentDisplayListForDate = null;
                     
