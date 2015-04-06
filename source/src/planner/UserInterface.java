@@ -17,13 +17,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -36,7 +36,6 @@ import javax.swing.text.StyledDocument;
 
 import planner.Constants.CommandType;
 import planner.Constants.DisplayStateFlag;
-import sun.util.logging.PlatformLogger.Level;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -129,17 +128,8 @@ public class UserInterface extends JFrame {
                 break;
                 
             case SAVEHERE:
-            case SHOW:
-            case SHOW_ONE:
-            case SHOW_ALL:
-            case JUMP:
-            case HELP_DONE:
-            case HELP_UNDO:
-            case HELP_SEARCH:
-            case HELP_SHOW:
-            case CONVERT:
                 
-                handleSaveWhere(input);
+                handleSaveHere();
                 
                 break;
             
@@ -187,12 +177,10 @@ public class UserInterface extends JFrame {
         System.exit(0);
     }
     
-    private void handleSaveWhere( String userInput ){
-        
-        System.out.println("Reached save where");
+    private void handleSaveWhere(String userInput){
         
         displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
-                "YOPO's settings", 
+                "YOPO's Settings", 
                 userInput, null ) );
         
         DisplayState currentDisplayState =  displayStateStack.peek();
@@ -204,7 +192,29 @@ public class UserInterface extends JFrame {
         
         String fileSavePath = Engine.getStoragePath();
         
-        displayPane.showMessageOnDisplay("YOPO's File Storage Location:\n\n" + fileSavePath);
+        displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
+        
+        commandPanel.setText( "Enter commands here", true );
+    }
+    
+    private void handleSaveHere(){
+        
+        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
+                "YOPO's Settings", 
+                "savewhere", null ) );
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
+        
+        String fileSavePath = Engine.getStoragePath();
+        
+        displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
+        
+        commandPanel.setText( "YOPO's file storage location changed successfully", true );
     }
     
     private void handleUndo(){
@@ -305,7 +315,9 @@ public class UserInterface extends JFrame {
                 return;
             }
         }
-            
+        
+        displayPane.clearDisplay();
+        
         commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
     }
     
@@ -611,6 +623,18 @@ public class UserInterface extends JFrame {
                         case SEARCH:
                             
                             handleSearch(userCommand);
+                            
+                            break;
+                            
+                        case SAVEWHERE:
+                            
+                            handleSaveWhere(userCommand);
+                            
+                            break;
+                            
+                        case SAVEHERE:
+                            
+                            handleSaveWhere(userCommand);
                             
                             break;
                             
