@@ -4,10 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JTextPane;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyledDocument;
 
@@ -88,6 +91,39 @@ public class TranslucentTextPane extends JTextPane{
                 doc.insertString(doc.getLength(), text, style);
                 
                 doc.setCharacterAttributes(doc.getLength(), doc.getLength()+1, style, false);
+            }
+            
+        } catch (BadLocationException e) {}
+    }
+    
+    public void highlightWords( String []list, SimpleAttributeSet style ){
+        
+         try {
+             
+            if( list != null && list.length > 0 ){
+                
+                StyledDocument doc = getStyledDocument();
+                
+                if( doc != null && doc.getLength() > 0 ){
+                
+                    String regex = CommandPanelDocumentFilter.generateRegex(list);
+                    
+                    Pattern pattern = Pattern.compile(regex);
+                    
+                    String currentString = doc.getText(0, doc.getLength()); 
+                    
+                    Matcher matcher = pattern.matcher(currentString);
+                    
+                    int startIdx;
+                    int endIdx;
+                    while( matcher.find() ){
+                        
+                        startIdx = matcher.start();
+                        endIdx = matcher.end();
+                        
+                        doc.setCharacterAttributes(startIdx, endIdx-startIdx, style, true);
+                    }
+                }
             }
             
         } catch (BadLocationException e) {}
