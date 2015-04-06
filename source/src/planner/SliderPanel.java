@@ -1,23 +1,19 @@
 package planner;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
