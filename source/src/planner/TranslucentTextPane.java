@@ -6,6 +6,10 @@ import java.awt.Graphics;
 import java.awt.Insets;
 
 import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
 
 public class TranslucentTextPane extends JTextPane{
 
@@ -46,27 +50,46 @@ public class TranslucentTextPane extends JTextPane{
         int componentWidth = getWidth() - posAttribute.right - posAttribute.left;
         int componentHeight = getHeight() - posAttribute.bottom - posAttribute.top;
         
-        graphics.fillRect(xCoordinate, yCoordinate, componentWidth, componentHeight);
+        graphics.fillRoundRect(xCoordinate, yCoordinate, componentWidth, componentHeight, 10, 10);
         
         super.paintComponent(graphics);
     }
     
-    private void adjustComponentSizeToFitText( String text ){
-        
-        setSize(getWidth(), Short.MAX_VALUE);
-        
-        super.setText(text);
+    public void adjustComponentSizeToFitText(){
         
         int newHeightOfComponent = (getPreferredSize() != null ? getPreferredSize().height : getHeight());
         
         super.setSize(getWidth(), newHeightOfComponent);
-        
-        super.setPreferredSize(new Dimension( getWidth(), newHeightOfComponent ));
     }
     
     @Override
     public void setText( String text ){
         
-        adjustComponentSizeToFitText(text);
+        setSize(getWidth(), Short.MAX_VALUE);
+        
+        super.setText(text);
+        
+        adjustComponentSizeToFitText();
+    }
+    
+    public void initialiseForResize(){
+        
+        setSize(getWidth(), Short.MAX_VALUE);
+    }
+    
+    public void appendText( String text, AttributeSet style ){
+        
+        try {
+        
+            if( text != null ){
+                
+                StyledDocument doc = getStyledDocument();
+                
+                doc.insertString(doc.getLength(), text, style);
+                
+                doc.setCharacterAttributes(doc.getLength(), doc.getLength()+1, style, false);
+            }
+            
+        } catch (BadLocationException e) {}
     }
 }
