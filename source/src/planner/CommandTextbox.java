@@ -344,7 +344,7 @@ public class CommandTextbox extends JScrollPane{
         
         if( textPane != null ){
             
-            inputCommandBox.setEditorKit(new CustomWrapKit());
+            inputCommandBox.setEditorKit(new CustomNoWrapKit());
             inputCommandBox.addCaretListener(new CustomCaretListener(2));
             inputCommandBox.setOpaque(false);
             inputCommandBox.setFont( new Font( "Arial", Font.BOLD, 20 ) );
