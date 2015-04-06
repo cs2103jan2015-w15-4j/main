@@ -2,7 +2,6 @@ package planner;
 
 import java.awt.Color;
 import java.util.EnumMap;
-import java.util.HashMap;
 
 /**
  * This class contains all the constants to be used across the planner.
