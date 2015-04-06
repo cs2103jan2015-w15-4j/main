@@ -8,14 +8,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
 
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 
 // Might have to implement actionlisters
 public class FadedTextField extends JTextField{
