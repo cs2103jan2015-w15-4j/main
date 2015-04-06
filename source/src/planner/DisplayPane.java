@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.ListIterator;
 import java.util.Map;
@@ -465,14 +466,27 @@ public class DisplayPane extends JScrollPane{
 	        
 	        clearDisplay();
 	        
-	        if( idx >= 0 && idx < mappings.length && mappings[idx].length > 0 ){
+	        SimpleAttributeSet hightlightStyle = new SimpleAttributeSet();
+	        StyleConstants.setFontFamily(hightlightStyle, "Arial");
+	        StyleConstants.setFontSize(hightlightStyle, 14);
+	        StyleConstants.setBold(hightlightStyle, true);
+	        StyleConstants.setItalic(hightlightStyle, true);
+	        StyleConstants.setForeground(hightlightStyle, Color.GREEN);
+	        
+	        if( idx >= 0 && idx < mappings.length && mappings[idx].length > 1 ){
                 
-                for( int i = 1, size = mappings[idx].length; i < size; ++i ){
-                        
-                    addInfoToDisplayWithoutSelection( i + ") " + mappings[idx][i], null);
-                }
+	            String []wordsToHighlight = null;
+	            
+	            if( mappings[idx].length > 2 ){
+	                
+	                wordsToHighlight = Arrays.copyOfRange(mappings[idx], 2, mappings[idx].length);
+	            }
+	            
+	            addInfoToDisplayWithoutSelection( mappings[idx][1], wordsToHighlight, hightlightStyle );
                 
 	        } else{
+	            
+	            String []wordsToHighlight;
 	            
 	            for( int i = 0, size = mappings.length; i < size; ++i ){
 	                
@@ -482,19 +496,20 @@ public class DisplayPane extends JScrollPane{
     	                headerLabel.setHorizontalAlignment(SwingConstants.LEFT);
     	                headerLabel.setFont(new Font("Arial", Font.BOLD, 16));
     	                headerLabel.setForeground(new Color(255,255,255));
-    	                headerLabel.setText(mappings[i][0]);
+    	                headerLabel.setText(" " + mappings[i][0]);
     	                
-    	                for( int j = 1, sizeOfJ = mappings[i].length; j < sizeOfJ; ++j ){
+    	                addComponentToDisplay(headerLabel);
+    	                
+    	                appendString("\n", null);
+    	                
+    	                wordsToHighlight = null;
+    	                
+    	                if( mappings[i].length > 2 ){
     	                    
-    	                    if( j > 1 ){
-    	                        
-    	                        addInfoToDisplayWithoutSelection( j + ") " + mappings[i][j], null );
-    	                        
-    	                    } else{
-    	                        
-    	                        addInfoToDisplayWithoutSelection( j + ") " + mappings[i][j], headerLabel );
-    	                    }
+    	                    wordsToHighlight = Arrays.copyOfRange(mappings[i], 2, mappings[i].length);
     	                }
+    	                
+    	                addInfoToDisplayWithoutSelection( mappings[i][1], wordsToHighlight, hightlightStyle );
     	                
     	                appendString( "\n\n\n\n\n\n", null );
 	                }
@@ -506,32 +521,53 @@ public class DisplayPane extends JScrollPane{
                 selectTask( listOfTasks.get(0L), 0L );
             }
 	        
+	        display.setCaretPosition(0);
+	        
 	        return true;
 	    }   
 	        
 	    return false;
 	}
 	
-	private boolean addInfoToDisplayWithoutSelection( String info, JLabel header){
+	private boolean addInfoToDisplayWithoutSelection( String info, String []wordsToHighlight, SimpleAttributeSet style ){
 	    
 	    if( info == null ){
 	        
 	        return false;
 	    }
 	    
-	    long taskBarID = listOfTasks.size();
+	    SimpleAttributeSet newLineStyle = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(newLineStyle, "Arial");
+        StyleConstants.setFontSize(newLineStyle, 2);
+        StyleConstants.setBold(newLineStyle, false);
+        
+        SimpleAttributeSet TextStyle = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(TextStyle, "Arial");
+        StyleConstants.setFontSize(TextStyle, 14);
+        StyleConstants.setBold(TextStyle, true);
 	    
-	    TaskBar infoBar = new TaskBar( header, info );
-	    
-	    infoBar.setPosition(display.getCaretPosition());
-	    
-	    appendString("               ", null);
-	    
-	    addComponentToDisplay(infoBar);
-	    
-	    listOfTasks.put( taskBarID, infoBar );
-	    
-	    appendString("\n", null);
+        TranslucentTextPane messagePane = new TranslucentTextPane( new Color( 0, 0, 0, 100 ) );
+        messagePane.setEditable(false);
+        messagePane.setHighlighter(null);
+        messagePane.setFocusable(false);
+        messagePane.setFont(new Font( "Arial", Font.BOLD, 20 ));
+        messagePane.setForeground(new Color(255,255,255));
+        
+        messagePane.setBounds(0, 0, display.getWidth(), 100);
+        
+        messagePane.initialiseForResize();
+        
+        messagePane.appendText("\n\n", newLineStyle);
+        messagePane.appendText(info, TextStyle);
+        messagePane.appendText("\n\n\n", newLineStyle);
+        messagePane.adjustComponentSizeToFitText();
+        
+        addComponentToDisplay(messagePane);
+        
+        if( wordsToHighlight != null && wordsToHighlight.length > 0 ){
+            
+            messagePane.highlightWords(wordsToHighlight, style);
+        }
         
         return true;
 	}
