@@ -1,49 +1,26 @@
 package planner;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JComponent;
-import javax.swing.JLayeredPane;
+import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.JViewport;
-import javax.swing.JLabel;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.plaf.ScrollBarUI;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.Utilities;
 
 public class DisplayPane extends JScrollPane{
 
@@ -453,16 +430,30 @@ public class DisplayPane extends JScrollPane{
 	        
 	        clearDisplay();
 	        
-	        appendString( "\n\n\n\n\n\n\n\n\n\n\n\n\n", null );
-	        
-	        TranslucentTextPane messagePane = new TranslucentTextPane( new Color( 0, 0, 0, 70 ) );
+	        TranslucentTextPane messagePane = new TranslucentTextPane( new Color( 0, 0, 0, 100 ) );
 	        messagePane.setEditable(false);
 	        messagePane.setHighlighter(null);
 	        messagePane.setFocusable(false);
+	        messagePane.setFont(new Font( "Arial", Font.BOLD, 20 ));
+	        messagePane.setForeground(new Color(255,255,255));
 	        
 	        messagePane.setBounds(0, 0, display.getWidth(), 100);
 	        
-	        messagePane.setText(msg);
+	        SimpleAttributeSet newLineStyle = new SimpleAttributeSet();
+	        StyleConstants.setFontFamily(newLineStyle, "Arial");
+	        StyleConstants.setFontSize(newLineStyle, 2);
+	        StyleConstants.setBold(newLineStyle, false);
+	        
+	        SimpleAttributeSet TextStyle = new SimpleAttributeSet();
+	        StyleConstants.setFontFamily(TextStyle, "Arial");
+	        StyleConstants.setFontSize(TextStyle, 20);
+	        StyleConstants.setBold(TextStyle, true);
+	        
+	        messagePane.initialiseForResize();
+	        messagePane.appendText("\n\n", newLineStyle);
+	        messagePane.appendText(msg, TextStyle);
+	        messagePane.appendText("\n\n\n", newLineStyle);
+	        messagePane.adjustComponentSizeToFitText();
 	        
 	        addComponentToDisplay(messagePane);
 	    }
@@ -516,7 +507,6 @@ public class DisplayPane extends JScrollPane{
             }
 	        
 	        return true;
-	        
 	    }   
 	        
 	    return false;
@@ -699,6 +689,11 @@ public class DisplayPane extends JScrollPane{
                 selectTask( listOfTasks.get(0L), 0L );
             }
         }
+        
+        if( !hasTasksDisplayed() ){
+            
+            showMessageOnDisplay( " You have no tasks for this section :)" );
+        }
     }
     
     public void displayByDate( Set<Map.Entry<Date, DisplayTaskList>> displayList ){
@@ -764,6 +759,11 @@ public class DisplayPane extends JScrollPane{
                 
                 selectTask( listOfTasks.get(0L), 0L );
             }
+        }
+        
+        if( !hasTasksDisplayed() ){
+            
+            showMessageOnDisplay( " You have no tasks for this section :)" );
         }
     }
 }
