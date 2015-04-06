@@ -36,7 +36,7 @@ public class WrapTextLogic implements ViewFactory{
                 
                 return new IconView(element);
                 
-            } else if( viewType.equals( StyleConstants.ComponentElementName ){
+            } else if( viewType.equals( StyleConstants.ComponentElementName) ){
                 
                 return new ComponentView(element);
             }
