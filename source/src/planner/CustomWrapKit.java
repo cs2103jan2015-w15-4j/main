@@ -5,18 +5,18 @@ import javax.swing.text.ViewFactory;
 
 public class CustomWrapKit extends StyledEditorKit{
 
-    private ViewFactory customViewFactory;
+    private ViewFactory defaultViewFactory;
     
     public CustomWrapKit(){
         
         super();
         
-        customViewFactory = new WrapTextLogic();
+        defaultViewFactory = new WrapTextLogic();
     }
     
     @Override
     public ViewFactory getViewFactory(){
         
-        return customViewFactory;
+        return defaultViewFactory;
     }
 }
