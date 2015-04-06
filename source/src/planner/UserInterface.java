@@ -156,6 +156,24 @@ public class UserInterface extends JFrame {
                 showTutorialScreen( Constants.UPDATE_TUTORIAL, input );
                 
                 break;
+                
+            case HELP_DONE:
+                
+                showTutorialScreen( Constants.DONE_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_SEARCH:
+                
+                showTutorialScreen( Constants.SEARCH_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_UNDO:
+                
+                showTutorialScreen( Constants.UNDO_TUTORIAL, input );
+                
+                break;
              
             case EXIT:
                 
@@ -663,8 +681,20 @@ public class UserInterface extends JFrame {
                             break;
                             
                         case HELP_DONE:
+                            
+                            showTutorialScreen(Constants.DONE_TUTORIAL, userCommand );
+                            
+                            break;
+                            
                         case HELP_UNDO:
+                            
+                            showTutorialScreen(Constants.UNDO_TUTORIAL, userCommand );
+                            
+                            break;
+                            
                         case HELP_SEARCH:
+                            
+                            showTutorialScreen(Constants.SEARCH_TUTORIAL, userCommand );
                             
                             break;
                             
@@ -1167,39 +1197,75 @@ public class UserInterface extends JFrame {
             case Constants.ADD_TUTORIAL:
 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_ADD, 
-                        Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.ADD_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.ADD_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.ADD_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.ADD_TUTORIAL);
                 
                 break;
                 
             case Constants.DELETE_TUTORIAL:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_DELETE, 
-                        Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.DELETE_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.DELETE_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.DELETE_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.DELETE_TUTORIAL);
                 
                 break;
                 
             case Constants.UPDATE_TUTORIAL:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_UPDATE, 
-                        Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.UPDATE_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.UPDATE_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.UPDATE_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.UPDATE_TUTORIAL);
+                
+                break;
+            
+            case Constants.DONE_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_DONE, 
+                        Constants.HELP_CONTENT[Constants.DONE_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.DONE_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.DONE_TUTORIAL);
                 
                 break;
                 
+            case Constants.SEARCH_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_SEARCH, 
+                        Constants.HELP_CONTENT[Constants.SEARCH_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.SEARCH_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.SEARCH_TUTORIAL);
+                
+                break;
+                
+            case Constants.UNDO_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_UNDO, 
+                        Constants.HELP_CONTENT[Constants.UNDO_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.UNDO_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.UNDO_TUTORIAL);
+                
+                break;
+            
             default:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP, "Tutorial", null, 
@@ -1208,7 +1274,7 @@ public class UserInterface extends JFrame {
                 
                 updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, "Tutorial", null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, -1);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, -1);
                 
                 break;
         }
@@ -1347,9 +1413,12 @@ public class UserInterface extends JFrame {
                     displayPane.requestFocusInWindow();
                 }
                 
-                displayPane.selectTaskRelativeToCurrentSelectedTask(-8);
-                
-                event.consume();
+                if( displayPane.hasTasksDisplayed() ){
+                    
+                    displayPane.selectTaskRelativeToCurrentSelectedTask(-8);
+                    
+                    event.consume();
+                }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_PAGE_DOWN ){
                 
@@ -1358,9 +1427,12 @@ public class UserInterface extends JFrame {
                     displayPane.requestFocusInWindow();
                 }
                 
-                displayPane.selectTaskRelativeToCurrentSelectedTask(8);
+                if( displayPane.hasTasksDisplayed() ){
                 
-                event.consume();
+                    displayPane.selectTaskRelativeToCurrentSelectedTask(8);
+                    
+                    event.consume();
+                }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F10 ){
                 
@@ -1595,7 +1667,10 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                event.consume();
+                if( displayPane.hasTasksDisplayed() ){
+                    
+                    event.consume();
+                }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_DOWN ){
                 
@@ -1645,7 +1720,9 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                event.consume();
+                if( displayPane.hasTasksDisplayed() ){
+                    event.consume();
+                }
                 
             } else{
                 
