@@ -83,10 +83,10 @@ public class SearchLogic {
                 } else {
     
                     long inputStartTime = input.get(i).getDueDate().getTime();
-                    long inputEndTime = input.get(i).getDueDate().getTime();
+                    long inputEndTime = input.get(i).getEndDate().getTime();
   
-                    if (!((inputStartTime > endTime) && (inputStartTime > endTime))
-                            && !((inputEndTime < startTime) && (inputEndTime < endTime))) {
+                    if (!((inputStartTime > endTime) && (inputEndTime > endTime))
+                            && !((inputEndTime < startTime) && (inputStartTime < startTime))) {
     
                         searchList.add(input.get(i));
                     }
