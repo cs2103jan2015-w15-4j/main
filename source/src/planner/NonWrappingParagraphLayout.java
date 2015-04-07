@@ -13,7 +13,7 @@ public class NonWrappingParagraphLayout extends ParagraphView{
     @Override
     public void layout( int width, int height ){
         
-        super.layout( Short.MAX_VALUE, height );
+        super.layout( Integer.MAX_VALUE, height );
     }
     
     @Override
