@@ -5,12 +5,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -99,7 +97,6 @@ public class CommandTextbox extends JScrollPane{
                     }
                     
                 } else if( keyEvent.getKeyCode() == KeyEvent.VK_DOWN ){
-                    
                     
                     currentPopupListIndex = Math.min( currentPopupListIndex + 1, popUpList.getSize() + 1 );
                     popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex , popUpList.getSize() ));
@@ -194,6 +191,9 @@ public class CommandTextbox extends JScrollPane{
             
             popUpBox.setOpaque(false);
             popUpBox.setFocusable(false);
+            
+            
+            popUpBox.setFont(new Font("Arial", Font.PLAIN, 14));
             
             possibleCommands = new ArrayList<String>();
             
@@ -402,6 +402,23 @@ public class CommandTextbox extends JScrollPane{
     public JTextPane getTextDisplay(){
         
         return inputCommandBox;
+    }
+    
+    public JComboBox<String> getPopupBox(){
+        
+        return popUpBox;
+    }
+    
+    public boolean hasSelectedItem(){
+        
+        if( popUpList != null ){
+            
+            return (popUpList.getSelectedItem() != null);
+            
+        } else {
+            
+            return false;
+        }
     }
     
     private Style getStyleOfTextPane( JTextPane textPane ){

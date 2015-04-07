@@ -1,36 +1,26 @@
 package planner;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.SwingConstants;
-
-import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import javax.swing.JTextArea;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTextPane;
-import javax.swing.text.AbstractDocument;
+import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DateFormatter;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-
-import java.text.SimpleDateFormat;
 
 public class TaskBar extends JComponent {
 
@@ -628,7 +618,7 @@ public class TaskBar extends JComponent {
 	                
 	                if( task.getDueDate() != null && task.getEndDate() != null ){
                         
-                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                        timeDisplayLabel.setText( "From " + dateFormatterWithDay.format(task.getDueDate()) );
                         
                         Point currentLocation = timeDisplayLabel.getLocation();
                         
@@ -649,13 +639,20 @@ public class TaskBar extends JComponent {
                         timeDisplayLabelEx = new JLabel();
                         setTimeDisplayLabelAttributes(timeDisplayLabelEx);
                         timeDisplayLabelEx.setHorizontalAlignment(SwingConstants.LEFT);
-                        timeDisplayLabelEx.setText("To   " + dateFormatter.format(task.getEndDate()) );
-                        timeDisplayLabelEx.setBounds(currentLocation.x, currentLocation.y, timeDisplayLabel.getWidth(), timeDisplayLabel.getHeight());
+                        timeDisplayLabelEx.setText("To " + dateFormatterWithDay.format(task.getEndDate()) );
+                        timeDisplayLabelEx.setBounds(currentLocation.x, currentLocation.y + 8, timeDisplayLabel.getWidth(), timeDisplayLabel.getHeight());
                         add(timeDisplayLabelEx);
+                        
+                        if( timeDisplayLabelEx.getParent() != null ){
+                            
+                            timeDisplayLabelEx.getParent().setComponentZOrder(timeDisplayLabelEx, 0);
+                        }
+                        
+                        timeDisplayLabelEx.setForeground(new Color(255,255,255));
                         
                     } else if( task.getEndDate() != null ){
                         
-                        timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
+                        timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getEndDate()) );
                         
                         if( timeDisplayLabelEx != null ){
                             
@@ -673,7 +670,14 @@ public class TaskBar extends JComponent {
                         
                     } else if( task.getDueDate() != null ){
                         
-                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                        if( task.getParent() != null && task.getParent().getEndDate() != null ){
+                            
+                            timeDisplayLabel.setText( "From " + dateFormatterWithDay.format(task.getDueDate()) );
+                            
+                        } else{
+                            
+                            timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getDueDate()) );
+                        }
                         
                         if( timeDisplayLabelEx != null ){
                             

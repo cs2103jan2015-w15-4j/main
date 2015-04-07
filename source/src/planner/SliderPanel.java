@@ -1,23 +1,19 @@
 package planner;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JScrollBar;
-import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -277,6 +273,7 @@ public class SliderPanel extends JComponent{
         infoPanel.setEditable(false);
         infoPanel.setHighlighter(null);
         infoPanel.setFocusable(false);
+        infoPanel.setEditorKit(new CustomWrapKit());
         
         infoPanelScrollPane.setViewportView(infoPanel);
         infoPanelScrollPane.setBorder(null);
@@ -442,7 +439,7 @@ public class SliderPanel extends JComponent{
             StyleConstants.setFontSize(bigBoldText, 15);
             
             Style smallText = infoPanel.addStyle("small text", null);
-            StyleConstants.setFontSize(smallText, 10);
+            StyleConstants.setFontSize(smallText, 12);
             
             StyledDocument doc = infoPanel.getStyledDocument();
             
@@ -467,15 +464,47 @@ public class SliderPanel extends JComponent{
                 
                 if( task.getDescription() != null && task.getDescription().length() > 0 ){
                     
-                    doc.insertString( doc.getLength(), task.getDescription(), smallText );
+                    doc.insertString( doc.getLength(), task.getDescription() + "\n\n", smallText );
                     
                 } else{
                     
-                    doc.insertString( doc.getLength(), "No description is entered for this task and testing wrapping text\n\n", smallText );
+                    doc.insertString( doc.getLength(), "No description is entered for this task\n\n", smallText );
                 }
                 
-                doc.insertString( doc.getLength(), "From: " + (task.getDueDate() != null ? task.getDueDate() : "null") + "\n\n", bigBoldText );
-                doc.insertString( doc.getLength(), "To: " + (task.getEndDate() != null ? task.getEndDate() : "null") + "\n\n", bigBoldText );
+                if( task.isFloating() ){
+                    
+                    doc.insertString( doc.getLength(), "This is a floating task", bigBoldText );
+                    
+                } else if( task.isDone() ){
+                    
+                    doc.insertString( doc.getLength(), "Completed on:\n", bigBoldText );
+                    doc.insertString( doc.getLength(), task.getDateCompleted().toString(), smallText );
+                    
+                } else{
+                    
+                    if( task.getDueDate() != null && task.getEndDate() != null ){
+                        
+                        doc.insertString( doc.getLength(), "From:\n", bigBoldText );
+                        doc.insertString( doc.getLength(), task.getDueDate() + "\n\n", smallText );
+                        
+                        doc.insertString( doc.getLength(), "To:\n", bigBoldText );
+                        doc.insertString( doc.getLength(), task.getEndDate().toString(), smallText );
+                        
+                    } else if( task.getEndDate() != null ){
+                        
+                        doc.insertString( doc.getLength(), "By:\n", bigBoldText );
+                        doc.insertString( doc.getLength(), task.getEndDate().toString(), smallText );
+                        
+                    } else if( task.getDueDate() != null ){
+                        
+                        doc.insertString( doc.getLength(), "By:\n", bigBoldText );
+                        doc.insertString( doc.getLength(), task.getDueDate().toString(), smallText );
+                        
+                    } else{
+                        
+                        doc.insertString( doc.getLength(), "This is a floating task", bigBoldText );
+                    }
+                }
                 
                 infoPanel.setCaretPosition(0);
                 

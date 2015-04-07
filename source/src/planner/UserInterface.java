@@ -17,13 +17,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -36,7 +37,6 @@ import javax.swing.text.StyledDocument;
 
 import planner.Constants.CommandType;
 import planner.Constants.DisplayStateFlag;
-import sun.util.logging.PlatformLogger.Level;
 
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
@@ -129,17 +129,8 @@ public class UserInterface extends JFrame {
                 break;
                 
             case SAVEHERE:
-            case SHOW:
-            case SHOW_ONE:
-            case SHOW_ALL:
-            case JUMP:
-            case HELP_DONE:
-            case HELP_UNDO:
-            case HELP_SEARCH:
-            case HELP_SHOW:
-            case CONVERT:
                 
-                handleSaveWhere(input);
+                handleSaveHere();
                 
                 break;
             
@@ -166,6 +157,24 @@ public class UserInterface extends JFrame {
                 showTutorialScreen( Constants.UPDATE_TUTORIAL, input );
                 
                 break;
+                
+            case HELP_DONE:
+                
+                showTutorialScreen( Constants.DONE_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_SEARCH:
+                
+                showTutorialScreen( Constants.SEARCH_TUTORIAL, input );
+                
+                break;
+                
+            case HELP_UNDO:
+                
+                showTutorialScreen( Constants.UNDO_TUTORIAL, input );
+                
+                break;
              
             case EXIT:
                 
@@ -187,12 +196,10 @@ public class UserInterface extends JFrame {
         System.exit(0);
     }
     
-    private void handleSaveWhere( String userInput ){
-        
-        System.out.println("Reached save where");
+    private void handleSaveWhere(String userInput){
         
         displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
-                "YOPO's settings", 
+                "YOPO's Settings", 
                 userInput, null ) );
         
         DisplayState currentDisplayState =  displayStateStack.peek();
@@ -204,7 +211,29 @@ public class UserInterface extends JFrame {
         
         String fileSavePath = Engine.getStoragePath();
         
-        displayPane.showMessageOnDisplay("YOPO's File Storage Location:\n\n" + fileSavePath);
+        displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
+        
+        commandPanel.setText( "Enter commands here", true );
+    }
+    
+    private void handleSaveHere(){
+        
+        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
+                "YOPO's Settings", 
+                "savewhere", null ) );
+        
+        DisplayState currentDisplayState =  displayStateStack.peek();
+        DisplayState upcomingDisplayState = updateCurrentList( currentDisplayState );
+        
+        String sectionTitleString = upcomingDisplayState.getTitle();
+        
+        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
+        
+        String fileSavePath = Engine.getStoragePath();
+        
+        displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
+        
+        commandPanel.setText( "YOPO's file storage location changed successfully", true );
     }
     
     private void handleUndo(){
@@ -305,7 +334,9 @@ public class UserInterface extends JFrame {
                 return;
             }
         }
-            
+        
+        displayPane.clearDisplay();
+        
         commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
     }
     
@@ -614,6 +645,18 @@ public class UserInterface extends JFrame {
                             
                             break;
                             
+                        case SAVEWHERE:
+                            
+                            handleSaveWhere(userCommand);
+                            
+                            break;
+                            
+                        case SAVEHERE:
+                            
+                            handleSaveWhere(userCommand);
+                            
+                            break;
+                            
                         case HELP:
                             
                             showTutorialScreen(-1, userCommand );
@@ -639,8 +682,20 @@ public class UserInterface extends JFrame {
                             break;
                             
                         case HELP_DONE:
+                            
+                            showTutorialScreen(Constants.DONE_TUTORIAL, userCommand );
+                            
+                            break;
+                            
                         case HELP_UNDO:
+                            
+                            showTutorialScreen(Constants.UNDO_TUTORIAL, userCommand );
+                            
+                            break;
+                            
                         case HELP_SEARCH:
+                            
+                            showTutorialScreen(Constants.SEARCH_TUTORIAL, userCommand );
                             
                             break;
                             
@@ -1058,6 +1113,8 @@ public class UserInterface extends JFrame {
     private char characterToTransfer;
     private boolean isBackspacePressed;
     
+    private JComboBox<String> popupBox;
+    
     private DisplayStateStack displayStateStack;
     private final int maxNumOfDisplayStates = 100;
     
@@ -1143,39 +1200,75 @@ public class UserInterface extends JFrame {
             case Constants.ADD_TUTORIAL:
 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_ADD, 
-                        Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.ADD_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.ADD_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.ADD_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.ADD_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.ADD_TUTORIAL);
                 
                 break;
                 
             case Constants.DELETE_TUTORIAL:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_DELETE, 
-                        Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.DELETE_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.DELETE_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.DELETE_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.DELETE_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.DELETE_TUTORIAL);
                 
                 break;
                 
             case Constants.UPDATE_TUTORIAL:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_UPDATE, 
-                        Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], 
+                        Constants.HELP_CONTENT[Constants.UPDATE_TUTORIAL][0], 
                         userInput, null ) );
                 
-                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.POSSIBLE_COMMANDS[Constants.UPDATE_TUTORIAL][0], null);
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.UPDATE_TUTORIAL][0], null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, Constants.UPDATE_TUTORIAL);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.UPDATE_TUTORIAL);
+                
+                break;
+            
+            case Constants.DONE_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_DONE, 
+                        Constants.HELP_CONTENT[Constants.DONE_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.DONE_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.DONE_TUTORIAL);
                 
                 break;
                 
+            case Constants.SEARCH_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_SEARCH, 
+                        Constants.HELP_CONTENT[Constants.SEARCH_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.SEARCH_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.SEARCH_TUTORIAL);
+                
+                break;
+                
+            case Constants.UNDO_TUTORIAL:
+                
+                displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP_UNDO, 
+                        Constants.HELP_CONTENT[Constants.UNDO_TUTORIAL][0], 
+                        userInput, null ) );
+                
+                updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, Constants.HELP_CONTENT[Constants.UNDO_TUTORIAL][0], null);
+                
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, Constants.UNDO_TUTORIAL);
+                
+                break;
+            
             default:
                 
                 displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP, "Tutorial", null, 
@@ -1184,7 +1277,7 @@ public class UserInterface extends JFrame {
                 
                 updateGUIView(currentDisplayListForDate, currentDisplayListForPriority, "Tutorial", null);
                 
-                displayPane.addInfoToDisplay(Constants.POSSIBLE_COMMANDS, -1);
+                displayPane.addInfoToDisplay(Constants.HELP_CONTENT, -1);
                 
                 break;
         }
@@ -1304,41 +1397,11 @@ public class UserInterface extends JFrame {
         }
     }
     
-    private void handleKeyEvent(KeyEvent event){
+    private boolean handleNavigationKeys(KeyEvent event){
         
         if( event != null ){
             
-            if( commandPanel != null ){
-                
-                if( commandPanel.handleKeyEvent(event) ){
-                   
-                    return;
-                }
-            }
-            
-            if( event.getKeyCode() == KeyEvent.VK_PAGE_UP ){
-                
-                if( !displayPane.isFocusOwner() ){
-                    
-                    displayPane.requestFocusInWindow();
-                }
-                
-                displayPane.selectTaskRelativeToCurrentSelectedTask(-8);
-                
-                event.consume();
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_PAGE_DOWN ){
-                
-                if( !displayPane.isFocusOwner() ){
-                    
-                    displayPane.requestFocusInWindow();
-                }
-                
-                displayPane.selectTaskRelativeToCurrentSelectedTask(8);
-                
-                event.consume();
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F10 ){
+            if( event.getKeyCode() == KeyEvent.VK_F10 ){
                 
                 DisplayState currentDisplayState = displayStateStack.peek();
                 
@@ -1356,7 +1419,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F9 ){
@@ -1377,7 +1440,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
@@ -1398,7 +1461,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F7 ){
@@ -1419,7 +1482,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
@@ -1440,7 +1503,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F5 ){
@@ -1463,7 +1526,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F4 ){
@@ -1486,7 +1549,7 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                         
-                        return;
+                        return true;
                     }
                     
                 } else{
@@ -1495,7 +1558,7 @@ public class UserInterface extends JFrame {
                     
                     event.consume();
                     
-                    return;
+                    return true;
                 }
                 
             } else if(event.getKeyCode() == KeyEvent.VK_F3){
@@ -1504,7 +1567,7 @@ public class UserInterface extends JFrame {
                 
                 event.consume();
                         
-                return;
+                return true;
                 
             } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
                 
@@ -1512,9 +1575,60 @@ public class UserInterface extends JFrame {
                 
                 event.consume();
                 
-                return;
+                return true;
                 
-            } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
+            }
+        }
+        
+        return false;
+    }
+    
+    private void handleKeyEvent(KeyEvent event){
+        
+        if( event != null ){
+            
+            if(  commandPanel != null ){
+                
+                if( commandPanel.handleKeyEvent(event) ){
+                   
+                    return;
+                }
+            }
+            
+            if( handleNavigationKeys(event) ){
+                
+                return;
+            }
+            
+            if( event.getKeyCode() == KeyEvent.VK_PAGE_UP ){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                if( displayPane.hasTasksDisplayed() ){
+                    
+                    displayPane.selectTaskRelativeToCurrentSelectedTask(-8);
+                    
+                    event.consume();
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_PAGE_DOWN ){
+                
+                if( !displayPane.isFocusOwner() ){
+                    
+                    displayPane.requestFocusInWindow();
+                }
+                
+                if( displayPane.hasTasksDisplayed() ){
+                
+                    displayPane.selectTaskRelativeToCurrentSelectedTask(8);
+                    
+                    event.consume();
+                }
+                
+            }  else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
          
                 if( slidePanel.isVisible()){
                     
@@ -1571,9 +1685,14 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                event.consume();
+                if( displayPane.hasTasksDisplayed() ){
+                    
+                    event.consume();
+                }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_DOWN ){
+                
+                
                 
                 if( !displayPane.isFocusOwner() ){
                     
@@ -1621,7 +1740,9 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                event.consume();
+                if( displayPane.hasTasksDisplayed() ){
+                    event.consume();
+                }
                 
             } else{
                 
@@ -1662,6 +1783,8 @@ public class UserInterface extends JFrame {
                     
                 } else if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                        
+                    
+                    
                     String input = commandInputField.getText();
                     
                     if( input.length() > 0 ){
@@ -2178,8 +2301,49 @@ public class UserInterface extends JFrame {
         addKeyBindingsToCommandTextField(commandInputField);
         addFocusListenerToCommandTextField( commandPanel, commandInputField );
         
+        popupBox = commandPanel.getPopupBox();
+        
+        addKeyBindingsToPopupBox(popupBox);
+        
         characterToTransfer = '\0';
         isBackspacePressed = false;
+    }
+    
+    private void addKeyBindingsToPopupBox( final JComboBox<String> currentPopupBox ){
+        
+        if( currentPopupBox != null ){
+            
+            currentPopupBox.addKeyListener(new KeyListener(){
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+                
+            });
+        }
     }
     
     private void addKeyBindingsToCommandTextField( JTextPane currentCommand ){

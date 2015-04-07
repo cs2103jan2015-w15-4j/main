@@ -3,10 +3,10 @@ package planner;
 import java.awt.Color;
 import java.awt.Dimension;
 
-import javax.swing.JComponent;
-import javax.swing.JTextPane;
-import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
