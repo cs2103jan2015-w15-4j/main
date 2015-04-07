@@ -22,7 +22,7 @@ public class Constants {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
         INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
         INVALID_PRIORITY_LEVEL, TASK_NOT_FOUND, CONVERT_TASK_TYPE_IN_UPDATE,
-        UPDATE_NO_CHANGES, NOTHING_TO_UNDO, NO_INPUT
+        UPDATE_NO_CHANGES, NOTHING_TO_UNDO, NO_INPUT, INVALID_PATH
     };
     
     public enum TipType{
@@ -214,5 +214,6 @@ public class Constants {
                 + " update command!");
         errorMessages.put(ErrorType.NOTHING_TO_UNDO, "No actions to undo!");
         errorMessages.put(ErrorType.NO_INPUT, "Please enter a command.");
+        errorMessages.put(ErrorType.INVALID_PATH, "Path provided is invalid");
     }
 }
