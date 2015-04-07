@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -1112,6 +1113,8 @@ public class UserInterface extends JFrame {
     private char characterToTransfer;
     private boolean isBackspacePressed;
     
+    private JComboBox<String> popupBox;
+    
     private DisplayStateStack displayStateStack;
     private final int maxNumOfDisplayStates = 100;
     
@@ -1394,16 +1397,207 @@ public class UserInterface extends JFrame {
         }
     }
     
+    private boolean handleNavigationKeys(KeyEvent event){
+        
+        if( event != null ){
+            
+            if( event.getKeyCode() == KeyEvent.VK_F10 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.NOTDONE ){
+                        
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUndoneTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.NOTDONE, "Ongoing Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Ongoing Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F9 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
+                        
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getDoneTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.DONE, "Completed Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Completed Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
+                        
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getOverdueTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.OVERDUE, "Overdue Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Overdue Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F7 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
+                        
+                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getFloatingTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = null;
+                    currentDisplayListForPriority = tempTaskList;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TENTATIVE, "Floating Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Floating Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.UPCOMING ){
+                        
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUpcomingTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.UPCOMING, "Upcoming Tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Upcoming Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F5 ){
+                
+                DisplayState currentDisplayState = displayStateStack.peek();
+                
+                System.out.println( "entered f5" + (displayStateStack.isEmpty() ? "empty" : "not empty") );
+                
+                if( currentDisplayState != null &&
+                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
+                    
+                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getAllTasks();
+                    currentList = convertToDisplayTaskList(tempTaskList);
+                    currentDisplayListForDate = tempTaskList;
+                    currentDisplayListForPriority = null;
+                    
+                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event ));
+                    
+                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", null );
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F4 ){
+                
+                if( !event.isAltDown() ){
+                    
+                    DisplayState currentDisplayState = displayStateStack.peek();
+                    
+                    if( currentDisplayState != null &&
+                        currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
+                        
+                        Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTodayTasks();
+                        currentList = convertToDisplayTaskList(tempTaskList);
+                        currentDisplayListForDate = null;
+                        currentDisplayListForPriority = tempTaskList;
+                        
+                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TODAY, "Tasks due today", null, event ));
+                        
+                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Tasks due today", null );
+                        
+                        event.consume();
+                        
+                        return true;
+                    }
+                    
+                } else{
+                    
+                    handleExit();
+                    
+                    event.consume();
+                    
+                    return true;
+                }
+                
+            } else if(event.getKeyCode() == KeyEvent.VK_F3){
+                
+                showTutorialScreen( -1, null );
+                
+                event.consume();
+                        
+                return true;
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
+                
+                handlePreviousViewOperation(displayStateStack);
+                
+                event.consume();
+                
+                return true;
+                
+            }
+        }
+        
+        return false;
+    }
+    
     private void handleKeyEvent(KeyEvent event){
         
         if( event != null ){
             
-            if( commandPanel != null ){
+            if(  commandPanel != null ){
                 
                 if( commandPanel.handleKeyEvent(event) ){
                    
                     return;
                 }
+            }
+            
+            if( handleNavigationKeys(event) ){
+                
+                return;
             }
             
             if( event.getKeyCode() == KeyEvent.VK_PAGE_UP ){
@@ -1434,183 +1628,7 @@ public class UserInterface extends JFrame {
                     event.consume();
                 }
                 
-            } else if( event.getKeyCode() == KeyEvent.VK_F10 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.NOTDONE ){
-                        
-                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUndoneTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = tempTaskList;
-                    currentDisplayListForPriority = null;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.NOTDONE, "Ongoing Tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Ongoing Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F9 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.DONE ){
-                        
-                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getDoneTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = tempTaskList;
-                    currentDisplayListForPriority = null;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.DONE, "Completed Tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Completed Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F8 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.OVERDUE ){
-                        
-                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getOverdueTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = tempTaskList;
-                    currentDisplayListForPriority = null;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.OVERDUE, "Overdue Tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Overdue Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F7 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TENTATIVE ){
-                        
-                    Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getFloatingTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = null;
-                    currentDisplayListForPriority = tempTaskList;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TENTATIVE, "Floating Tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Floating Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F6 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.UPCOMING ){
-                        
-                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getUpcomingTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = tempTaskList;
-                    currentDisplayListForPriority = null;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.UPCOMING, "Upcoming Tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Upcoming Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F5 ){
-                
-                DisplayState currentDisplayState = displayStateStack.peek();
-                
-                System.out.println( "entered f5" + (displayStateStack.isEmpty() ? "empty" : "not empty") );
-                
-                if( currentDisplayState != null &&
-                    currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
-                    
-                    Set<Map.Entry<Date, DisplayTaskList>>tempTaskList = Engine.getAllTasks();
-                    currentList = convertToDisplayTaskList(tempTaskList);
-                    currentDisplayListForDate = tempTaskList;
-                    currentDisplayListForPriority = null;
-                    
-                    displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, event ));
-                    
-                    updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "All Tasks", null );
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F4 ){
-                
-                if( !event.isAltDown() ){
-                    
-                    DisplayState currentDisplayState = displayStateStack.peek();
-                    
-                    if( currentDisplayState != null &&
-                        currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.TODAY ){
-                        
-                        Set<Map.Entry<Integer, DisplayTaskList>>tempTaskList = Engine.getTodayTasks();
-                        currentList = convertToDisplayTaskList(tempTaskList);
-                        currentDisplayListForDate = null;
-                        currentDisplayListForPriority = tempTaskList;
-                        
-                        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.TODAY, "Tasks due today", null, event ));
-                        
-                        updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, "Tasks due today", null );
-                        
-                        event.consume();
-                        
-                        return;
-                    }
-                    
-                } else{
-                    
-                    handleExit();
-                    
-                    event.consume();
-                    
-                    return;
-                }
-                
-            } else if(event.getKeyCode() == KeyEvent.VK_F3){
-                
-                showTutorialScreen( -1, null );
-                
-                event.consume();
-                        
-                return;
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
-                
-                handlePreviousViewOperation(displayStateStack);
-                
-                event.consume();
-                
-                return;
-                
-            } else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
+            }  else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
          
                 if( slidePanel.isVisible()){
                     
@@ -1673,6 +1691,8 @@ public class UserInterface extends JFrame {
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_DOWN ){
+                
+                
                 
                 if( !displayPane.isFocusOwner() ){
                     
@@ -1763,6 +1783,8 @@ public class UserInterface extends JFrame {
                     
                 } else if( event.getKeyCode() == KeyEvent.VK_ENTER ){
                        
+                    
+                    
                     String input = commandInputField.getText();
                     
                     if( input.length() > 0 ){
@@ -2279,8 +2301,49 @@ public class UserInterface extends JFrame {
         addKeyBindingsToCommandTextField(commandInputField);
         addFocusListenerToCommandTextField( commandPanel, commandInputField );
         
+        popupBox = commandPanel.getPopupBox();
+        
+        addKeyBindingsToPopupBox(popupBox);
+        
         characterToTransfer = '\0';
         isBackspacePressed = false;
+    }
+    
+    private void addKeyBindingsToPopupBox( final JComboBox<String> currentPopupBox ){
+        
+        if( currentPopupBox != null ){
+            
+            currentPopupBox.addKeyListener(new KeyListener(){
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    
+                    if( handleNavigationKeys(e) ){
+                        
+                        return;
+                    }
+                }
+                
+            });
+        }
     }
     
     private void addKeyBindingsToCommandTextField( JTextPane currentCommand ){
