@@ -618,7 +618,7 @@ public class TaskBar extends JComponent {
 	                
 	                if( task.getDueDate() != null && task.getEndDate() != null ){
                         
-                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                        timeDisplayLabel.setText( "From " + dateFormatterWithDay.format(task.getDueDate()) );
                         
                         Point currentLocation = timeDisplayLabel.getLocation();
                         
@@ -639,13 +639,20 @@ public class TaskBar extends JComponent {
                         timeDisplayLabelEx = new JLabel();
                         setTimeDisplayLabelAttributes(timeDisplayLabelEx);
                         timeDisplayLabelEx.setHorizontalAlignment(SwingConstants.LEFT);
-                        timeDisplayLabelEx.setText("To   " + dateFormatter.format(task.getEndDate()) );
-                        timeDisplayLabelEx.setBounds(currentLocation.x, currentLocation.y, timeDisplayLabel.getWidth(), timeDisplayLabel.getHeight());
+                        timeDisplayLabelEx.setText("To " + dateFormatterWithDay.format(task.getEndDate()) );
+                        timeDisplayLabelEx.setBounds(currentLocation.x, currentLocation.y + 8, timeDisplayLabel.getWidth(), timeDisplayLabel.getHeight());
                         add(timeDisplayLabelEx);
+                        
+                        if( timeDisplayLabelEx.getParent() != null ){
+                            
+                            timeDisplayLabelEx.getParent().setComponentZOrder(timeDisplayLabelEx, 0);
+                        }
+                        
+                        timeDisplayLabelEx.setForeground(new Color(255,255,255));
                         
                     } else if( task.getEndDate() != null ){
                         
-                        timeDisplayLabel.setText( "By " + dateFormatter.format(task.getEndDate()) );
+                        timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getEndDate()) );
                         
                         if( timeDisplayLabelEx != null ){
                             
@@ -663,7 +670,14 @@ public class TaskBar extends JComponent {
                         
                     } else if( task.getDueDate() != null ){
                         
-                        timeDisplayLabel.setText( "From " + dateFormatter.format(task.getDueDate()) );
+                        if( task.getParent() != null && task.getParent().getEndDate() != null ){
+                            
+                            timeDisplayLabel.setText( "From " + dateFormatterWithDay.format(task.getDueDate()) );
+                            
+                        } else{
+                            
+                            timeDisplayLabel.setText( "By " + dateFormatterWithDay.format(task.getDueDate()) );
+                        }
                         
                         if( timeDisplayLabelEx != null ){
                             
