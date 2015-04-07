@@ -1,8 +1,9 @@
+//@author A0110797B
+
 package planner;
 
 import java.util.Date;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 /**
  * @author Ke Jing

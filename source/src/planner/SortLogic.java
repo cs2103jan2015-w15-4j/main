@@ -1,3 +1,5 @@
+//@author A0110797B
+
 package planner;
 
 import java.text.SimpleDateFormat;
@@ -7,10 +9,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Set;
 
 /**
- * @author Ke Jing
  * SORTLOGIC IS USED TO SORT DISPLAYTASKLIST OR TREEMAPS
  */
 public class SortLogic {

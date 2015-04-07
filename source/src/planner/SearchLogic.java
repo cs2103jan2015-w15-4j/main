@@ -1,10 +1,11 @@
+//@author A0110767B
+
 package planner;
 
 import java.util.Calendar;
 import java.util.Date;
 
 /**
- * @author Ke Jing
  * SEARCH LOGIC TAKES IN TASKLIST AND OUTPUTS ANOTHER TASKLIST TO 
  * BE CONVERTED BY SPLITLOGIC INTO DISPLAYTASKLIST
  */

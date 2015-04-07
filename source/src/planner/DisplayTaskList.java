@@ -1,3 +1,5 @@
+//@author A0110797B
+
 package planner;
 
 import java.util.ArrayList;
@@ -6,11 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-/**
- * 
- * @author Ke Jing
- * Same as TaskList class
- */
 public class DisplayTaskList implements List<DisplayTask>{
     
     private ArrayList<DisplayTask> displayTasks;

@@ -1,16 +1,14 @@
+//@author A0110797B
+
 package planner;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * 
- * @author Ke Jing
- * 
  * THIS LOGIC CLASS HAS YET TO BE TESTED AS OF NOW
  * WILL DEFINITELY BE REFACTORED SINCE MOST OF THE METHODS ARE VERY SIMILAR IN STRUCTURE 
  */
@@ -18,6 +16,13 @@ import java.util.TreeMap;
 public class Logic {
     private static Logger logger = Logger.getLogger("Logic");
     
+    /**
+     * 
+     * @param input 
+     * @param start
+     * @param end
+     * @return
+     */
     public static TaskList searchPeriod(TaskList input, Date start, Date end) {
         return SearchLogic.searchPeriod(input, start, end);
     }
@@ -75,21 +80,22 @@ public class Logic {
         return SearchLogic.searchConfirmed(input);
     }
     
-    /**This method searches for time clashes if found within the TaskList provided
-     * Output: returns -1 if no clashes are found 
-     *         OR
-     *         returns int task ID for tasks that are found to clash
-     *         
-     * WORD OF CAUTION: Assuming a task is 3 months long, this method would report clash
-     *                  for every clash search within this time period
+    /**
+     * 
+     * @param taskInput
+     * @param start
+     * @param end
+     * @return
      */
     public static int findClash(TaskList taskInput, Date start, Date end) {
         return SearchLogic.searchForClash(taskInput, start, end);
     }
     
     /**
-     * This method splits TaskList into displayTaskList regardless it is floating or null
-     * Purpose: For testing
+     * Purpose is for testing
+     * 
+     * @param input
+     * @return
      */
     public static DisplayTaskList splitAllTask (TaskList input) {
         return SplitLogic.splitAllTaskList(input);
