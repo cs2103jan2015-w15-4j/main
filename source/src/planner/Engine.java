@@ -619,6 +619,23 @@ public class Engine {
     }
     
     /**
+     * Handles savehere commands.
+     * 
+     * @param result
+     * @return
+     */
+    private static Constants.CommandType setStoragePath(ParseResult result) {
+        String newPath = result.getName();
+        if(config.setStoragePath(newPath)) {
+            return Constants.CommandType.SAVEHERE;
+        } else {
+            commandErrorType = Constants.ErrorType.INVALID_PATH;
+            return Constants.CommandType.INVALID;
+        }
+        
+    }
+    
+    /**
      * Handles invalid/unrecognised commands.
      * 
      * @param result
@@ -700,6 +717,9 @@ public class Engine {
             case SAVEWHERE:
                 return fetchStoragePath();
                 
+            case SAVEHERE:
+                return setStoragePath(result);
+    
             case HELP:
                 return Constants.CommandType.HELP;
                 
