@@ -26,6 +26,8 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
     private Color COMMAND_KEYWORD_COLOUR;
     private Color NONCOMMAND_KEYWORD_COLOUR;
     
+    private final int CHARACTER_LIMIT = 2000;
+    
     public CommandPanelDocumentFilter( String []commandkeywords, String []nonCommandKeywords, Style originalStyle ){
         
         super();
@@ -74,16 +76,30 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         
         try{
             
-            if( str != null && str.contains("\n") ){
+            StyledDocument doc = null;
+            
+            if( str != null && filterBypass != null ){
                 
-                str.replaceAll("\\n", "");
+                if( str.contains("\n") ){
+                    
+                    str.replaceAll("\\n", "");
+                }
+                
+                doc = (StyledDocument)filterBypass.getDocument();
+                
+                if( doc.getLength() + str.length() >= CHARACTER_LIMIT ){
+                    
+                    System.out.println( "heret" );
+                    
+                    return; 
+                }
             }
 
             super.insertString(filterBypass, offset, str, m_originalStyle);
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( doc != null && m_commandKeywords != null ){
                 
-                syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
+                syntaxHighlightingListener( doc );
             }
             
         } catch( BadLocationException badLocationException ){}
@@ -94,14 +110,26 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         
         try{
             
-            if( str != null && str.contains("\n") ){
+            StyledDocument doc = null;
+            
+            if( str != null && filterBypass != null ){
                 
-                str.replaceAll("\\n", "");
+                if( str.contains("\n") ){
+                    
+                    str.replaceAll("\\n", "");
+                }
+                
+                doc = (StyledDocument)filterBypass.getDocument();
+                
+                if( doc.getLength() + str.length() >= CHARACTER_LIMIT ){
+                    
+                    return; 
+                }
             }
             
             super.replace(filterBypass, offset, strLength, str, m_originalStyle);
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( doc != null && m_commandKeywords != null ){
                 
                 syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
             }
