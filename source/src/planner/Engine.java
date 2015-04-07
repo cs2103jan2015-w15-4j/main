@@ -855,7 +855,7 @@ public class Engine {
      */
     //Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getTodayTasks() {
-        return Logic.displayAllTaskByPriority(todayTasks);
+        return Logic.displaySearchedTaskByPriority(todayTasks);
     }
     
     /**
