@@ -1,3 +1,5 @@
+//@author A0114156N
+
 package planner;
 
 import java.io.File;
@@ -8,7 +10,6 @@ import java.io.IOException;
  * It is meant to keep track of where the program data is stored and
  * the number of tasks that have been created in the program. 
  * 
- * @author kohwaikit
  *
  */
 
