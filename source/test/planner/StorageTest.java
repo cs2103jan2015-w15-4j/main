@@ -1,3 +1,5 @@
+//@author A0114156N
+
 package planner;
 
 import static org.junit.Assert.*;
@@ -10,11 +12,7 @@ import java.util.Date;
 import java.util.ArrayList;
 
 import org.junit.Test;
-/**
- * 
- * @author kohwaikit
- *
- */
+
 public class StorageTest {
 
     @Test

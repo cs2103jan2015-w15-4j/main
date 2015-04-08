@@ -6,8 +6,6 @@ import java.util.Date;
 
 /**
  * 
- * @author kohwaikit
- *
  */
 public class Task {
 	

@@ -21,8 +21,6 @@ import org.json.simple.parser.ParseException;
  * of the program is in JSON using the json.simple library. This class handles
  * the saving and loading of TaskList objects and Configuration objects.
  * 
- * @author kohwaikit
- *
  */
 public class Storage {
     
