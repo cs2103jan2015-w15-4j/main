@@ -1,3 +1,4 @@
+//@author A0110797B
 package planner;
 
 import static org.junit.Assert.*;
@@ -6,9 +7,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Test;
