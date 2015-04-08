@@ -213,7 +213,8 @@ public class UserInterface extends JFrame {
         
         displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
         
-        commandPanel.setText( "Enter commands here", true );
+        messageType = 2;
+        isMessageDisplayed = false;
     }
     
     private void handleSaveHere(){
@@ -233,6 +234,7 @@ public class UserInterface extends JFrame {
         
         displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
         
+        messageType = 0;
         commandPanel.setText( "YOPO's file storage location changed successfully", true );
     }
     
@@ -250,6 +252,7 @@ public class UserInterface extends JFrame {
         
         updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
+        messageType = 0;
         commandPanel.setText( "Previous keyboard command undone successfully", true );
     }
     
@@ -292,6 +295,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Fail to mark task as not done", true );
                     
                     return;
@@ -299,12 +303,14 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
+                messageType = 1;
                 commandPanel.setText( "Fail to mark task as not done", true );
                 
                 return;
             }
         }
 
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " marked not done successfully", true );
     }
     
@@ -329,6 +335,7 @@ public class UserInterface extends JFrame {
            
             if( displayPane.hasTasksDisplayed() ){
                 
+                messageType = 0;
                 commandPanel.setText( "Search success", true );
                 
                 return;
@@ -337,6 +344,8 @@ public class UserInterface extends JFrame {
         
         displayPane.clearDisplay();
         
+        messageType = 1;
+        isMessageDisplayed = true;
         commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
     }
     
@@ -596,6 +605,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to add task", true );
                     
                     return;
@@ -603,12 +613,14 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
+                messageType = 1;
                 commandPanel.setText( "Failed to add task", true );
                 
                 return;
             }
         }
 
+        messageType = 0;
         commandPanel.setText( "Task #"+ modifiedTaskID + " added successfully", true );
     }
     
@@ -637,11 +649,19 @@ public class UserInterface extends JFrame {
                     
                     updateCurrentList(previousDisplayState);
                     
+                    String text = commandInputField.getText();
+                    
                     switch( Engine.process(userCommand) ){
                     
                         case SEARCH:
                             
                             handleSearch(userCommand);
+                            
+                            if( text.length() > 0 ){
+                                
+                                commandPanel.setSyntaxFilterOn();
+                                commandPanel.setText(text, false);
+                            }
                             
                             break;
                             
@@ -766,6 +786,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to add task", true );
                     
                     return;
@@ -773,6 +794,7 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
+                messageType = 1;
                 commandPanel.setText( "Failed to add task", true );
                 
                 return;
@@ -781,6 +803,7 @@ public class UserInterface extends JFrame {
 
         int conflictTaskID = Engine.getClashingTask();
         
+        messageType = 1;
         commandPanel.setText( "Task #" + modifiedTaskID + " conflicts with task #" + conflictTaskID, true );
     }
     
@@ -823,6 +846,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to convert task into a deadline task", true );
                     
                     return;
@@ -830,6 +854,7 @@ public class UserInterface extends JFrame {
             }
         }
         
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
     }
     
@@ -872,6 +897,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to convert task into a deadline task", true );
                     
                     return;
@@ -879,6 +905,7 @@ public class UserInterface extends JFrame {
             }
         }
         
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
     }
     
@@ -921,6 +948,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to convert task into a floating task", true );
                     
                     return;
@@ -928,6 +956,7 @@ public class UserInterface extends JFrame {
             }
         }
         
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a floating task successfully", true );
     }
     
@@ -970,6 +999,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Failed to update task", true );
                     
                     return;
@@ -977,12 +1007,14 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
+                messageType = 1;
                 commandPanel.setText( "Failed to update task", true );
                 
                 return;
             }
         }
 
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " updated successfully", true );
     }
     
@@ -1025,6 +1057,7 @@ public class UserInterface extends JFrame {
                     
                 } else{
                     
+                    messageType = 1;
                     commandPanel.setText( "Fail to mark task as done", true );
                     
                     return;
@@ -1032,12 +1065,14 @@ public class UserInterface extends JFrame {
                 
             } else{
                 
+                messageType = 1;
                 commandPanel.setText( "Fail to mark task as done", true );
                 
                 return;
             }
         }
 
+        messageType = 0;
         commandPanel.setText( "Task #" + modifiedTaskID + " marked done successfully", true );
     }
     
@@ -1055,16 +1090,19 @@ public class UserInterface extends JFrame {
         
         updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
+        messageType = 0;
         commandPanel.setText( "Task deleted successfully", true );
     }
     
     private void handleInvalidOperation(){
         
+        messageType = 1;
         commandPanel.setText( "Invalid Command", true );
     }
     
     public void handleUnexpectedOperation(){
         
+        messageType = 1;
         commandPanel.setText( "Feature not supported in V0.4", true );
     }
     ///////////////////////////////////////////////////////////////////// 
@@ -1112,6 +1150,8 @@ public class UserInterface extends JFrame {
     
     private char characterToTransfer;
     private boolean isBackspacePressed;
+
+    private int messageType;  // 0 - success message, 1 - error message, anything else - normal message
     
     private JComboBox<String> popupBox;
     
@@ -1281,6 +1321,10 @@ public class UserInterface extends JFrame {
                 
                 break;
         }
+        
+        messageType = 2;
+        isMessageDisplayed = false;
+        commandPanel.setText( "", true );
     }
     
     private void prepareTaskDisplayPanel( DisplayPane displayPanel ){
@@ -1576,7 +1620,6 @@ public class UserInterface extends JFrame {
                 event.consume();
                 
                 return true;
-                
             }
         }
         
@@ -2296,6 +2339,7 @@ public class UserInterface extends JFrame {
         commandInputField = commandPanel.getTextDisplay();
         commandPanel.setFontAttributes(new Font( "Arial", Font.BOLD, 20 ));
         commandPanel.setForegroundColor(new Color( 128,128,128 ));
+        messageType = 2;
         commandPanel.setText("Enter commands here", true);
         
         addKeyBindingsToCommandTextField(commandInputField);
@@ -2424,6 +2468,8 @@ public class UserInterface extends JFrame {
                            
                         updateNavigationBarTaskInfoContents( commandInputField, currentNavigationBars, displayPane.getCurrentSelectedTask() );
                     }
+                    
+                    messageType = 2;
                 }
 
                 @Override
@@ -2433,7 +2479,28 @@ public class UserInterface extends JFrame {
                     
                     commandTextbox.hidePopupBox();
                     
-                    commandTextbox.setForegroundColor( new Color( 128,128,128 ) );
+                    commandTextbox.setForegroundColor( new Color( 255,0,0 ) );
+                    
+                    System.out.println( "MessageType = " + messageType );
+                    
+                    if( messageType == 0 ){
+                        
+                        System.out.println( "Here good" );
+                        
+                        commandTextbox.setForegroundColor( new Color( 0,100,0 ) );
+                        
+                    } else if( messageType == 1 ){
+                        
+                        System.out.println( "Here nice" );
+                        
+                        commandTextbox.setForegroundColor( new Color( 255,0,0 ) );
+                        
+                    } else{
+                        
+                        System.out.println( "Here residue" );
+                        
+                        commandTextbox.setForegroundColor( new Color( 128,128,128 ) );
+                    }
                     
                     String input = currentCommand.getText();
                     
@@ -2459,6 +2526,8 @@ public class UserInterface extends JFrame {
                            
                            currentNavigationBars.get(0).setMessageToView(messageTitle, "F1/Enter" );
                        }
+                    
+                    messageType = 2;
                 }
             });
         }
