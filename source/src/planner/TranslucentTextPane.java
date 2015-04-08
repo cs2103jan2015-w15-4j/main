@@ -96,6 +96,28 @@ public class TranslucentTextPane extends JTextPane{
         } catch (BadLocationException e) {}
     }
     
+    private String generateRegexWithoutWordBoundary( String []keywords ){
+        
+        StringBuilder regex = new StringBuilder("");
+        
+        if( keywords != null ){
+            
+            for( int i = 0, size = keywords.length; i < size; ++i ){
+                
+                if( keywords[i] != null ){
+                    regex.append(keywords[i]).append("|");
+                }
+            }
+            
+            if( regex.length() > 1 ){
+                
+                regex.deleteCharAt(regex.length()-1);
+            }
+        }
+        
+        return regex.toString();
+    }
+    
     public void highlightWords( String []list, SimpleAttributeSet style ){
         
          try {
@@ -106,7 +128,7 @@ public class TranslucentTextPane extends JTextPane{
                 
                 if( doc != null && doc.getLength() > 0 ){
                 
-                    String regex = CommandPanelDocumentFilter.generateRegex(list);
+                    String regex = generateRegexWithoutWordBoundary(list);
                     
                     Pattern pattern = Pattern.compile(regex);
                     
