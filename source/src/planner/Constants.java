@@ -171,8 +171,8 @@ public class Constants {
                                                               " Tasks in total",
                                                               " Upcoming Task",                 // F6
                                                               " Upcoming Tasks",
-                                                              " Tentative Task",                // F7
-                                                              " Tentative Tasks",
+                                                              " Floating Task",                // F7
+                                                              " Floating Tasks",
                                                               " Overdue Task",                  // F8
                                                               " Overdue Tasks",
                                                               " Task Done",                     // F9
