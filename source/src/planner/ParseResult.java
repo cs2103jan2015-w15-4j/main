@@ -1,3 +1,4 @@
+//@author A0108232U
 package planner;
 
 import java.util.Arrays;
@@ -11,7 +12,6 @@ import planner.Constants.ErrorType;
  * This class is used to deliver the results of  
  * parsing a user command to the engine.
  * 
- * @author Tham Zheng Yi
  */
 public class ParseResult {
 
