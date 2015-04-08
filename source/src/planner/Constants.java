@@ -5,8 +5,6 @@ import java.util.EnumMap;
 
 /**
  * This class contains all the constants to be used across the planner.
- * 
- * @author kohwaikit
  *
  */
 public class Constants {

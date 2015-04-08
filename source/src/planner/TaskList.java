@@ -1,3 +1,5 @@
+//@author A0114156N
+
 package planner;
 
 import java.util.ArrayList;
@@ -9,7 +11,6 @@ import java.util.ListIterator;
 
 /**
  * TaskList class is a container class for Tasks. It extends ArrayList.
- * @author kohwaikit
  *
  */
 public class TaskList implements List<Task>{

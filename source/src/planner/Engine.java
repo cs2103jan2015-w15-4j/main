@@ -1,3 +1,5 @@
+//@author A0114156N
+
 package planner;
 
 import java.io.IOException;
@@ -13,8 +15,6 @@ import java.util.Stack;
  * changes to the data. Provides accessors for GUI to access the different
  * types of tasks.
  * 
- * @author kohwaikit
- *
  */
 public class Engine {
     
