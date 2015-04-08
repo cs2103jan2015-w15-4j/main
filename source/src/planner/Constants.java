@@ -150,7 +150,7 @@ public class Constants {
         },
         {"Changing save data location",
          "format: savehere <full file path>\n\nThis command causes all program files to be saved in the location specified by <full file path>\n\nExample usage: save here C:\\\n\n[This will cause all program files to be saved in C:\\]",
-         "Example usage: save here C"
+         "Example usage: save here C:\\\\"
         },
         {"Finding out save data location",
          "This command will cause the current save location for program files to be displayed in the display box.\n\nExample usage: savewhere\n\n[This causes the current save location for program files to be displayed in the display box]",
