@@ -8,12 +8,13 @@ import java.util.EnumMap;
  *
  */
 public class Constants {
-    
+    //@author A0108232U
     public enum CommandType {
-        ADD, ADD_CLASH, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, SETNOTDONE, UNDO, SEARCH,
-        HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_SHOW, HELP_DONE,
-        HELP_UNDO, HELP_SEARCH, JUMP, CONVERT, CONVERT_FLOATING, 
-        CONVERT_DEADLINE, CONVERT_TIMED, SAVEWHERE, SAVEHERE, INVALID, EXIT
+        ADD, ADD_CLASH, UPDATE, DELETE, SHOW, SHOW_ALL, SHOW_ONE, DONE, 
+        SETNOTDONE, UNDO, SEARCH, HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, 
+        HELP_SHOW, HELP_DONE, HELP_UNDO, HELP_SEARCH, JUMP, CONVERT, 
+        CONVERT_FLOATING, CONVERT_DEADLINE, CONVERT_TIMED, SAVEWHERE, SAVEHERE, 
+        INVALID, EXIT
     };
     
     public enum ErrorType {
@@ -22,7 +23,7 @@ public class Constants {
         INVALID_PRIORITY_LEVEL, TASK_NOT_FOUND, CONVERT_TASK_TYPE_IN_UPDATE,
         UPDATE_NO_CHANGES, NOTHING_TO_UNDO, NO_INPUT, INVALID_PATH
     };
-    
+    //@author A0114156N
     public enum TipType{
         UP_TIP, DOWN_TIP, UPDOWN_TIP
     }
@@ -32,7 +33,7 @@ public class Constants {
         HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_DONE, HELP_UNDO, HELP_SEARCH, HELP_PRIORITY_SEARCH,
         SETTINGS
     }
-    
+    //@author A0108232U
     public static final String[] COMMAND_KEYWORDS = {"add", "new", "update", 
         "edit", "change", "del", "delete", "trash", "remove", "show", "display", 
         "done", "completed", "finished", "setnotdone", "undo", "revert", 
@@ -159,7 +160,7 @@ public class Constants {
          "Example usage: exit"
         }
     };
-    
+    //@author A0114156N
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
                                                               "Tutorial",                       // F3
@@ -193,7 +194,7 @@ public class Constants {
     public static final int NO_ID_SET = 0;
     public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 17;
     public static final int NAVIGATION_BARS_MAX_NUM = 10;
-    
+    //@author A0108232U
     EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
     
     public void initializeErrorMessages() {
