@@ -653,7 +653,7 @@ public class Engine {
      * 
      * @return
      */
-    private static Constants.ErrorType getErrorType() {
+    public static Constants.ErrorType getErrorType() {
         
         return commandErrorType;
         
