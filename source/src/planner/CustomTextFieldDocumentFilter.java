@@ -39,7 +39,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
     
     private final int CHARACTER_LIMIT = 2000;
     
-    private final static Logger commandPanelDocumentFilterLogger = Logger.getLogger(CustomTextFieldDocumentFilter.class.getName());
+    private final static Logger customTextFieldDocumentFilterLogger_ = Logger.getLogger(CustomTextFieldDocumentFilter.class.getName());
     
     private final char NONCOMMAND_KEYWORD_NULLIFIER = '/';
     
@@ -66,7 +66,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
     public CustomTextFieldDocumentFilter( String []commandKeywords, String []nonCommandKeywords, Style originalFontStyle ){
         super();
 
-        commandPanelDocumentFilterLogger.setLevel(java.util.logging.Level.SEVERE);
+        customTextFieldDocumentFilterLogger_.setLevel(java.util.logging.Level.SEVERE);
         
         if( commandKeywords != null && nonCommandKeywords != null && originalFontStyle != null ){
             commandKeywords_ = commandKeywords;
@@ -145,7 +145,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
                 syntaxHighlightingListener( doc );
             }
         } catch( BadLocationException badLocationException ){
-            commandPanelDocumentFilterLogger.severe(badLocationException.getMessage());
+            customTextFieldDocumentFilterLogger_.severe(badLocationException.getMessage());
         }
     }
     
@@ -181,7 +181,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
                 syntaxHighlightingListener( doc );
             }
         } catch( BadLocationException badLocationException ){
-            commandPanelDocumentFilterLogger.severe(badLocationException.getMessage());
+            customTextFieldDocumentFilterLogger_.severe(badLocationException.getMessage());
         }
     }
     
@@ -208,7 +208,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
                 syntaxHighlightingListener( doc );
             }
         } catch (BadLocationException badLocationException) {
-            commandPanelDocumentFilterLogger.severe(badLocationException.getMessage());
+            customTextFieldDocumentFilterLogger_.severe(badLocationException.getMessage());
         }
     }
     
@@ -290,13 +290,13 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
                                 }
                             }
                         } catch( BadLocationException badLocationException ){
-                            commandPanelDocumentFilterLogger.severe(badLocationException.getMessage());
+                            customTextFieldDocumentFilterLogger_.severe(badLocationException.getMessage());
                         } catch( IllegalStateException illegalStateException ){
-                            commandPanelDocumentFilterLogger.severe(illegalStateException.getMessage());
+                            customTextFieldDocumentFilterLogger_.severe(illegalStateException.getMessage());
                         } catch(PatternSyntaxException patternSyntaxException){
-                            commandPanelDocumentFilterLogger.severe(patternSyntaxException.getMessage());
+                            customTextFieldDocumentFilterLogger_.severe(patternSyntaxException.getMessage());
                         } catch(IndexOutOfBoundsException indexOutOfBoundsException){
-                            commandPanelDocumentFilterLogger.severe(indexOutOfBoundsException.getMessage());
+                            customTextFieldDocumentFilterLogger_.severe(indexOutOfBoundsException.getMessage());
                         }
                     }
                 }
@@ -328,7 +328,7 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
             regex.append(REGEX_GROUP_END);
             return regex.toString();
         } catch( StringIndexOutOfBoundsException stringIndexOutOfBoundsException){
-            commandPanelDocumentFilterLogger.severe(stringIndexOutOfBoundsException.getMessage());
+            customTextFieldDocumentFilterLogger_.severe(stringIndexOutOfBoundsException.getMessage());
         }
         return null;
     }
