@@ -16,17 +16,17 @@ import javax.swing.text.StyledDocument;
 
 public class CommandPanelDocumentFilter extends DocumentFilter{
 
-    private String []m_commandKeywords;
-    private String []m_nonCommandKeywords;
-    private String commandKeywordRegexPattern;
-    private String nonCommandKeywordRegexPattern;
+    private String []commandKeywords_;
+    private String []nonCommandKeywords_;
+    private String commandKeywordRegexPattern_;
+    private String nonCommandKeywordRegexPattern_;
     
-    private boolean isFilterTurnedOff;
+    private boolean isFilterTurnedOff_;
     
-    private Style m_originalStyle;
+    private Style originalStyle_;
     
-    private Color COMMAND_KEYWORD_COLOUR;
-    private Color NONCOMMAND_KEYWORD_COLOUR;
+    private final Color COLOUR_COMMAND_KEYWORD = new Color( 0, 0, 192 );
+    private final Color COLOUR_NONCOMMAND_KEYWORD = new Color( 127, 0, 85 );
     
     private final int CHARACTER_LIMIT = 2000;
     
@@ -36,35 +36,32 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
 
         if( commandkeywords != null && nonCommandKeywords != null && originalStyle != null ){
             
-            m_commandKeywords = commandkeywords;
-            m_nonCommandKeywords = nonCommandKeywords;
-            m_originalStyle = originalStyle;
+            commandKeywords_ = commandkeywords;
+            nonCommandKeywords_ = nonCommandKeywords;
+            originalStyle_ = originalStyle;
             
-            commandKeywordRegexPattern = generateRegex(m_commandKeywords);
-            nonCommandKeywordRegexPattern = generateRegex(m_nonCommandKeywords);
+            commandKeywordRegexPattern_ = generateRegex(commandKeywords_);
+            nonCommandKeywordRegexPattern_ = generateRegex(nonCommandKeywords_);
         }
-        
-        COMMAND_KEYWORD_COLOUR = new Color( 0, 0, 192 );
-        NONCOMMAND_KEYWORD_COLOUR = new Color( 127, 0, 85 );
         
         setFilterOn();
     }
     
     public void setFilterOn(){
         
-        isFilterTurnedOff = false;
+        isFilterTurnedOff_ = false;
     }
     
     public void setFilterOff(){
         
-        isFilterTurnedOff = true;
+        isFilterTurnedOff_ = true;
     }
     
     public void setTextStyle( Style currentTextStyle ){
         
         if( currentTextStyle != null ){
             
-            m_originalStyle = currentTextStyle;
+            originalStyle_ = currentTextStyle;
         }
     }
     
@@ -91,15 +88,13 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                 
                 if( doc.getLength() + str.length() >= CHARACTER_LIMIT ){
                     
-                    System.out.println( "heret" );
-                    
                     return; 
                 }
             }
 
-            super.insertString(filterBypass, offset, str, m_originalStyle);
+            super.insertString(filterBypass, offset, str, originalStyle_);
             
-            if( doc != null && m_commandKeywords != null ){
+            if( doc != null && commandKeywords_ != null ){
                 
                 syntaxHighlightingListener( doc );
             }
@@ -129,11 +124,11 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                 }
             }
             
-            super.replace(filterBypass, offset, strLength, str, m_originalStyle);
+            super.replace(filterBypass, offset, strLength, str, originalStyle_);
             
-            if( doc != null && m_commandKeywords != null ){
+            if( doc != null && commandKeywords_ != null ){
                 
-                syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
+                syntaxHighlightingListener( doc );
             }
             
         } catch( BadLocationException badLocationException ){}
@@ -144,11 +139,18 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
         
         try {
             
+            StyledDocument doc = null;
+            
+            if( filterBypass != null ){
+                
+                doc = (StyledDocument)filterBypass.getDocument();
+            }
+            
             super.remove( filterBypass, offset, strLength );
             
-            if( filterBypass != null && m_commandKeywords != null ){
+            if( doc != null && commandKeywords_ != null ){
                 
-                syntaxHighlightingListener( (StyledDocument)filterBypass.getDocument() );
+                syntaxHighlightingListener( doc );
             }
             
         } catch (BadLocationException e) {}
@@ -156,39 +158,39 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
     
     private void changeTextColor( StyledDocument doc, int offset, int stringLength, Color color ){
         
-        if( doc != null && m_originalStyle != null && color != null && offset >= 0 && stringLength > 0 ){
+        if( doc != null && originalStyle_ != null && color != null && offset >= 0 && stringLength > 0 ){
             
-            Color tempColor = StyleConstants.getForeground(m_originalStyle);
-            StyleConstants.setForeground(m_originalStyle, color);
+            Color tempColor = StyleConstants.getForeground(originalStyle_);
+            StyleConstants.setForeground(originalStyle_, color);
             
-            doc.setCharacterAttributes(offset, stringLength, m_originalStyle, true);
-            StyleConstants.setForeground(m_originalStyle, tempColor);
+            doc.setCharacterAttributes(offset, stringLength, originalStyle_, true);
+            StyleConstants.setForeground(originalStyle_, tempColor);
         }
     }
     
     public void resetTextColor( StyledDocument doc ){
         
-        if( doc != null && m_originalStyle != null ){
+        if( doc != null && originalStyle_ != null ){
 
-            changeTextColor( doc, 0, doc.getLength(), StyleConstants.getForeground(m_originalStyle) );
+            changeTextColor( doc, 0, doc.getLength(), StyleConstants.getForeground(originalStyle_) );
         }
     }
     
     private void syntaxHighlightingListener( final StyledDocument doc ){
         
-        if( doc != null && m_commandKeywords != null && m_nonCommandKeywords != null ){
+        if( doc != null && commandKeywords_ != null && nonCommandKeywords_ != null ){
             
             SwingUtilities.invokeLater(new Runnable(){
     
                 @Override
                 public void run() {
                     
-                    if( !isFilterTurnedOff ){
+                    if( !isFilterTurnedOff_ ){
                         
                         resetTextColor( doc );
                             
-                        Pattern commandPattern = Pattern.compile(commandKeywordRegexPattern);
-                        Pattern nonCommandPattern = Pattern.compile(nonCommandKeywordRegexPattern);
+                        Pattern commandPattern = Pattern.compile(commandKeywordRegexPattern_);
+                        Pattern nonCommandPattern = Pattern.compile(nonCommandKeywordRegexPattern_);
                         
                         try{
                             
@@ -211,7 +213,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                                     
                                     if( stringInFrontOfMatchedWord.length() <= 0 ){
       
-                                        changeTextColor( doc, startIdx, endIdx-startIdx, COMMAND_KEYWORD_COLOUR );
+                                        changeTextColor( doc, startIdx, endIdx-startIdx, COLOUR_COMMAND_KEYWORD );
                                         break;
                                     }
                                 }
@@ -223,7 +225,7 @@ public class CommandPanelDocumentFilter extends DocumentFilter{
                                     
                                     if( startIdx - 1 < 0 || text.charAt(startIdx - 1) != '/' ){
                                     
-                                        changeTextColor( doc, startIdx, endIdx-startIdx, NONCOMMAND_KEYWORD_COLOUR );
+                                        changeTextColor( doc, startIdx, endIdx-startIdx, COLOUR_NONCOMMAND_KEYWORD );
                                     }
                                 }
                             }
