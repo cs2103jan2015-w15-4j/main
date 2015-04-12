@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import planner.Constants.SearchType;
+
 /**
  * THIS LOGIC CLASS HAS YET TO BE TESTED AS OF NOW
  * WILL DEFINITELY BE REFACTORED SINCE MOST OF THE METHODS ARE VERY SIMILAR IN STRUCTURE 
@@ -40,44 +42,45 @@ public class Logic {
         return SearchLogic.searchPriorityGreaterThan(input, priority);
     }
     
+    //All to be the same method
     public static TaskList searchName(TaskList input, String name) {
-        return SearchLogic.searchName(input, name);
+        return SearchLogic.searchString(input, name, SearchType.SEARCH_NAME);
     }
     
     public static TaskList searchDescription(TaskList input, String desc) {
-        return SearchLogic.searchDesc(input, desc);
+        return SearchLogic.searchString(input, desc, SearchType.SEARCH_DESC);
     }
     
     public static TaskList searchTag(TaskList input, String tags) {
-        return SearchLogic.searchTags(input, tags);
+        return SearchLogic.searchString(input, tags, SearchType.SEARCH_TAG);
     }
     
     public static TaskList searchOverDuedTasks (TaskList input) {
-        return SearchLogic.searchOverDuedTask(input);
+        return SearchLogic.searchTaskDue(input, SearchType.SEARCH_OVERDUE);
     }
     
     public static TaskList searchUpcomingTasks (TaskList input) {
-        return SearchLogic.searchUpcomingTask(input);
+        return SearchLogic.searchTaskDue(input, SearchType.SEARCH_UPCOMING);
     }
     
     public static TaskList searchTimedTask (TaskList input) {
-        return SearchLogic.searchTimedTask(input);
+        return SearchLogic.searchTaskProperties(input, SearchType.SEARCH_TIMED);
     }
     
     public static TaskList searchDone (TaskList input) {
-        return SearchLogic.searchDone(input);
+        return SearchLogic.searchTaskProperties(input, SearchType.SEARCH_DONE);
     }
     
     public static TaskList searchNotDone (TaskList input) {
-        return SearchLogic.searchNotDone(input);
+        return SearchLogic.searchTaskProperties(input, SearchType.SEARCH_NOTDONE);
     }
     
     public static TaskList searchFloating (TaskList input) {
-        return SearchLogic.searchFloating(input);
+        return SearchLogic.searchTaskProperties(input, SearchType.SEARCH_FLOATING);
     }
     
     public static TaskList searchConfirmed (TaskList input) {
-        return SearchLogic.searchConfirmed(input);
+        return SearchLogic.searchTaskProperties(input, SearchType.SEARCH_CONFIRMED);
     }
     
     /**
