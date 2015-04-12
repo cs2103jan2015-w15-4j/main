@@ -29,6 +29,8 @@ public class DisplayStateStack {
     
     /**
      * Pushes the provided displayState onto the stack. This method will not add any invalid displayStates and null displayStates.
+     * This method will also limit the number of DisplayStates that exist within the stack by removing some of the oldest DisplayStates 
+     * that exist on the stack
      *
      * @param displayState  The displayState to be pushed onto the stack
      * @return              The displayState provided
