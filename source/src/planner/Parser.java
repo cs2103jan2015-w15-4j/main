@@ -464,6 +464,9 @@ public class Parser {
                 break;
     
             case "update":
+                updateId(keywordArgsArray[0], keyword);
+                updateName(keywordArgsArray);
+                
             case "delete":
             case "setnotdone":
             case "done":
@@ -549,6 +552,16 @@ public class Parser {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TASK_ID);
         }
+    }
+    
+    private static void updateName(String[] keywordArgs) {
+        if (keywordArgs.length > 1) {
+            String nameToUpdateTo = "";
+            for (int i = 1; i < keywordArgs.length; i++) {
+                nameToUpdateTo += keywordArgs[i] + " ";
+            }
+            name = nameToUpdateTo.trim();
+        }        
     }
     
     /**
