@@ -24,7 +24,7 @@ public class CustomWrapKit extends StyledEditorKit{
     }
     
     /**
-     * Gets the view factory currently used by this editor kit
+     * Retrieves the view factory currently used by this editor kit
      * 
      * @return The view factory currently used by this editor kit to handle wrap text logic
      */
