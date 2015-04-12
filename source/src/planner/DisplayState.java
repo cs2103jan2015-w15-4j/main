@@ -30,7 +30,7 @@ public class DisplayState {
      * @param currentDisplayStateFlag  An ENUM flag that describes the displayState
      * @param title                    The title shown for this displayState
      * @param userCommand              The user input string used to invoke this displayState
-     * @param event                    The keyevent used to invoke this displayState
+     * @param event                    The key event used to invoke this displayState
      */
     public DisplayState( DisplayStateFlag currentDisplayStateFlag, String title, String userCommand, KeyEvent event ){
         
