@@ -11,7 +11,7 @@ public class DisplayStateStack {
     
     public DisplayStateStack( int maxNumOfDisplayStates ){
         
-        maxNumOfStates = Math.max( 0, maxNumOfDisplayStates );
+        maxNumOfStates = Math.max( 1, maxNumOfDisplayStates );
         
         stack = new LinkedList<DisplayState>();
     }
@@ -25,7 +25,10 @@ public class DisplayStateStack {
                 stack.removeLast();
             }
             
-            stack.push(displayState);
+            if( stack.size() + 1 <= maxNumOfStates ){
+                
+                stack.push(displayState);
+            }
         }
         
         return displayState;
