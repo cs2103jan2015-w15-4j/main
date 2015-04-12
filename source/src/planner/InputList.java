@@ -22,6 +22,8 @@ public class InputList {
     private boolean isNextIteratorCalled_;
     private boolean isPrevIteratorCalled_;
     
+    private final int MINIMUM_LIST_SIZE = 1;
+    private final int SIZE_OF_ONE_COMMAND_INPUT_STRING = 1;
     /**
      * Constructs a command input list that will handle the storage of previous commands and the logic of cycling through
      * previous commands. If maxListSize is < 1, the maximum number of previous commands strings that this list will store
@@ -33,7 +35,7 @@ public class InputList {
         
         commandList_ = new LinkedList<String>();
         currentStringInput_ = null;
-        maxCommandListSize_ = Math.max( 1, maxListSize ); 
+        maxCommandListSize_ = Math.max( MINIMUM_LIST_SIZE, maxListSize ); 
         hasReturnedRecentlyTypedString_ = false;
         isNextIteratorCalled_ = false;
         isPrevIteratorCalled_ = false;
@@ -53,7 +55,7 @@ public class InputList {
             while( commandList_.size() >= maxCommandListSize_ ){
                 commandList_.removeLast();
             }
-            if( commandList_.size() + 1 <= maxCommandListSize_ ){
+            if( commandList_.size() + SIZE_OF_ONE_COMMAND_INPUT_STRING <= maxCommandListSize_ ){
                 commandList_.addFirst(input);
             }
         }
