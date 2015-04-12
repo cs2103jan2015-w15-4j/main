@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
+import planner.Constants.SortType;
+
 /**
  * SORTLOGIC IS USED TO SORT DISPLAYTASKLIST OR TREEMAPS
  */
@@ -47,16 +49,13 @@ public class SortLogic {
                 String today = dateFormatter.format(task.getShownDate());
                 
                 if (endTime.equals(today)) {
-                    //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + getTimeFromDate(task.getEndDate()));
                     return getTimeFromDate(task.getEndDate());
                     
                 } else {   
-                    //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + 2400);
                     return 2400;                 
                 }    
                 
             } else {
-                //System.out.println("Task ID: " + task.getParent().getID() + " Time: " + getTimeFromDate(task.getDueDate()));
                 return getTimeFromDate(task.getDueDate());
             }
         }
@@ -75,8 +74,7 @@ public class SortLogic {
     private static Comparator<DisplayTask> priorityComparator = new Comparator<DisplayTask>() {
         
         @Override
-        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
-            
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {  
             return comparePriority(displayTask1, displayTask2);
         }
     };
@@ -84,8 +82,7 @@ public class SortLogic {
     private static Comparator<DisplayTask> nameComparator = new Comparator<DisplayTask>() {
         
         @Override
-        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {
-            
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) { 
             return compareName(displayTask1, displayTask2);
         }
     };
@@ -97,18 +94,14 @@ public class SortLogic {
     private static Comparator<Integer> priorityComparatorForMap = new Comparator<Integer>() {
         
         @Override
-        public int compare(Integer priority1, Integer priority2) {
-            
+        public int compare(Integer priority1, Integer priority2) {   
             if (priority1 > priority2) {
-            
                 return -1;
      
             } else if (priority1 < priority2) {
-            
                 return 1;
          
             } else {
-        
                 return 0;
             }
         }
@@ -119,35 +112,26 @@ public class SortLogic {
         
         @Override
         public int compare(Date date1, Date date2) {
-            
-            if( date1 != null && date2 != null ){
-                
+            if( date1 != null && date2 != null ){ 
                 SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
                 
                 String dateOneString = dateFormatter.format(date1);
                 String dateTwoString = dateFormatter.format(date2);
                 
-                if( dateOneString.equals(dateTwoString) ){
-                    
+                if( dateOneString.equals(dateTwoString) ){       
                     return 0;
                     
-                } else{
-                    
-                    return date1.compareTo(date2);
-                    
+                } else{         
+                    return date1.compareTo(date2);        
                 }            
-            } else if( date1 != null ){
-                
+            } else if( date1 != null ){   
                 return -1;
                 
-            } else if( date2 != null ){
-                
+            } else if( date2 != null ){     
                 return 1;
                 
-            } else{
-                
-                return 0;
-                
+            } else{   
+                return 0;      
             }
         }   
     };
@@ -165,16 +149,13 @@ public class SortLogic {
         
         int result = task1.getPriority() - task2.getPriority();
         
-        if (result > 0) {
-            
+        if (result > 0) {    
             return -1;
             
         } else if (result < 0) {
-           
             return 1;
             
-        } else {
-            
+        } else {   
             return compareName(displayTask1, displayTask2);
         }
     }
@@ -189,34 +170,49 @@ public class SortLogic {
         
         int name = name1.compareTo(name2);
         
-        if (name > 0) {
-            
+        if (name > 0) {       
             return 1;
             
-        } else if (name < 0) {
-            
+        } else if (name < 0) {  
             return -1;
             
-        } else {
-            
+        } else {  
             long ID1 = task1.getID();
             long ID2 = task2.getID();
             
-            if (ID1 > ID2) {
-                
+            if (ID1 > ID2) {    
                 return 1;
                 
-            } else if (ID1 < ID2) {
-                
+            } else if (ID1 < ID2) {   
                return -1;
                
             } else {
-                
-               return 0;
+                return 0;
             }
         }
     }
     
+    public static DisplayTaskList sortDisplayTaskList(DisplayTaskList tasks, SortType sortMode) {
+        DisplayTaskList newTasks = new DisplayTaskList(tasks);
+        switch (sortMode) {
+            case SORT_DATE :
+                Collections.sort(newTasks, dateComparator);
+                break;
+                
+            case SORT_PRIORITY :
+                Collections.sort(newTasks, priorityComparator);
+                break;
+                
+            case SORT_NAME :
+                Collections.sort(newTasks, nameComparator);
+                break;
+                
+            default :
+                break;
+        }
+        return newTasks;
+    }
+/*    
     public static DisplayTaskList sortByDate(DisplayTaskList tasks) {
         //ADD LOG
         DisplayTaskList newTasks = new DisplayTaskList(tasks);
@@ -237,8 +233,10 @@ public class SortLogic {
         Collections.sort(newTasks, nameComparator);
         return newTasks;
     }
-    
-    public static TreeMap <Date, DisplayTaskList> sortTreeMapIntoSetMapByDate(TreeMap <Date, DisplayTaskList> map) {
+*/    
+    public static TreeMap <Date, DisplayTaskList> sortTreeMapIntoSetMapByDate(
+                                        TreeMap <Date, DisplayTaskList> map) {
+        
         TreeMap<Date, DisplayTaskList> sortedTree = 
                 new TreeMap<Date, DisplayTaskList>(dateComparatorForMap);
         
@@ -248,17 +246,24 @@ public class SortLogic {
             Date key = entry.getKey();
             
             if (key == null) {          
-                DisplayTaskList sortedDisplayList = sortByPriority(unsortedList);     
+                DisplayTaskList sortedDisplayList = 
+                        sortDisplayTaskList(unsortedList, 
+                                            SortType.SORT_PRIORITY);  
+                
                 sortedTree.put(key, sortedDisplayList);           
             } else {            
-                DisplayTaskList sortedDisplayList = sortByDate(unsortedList);       
+                DisplayTaskList sortedDisplayList = 
+                        sortDisplayTaskList(unsortedList, SortType.SORT_DATE);       
                 sortedTree.put(key, sortedDisplayList);
             }        
         }
         return sortedTree;
     }
     
-    public static TreeMap <Integer, DisplayTaskList> sortTreeMapIntoSetMapByPriority(TreeMap <Integer, DisplayTaskList> map) {
+    public static TreeMap <Integer, DisplayTaskList> 
+                            sortTreeMapIntoSetMapByPriority(TreeMap <Integer, 
+                                                        DisplayTaskList> map) {
+        
         TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
                 <Integer, DisplayTaskList> (priorityComparatorForMap);
         
@@ -268,7 +273,8 @@ public class SortLogic {
             
             Integer key = entry.getKey();
             
-            DisplayTaskList sortedDisplayList = sortByName(unsortedList);
+            DisplayTaskList sortedDisplayList = 
+                    sortDisplayTaskList(unsortedList, SortType.SORT_NAME);
                 
             displayMap.put(key, sortedDisplayList);
         }
@@ -276,7 +282,8 @@ public class SortLogic {
         return displayMap;
     }
     
-    public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority (DisplayTaskList input) {
+    public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority 
+                                                    (DisplayTaskList input) {
         
         TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
                 <Integer, DisplayTaskList> (priorityComparatorForMap);
@@ -291,8 +298,9 @@ public class SortLogic {
         return displayMap;
     }
     
-    private static void addDisplayTaskToMapByPriority(TreeMap < Integer, DisplayTaskList> displayMap, 
-            DisplayTask inputTask) {
+    private static void addDisplayTaskToMapByPriority(
+                            TreeMap < Integer, DisplayTaskList> displayMap, 
+                            DisplayTask inputTask) {
         
         if (displayMap.containsKey(inputTask.getParent().getPriority())) {
             
@@ -300,13 +308,15 @@ public class SortLogic {
             
         } else {
             
-            displayMap.put(inputTask.getParent().getPriority(), new DisplayTaskList());
+            displayMap.put(inputTask.getParent().getPriority(), 
+                                        new DisplayTaskList());
             
             displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
         }
     }
     
-    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (DisplayTaskList input) {
+    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (
+                                                    DisplayTaskList input) {
     
         TreeMap < Date, DisplayTaskList > displayMap = 
                 new TreeMap < Date, DisplayTaskList>(dateComparatorForMap);

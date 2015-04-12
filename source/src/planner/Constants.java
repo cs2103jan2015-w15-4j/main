@@ -215,4 +215,15 @@ public class Constants {
         errorMessages.put(ErrorType.NO_INPUT, "Please enter a command.");
         errorMessages.put(ErrorType.INVALID_PATH, "Path provided is invalid");
     }
+    
+    //@author A0110797B
+    public enum SearchType{
+        SEARCH_NAME, SEARCH_DESC, SEARCH_TAG, SEARCH_OVERDUE, SEARCH_UPCOMING, 
+        SEARCH_FLOATING, SEARCH_CONFIRMED, SEARCH_DONE, SEARCH_NOTDONE,
+        SEARCH_TIMED
+    };
+    
+    public enum SortType{
+        SORT_DATE, SORT_PRIORITY, SORT_NAME
+    };
 }
