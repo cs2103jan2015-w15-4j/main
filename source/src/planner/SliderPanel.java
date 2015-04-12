@@ -1,3 +1,5 @@
+//@author A0111333B
+
 package planner;
 
 import java.awt.Color;
@@ -16,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -53,6 +56,8 @@ public class SliderPanel extends JComponent{
     private Timer timerSlideOut;
     private Timer timerSlideIn;
     
+    private static final long NANOSECOND_PER_MILLISECOND = 1000000;
+    
     @Override
     public Dimension getPreferredSize(){
         
@@ -60,8 +65,6 @@ public class SliderPanel extends JComponent{
     }
     
     public SliderPanel( int widthNotToMoveInto, int parentWidth ) {
-        
-        //setBackground(new Color(0,0,0,0));
         
         prepareDisplayInfoPanel();
         prepareUpArrow();
@@ -83,7 +86,6 @@ public class SliderPanel extends JComponent{
         timerSlideOut = new Timer( 2, new ActionListener(){
 
             private long time = -1;
-            private static final long NANOSECOND_PER_MILLISECOND = 1000000;
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -130,7 +132,6 @@ public class SliderPanel extends JComponent{
         timerSlideIn = new Timer( 2, new ActionListener(){
 
             private long time = -1;
-            private static final long NANOSECOND_PER_MILLISECOND = 1000000;
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -219,6 +220,52 @@ public class SliderPanel extends JComponent{
     private void hideTip(){
         
         tips.setVisible(false);
+    }
+    
+    public void insertStringToDisplay( int position, String str, SimpleAttributeSet style ){
+        
+        if( infoPanel != null && str != null ){
+            
+            StyledDocument doc = infoPanel.getStyledDocument();
+            
+            if( doc != null ){
+                
+                try {
+                    
+                    doc.insertString(position, str, style);
+                    
+                } catch (BadLocationException e) {}
+            }
+        }
+    }
+    
+    public int getDisplayCaretPosition(){
+        
+        if( infoPanel != null ){
+            
+            return infoPanel.getCaretPosition();
+            
+        } else{
+            
+            return -1;
+        }
+    }
+    
+    public void setDisplayCaretPosition( int caretPosition ){
+        
+        try{
+            
+            if( infoPanel != null ){
+            
+                String currentTxt = infoPanel.getText();
+                
+                if( caretPosition >= 0 && caretPosition <= currentTxt.length() ){
+                
+                    infoPanel.setCaretPosition(caretPosition);
+                }
+            }
+            
+        } catch( IllegalArgumentException illegalArgumentException ){}
     }
     
     private void showTip( TipType tipType ){
@@ -357,43 +404,41 @@ public class SliderPanel extends JComponent{
         isCurrentlyVisible = true;
     }
     
-    public void slideOut( Task task ){
+    public void slideOut( Task task, boolean canOverrideContents ){
         
-        if( task != null ){
+        Point pointInParent = getLocation();
+        
+        if( firstXCoordinate != null ){
             
-            Point pointInParent = getLocation();
+            initialXCoordinate = firstXCoordinate;
             
-            if( firstXCoordinate != null ){
-                
-                System.out.println("initialXCoordinate = " + initialXCoordinate);
-                
-                initialXCoordinate = firstXCoordinate;
-                
-            } else{
-                
-                firstXCoordinate = (pointInParent != null ? pointInParent.x : null);
-                initialXCoordinate = firstXCoordinate != null ? firstXCoordinate : 0;
-            }
+        } else{
             
-            initialYCoordinate = pointInParent != null ? pointInParent.y : 0;
+            firstXCoordinate = (pointInParent != null ? pointInParent.x : null);
+            initialXCoordinate = firstXCoordinate != null ? firstXCoordinate : 0;
+        }
+        
+        initialYCoordinate = pointInParent != null ? pointInParent.y : 0;
+        
+        if( initialXCoordinate <= widthNotToMoveInto ){
             
-            if( initialXCoordinate <= widthNotToMoveInto ){
-                
-                return;
-            }
+            return;
+        }
+        
+        if( canOverrideContents ){
             
             populateDisplay(task);
-            
-            currentXCoordinate = initialXCoordinate;
-            
-            if( timerSlideOut.isRunning() ){
-                timerSlideOut.stop();
-            }
-            
-            setLocation( currentXCoordinate, initialYCoordinate );
-            
-            timerSlideOut.start();
         }
+        
+        currentXCoordinate = initialXCoordinate;
+        
+        if( timerSlideOut.isRunning() ){
+            timerSlideOut.stop();
+        }
+        
+        setLocation( currentXCoordinate, initialYCoordinate );
+        
+        timerSlideOut.start();
     }
     
     public void slideIn(){

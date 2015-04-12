@@ -1,3 +1,5 @@
+//@author A0111333B
+
 package planner;
 import java.awt.Color;
 import java.awt.Component;
@@ -18,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -97,8 +100,6 @@ public class TaskBar extends JComponent {
             
         } else{
             
-            System.out.println("went here");
-            
             heightOfLabel = 0;
         }
         
@@ -124,20 +125,12 @@ public class TaskBar extends JComponent {
         componentCoordinates = getInsets();
         
         if( dateHeader != null ){
-            
-            //heightOfLabel = newDateHeader.getHeight();
-            
             heightOfLabel = 20;
-            
-            //dateHeader.getText();
             dateHeader.setBounds(componentCoordinates.left, componentCoordinates.top, m_width, heightOfLabel);
             dateHeader.setPreferredSize(new Dimension(m_width, heightOfLabel));
             add(dateHeader);
             
         } else{
-            
-            System.out.println("went here");
-            
             heightOfLabel = 0;
         }
         
@@ -228,21 +221,32 @@ public class TaskBar extends JComponent {
 		hasMovedUp = false;
 	}
 	
-	public void setTaskTitle( String taskTitle ){
+	public void setTaskTitle( Task task ){
 		
-		if( taskTitle != null ){
-			
-			taskTitleLabel.setText(taskTitle);
-		}
+	    if( task != null ){
+	        String taskName = task.getName();
+	        if( taskName != null ){
+	            if( !task.isDone() ){
+        	        if( task.isFloating() ){
+        	            taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/FloatingTaskStatus.png")));
+        	        } else if( task.isTimed() ){
+        	            taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/TimedTaskStatus.png")));
+        	        } else{
+        	            taskCheckBox.setIcon(new ImageIcon(TaskBar.class.getResource("/planner/DeadlineTaskStatus.png")));
+        	        }
+	            }
+    	        taskTitleLabel.setText( taskName );
+	        }
+	    }
 	}
 	
 	private void moveTitleLabelVertically( int relativeIncrements ){
 	    
-	    Point currentLocation = taskTitleLabel.getLocation();
+	    Point currentLocationOfTitle = taskTitleLabel.getLocation();
 	    
-	    if( currentLocation != null ){
+	    if( currentLocationOfTitle != null ){
 	        
-	        taskTitleLabel.setLocation(currentLocation.x, currentLocation.y + relativeIncrements);
+	        taskTitleLabel.setLocation(currentLocationOfTitle.x, currentLocationOfTitle.y + relativeIncrements);
 	    }
 	}
 	
@@ -425,8 +429,6 @@ public class TaskBar extends JComponent {
 	            
 	            if( !hasMovedUp ){
 	                
-	                System.out.println( "moved up" );
-	                
 	                moveTitleLabelVertically( -8 );
 	                
 	                hasMovedUp = true;
@@ -436,8 +438,6 @@ public class TaskBar extends JComponent {
 	        } else{
 	            
 	            if( !hasMovedDown ){
-                    
-	                System.out.println( "moved down" );
 	                
                     moveTitleLabelVertically( 8 );
                     

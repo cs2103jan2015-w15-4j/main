@@ -1,3 +1,5 @@
+//@author A0111333B
+
 package planner;
 
 import java.awt.Color;
@@ -266,7 +268,7 @@ public class DisplayPane extends JScrollPane{
     			}
     			
     			// set task name	
-    			taskBar.setTaskTitle(parentTask.getName());
+    			taskBar.setTaskTitle(parentTask);
     			
     			// Set tags
     			taskBar.setTags(parentTask);
@@ -304,8 +306,6 @@ public class DisplayPane extends JScrollPane{
 		long taskBarID = listOfTasks.size();
 		
 		TaskBar taskBar = new TaskBar();
-		
-		//setTaskBarParameters( taskBar, task, taskBarID + 1 );
 		
 		setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
 		
@@ -373,7 +373,6 @@ public class DisplayPane extends JScrollPane{
                     selectTask( tempTaskBar, internalID );
                     
                     return true;
-                
                 } 
 	        }
 	    }
@@ -396,7 +395,6 @@ public class DisplayPane extends JScrollPane{
 	                selectTask( tempTaskBar, internalID );
 	                
 	                return true;
-	                
 	            } 
 	        }
 	    }
