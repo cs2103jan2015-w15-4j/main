@@ -268,7 +268,7 @@ public class DisplayPane extends JScrollPane{
     			}
     			
     			// set task name	
-    			taskBar.setTaskTitle(parentTask.getName());
+    			taskBar.setTaskTitle(parentTask);
     			
     			// Set tags
     			taskBar.setTags(parentTask);
