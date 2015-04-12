@@ -56,6 +56,9 @@ public class Constants {
     public static final int HELP_TUTORIAL =7;
     public static final int SAVEHERE_TUTORIAL = 8;
     public static final int SAVEWHERE_TUTORIAL = 9;
+    public static final int CMD_HISTORY_TUTORIAL = 10;
+    public static final int SCROLL_INFOPANEL_CMD_HISTORY_TUTORIAL = 11;
+    public static final int CYCLE_PREVIOUS_COMMANDS_TURORIAL = 12;
     
     /**
      * Contains the information for the dropdown box at the GUI input bar.
@@ -64,8 +67,19 @@ public class Constants {
         {"Add tasks (fields besides name optional)", 
          "add <taskname>",
          "add <taskname> by <date>", 
+         "add <taskname> date <start date> date2 <end date>",
+         "add <taskname> at <date> priority <priority level> desc <description info> tag <tagname>",
+         "add exampletask at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
+         "new <taskname>",
+         "new <taskname> by <date>", 
          "new <taskname> date <start date> date2 <end date>",
-         "new <taskname> at <date> priority <priority level> desc <description info> tag <tagname>"
+         "new <taskname> at <date> priority <priority level> desc <description info> tag <tagname>",
+         "new exampletask at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
+         "create <taskname>",
+         "create <taskname> by <date>", 
+         "create <taskname> date <start date> date2 <end date>",
+         "create <taskname> at <date> priority <priority level> desc <description info> tag <tagname>", 
+         "create exampletask at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
         },
         {"Delete tasks", 
          "delete <task id>",
@@ -75,8 +89,11 @@ public class Constants {
         },
         {"Update tasks (number of fields to update optional)", 
          "update <task id> on <date> priority <priority level> desc <description info> tag <tagname>",
+         "update 1 name at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
          "edit <task id> on <date> priority <priority level> desc <description info> tag <tagname>",
-         "change <task id> on <date> priority <priority level> desc <description info> tag <tagname>"
+         "edit 1 name at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
+         "change <task id> on <date> priority <priority level> desc <description info> tag <tagname>",
+         "change 1 name at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
         },
         {"Done",
          "done <task id>",
@@ -91,15 +108,17 @@ public class Constants {
          "revert",              
         },
         {"Search tasks (number of fields to search by optional)",
-         "search <task id> on <date> priority <priority level> desc <description info> tag <tagname>",
-         "find <task id> on <date> priority <priority level> desc <description info> tag <tagname>"   
+         "search <task name> on <date> priority <priority level> desc <description info> tag <tagname>",
+         "search examplename at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
+         "find <task name> on <date> priority <priority level> desc <description info> tag <tagname>",
+         "find examplename at 5 april 2015 pm 7.00 priority 5 desc exampledescription tag exampletag",
         },
         {"Help",
          "help",
          "sos"
         },
         {"Savehere",
-         "savehere <full file path>"   
+         "savehere /<full file path>"   
         },
         {"Savewhere",
          "savewhere"
@@ -158,6 +177,18 @@ public class Constants {
         {"Exit",
          "Equivalent commands: exit/quit/bye\n\nThis command will cause the program to exit.\n\nExample usage: exit\n\n[This will exit the program]",
          "Example usage: exit"
+        },
+        {"Show command history",
+         "This shortcut will display your past commands and their results.\n\nExample usage: Shift + F1\n\n[This causes your command history to be displayed in the side panel]",
+         "Example usage: Shift + F1"
+        },
+        {"Scroll through info panel or command history",
+         "This will scroll through your info panel or command history.\n\nExample usage: Ctrl + down/up arrow key\n\n[This scrolls through the info panel/command history]",
+         "Ctrl + down/up arrow key"
+        },
+        {"Cycle through previous commands",
+         "This will cycle through the commands you previously input.\n\nExample usage: Shift + down/up arrow key\n\n[This cycles through your previous commands in the input box]",
+         "Shift + down/up arrow key"
         }
     };
 
@@ -206,7 +237,7 @@ public class Constants {
         errorMessages.put(ErrorType.INVALID_TIME, "Unable to parse time");
         errorMessages.put(ErrorType.INVALID_PRIORITY_LEVEL, "Please input a priority level from 1 to 5");
         errorMessages.put(ErrorType.DATE1_NOT_SMALLER_THAN_DATE2, "Please input a start date earlier than the end date");
-        errorMessages.put(ErrorType.INVALID_NUMBER_OF_DATES, "Input the correct number of dates for convert");
+        errorMessages.put(ErrorType.INVALID_NUMBER_OF_DATES, "Please input the correct number of dates for convert");
         
         //Errors from Engine
         errorMessages.put(ErrorType.TASK_NOT_FOUND, "Task not found!");

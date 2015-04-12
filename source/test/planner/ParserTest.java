@@ -256,7 +256,7 @@ public class ParserTest {
         assertEquals(12616, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals(Constants.ErrorType.INVALID_ARGUMENTS, result.getErrorType());
+        assertEquals(Constants.ErrorType.INVALID_NUMBER_OF_DATES, result.getErrorType());
         boolean[] flags = {true, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
@@ -304,7 +304,7 @@ public class ParserTest {
         assertEquals(3516, result.getId());
         assertEquals("", result.getDescription());
         assertEquals("", result.getTag());
-        assertEquals(Constants.ErrorType.INVALID_ARGUMENTS, result.getErrorType());
+        assertEquals(Constants.ErrorType.INVALID_NUMBER_OF_DATES, result.getErrorType());
         boolean[] flags = {false, false, false, true, false, false, false, false};
         assertTrue(Arrays.equals(flags, result.getCommandFlags()));
         assertEquals("", result.getName());
