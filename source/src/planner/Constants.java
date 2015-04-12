@@ -56,6 +56,9 @@ public class Constants {
     public static final int HELP_TUTORIAL =7;
     public static final int SAVEHERE_TUTORIAL = 8;
     public static final int SAVEWHERE_TUTORIAL = 9;
+    public static final int CMD_HISTORY_TUTORIAL = 10;
+    public static final int SCROLL_INFOPANEL_CMD_HISTORY_TUTORIAL = 11;
+    public static final int CYCLE_PREVIOUS_COMMANDS_TURORIAL = 12;
     
     /**
      * Contains the information for the dropdown box at the GUI input bar.
@@ -174,6 +177,18 @@ public class Constants {
         {"Exit",
          "Equivalent commands: exit/quit/bye\n\nThis command will cause the program to exit.\n\nExample usage: exit\n\n[This will exit the program]",
          "Example usage: exit"
+        },
+        {"Show command history",
+         "This shortcut will display your past commands and their results.\n\nExample usage: Shift + F1\n\n[This causes your command history to be displayed in the side panel]",
+         "Example usage: Shift + F1"
+        },
+        {"Scroll through info panel or command history",
+         "This will scroll through your info panel or command history.\n\nExample usage: Ctrl + down/up arrow key\n\n[This scrolls through the info panel/command history]",
+         "Ctrl + down/up arrow key"
+        },
+        {"Cycle through previous commands",
+         "This will cycle through the commands you previously input.\n\nExample usage: Shift + down/up arrow key\n\n[This cycles through your previous commands in the input box]",
+         "Shift + down/up arrow key"
         }
     };
 
