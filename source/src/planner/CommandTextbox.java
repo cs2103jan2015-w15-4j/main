@@ -95,25 +95,41 @@ public class CommandTextbox extends JScrollPane{
                 
                 if( keyEvent.getKeyCode() == KeyEvent.VK_UP ){
                     
-                    currentPopupListIndex = Math.max( currentPopupListIndex - 1, -2 );
-                    popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex, popUpList.getSize() ));
-                    currentPopupListIndex = (currentPopupListIndex > -2 ? currentPopupListIndex : popUpList.getSize() - 1);
-                    
-                    if( popUpBox.getSelectedIndex() < 0 ){
-                        popUpBox.hidePopup();
-                        popUpBox.setPopupVisible(true);
+                    if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
+                        
+                        currentPopupListIndex = Math.max( currentPopupListIndex - 1, -2 );
+                        popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex, popUpList.getSize() ));
+                        currentPopupListIndex = (currentPopupListIndex > -2 ? currentPopupListIndex : popUpList.getSize() - 1);
+                        
+                        if( popUpBox.getSelectedIndex() < 0 ){
+                            popUpBox.hidePopup();
+                            popUpBox.setPopupVisible(true);;
+                        }
+                        
+                    } else{
+                        
+                        isCurrentlyHandlingKeyEvent = false;
+                        return false;
                     }
                     
                 } else if( keyEvent.getKeyCode() == KeyEvent.VK_DOWN ){
                     
-                    currentPopupListIndex = Math.min( currentPopupListIndex + 1, popUpList.getSize() + 1 );
-                    popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex , popUpList.getSize() ));
-                    
-                    currentPopupListIndex = ( currentPopupListIndex<= popUpList.getSize() ? currentPopupListIndex  : (popUpList.getSize() > 0 ? 0 : -1) );
-                    
-                    if( popUpBox.getSelectedIndex() < 0 ){
-                        popUpBox.hidePopup();
-                        popUpBox.setPopupVisible(true);
+                    if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
+                        
+                        currentPopupListIndex = Math.min( currentPopupListIndex + 1, popUpList.getSize() + 1 );
+                        popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex , popUpList.getSize() ));
+                        
+                        currentPopupListIndex = ( currentPopupListIndex<= popUpList.getSize() ? currentPopupListIndex  : (popUpList.getSize() > 0 ? 0 : -1) );
+                        
+                        if( popUpBox.getSelectedIndex() < 0 ){
+                            popUpBox.hidePopup();
+                            popUpBox.setPopupVisible(true);
+                        }
+                        
+                    } else{
+                        
+                        isCurrentlyHandlingKeyEvent = false;
+                        return false;
                     }
                     
                 } else if( keyEvent.getKeyCode() == KeyEvent.VK_LEFT ){
@@ -138,18 +154,17 @@ public class CommandTextbox extends JScrollPane{
                         popUpBox.hidePopup();
                         popUpBox.setPopupVisible(false);
                         inputCommandBox.setCaretPosition(inputCommandBox.getText().length());
-                        return true;
                         
                     } else{
                         
                         popUpBox.hidePopup();
                         popUpBox.setPopupVisible(false);
+                        isCurrentlyHandlingKeyEvent = false;
                         return false;
                     }
                 }
                 
                 isCurrentlyHandlingKeyEvent = false;
-                
                 return true;
             }
         }
@@ -196,7 +211,6 @@ public class CommandTextbox extends JScrollPane{
             popUpBox.setOpaque(false);
             popUpBox.setFocusable(false);
             
-            
             popUpBox.setFont(new Font("Arial", Font.PLAIN, 14));
             
             possibleCommands = new ArrayList<String>();
@@ -227,7 +241,6 @@ public class CommandTextbox extends JScrollPane{
             textPane.setLayout(new BorderLayout());
             textPane.add( popUpBox, BorderLayout.SOUTH );
         }
-        
     }
     
     public void setSyntaxFilterOn(){
