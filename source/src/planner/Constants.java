@@ -19,11 +19,11 @@ public class Constants {
     
     public enum ErrorType {
         INVALID_COMMAND, INVALID_TASK_ID, BLANK_TASK_NAME, INVALID_DATE,
-        INVALID_ARGUMENTS, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
+        INVALID_NUMBER_OF_DATES, INVALID_TIME, DATE1_NOT_SMALLER_THAN_DATE2,
         INVALID_PRIORITY_LEVEL, TASK_NOT_FOUND, CONVERT_TASK_TYPE_IN_UPDATE,
         UPDATE_NO_CHANGES, NOTHING_TO_UNDO, NO_INPUT, INVALID_PATH
     };
-    //@author A0114156N
+
     public enum TipType{
         UP_TIP, DOWN_TIP, UPDOWN_TIP
     }
@@ -160,7 +160,7 @@ public class Constants {
          "Example usage: exit"
         }
     };
-    //@author A0114156N
+
     public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
                                                               "Previous View",                  // F2
                                                               "Tutorial",                       // F3
@@ -198,12 +198,15 @@ public class Constants {
     EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
     
     public void initializeErrorMessages() {
+        //Errors from Parser
         errorMessages.put(ErrorType.INVALID_COMMAND, "invalid command type");
         errorMessages.put(ErrorType.INVALID_TASK_ID, "a number must be entered for the task id");
         errorMessages.put(ErrorType.BLANK_TASK_NAME, "the name of the task added cannot be blank");
         errorMessages.put(ErrorType.INVALID_DATE, "Unable to parse date");
         errorMessages.put(ErrorType.INVALID_TIME, "Unable to parse time");
         errorMessages.put(ErrorType.INVALID_PRIORITY_LEVEL, "Please input a priority level from 1 to 5");
+        errorMessages.put(ErrorType.DATE1_NOT_SMALLER_THAN_DATE2, "Please input a start date earlier than the end date");
+        errorMessages.put(ErrorType.INVALID_NUMBER_OF_DATES, "Input the correct number of dates for convert");
         
         //Errors from Engine
         errorMessages.put(ErrorType.TASK_NOT_FOUND, "Task not found!");

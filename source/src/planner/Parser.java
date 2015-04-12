@@ -87,7 +87,7 @@ public class Parser {
         resetFields();
         process(inputString.trim());
         return createParseResult(commandType); 
-    }    
+    }
     
     /**
      * Processes the input string by updating the result fields based on what 
@@ -1148,7 +1148,7 @@ public class Parser {
         if (date == null || date2 == null) {
             logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
             setCommandType(CommandType.INVALID);
-            setErrorType(ErrorType.INVALID_ARGUMENTS);
+            setErrorType(ErrorType.INVALID_NUMBER_OF_DATES);
         }
     }
     /**
@@ -1158,7 +1158,7 @@ public class Parser {
         logger.log(Level.WARNING, "no valid dates for Convert Deadline");
         if (date == null && date2 == null) {
             setCommandType(CommandType.INVALID);
-            setErrorType(ErrorType.INVALID_ARGUMENTS);
+            setErrorType(ErrorType.INVALID_NUMBER_OF_DATES);
         }
     }
     
