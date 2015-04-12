@@ -13,14 +13,14 @@ import javax.swing.text.ViewFactory;
 */
 public class CustomWrapKit extends StyledEditorKit{
 
-    private ViewFactory defaultViewFactory;
+    private ViewFactory defaultViewFactory_;
     
     /**
      * Constructs a style editor kit using a custom view factory that handles wrap text logic
      */
     public CustomWrapKit(){
         super();
-        defaultViewFactory = new WrapTextLogic();
+        defaultViewFactory_ = new WrapTextLogic();
     }
     
     /**
@@ -30,6 +30,6 @@ public class CustomWrapKit extends StyledEditorKit{
      */
     @Override
     public ViewFactory getViewFactory(){
-        return defaultViewFactory;
+        return defaultViewFactory_;
     }
 }
