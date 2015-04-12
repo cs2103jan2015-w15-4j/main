@@ -118,7 +118,7 @@ public class DisplayState {
      * @return True if the user input string used to invoke the given anotherDisplayState equals to the user input string used to 
      *         invoke this displayState, false otherwise.
      */
-    public boolean compareCommand( DisplayState anotherDisplayState ){
+    public boolean compareCommandString( DisplayState anotherDisplayState ){
         if( anotherDisplayState != null ){
             boolean isCommandEqual;
             if( anotherDisplayState.getCommand() != null && inputCommand != null ){
@@ -133,65 +133,48 @@ public class DisplayState {
         return false;
     }
     
-    
-    
-    @Override
-    public boolean equals( Object obj ){
-        
-        if( obj instanceof DisplayState ){
-            
-            DisplayState displayState = (DisplayState)obj;
-            
-            // Compare title
-            boolean isTitleEqual;
-            if( displayState.getTitle() != null && title != null ){
-                
-                isTitleEqual = title.equals(displayState.getTitle());
-                
-            } else if( displayState.getTitle() != null || title != null ){
-                
-                isTitleEqual = false;
-                
-            } else{
-                
-                isTitleEqual = true;
-            }
-            
-            // Compare command
-            boolean isCommandEqual;
-            if( displayState.getCommand() != null && inputCommand != null ){
-                
-                isCommandEqual = inputCommand.equals(displayState.getCommand());
-                
-            } else if( displayState.getCommand() != null || inputCommand != null ){
-                
-                isCommandEqual = false;
-                
-            } else{
-                
-                isCommandEqual = true;
-            }
-            
-            // Compare keyevent
+    /**
+     * Returns true if the key event used to invoke the given anotherDisplayState equals to the keyevent used to 
+     * invoke this displayState, false otherwise.
+     *
+     * @param anotherDisplayState   The displayState in which its key event is to be compared with this displayState's key event
+     * @return True if the key event used to invoke the given anotherDisplayState equals to the keyevent used to 
+     *         invoke this displayState, false otherwise.
+     */
+    public boolean compareKeyEvent( DisplayState anotherDisplayState ){
+        if( anotherDisplayState != null ){
             boolean isKeyEventEqual;
-            if( displayState.getKeyEvent() != null && keyEvent != null ){
-                
-                isKeyEventEqual = keyEvent.equals(displayState.getKeyEvent());
-                
-            } else if( displayState.getKeyEvent() != null || keyEvent != null ){
-                
+            if( anotherDisplayState.getKeyEvent() != null && keyEvent != null ){
+                isKeyEventEqual = keyEvent.equals(anotherDisplayState.getKeyEvent());
+            } else if( anotherDisplayState.getKeyEvent() != null || keyEvent != null ){
                 isKeyEventEqual = false;
-                
             } else{
-                
                 isKeyEventEqual = true;
             }
-            
+            return isKeyEventEqual;
+        }
+        return false;
+    }
+    
+    /**
+     * Compares this DisplayState to the specified object. The result is true if and only if the argument is not null and 
+     * is a DisplayState object that has the same values for its displayStateFlag_, title_, inputStringCommand_ and keyEvent_ member
+     * field
+     *
+     * @param obj   An object to be compared with this DisplayState
+     * @return True if the object compared is an instance of DisplayState and has the same values; false otherwise.
+     */
+    @Override
+    public boolean equals( Object obj ){
+        if( obj instanceof DisplayState ){
+            DisplayState displayState = (DisplayState)obj;
+            boolean isTitleEqual = compareTitle(displayState);
+            boolean isCommandStringEqual = compareCommandString(displayState);
+            boolean isKeyEventEqual = compareKeyEvent(displayState);
+          
             return ((displayState.getdisplayStateFlag() == displayStateFlag) &&
-                    isTitleEqual && isCommandEqual && isKeyEventEqual);
-            
+                    isTitleEqual && isCommandStringEqual && isKeyEventEqual);
         } else{
-            
             return false;
         }
     }
