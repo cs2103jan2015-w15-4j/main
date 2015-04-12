@@ -1,111 +1,146 @@
 package planner;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+/**
+* The InputList class handles the storage of previous commands and the logic of cycling through previous commands
+*
+* @author A0111333B
+*/
 public class InputList {
 
-    private LinkedList<String> list;
-    private ListIterator<String> currentInput;
-    private int maxListSize;
+    private LinkedList<String> commandList_;
+    private ListIterator<String> currentStringInput_;
     
-    private String recentlyTypedString;
-    private String currentString;
+    private int maxCommandListSize_;
     
-    private boolean hasReturnedRecentlyTypedString;
-    private boolean isNextIteratorCalled;
-    private boolean isPrevIteratorCalled;
+    private String recentlyTypedCommand_;
+    private String recentCommandReturned_;
     
+    private boolean hasReturnedRecentlyTypedString_;
+    private boolean isNextIteratorCalled_;
+    private boolean isPrevIteratorCalled_;
+    
+    /**
+     * Constructs a command input list that will handle the storage of previous commands and the logic of cycling through
+     * previous commands. If maxListSize is < 1, the maximum number of previous commands strings that this list will store
+     * will automatically be set to 1.
+     *
+     * @param maxListSize   The maximum number of previous commands strings that this list will store.
+     */
     public InputList( int maxListSize ){
         
-        list = new LinkedList<String>();
-        
-        currentInput = null;
-             
-        this.maxListSize = Math.max( 1, maxListSize ); 
-        
-        hasReturnedRecentlyTypedString = false;
-        isNextIteratorCalled = false;
-        isPrevIteratorCalled = false;
+        commandList_ = new LinkedList<String>();
+        currentStringInput_ = null;
+        maxCommandListSize_ = Math.max( 1, maxListSize ); 
+        hasReturnedRecentlyTypedString_ = false;
+        isNextIteratorCalled_ = false;
+        isPrevIteratorCalled_ = false;
     }
     
+    /**
+     * Adds a command string to the list. Null strings passed in will be ignored.
+     *
+     * @param input   The command input string to be added to the list.
+     */
     public String addWordToList( String input ){
         
         if( input != null ){
-            if( input.equals(currentString) ){
+            if( input.equals(recentCommandReturned_) ){
                 return input;
             }
-            while( list.size() >= maxListSize ){
-                list.removeLast();
+            while( commandList_.size() >= maxCommandListSize_ ){
+                commandList_.removeLast();
             }
-            if( list.size() + 1 <= maxListSize ){
-                list.addFirst(input);
+            if( commandList_.size() + 1 <= maxCommandListSize_ ){
+                commandList_.addFirst(input);
             }
         }
         return input;
     }
     
+    /**
+     * Resets the position of the list pointer used to decide which command string is to be returned 
+     * at the next getNextInputString() or getPrevInputString() call.
+     */
     public void resetGetWordPosition(){
         
-        recentlyTypedString = null;
-        currentInput = list.listIterator();
-        hasReturnedRecentlyTypedString = false;
-        isNextIteratorCalled = false;
-        isPrevIteratorCalled = false;
-        if( !list.isEmpty() ){
-            currentString = list.getFirst();
+        recentlyTypedCommand_ = null;
+        currentStringInput_ = commandList_.listIterator();
+        hasReturnedRecentlyTypedString_ = false;
+        isNextIteratorCalled_ = false;
+        isPrevIteratorCalled_ = false;
+        if( !commandList_.isEmpty() ){
+            recentCommandReturned_ = commandList_.getFirst();
         } else{
-            currentString = null;
+            recentCommandReturned_ = null;
         }
     }
     
+    /**
+     * Returns the next command input string stored in the list. If there no more next command input strings to be returned,
+     * the current user typed command string will be returned instead.
+     *
+     * @return The next command input string stored in the list.
+     */
     public String getNextInputString(){
         
-        if( currentInput != null && currentInput.hasPrevious() ){
+        if( currentStringInput_ != null && currentStringInput_.hasPrevious() ){
             
-            if( isNextIteratorCalled ){
-                isNextIteratorCalled = false;
-                currentInput.previous();
+            if( isNextIteratorCalled_ ){
+                isNextIteratorCalled_ = false;
+                currentStringInput_.previous();
             }
             String tempString = null;
-            if( currentInput.hasPrevious() ){
-                currentString = currentInput.previous();
-                tempString = currentString;
-                isPrevIteratorCalled = true;
+            if( currentStringInput_.hasPrevious() ){
+                recentCommandReturned_ = currentStringInput_.previous();
+                tempString = recentCommandReturned_;
+                isPrevIteratorCalled_ = true;
             }
             return tempString;
         } else{
-            isPrevIteratorCalled = false;
-            if( !hasReturnedRecentlyTypedString ){  
-                hasReturnedRecentlyTypedString = true;
-                return currentString = recentlyTypedString;
+            isPrevIteratorCalled_ = false;
+            if( !hasReturnedRecentlyTypedString_ ){  
+                hasReturnedRecentlyTypedString_ = true;
+                return recentCommandReturned_ = recentlyTypedCommand_;
             } else{
                 return null;
             }
         }
     }
     
+    /**
+     * Records the current user typed command string that is not yet processed by YOPO. 
+     *
+     * @param The current user typed command string that is not yet processed by YOPO.
+     */
     public void setRecentlyTypedString( String input ){
-        if( input != null && !input.equals(currentString) ){
-            recentlyTypedString = input;
+        if( input != null && !input.equals(recentCommandReturned_) ){
+            recentlyTypedCommand_ = input;
         }
     }
     
+    /**
+     * Returns the previous command input string stored in the list. If there no more previous command input strings 
+     * to be returned, a null string will be returned
+     *
+     * @return The previous command input string stored in the list.
+     */
     public String getPrevInputString(){
         
-        if( currentInput != null && currentInput.hasNext() ){
+        if( currentStringInput_ != null && currentStringInput_.hasNext() ){
             
-            hasReturnedRecentlyTypedString = false;
-            if( isPrevIteratorCalled ){
-                isPrevIteratorCalled = false;
-                currentInput.next();
+            hasReturnedRecentlyTypedString_ = false;
+            if( isPrevIteratorCalled_ ){
+                isPrevIteratorCalled_ = false;
+                currentStringInput_.next();
             }
             String tempString = null;
-            if( currentInput.hasNext() ){
-                currentString = currentInput.next();
-                tempString = currentString;
-                isNextIteratorCalled = true;
+            if( currentStringInput_.hasNext() ){
+                recentCommandReturned_ = currentStringInput_.next();
+                tempString = recentCommandReturned_;
+                isNextIteratorCalled_ = true;
             }
             return tempString;
         } else{
