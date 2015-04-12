@@ -12,7 +12,7 @@ import java.util.LinkedList;
 */
 public class DisplayStateStack {
 
-    private int maxNumOfStates_;
+    private int maxNumOfDisplayStates_;
     private LinkedList<DisplayState> stack_;
     
     /**
@@ -23,7 +23,7 @@ public class DisplayStateStack {
     * @param maxNumOfDisplayStates  The maximum number of DisplayStates that can be stored within this stack
     */
     public DisplayStateStack( int maxNumOfDisplayStates ){
-        maxNumOfStates_ = Math.max( 1, maxNumOfDisplayStates );
+        maxNumOfDisplayStates_ = Math.max( 1, maxNumOfDisplayStates );
         stack_ = new LinkedList<DisplayState>();
     }
     
@@ -35,10 +35,10 @@ public class DisplayStateStack {
      */
     public DisplayState push( DisplayState displayState ){
         if( displayState != null && (displayState.getKeyEvent() != null || displayState.getCommand() != null) ){
-            while( stack_.size() >= maxNumOfStates_ ){
+            while( stack_.size() >= maxNumOfDisplayStates_ ){
                 stack_.removeLast();
             }
-            if( stack_.size() + 1 <= maxNumOfStates_ ){
+            if( stack_.size() + 1 <= maxNumOfDisplayStates_ ){
                 stack_.push(displayState);
             }
         }
