@@ -14,7 +14,7 @@ import javax.swing.text.ViewFactory;
 */
 public class CustomNoWrapKit extends StyledEditorKit{
 
-    private ViewFactory customViewFactory;
+    private ViewFactory customViewFactory_;
     
     /**
     * Constructs a style editor kit using a custom view factory that handles the logic of scrolling of the text component's
@@ -22,7 +22,7 @@ public class CustomNoWrapKit extends StyledEditorKit{
     */
     public CustomNoWrapKit(){
         super();
-        customViewFactory = new NoWrapTextLogic();
+        customViewFactory_ = new NoWrapTextLogic();
     }
     
     /**
@@ -33,6 +33,6 @@ public class CustomNoWrapKit extends StyledEditorKit{
      */
     @Override
     public ViewFactory getViewFactory(){
-        return customViewFactory;
+        return customViewFactory_;
     }
 }
