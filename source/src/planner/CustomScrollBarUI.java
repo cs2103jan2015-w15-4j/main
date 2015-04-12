@@ -29,8 +29,8 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
     private final int SCROLLBAR_ALPHA_VALUE = 100;
     private final int SCROLLBAR_THUMB_BORDER_SCALE_FACTOR = 2;
     
-    private InvisibleButton downButton = null;
-    private InvisibleButton upButton = null;
+    private InvisibleButton downButton_ = null;
+    private InvisibleButton upButton_ = null;
     
     private final String UP_ARROW_IMAGE_RESOURCE_LINK = "/planner/arrowUp.png";
     private final String DOWN_ARROW_IMAGE_RESOURCE_LINK = "/planner/arrowDown.png";
@@ -40,10 +40,10 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
     */
     public CustomScrollBarUI(){
         super();
-        downButton = new InvisibleButton(); 
-        prepareDownButton(downButton);
-        upButton = new InvisibleButton();
-        prepareUpButton(upButton);
+        downButton_ = new InvisibleButton(); 
+        prepareDownButton(downButton_);
+        upButton_ = new InvisibleButton();
+        prepareUpButton(upButton_);
     }
     
     /**
@@ -77,7 +77,7 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
      */
     @Override
     protected JButton createIncreaseButton( int orientation ){
-        return downButton;
+        return downButton_;
     }
     
     /**
@@ -87,7 +87,7 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
      */
     @Override
     protected JButton createDecreaseButton( int orientation ){
-        return upButton;
+        return upButton_;
     }
     
     /**
@@ -144,7 +144,7 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
      * @return The down button component used for the custom scrollbar
      */
     public InvisibleButton getDownButtonComponent(){
-        return downButton;
+        return downButton_;
     }
     
     /**
@@ -153,7 +153,7 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
      * @return The up button component used for the custom scrollbar
      */
     public InvisibleButton getUpButtonComponent(){
-        return upButton;
+        return upButton_;
     }
 }
     
