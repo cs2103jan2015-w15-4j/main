@@ -1791,12 +1791,15 @@ public class UserInterface extends JFrame {
                 if( event.isShiftDown() ){
                     
                     if( inputList != null && commandPanel != null && commandInputField != null ){
-                    
+                        
                         String currentInput = commandInputField.getText();
                         
                         inputList.setRecentlyTypedString(currentInput);
                         
                         String prevInputString = inputList.getPrevInputString();
+                        
+                        System.out.println( "currentInput = " + currentInput );
+                        System.out.println( "prevInputString = " + prevInputString );
                         
                         if( prevInputString != null){
                             
@@ -1878,12 +1881,15 @@ public class UserInterface extends JFrame {
                 if( event.isShiftDown() ){
                     
                     if( inputList != null && commandPanel != null && commandInputField != null ){
-                    
+                        
                         String currentInput = commandInputField.getText();
                         
                         inputList.setRecentlyTypedString(currentInput);
                         
                         String nextInputString = inputList.getNextInputString();
+                        
+                        System.out.println( "currentInput = " + currentInput );
+                        System.out.println( "nextInputString = " + nextInputString );
                         
                         if( nextInputString != null){
                             
@@ -2026,6 +2032,15 @@ public class UserInterface extends JFrame {
         sectionTitle.setForeground( new Color( 255,255,255,200 ) );
         sectionTitle.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(sectionTitle);
+        
+        if( displayStateStack != null ){
+            DisplayState currentDisplayState = displayStateStack.peek();
+            if( currentDisplayState != null ){
+                
+                sectionTitle.setText( currentDisplayState.getTitle() );
+                return;
+            }
+        }
         sectionTitle.setText("All Tasks");
     }
     
@@ -2521,21 +2536,36 @@ public class UserInterface extends JFrame {
         displayStateStack = new DisplayStateStack(maxNumOfDisplayStates);
         
         // Copying of all tasks
-        currentDisplayListForDate = Engine.getAllTasks();
-        currentDisplayListForPriority = null;
         
-        currentList = convertToDisplayTaskList( currentDisplayListForDate );
-        
-        // Display all tasks as default screen for now
-        displayPane.displayByDate(currentDisplayListForDate);
+        if( !Engine.isFirstRun() ){
+            
+            currentDisplayListForDate = Engine.getAllTasks();
+            currentDisplayListForPriority = null;
+            
+            currentList = convertToDisplayTaskList( currentDisplayListForDate );
+            
+            displayPane.displayByDate(currentDisplayListForDate);
+            
+            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
+                    new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
+                                  0, KeyEvent.VK_F5, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
+            
+        } else{
+            
+            currentDisplayListForDate = null;
+            currentDisplayListForPriority = null;
+            currentList = null;
+            
+            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.HELP, "Tutorial", null, 
+                    new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
+                                  0, KeyEvent.VK_F3, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
+            
+            displayPane.addInfoToDisplay(Constants.HELP_CONTENT, -1);
+        }
         
         displayPane.requestFocusInWindow();
         
         addKeyBindingsToDisplay(displayPane);
-        
-        displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
-                                                new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
-                                                              0, KeyEvent.VK_F5, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
     }
     
     private void addKeyBindingsToDisplay( DisplayPane currentDisplayPane ){
@@ -2548,7 +2578,6 @@ public class UserInterface extends JFrame {
                 public void keyPressed(KeyEvent event) {
                     
                     handleKeyEvent(event);
-                    
                 }
             });
         }
