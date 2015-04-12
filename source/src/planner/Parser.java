@@ -22,14 +22,19 @@ public class Parser {
     
     // stores the arguments for each keyword
     private static String keywordArgs = "";
-
+    
+    // stores the tokens of the user input delimited by spaces
     private static String[] inputTokens = null;
+    
+    // all keywords that are not a command
     private static String[] nonCommandKeywordsArray = {"at", "on", "from", "by",
         "priority", "desc", "description", "date", "due",
         "remind", "tag", "until", "to"  
     };
     private static ArrayList<String> nonCommandKeywords =
             new ArrayList<String>(Arrays.asList(nonCommandKeywordsArray));
+    
+    // common ways to type months
     private static String[] monthsArray = {"jan", "january", "feb", "february",
         "mar", "march", "apr", "april", "may", "may", "jun", "june", "jul",
         "july", "aug", "august", "sep", "september", "oct", "october", "nov",
@@ -37,19 +42,23 @@ public class Parser {
     };
     private static ArrayList<String> months =
             new ArrayList<String>(Arrays.asList(monthsArray));
+    
+    // common ways to type days
     private static String[] daysInWeek = {"mon", "monday", "tue", "tuesday", 
         "wed", "wednesday", "thu", "thursday", "fri", "friday", "sat", "saturday",
         "sun", "sunday"
     };
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
+    
+    // command types that will not take into account any keywords besides the
+    // command itself
     private static String[] cmdsWithoutFollowingKeywords = {"help", "undo",
         "delete", "done", "setnotdone", "savewhere", "savehere", "show", "exit"
     };
     private static ArrayList<String> commandsWithoutFollowingKeywords =
             new ArrayList<String>(Arrays.asList(cmdsWithoutFollowingKeywords));
     
-
     // these fields will be used to construct the parseResult
     private static ErrorType errorType = null;
     private static CommandType commandType = null;    
@@ -62,8 +71,7 @@ public class Parser {
     private static String description = "";
     private static String tag = "";
     private static boolean isTimeSetByUser = false;
-    private static boolean isTime2SetByUser = false;
-    
+    private static boolean isTime2SetByUser = false;    
     private static boolean[] flags = new boolean[8];
     private static Calendar calendar = null;
     
@@ -79,8 +87,8 @@ public class Parser {
      * information such as the user's desired command type and the relevant
      * fields to update.
      * 
-     * @param inputString The user input
-     * @return            A result containing information such as command type
+     * @param inputString The user input.
+     * @return            A result containing information such as command type.
      */
     public static ParseResult parse(String inputString) {
         logger.setLevel(Level.WARNING);
@@ -93,14 +101,14 @@ public class Parser {
      * Processes the input string by updating the result fields based on what 
      * the command type is.
      * 
-     * @param inputString The user input
-     * @return            A result containing information such as command type
+     * @param inputString The user input.
+     * @return            A result containing information such as command type.
      */
     private static void process(String inputString) {        
         logger.log(Level.INFO, "going to begin processing");
         inputTokens = splitBySpaceDelimiter(inputString);
         assert(inputTokens.length > 0);
-        commandType = extractCommandType(inputTokens[COMMAND_WORD_INDEX]);
+        commandType = determineCommandType(inputTokens[COMMAND_WORD_INDEX]);
         processDependingOnCommandType(commandType);
         
         logger.log(Level.INFO, "processing ended.");
@@ -109,8 +117,8 @@ public class Parser {
     /**
      * Tokenizes a string input.
      * 
-     * @param input Input string
-     * @return      Array of tokens
+     * @param input Input string.
+     * @return      Array of tokens.
      */
     private static String[] splitBySpaceDelimiter(String input) {
         return input.split(" ");
@@ -120,10 +128,10 @@ public class Parser {
      * Determines the type of command a user wants to execute given the input
      * token expected to be a valid command keyword.
      * 
-     * @param commandWord Command keyword
-     * @return            Type of command
+     * @param commandWord Command keyword.
+     * @return            Type of command.
      */
-    private static CommandType extractCommandType(String commandWord) {
+    private static CommandType determineCommandType(String commandWord) {
         switch(commandWord.toLowerCase()) {
             case "add":
             case "new":
@@ -190,7 +198,7 @@ public class Parser {
      * what the command is. The command type is converted to a string for 
      * convenience in processing.
      * 
-     * @param commandType Type of command being parsed
+     * @param commandType Type of command being parsed.
      */
     private static void processDependingOnCommandType(CommandType commandType) {
         switch(commandType) {
@@ -260,7 +268,7 @@ public class Parser {
     /**
      * Sets the error type result field to the given input.
      * 
-     * @param desiredErrorType Error that arose from parsing
+     * @param desiredErrorType Error that arose from parsing.
      */
     private static void setErrorType(ErrorType desiredErrorType) {
         errorType = desiredErrorType;
@@ -269,7 +277,7 @@ public class Parser {
     /**
      * Sets the command type result field to the given input.
      * 
-     * @param desiredCommandType Command type determined from parsing
+     * @param desiredCommandType Command type determined from parsing.
      */
     private static void setCommandType(CommandType desiredCommandType) {
         commandType = desiredCommandType;
@@ -298,9 +306,10 @@ public class Parser {
     }
 
     /**
-     * Checks whether input word is a non command keyword
-     * @param word Keyword
-     * @return     Whether the keyword is a non command keyword
+     * Checks whether input word is a non command keyword.
+     * 
+     * @param word Keyword.
+     * @return     Whether the keyword is a non command keyword.
      */
     private static Boolean isNonCmdKeyword(String word) {
         return nonCommandKeywords.contains(word);
@@ -309,7 +318,7 @@ public class Parser {
     /**
      * Processes the rest of the input given the command word the user used.
      * 
-     * @param commandWord User's desired command type
+     * @param commandWord User's desired command type.
      */
     private static void processCommand(String commandWord) {        
         processKeywordsAndArgs(commandWord);        
@@ -324,7 +333,7 @@ public class Parser {
      * Searches the user input for keywords and processes each keyword and its 
      * arguments in succession.
      * 
-     * @param commandWord The initial keyword representing the command type
+     * @param commandWord The initial keyword representing the command type.
      */
     private static void processKeywordsAndArgs(String commandWord) {
         int indexBeingProcessed = FIRST_AFTER_COMMAND_TYPE;
@@ -369,7 +378,7 @@ public class Parser {
      * Processes the existing keywords in the keyword buffer string based on
      * what the keyword is.
      * 
-     * @param keyword The keyword for which the arguments will be processed
+     * @param keyword The keyword for which the arguments will be processed.
      */
     private static void processArgs(String keyword) {  
         // remove escape character from arguments since now unneeded
@@ -389,11 +398,11 @@ public class Parser {
      * which of the non command keywords the keyword is.
      * 
      * @param keyword          The keyword for which the arguments will be 
-     *                         processed
+     *                         processed.
      * @param keywordArgs      The arguments of the keyword with escape 
-     *                         characters removed
+     *                         characters removed.
      * @param keywordArgsArray The tokenized arguments of the keyword with 
-     *                         escape characters removed
+     *                         escape characters removed.
      */
     private static void processNonCmdKeywordArgs(String keyword,
                                                  String keywordArgs,
@@ -449,11 +458,11 @@ public class Parser {
      * which of the command keywords the keyword is.
      * 
      * @param keyword          The keyword for which the arguments will be 
-     *                         processed
+     *                         processed.
      * @param keywordArgs      The arguments of the keyword with escape 
-     *                         characters removed
+     *                         characters removed.
      * @param keywordArgsArray The tokenized arguments of the keyword with 
-     *                         escape characters removed
+     *                         escape characters removed.
      */
     private static void processCmdKeywordArgs(String keyword, 
                                               String keywordArgs,
@@ -520,7 +529,7 @@ public class Parser {
      * Updates the priority field after processing a string representing the 
      * desired priority level.
      * 
-     * @param desiredLevel Priority level
+     * @param desiredLevel Priority level.
      */
     private static void updatePriorityLevel(String desiredLevel) {
         try {
@@ -541,8 +550,8 @@ public class Parser {
      * Updates the ID field after processing a string representing the target
      * id of the command. Keyword is input for logging purposes.
      * 
-     * @param targetIdString     Target task of command
-     * @param keywordBeingParsed Keyword being parsed
+     * @param targetIdString     Target task of command.
+     * @param keywordBeingParsed Keyword being parsed.
      */
     private static void updateId(String targetIdString, String keywordBeingParsed) {
         try {
@@ -568,8 +577,8 @@ public class Parser {
      * Updates the selected date result field based on the keyword arguments.
      * 
      * @param keywordArgs       The arguments of the keyword, expected to be 
-     *                          date data
-     * @param dateFieldToUpdate Index representing which date field to update
+     *                          date data.
+     * @param dateFieldToUpdate Index representing which date field to update.
      */
     private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
         calendar = parseDate(keywordArgs, dateFieldToUpdate);
@@ -587,14 +596,14 @@ public class Parser {
     /**
      * Updates the command type to a help-related command type if the user has
      * specified a valid command type as an argument.
-     * @param commandType
+     * @param commandType Type of command user needs help with.
      */
     private static void determineWhatUserNeedsHelpWith(String commandType) {
         // check whether the user needs help with specific command
         String cmdToHelpWith = commandType;
         
         // determine the type of command the user wants help with
-        CommandType cmdToHelpWithType = extractCommandType(cmdToHelpWith);
+        CommandType cmdToHelpWithType = determineCommandType(cmdToHelpWith);
         
         // user did not ask for help for a valid command type
         if (cmdToHelpWithType.equals(Constants.CommandType.INVALID)) {
@@ -609,8 +618,8 @@ public class Parser {
      * Remove all instances of the escape character '/' from the given input 
      * string, which is expected to be the arguments of a keyword.
      * 
-     * @param  inputString Arguments of the keyword being processed
-     * @return             The input string with the character removed
+     * @param  inputString Arguments of the keyword being processed.
+     * @return             The input string with the character removed.
      */
     private static String removeEscapeCharacterInstances(String inputString) {     
         String[] keywordArgsArray = splitBySpaceDelimiter(inputString);
@@ -626,15 +635,15 @@ public class Parser {
      * Updates the flags that show what useful information the parse result
      * contains after checking each field.
      * 
-     * @param date          First date field
-     * @param dateToRemind  Date at which to remind user to do task
-     * @param priorityLevel Priority level
-     * @param id            Task ID
-     * @param name          Task name
-     * @param description   Task description
-     * @param tag           Task tag
-     * @param date2         Second date field, used for timed tasks
-     * @return              Collection of flags showing presence of useful info
+     * @param date          First date field.
+     * @param dateToRemind  Date at which to remind user to do task.
+     * @param priorityLevel Priority level.
+     * @param id            Task ID.
+     * @param name          Task name.
+     * @param description   Task description.
+     * @param tag           Task tag.
+     * @param date2         Second date field, used for timed tasks.
+     * @return              Flags showing presence/absence of useful info.
      */
     private static boolean[] updateResultFlags(Date date, Date dateToRemind, 
                                                int priorityLevel, long id, 
@@ -675,8 +684,8 @@ public class Parser {
      * Constructs and returns a result object based on the current result 
      * fields and input command type.
      * 
-     * @param commandType Type of command the user input
-     * @return            Result of parsing user input string
+     * @param commandType Type of command the user input.
+     * @return            Result of parsing user input string.
      */
     private static ParseResult createParseResult(CommandType commandType) {
         return new ParseResult(commandType, date, date2, dateToRemind, 
@@ -688,8 +697,8 @@ public class Parser {
      * Returns a help-related command type for the result based on which 
      * command the user wants help with.
      * 
-     * @param commandType Command that user wants help with
-     * @return            Help-related command type
+     * @param commandType Command that user wants help with.
+     * @return            Help-related command type.
      */
     private static CommandType determineHelpCommandType(CommandType commandType) {
         switch(commandType) {
@@ -724,8 +733,8 @@ public class Parser {
      * Returns a convert-related command type for the result based on which 
      * type of task the user wants to convert his task to.
      * 
-     * @param convertTypeString Desired type of task to convert to
-     * @return                  Convert-related command type
+     * @param convertTypeString Desired type of task to convert to.
+     * @return                  Convert-related command type.
      */
     private static CommandType determineConvertType(String convertTypeString) {
         switch (convertTypeString.trim()) {
@@ -749,10 +758,10 @@ public class Parser {
      * Parses the input arguments that are expected to be a date representation
      * into a consistent Calendar format.
      * 
-     * @param arguments            String representation of a date
+     * @param arguments            String representation of a date.
      * @param dateBeingParsedIndex Index of the date field being updated (e.g. 
-     *                             date, date2)
-     * @return                     Parsed date
+     *                             date, date2).
+     * @return                     Parsed date.
      */
     private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
@@ -886,8 +895,8 @@ public class Parser {
      * Converts arguments in the form of 'next x time period' (e.g. next 3 
      * days) into a proper date based on the current time and date.
      * 
-     * @param arguments String representation of date in form "next ..."
-     * @return          Parsed date
+     * @param arguments String representation of date in form "next ...".
+     * @return          Parsed date.
      */
     private static Calendar parseNext(String arguments) {
         String[] dateParts = splitBySpaceDelimiter(arguments);
@@ -958,12 +967,12 @@ public class Parser {
      *  index containing the time string, and returns a Calendar constructed 
      *  with all the date info.
      *  
-     *  @param dateParts    String tokens with date info
-     *  @param indexToCheck Index expected to contain time string
-     *  @param year         Year of desired date
-     *  @param month        Month of desired date
-     *  @param day          Day of desired date
-     *  @return             Representation of full date
+     *  @param dateParts    String tokens with date info.
+     *  @param indexToCheck Index expected to contain time string.
+     *  @param year         Year of desired date.
+     *  @param month        Month of desired date.
+     *  @param day          Day of desired date.
+     *  @return             Representation of full date.
      */    
     private static Calendar calcDateGivenTime(String[] dateParts, 
                                                 int indexBeingParsed, 
@@ -1007,9 +1016,9 @@ public class Parser {
      * Helper method for calcDateGivenTime that validates the presence of an 
      * argument for the time keyword.
      * 
-     * @param indexBeingParsed Index of time keyword
-     * @param dateParts        String tokens with date info
-     * @return                 Whether the argument exists
+     * @param indexBeingParsed Index of time keyword.
+     * @param dateParts        String tokens with date info.
+     * @return                 Whether the argument exists.
      */
     private static boolean isTimeArgExistent(int indexBeingParsed, String[] dateParts) {
         if (indexBeingParsed + 1 > dateParts.length) {
@@ -1027,9 +1036,9 @@ public class Parser {
      * two parts (expected to be hour and minute). Index of time keyword is 
      * input for logging purposes.
      * 
-     * @param indexBeingParsed Index of time keyword
-     * @param timeParts        Hour and minute
-     * @return                 Whether there are two parts
+     * @param indexBeingParsed Index of time keyword.
+     * @param timeParts        Hour and minute.
+     * @return                 Whether there are two parts.
      */
     private static boolean isValidTimeFormat(int indexBeingParsed, String[] timeParts) {  
         if (timeParts.length != 2) {
@@ -1045,8 +1054,8 @@ public class Parser {
     /**
      * Checks whether the input hour is between 0 and 12 inclusive.
      * 
-     * @param hour Hour of the day
-     * @return     Whether the hour is valid
+     * @param hour Hour of the day.
+     * @return     Whether the hour is valid.
      */
     private static boolean isValidHour(int hour) {
         if (hour < 0 || hour > 12) {
@@ -1062,8 +1071,8 @@ public class Parser {
     /**
      * Checks whether the input minute is between 0 and 59 inclusive.
      * 
-     * @param min Minute of the day
-     * @return    Whether the minute is valid
+     * @param min Minute of the day.
+     * @return    Whether the minute is valid.
      */
     private static boolean isValidMin(int min) {
         if (min < 0 || min > 59) {
@@ -1081,13 +1090,13 @@ public class Parser {
      * based on the fields calculated so far as well as whether the time given 
      * is in PM or AM.
      * 
-     * @param pmOrAm Either "pm" or "am"
-     * @param year   Desired year
-     * @param month  Desired month
-     * @param day    Desired day
-     * @param hour   Desired hour
-     * @param min    Desired min
-     * @return       Resulting date
+     * @param pmOrAm Either "pm" or "am".
+     * @param year   Desired year.
+     * @param month  Desired month.
+     * @param day    Desired day.
+     * @param hour   Desired hour.
+     * @param min    Desired min.
+     * @return       Resulting date.
      */
     private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int year, 
                                                       int month, int day, 
@@ -1114,12 +1123,12 @@ public class Parser {
      * Creates a calendar with a time given by the input values. The value of the
      * second is always set to 0.
      * 
-     * @param year   Desired year
-     * @param month  Desired month
-     * @param day    Desired day
-     * @param hour   Desired hour
-     * @param minute Desired minute
-     * @return       Resulting date
+     * @param year   Desired year.
+     * @param month  Desired month.
+     * @param day    Desired day.
+     * @param hour   Desired hour.
+     * @param minute Desired minute.
+     * @return       Resulting date.
      */
     private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
@@ -1128,7 +1137,7 @@ public class Parser {
     }
     
     /**
-     * Verifies that a command with the type Add or Convert has valid fields:
+     * Verifies that a command with the type Add or Convert has valid fields.
      */
     private static void checkAddConvertHaveValidFields() {       
         if (commandType.equals(CommandType.ADD)) {
@@ -1179,7 +1188,7 @@ public class Parser {
      * Sets true the flag showing whether the user has set a particular time 
      * field.
      * 
-     * @param targetTimeIndex Index of time field the user has set
+     * @param targetTimeIndex Index of time field the user has set.
      */
     private static void setTimeSetByUserToTrue(int targetTimeIndex) {
         if (targetTimeIndex == 1) {
