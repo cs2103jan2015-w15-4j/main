@@ -41,7 +41,9 @@ public class CommandTextbox extends JScrollPane{
     
     private int currentPopupListIndex;
     
-    private CommandPanelDocumentFilter commandPanelDocumentFilter;
+    private CustomTextFieldDocumentFilter commandPanelDocumentFilter;
+    
+    private boolean isCurrentlyHandlingKeyEvent;
     
     public CommandTextbox( String []commandKeywords, String []nonCommandKeywords, 
                            ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands ){
@@ -74,13 +76,17 @@ public class CommandTextbox extends JScrollPane{
         }
         
         prepareComboBox( inputCommandBox, listOfCommands );
+        
+        isCurrentlyHandlingKeyEvent = false;
     }
     
     public boolean handleKeyEvent( KeyEvent keyEvent ){
         
-        if( keyEvent != null && popUpBox != null && popUpList != null ){
+        if( !isCurrentlyHandlingKeyEvent && keyEvent != null && popUpBox != null && popUpList != null ){
             
             if( popUpBox != null && popUpBox.isPopupVisible() && inputCommandBox.isFocusOwner() ){
+                
+                isCurrentlyHandlingKeyEvent = true;
                 
                 restrictPopupBoxDimensions( inputCommandBox, popUpBox, 30 );
                 
@@ -142,17 +148,13 @@ public class CommandTextbox extends JScrollPane{
                     }
                 }
                 
+                isCurrentlyHandlingKeyEvent = false;
+                
                 return true;
-                
-            } else{
-                
-                return false;
             }
-            
-        } else{
-            
-            return false;
         }
+            
+        return false;
     }
     
     private int getPopupListIdx( int idx, int listSize ){
@@ -355,7 +357,7 @@ public class CommandTextbox extends JScrollPane{
             originalTextStyle = getStyleOfTextPane(textPane);
             
             AbstractDocument abstractDocument = (AbstractDocument)inputCommandBox.getDocument();
-            commandPanelDocumentFilter = new CommandPanelDocumentFilter( m_commandKeywords, m_nonCommandKeywords, originalTextStyle);
+            commandPanelDocumentFilter = new CustomTextFieldDocumentFilter( m_commandKeywords, m_nonCommandKeywords, originalTextStyle);
             abstractDocument.setDocumentFilter(commandPanelDocumentFilter);
         }
     }

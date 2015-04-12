@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Calendar;
 
 /**
- * @author Ke Jing
  * SPLITLOGIC CLASS SPLITS TASKLIST INTO DISPLAYTASKLIST FORMAT
  */
 public class SplitLogic {

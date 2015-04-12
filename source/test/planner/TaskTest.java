@@ -1,3 +1,5 @@
+//@author A0114156N
+
 package planner;
 
 import static org.junit.Assert.*;
@@ -5,11 +7,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import org.junit.Test;
-/**
- * 
- * @author kohwaikit
- *
- */
+
 public class TaskTest {
 
     @Test

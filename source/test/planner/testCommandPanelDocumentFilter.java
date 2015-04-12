@@ -11,7 +11,7 @@ public class testCommandPanelDocumentFilter {
     @Test
     public void testRegularStringArray() {
        
-        CommandPanelDocumentFilter commandPanelDocumentFilter = new CommandPanelDocumentFilter();
+        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
         
         String []keywords = { "nice", "done" };
         
@@ -23,7 +23,7 @@ public class testCommandPanelDocumentFilter {
     @Test
     public void testStringArrayContainingNull() {
         
-        CommandPanelDocumentFilter commandPanelDocumentFilter = new CommandPanelDocumentFilter();
+        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
         
         String []keywords = { "nice", null, "done" };
         
@@ -35,7 +35,7 @@ public class testCommandPanelDocumentFilter {
     @Test
     public void testNullStringArray(){
         
-        CommandPanelDocumentFilter commandPanelDocumentFilter = new CommandPanelDocumentFilter();
+        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
         
         String regexOutput = commandPanelDocumentFilter.generateRegex(null);
         

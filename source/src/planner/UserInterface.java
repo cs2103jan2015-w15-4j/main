@@ -3,6 +3,7 @@
 package planner;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -13,6 +14,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +37,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -90,7 +95,7 @@ public class UserInterface extends JFrame {
                 
             case SEARCH:
                 
-                handleSearch( input );
+                handleSearch( input, false );
                 
                 break;
             
@@ -126,55 +131,55 @@ public class UserInterface extends JFrame {
                 
             case SAVEWHERE:
                 
-                handleSaveWhere(input);
+                handleSaveWhere(input, false);
                 
                 break;
                 
             case SAVEHERE:
                 
-                handleSaveHere();
+                handleSaveHere(false);
                 
                 break;
             
             case HELP:
                 
-                showTutorialScreen( -1, input );
+                showTutorialScreen( -1, input, false );
                 
                 break;
                 
             case HELP_ADD:
             
-                showTutorialScreen( Constants.ADD_TUTORIAL, input );
+                showTutorialScreen( Constants.ADD_TUTORIAL, input, false );
                 
                 break;
                 
             case HELP_DELETE:
                 
-                showTutorialScreen( Constants.DELETE_TUTORIAL, input );
+                showTutorialScreen( Constants.DELETE_TUTORIAL, input, false );
                 
                 break;
                 
             case HELP_UPDATE:
                 
-                showTutorialScreen( Constants.UPDATE_TUTORIAL, input );
+                showTutorialScreen( Constants.UPDATE_TUTORIAL, input, false );
                 
                 break;
                 
             case HELP_DONE:
                 
-                showTutorialScreen( Constants.DONE_TUTORIAL, input );
+                showTutorialScreen( Constants.DONE_TUTORIAL, input, false );
                 
                 break;
                 
             case HELP_SEARCH:
                 
-                showTutorialScreen( Constants.SEARCH_TUTORIAL, input );
+                showTutorialScreen( Constants.SEARCH_TUTORIAL, input, false );
                 
                 break;
                 
             case HELP_UNDO:
                 
-                showTutorialScreen( Constants.UNDO_TUTORIAL, input );
+                showTutorialScreen( Constants.UNDO_TUTORIAL, input, false );
                 
                 break;
              
@@ -190,6 +195,20 @@ public class UserInterface extends JFrame {
             
                 break;
         }
+        
+        
+        if( commandInputField != null ){
+            
+            String msg = commandInputField.getText();
+            updateCommandPanel( input, msg, messageType );
+        }
+        
+        if( inputList != null ){
+   
+            inputList.resetGetWordPosition();
+            
+            inputList.addWordToList(input);
+        }
     }
     
     private void handleExit(){
@@ -198,7 +217,7 @@ public class UserInterface extends JFrame {
         System.exit(0);
     }
     
-    private void handleSaveWhere(String userInput){
+    private void handleSaveWhere(String userInput, boolean isAPrevCall ){
         
         displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
                 "YOPO's Settings", 
@@ -215,11 +234,15 @@ public class UserInterface extends JFrame {
         
         displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
         
-        messageType = 2;
-        isMessageDisplayed = false;
+        if( !isAPrevCall ){
+            
+            messageType = 2;
+            isMessageDisplayed = true;
+            commandPanel.setText( "Enter commands here", true );
+        }
     }
     
-    private void handleSaveHere(){
+    private void handleSaveHere( boolean isAPrevCall ){
         
         displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.SETTINGS, 
                 "YOPO's Settings", 
@@ -236,8 +259,12 @@ public class UserInterface extends JFrame {
         
         displayPane.showMessageOnDisplay(" YOPO's Current File Storage Location:\n\n " + fileSavePath);
         
-        messageType = 0;
-        commandPanel.setText( "YOPO's file storage location changed successfully", true );
+        if( !isAPrevCall ){
+                
+            messageType = 0;
+            isMessageDisplayed = true;
+            commandPanel.setText( "YOPO's file storage location changed successfully", true );
+        }
     }
     
     private void handleUndo(){
@@ -255,6 +282,7 @@ public class UserInterface extends JFrame {
         updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Previous keyboard command undone successfully", true );
     }
     
@@ -298,6 +326,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Fail to mark task as not done", true );
                     
                     return;
@@ -306,6 +335,7 @@ public class UserInterface extends JFrame {
             } else{
                 
                 messageType = 1;
+                isMessageDisplayed = true;
                 commandPanel.setText( "Fail to mark task as not done", true );
                 
                 return;
@@ -313,10 +343,11 @@ public class UserInterface extends JFrame {
         }
 
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " marked not done successfully", true );
     }
     
-    private void handleSearch( String userInput ){
+    private void handleSearch( String userInput, boolean isAPrevCall ){
         
         Set<Map.Entry<Date, DisplayTaskList>> tempList = Engine.getSearchResult();
         
@@ -337,18 +368,25 @@ public class UserInterface extends JFrame {
            
             if( displayPane.hasTasksDisplayed() ){
                 
-                messageType = 0;
-                commandPanel.setText( "Search success", true );
+                if( !isAPrevCall ){
+                    
+                    messageType = 0;
+                    isMessageDisplayed = true;
+                    commandPanel.setText( "Search success", true );
+                }
                 
                 return;
             }
         }
         
-        displayPane.clearDisplay();
+        displayPane.showMessageOnDisplay(" There are no tasks containing your search phrase");
         
-        messageType = 1;
-        isMessageDisplayed = true;
-        commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
+        if( !isAPrevCall ){
+            
+            messageType = 1;
+            isMessageDisplayed = true;
+            commandPanel.setText( "We cannot find any task containing the search phrase :/", true );
+        }
     }
     
     private void updateGUIView( Set<Map.Entry<Date, DisplayTaskList>> dateDisplayList, 
@@ -378,13 +416,13 @@ public class UserInterface extends JFrame {
         
         if( task != null ){
             
-            slidePanel.populateDisplay(task);
+            infoPanel.populateDisplay(task);
             
         } else{
             
             if( displayPane.getCurrentSelectedTask() != null && displayPane.getCurrentSelectedTask().getParent() != null ){
                 
-                slidePanel.populateDisplay(displayPane.getCurrentSelectedTask().getParent());
+                infoPanel.populateDisplay(displayPane.getCurrentSelectedTask().getParent());
             }
         }
         
@@ -395,7 +433,7 @@ public class UserInterface extends JFrame {
         
         if( !displayPane.hasTasksDisplayed() ){
             
-            slidePanel.slideIn();
+            infoPanel.slideIn();
         }
     }
     
@@ -608,6 +646,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to add task", true );
                     
                     return;
@@ -616,6 +655,7 @@ public class UserInterface extends JFrame {
             } else{
                 
                 messageType = 1;
+                isMessageDisplayed = true;
                 commandPanel.setText( "Failed to add task", true );
                 
                 return;
@@ -623,6 +663,7 @@ public class UserInterface extends JFrame {
         }
 
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #"+ modifiedTaskID + " added successfully", true );
     }
     
@@ -632,6 +673,7 @@ public class UserInterface extends JFrame {
             
             DisplayState currentDisplayState = displayStateStack.pop();
             DisplayState previousDisplayState = displayStateStack.pop();
+            
             displayStateStack.push(currentDisplayState);
             
             if( previousDisplayState != null ){
@@ -651,73 +693,65 @@ public class UserInterface extends JFrame {
                     
                     updateCurrentList(previousDisplayState);
                     
-                    String text = commandInputField.getText();
-                    
                     switch( Engine.process(userCommand) ){
                     
                         case SEARCH:
                             
-                            handleSearch(userCommand);
-                            
-                            if( text.length() > 0 ){
-                                
-                                commandPanel.setSyntaxFilterOn();
-                                commandPanel.setText(text, false);
-                            }
+                            handleSearch(userCommand, true);
                             
                             break;
                             
                         case SAVEWHERE:
                             
-                            handleSaveWhere(userCommand);
+                            handleSaveWhere(userCommand, true);
                             
                             break;
                             
                         case SAVEHERE:
                             
-                            handleSaveWhere(userCommand);
+                            handleSaveWhere(userCommand, true);
                             
                             break;
                             
                         case HELP:
                             
-                            showTutorialScreen(-1, userCommand );
+                            showTutorialScreen(-1, userCommand, true );
                             
                             break;
                             
                         case HELP_ADD:
                             
-                            showTutorialScreen(Constants.ADD_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.ADD_TUTORIAL, userCommand, true );
                             
                             break;
                             
                         case HELP_UPDATE:
                             
-                            showTutorialScreen(Constants.UPDATE_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.UPDATE_TUTORIAL, userCommand, true );
                             
                             break;
                             
                         case HELP_DELETE:
                             
-                            showTutorialScreen(Constants.DELETE_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.DELETE_TUTORIAL, userCommand, true );
                             
                             break;
                             
                         case HELP_DONE:
                             
-                            showTutorialScreen(Constants.DONE_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.DONE_TUTORIAL, userCommand, true );
                             
                             break;
                             
                         case HELP_UNDO:
                             
-                            showTutorialScreen(Constants.UNDO_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.UNDO_TUTORIAL, userCommand, true );
                             
                             break;
                             
                         case HELP_SEARCH:
                             
-                            showTutorialScreen(Constants.SEARCH_TUTORIAL, userCommand );
+                            showTutorialScreen(Constants.SEARCH_TUTORIAL, userCommand, true );
                             
                             break;
                             
@@ -789,6 +823,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to add task", true );
                     
                     return;
@@ -797,6 +832,7 @@ public class UserInterface extends JFrame {
             } else{
                 
                 messageType = 1;
+                isMessageDisplayed = true;
                 commandPanel.setText( "Failed to add task", true );
                 
                 return;
@@ -806,6 +842,7 @@ public class UserInterface extends JFrame {
         int conflictTaskID = Engine.getClashingTask();
         
         messageType = 1;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " conflicts with task #" + conflictTaskID, true );
     }
     
@@ -849,6 +886,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to convert task into a deadline task", true );
                     
                     return;
@@ -857,6 +895,7 @@ public class UserInterface extends JFrame {
         }
         
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
     }
     
@@ -900,6 +939,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to convert task into a deadline task", true );
                     
                     return;
@@ -908,6 +948,7 @@ public class UserInterface extends JFrame {
         }
         
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a deadline task successfully", true );
     }
     
@@ -951,6 +992,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to convert task into a floating task", true );
                     
                     return;
@@ -959,6 +1001,7 @@ public class UserInterface extends JFrame {
         }
         
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " converted into a floating task successfully", true );
     }
     
@@ -1002,6 +1045,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Failed to update task", true );
                     
                     return;
@@ -1010,6 +1054,7 @@ public class UserInterface extends JFrame {
             } else{
                 
                 messageType = 1;
+                isMessageDisplayed = true;
                 commandPanel.setText( "Failed to update task", true );
                 
                 return;
@@ -1017,6 +1062,7 @@ public class UserInterface extends JFrame {
         }
 
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " updated successfully", true );
     }
     
@@ -1060,6 +1106,7 @@ public class UserInterface extends JFrame {
                 } else{
                     
                     messageType = 1;
+                    isMessageDisplayed = true;
                     commandPanel.setText( "Fail to mark task as done", true );
                     
                     return;
@@ -1068,6 +1115,7 @@ public class UserInterface extends JFrame {
             } else{
                 
                 messageType = 1;
+                isMessageDisplayed = true;
                 commandPanel.setText( "Fail to mark task as done", true );
                 
                 return;
@@ -1075,6 +1123,7 @@ public class UserInterface extends JFrame {
         }
 
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task #" + modifiedTaskID + " marked done successfully", true );
     }
     
@@ -1093,19 +1142,32 @@ public class UserInterface extends JFrame {
         updateGUIView( currentDisplayListForDate, currentDisplayListForPriority, sectionTitleString, null );
         
         messageType = 0;
+        isMessageDisplayed = true;
         commandPanel.setText( "Task deleted successfully", true );
     }
     
     private void handleInvalidOperation(){
         
         messageType = 1;
-        commandPanel.setText( "Invalid Command", true );
+        isMessageDisplayed = true;
+        
+        String errorMessage = Constants.errorMessages.get(Engine.getErrorType());
+        
+        if( errorMessage != null ){
+            
+            commandPanel.setText( errorMessage, true );
+            
+        } else{
+            
+            commandPanel.setText( "Invalid Command", true );
+        }
     }
     
     public void handleUnexpectedOperation(){
         
         messageType = 1;
-        commandPanel.setText( "Feature not supported in V0.4", true );
+        isMessageDisplayed = true;
+        commandPanel.setText( "Feature not supported in V0.5", true );
     }
     ///////////////////////////////////////////////////////////////////// 
     //  PROCESS COMMANDS FUNCTIONS END HERE
@@ -1114,9 +1176,9 @@ public class UserInterface extends JFrame {
     private JPanel contentPane;
     private JPanel slidePanelFrame;
     
-    private SliderPanel slidePanel;
+    private SliderPanel infoPanel;
+    private SliderPanel lastCommandPanel;
     
-    //private JTextField command;
     private CommandTextbox commandPanel;
     private JTextPane commandInputField;
     
@@ -1139,6 +1201,8 @@ public class UserInterface extends JFrame {
     private int mouseXCoordinate;
     private int mouseYCoordinate;
     
+    private int caretPositionToAppendLastCommandString;
+    
     private DisplayTaskList currentList;
     
     private Set<Map.Entry<Integer, DisplayTaskList>> currentDisplayListForPriority;
@@ -1159,6 +1223,9 @@ public class UserInterface extends JFrame {
     
     private DisplayStateStack displayStateStack;
     private final int maxNumOfDisplayStates = 100;
+    
+    private InputList inputList;
+    private final int MAX_INPUT_LIST_SIZE = 1000;
     
     public static void main(String[] args) {
         
@@ -1196,11 +1263,15 @@ public class UserInterface extends JFrame {
             System.exit(1);
         }
         
+        // Initialize messages
+        Constants.initializeErrorMessages();
+        
         isMessageDisplayed = true;
         
         // Main frame
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCustomClosingFrameBehaviour();
         
         // Adding paintable component to main frame
         setBounds(100, 100, 867, 587);
@@ -1213,6 +1284,7 @@ public class UserInterface extends JFrame {
         prepareCloseButton();
         prepareMinimiseButton();
         prepareSlidePanel();
+        prepareLastCommandPanel();
         prepareNavigationPanel();
         prepareDragPanel();
         prepareSectionTitle();
@@ -1228,14 +1300,29 @@ public class UserInterface extends JFrame {
             prepareTaskDisplayPanel(displayPane);
         }
         
+        inputList = new InputList(MAX_INPUT_LIST_SIZE);
+        
         setUndecorated(true);
         setLocationRelativeTo(null);
     }
     
-    private void showTutorialScreen( int tutorialIndex, String userInput ){
+    private void setDefaultCustomClosingFrameBehaviour(){
+        
+        addWindowListener( new WindowAdapter(){
+
+            @Override
+            public void windowClosing(WindowEvent arg0) {
+
+                handleExit();
+            }
+        });
+    }
+    
+    private void showTutorialScreen( int tutorialIndex, String userInput, boolean isPrevCall ){
         
         currentDisplayListForDate = null;
         currentDisplayListForPriority = null;
+        currentList = null;
         
         switch( tutorialIndex ){
         
@@ -1323,10 +1410,16 @@ public class UserInterface extends JFrame {
                 
                 break;
         }
-        
-        messageType = 2;
-        isMessageDisplayed = false;
-        commandPanel.setText( "", true );
+      
+        if( !isPrevCall ){
+            
+            if( !commandInputField.isFocusOwner() && isMessageDisplayed ){
+                
+                messageType = 2;
+                commandPanel.setForegroundColor(new Color(128,128,128));
+                commandPanel.setText( "Enter Commands here", true );
+            }
+        }
     }
     
     private void prepareTaskDisplayPanel( DisplayPane displayPanel ){
@@ -1556,8 +1649,6 @@ public class UserInterface extends JFrame {
                 
                 DisplayState currentDisplayState = displayStateStack.peek();
                 
-                System.out.println( "entered f5" + (displayStateStack.isEmpty() ? "empty" : "not empty") );
-                
                 if( currentDisplayState != null &&
                     currentDisplayState.getdisplayStateFlag() != planner.Constants.DisplayStateFlag.ALL ){
                     
@@ -1597,19 +1688,11 @@ public class UserInterface extends JFrame {
                         
                         return true;
                     }
-                    
-                } else{
-                    
-                    handleExit();
-                    
-                    event.consume();
-                    
-                    return true;
                 }
                 
             } else if(event.getKeyCode() == KeyEvent.VK_F3){
                 
-                showTutorialScreen( -1, null );
+                showTutorialScreen( -1, null, false );
                 
                 event.consume();
                         
@@ -1618,6 +1701,27 @@ public class UserInterface extends JFrame {
             } else if( event.getKeyCode() == KeyEvent.VK_F2 ){
                 
                 handlePreviousViewOperation(displayStateStack);
+                
+                event.consume();
+                
+                return true;
+                
+            } else if( event.getKeyCode() == KeyEvent.VK_F1 ){
+                
+                if( !event.isShiftDown() ){
+                    
+                    DisplayTask tempTask = displayPane.getCurrentSelectedTask();
+                    
+                    if( tempTask != null && tempTask.getParent() != null ){
+                        
+                        //infoPanel.slideOut( tempTask.getParent(), true );
+                        slideOut(infoPanel, tempTask.getParent());
+                    }
+                    
+                } else{
+                    
+                    slideOut(lastCommandPanel, null);
+                }
                 
                 event.consume();
                 
@@ -1635,7 +1739,7 @@ public class UserInterface extends JFrame {
             if(  commandPanel != null ){
                 
                 if( commandPanel.handleKeyEvent(event) ){
-                   
+                    
                     return;
                 }
             }
@@ -1675,34 +1779,68 @@ public class UserInterface extends JFrame {
                 
             }  else if( event.getKeyCode() == KeyEvent.VK_ESCAPE ){
          
-                if( slidePanel.isVisible()){
+                if( infoPanel.isVisible() || lastCommandPanel.isVisible() ){
                     
-                    slidePanel.slideIn();
+                    slideInAllPanelsExcept(null);
                     
                     event.consume();
                 }
                 
             } else if( event.getKeyCode() == KeyEvent.VK_UP ){
                 
+                if( event.isShiftDown() ){
+                    
+                    if( inputList != null && commandPanel != null && commandInputField != null ){
+                    
+                        String currentInput = commandInputField.getText();
+                        
+                        inputList.setRecentlyTypedString(currentInput);
+                        
+                        String prevInputString = inputList.getPrevInputString();
+                        
+                        if( prevInputString != null){
+                            
+                            commandPanel.setText(prevInputString, false);
+                        }
+                        
+                        event.consume();
+                        
+                        return;
+                    }
+                }
+                
                 if( !displayPane.isFocusOwner() ){
                     
                     displayPane.requestFocusInWindow();
                 }
                 
-                if( slidePanel.isVisible() && event.isControlDown() ){
+                if( event.isControlDown() ){
                     
-                    JScrollPane tempScrollPane = slidePanel.getDisplayScrollComponent();
-                    JScrollBar verticalScrollBar = tempScrollPane != null ? tempScrollPane.getVerticalScrollBar() : null;
+                    JScrollPane tempScrollPane = null;
                     
-                    if( verticalScrollBar != null && verticalScrollBar.isVisible() ){
+                    if( infoPanel != null && infoPanel.isVisible() ){
                         
-                        int currentScrollValue = verticalScrollBar.getValue();
-                        int tempScrollUnitDifference = -verticalScrollBar.getUnitIncrement(-1);
-                        verticalScrollBar.setValue(currentScrollValue + tempScrollUnitDifference);
+                        tempScrollPane = infoPanel.getDisplayScrollComponent();
                         
-                        event.consume();
-                       
-                        return;
+                    } else if( lastCommandPanel != null && lastCommandPanel.isVisible() ){
+                        
+                        tempScrollPane = lastCommandPanel.getDisplayScrollComponent();
+                    }
+                    
+                    if( tempScrollPane != null ){
+                        
+                        JScrollBar verticalScrollBar = tempScrollPane != null ? tempScrollPane.getVerticalScrollBar() : null;
+                        
+                        if( verticalScrollBar != null && verticalScrollBar.isVisible() ){
+                            
+                            int currentScrollValue = verticalScrollBar.getValue();
+                            int tempScrollUnitDifference = -verticalScrollBar.getUnitIncrement(-1);
+                            verticalScrollBar.setValue(currentScrollValue + tempScrollUnitDifference);
+                            
+                            event.consume();
+                           
+                            return;
+                        }
                     }
                 }
                 
@@ -1720,13 +1858,13 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                if( slidePanel.isVisible() ){
+                if( infoPanel.isVisible() ){
                     
                     DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                     
                     if( tempTask != null && tempTask.getParent() != null ){
                         
-                        slidePanel.populateDisplay(tempTask.getParent());
+                        infoPanel.populateDisplay(tempTask.getParent());
                     }
                 }
                 
@@ -1737,27 +1875,59 @@ public class UserInterface extends JFrame {
                 
             } else if( event.getKeyCode() == KeyEvent.VK_DOWN ){
                 
-                
+                if( event.isShiftDown() ){
+                    
+                    if( inputList != null && commandPanel != null && commandInputField != null ){
+                    
+                        String currentInput = commandInputField.getText();
+                        
+                        inputList.setRecentlyTypedString(currentInput);
+                        
+                        String nextInputString = inputList.getNextInputString();
+                        
+                        if( nextInputString != null){
+                            
+                            commandPanel.setText(nextInputString, false);
+                        }
+                        
+                        event.consume();
+                        
+                        return;
+                    }
+                }
                 
                 if( !displayPane.isFocusOwner() ){
                     
                     displayPane.requestFocusInWindow();
                 }
                 
-                if( slidePanel.isVisible() && event.isControlDown() ){
+                if( event.isControlDown() ){
                     
-                    JScrollPane tempScrollPane = slidePanel.getDisplayScrollComponent();
-                    JScrollBar verticalScrollBar = tempScrollPane != null ? tempScrollPane.getVerticalScrollBar() : null;
+                    JScrollPane tempScrollPane = null;
                     
-                    if( verticalScrollBar != null && verticalScrollBar.isVisible() ){
-                    
-                        int currentScrollValue = verticalScrollBar.getValue();
-                        int tempScrollUnitDifference = verticalScrollBar.getUnitIncrement(1);
-                        verticalScrollBar.setValue(currentScrollValue + tempScrollUnitDifference);
+                    if( infoPanel != null && infoPanel.isVisible() ){
                         
-                        event.consume();
+                        tempScrollPane = infoPanel.getDisplayScrollComponent();
                         
-                        return;
+                    } else if( lastCommandPanel != null && lastCommandPanel.isVisible() ){
+                        
+                        tempScrollPane = lastCommandPanel.getDisplayScrollComponent();
+                    }
+                    
+                    if( tempScrollPane != null ){
+                        
+                        JScrollBar verticalScrollBar = tempScrollPane != null ? tempScrollPane.getVerticalScrollBar() : null;
+                        
+                        if( verticalScrollBar != null && verticalScrollBar.isVisible() ){
+                        
+                            int currentScrollValue = verticalScrollBar.getValue();
+                            int tempScrollUnitDifference = verticalScrollBar.getUnitIncrement(1);
+                            verticalScrollBar.setValue(currentScrollValue + tempScrollUnitDifference);
+                            
+                            event.consume();
+                            
+                            return;
+                        }
                     }
                 }
                 
@@ -1775,13 +1945,13 @@ public class UserInterface extends JFrame {
                     }
                 }
                 
-                if( slidePanel.isVisible() ){
+                if( infoPanel.isVisible() ){
                     
                     DisplayTask tempTask = displayPane.getCurrentSelectedTask();
                     
                     if( tempTask != null && tempTask.getParent() != null ){
                         
-                        slidePanel.populateDisplay(tempTask.getParent());
+                        infoPanel.populateDisplay(tempTask.getParent());
                     }
                 }
                 
@@ -1799,7 +1969,8 @@ public class UserInterface extends JFrame {
                         
                         if( tempTask != null && tempTask.getParent() != null ){
                             
-                            slidePanel.slideOut( tempTask.getParent() );
+                            //infoPanel.slideOut( tempTask.getParent(), true );
+                            slideOut(infoPanel, tempTask.getParent());
                         }
                         
                         event.consume();
@@ -1827,8 +1998,6 @@ public class UserInterface extends JFrame {
                     } 
                     
                 } else if( event.getKeyCode() == KeyEvent.VK_ENTER ){
-                       
-                    
                     
                     String input = commandInputField.getText();
                     
@@ -1844,7 +2013,6 @@ public class UserInterface extends JFrame {
                         
                         event.consume();
                     }
-                    
                 }
             }
         }
@@ -1871,16 +2039,114 @@ public class UserInterface extends JFrame {
     
     private void prepareSlidePanel(){
         
-        slidePanelFrame = new JPanel();
-        slidePanelFrame.setBounds(670, 45, 396, 520);
-        contentPane.add(slidePanelFrame);
-        slidePanelFrame.setLayout(null);
-        slidePanelFrame.setOpaque(false);
-        //slidePanelFrame.setFocusable(false);
+        if( slidePanelFrame == null ){
+            
+            slidePanelFrame = new JPanel();
+            slidePanelFrame.setBounds(670, 45, 396, 520);
+            contentPane.add(slidePanelFrame);
+            slidePanelFrame.setLayout(null);
+            slidePanelFrame.setOpaque(false);
+        }
         
-        slidePanel = new SliderPanel(0, 198);
-        slidePanel.setBounds(198, 0, 202, 520);
-        slidePanelFrame.add(slidePanel);
+        infoPanel = new SliderPanel(0, 198);
+        infoPanel.setBounds(198, 0, 202, 520);
+        slidePanelFrame.add(infoPanel);
+    }
+    
+    private void prepareLastCommandPanel(){
+        
+        if( slidePanelFrame == null ){
+            
+            slidePanelFrame = new JPanel();
+            slidePanelFrame.setBounds(670, 45, 396, 520);
+            contentPane.add(slidePanelFrame);
+            slidePanelFrame.setLayout(null);
+            slidePanelFrame.setOpaque(false);
+        }
+        
+        lastCommandPanel = new SliderPanel(0, 198);
+        lastCommandPanel.setBounds(198, 0, 202, 520);
+        slidePanelFrame.add(lastCommandPanel);
+        
+        int caretPosition = lastCommandPanel.getDisplayCaretPosition();
+        
+        SimpleAttributeSet titleStyle = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(titleStyle, "Arial");
+        StyleConstants.setFontSize(titleStyle, 14);
+        StyleConstants.setBold(titleStyle, true);
+        StyleConstants.setForeground(titleStyle, Color.WHITE);
+        StyleConstants.setUnderline(titleStyle, true);
+        
+        lastCommandPanel.insertStringToDisplay(caretPosition, "Recent Commands\n", titleStyle);
+        
+        caretPositionToAppendLastCommandString = lastCommandPanel.getDisplayCaretPosition();
+    }
+    
+    private void updateCommandPanel( String userInput, String message, int messageType ){
+        
+        if( lastCommandPanel != null && userInput != null && message != null ){
+            
+            SimpleAttributeSet headerStyle = new SimpleAttributeSet();
+            StyleConstants.setFontFamily(headerStyle, "Arial");
+            StyleConstants.setFontSize(headerStyle, 13);
+            StyleConstants.setBold(headerStyle, true);
+            StyleConstants.setForeground(headerStyle, Color.WHITE);
+            
+            SimpleAttributeSet infoStyle = new SimpleAttributeSet();
+            StyleConstants.setFontFamily(infoStyle, "Arial");
+            StyleConstants.setFontSize(infoStyle, 12);
+            StyleConstants.setBold(infoStyle, false);
+            
+            lastCommandPanel.setDisplayCaretPosition(caretPositionToAppendLastCommandString);
+            
+            lastCommandPanel.insertStringToDisplay(caretPositionToAppendLastCommandString, "\nYour Command:\n", headerStyle);
+            
+            StyleConstants.setForeground(infoStyle, new Color(125, 249, 255) );
+            lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), userInput, infoStyle );
+            
+            if( messageType == 0 ){
+                
+                lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), "\nCommand Result:\n", headerStyle);
+                StyleConstants.setForeground(infoStyle, Color.GREEN);
+                lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), message, infoStyle );
+                
+            } else if( messageType == 1 ){
+                
+                lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), "\nCommand Result:\n", headerStyle);
+                StyleConstants.setForeground(infoStyle, new Color(255, 102, 102));
+                lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), message, infoStyle );
+            }
+            
+            StyleConstants.setForeground(infoStyle, Color.WHITE);
+            lastCommandPanel.insertStringToDisplay(lastCommandPanel.getDisplayCaretPosition(), "\n*********************************\n", infoStyle );
+        }
+    }
+    
+    private void slideInAllPanelsExcept( SliderPanel slidePanel ){
+        
+        if( infoPanel != null && slidePanel != infoPanel ){
+            
+            infoPanel.slideIn();   
+        } 
+        
+        if( lastCommandPanel != null && slidePanel != lastCommandPanel ){
+            
+            lastCommandPanel.slideIn();
+        }
+    }
+    
+    private void slideOut( SliderPanel slidePanel, Task task ){
+        
+        if( infoPanel != null && slidePanel == infoPanel ){
+            
+            infoPanel.slideOut(task, true);
+            slideInAllPanelsExcept(infoPanel);
+            
+        } else if( lastCommandPanel != null && slidePanel == lastCommandPanel ){
+            
+            lastCommandPanel.slideOut(null, false);
+            slideInAllPanelsExcept(lastCommandPanel);
+        }
     }
     
     private void prepareNavigationPanel(){
@@ -2261,7 +2527,6 @@ public class UserInterface extends JFrame {
         currentList = convertToDisplayTaskList( currentDisplayListForDate );
         
         // Display all tasks as default screen for now
-        //displayPane.addTasksToDisplay(currentList);
         displayPane.displayByDate(currentDisplayListForDate);
         
         displayPane.requestFocusInWindow();
@@ -2440,6 +2705,11 @@ public class UserInterface extends JFrame {
                 @Override
                 public void focusGained(FocusEvent e) {
                     
+                    if( inputList != null ){
+                        
+                        inputList.resetGetWordPosition();
+                    }
+                    
                     commandTextbox.setSyntaxFilterOn();
                     
                     commandTextbox.setForegroundColor( new Color( 0,0,0 ) );
@@ -2477,29 +2747,26 @@ public class UserInterface extends JFrame {
                 @Override
                 public void focusLost(FocusEvent e) {
                     
+                    if( inputList != null ){
+                       
+                        inputList.resetGetWordPosition();
+                    }
+                    
                     commandTextbox.setSyntaxFilterOff();
                     
                     commandTextbox.hidePopupBox();
                     
                     commandTextbox.setForegroundColor( new Color( 255,0,0 ) );
                     
-                    System.out.println( "MessageType = " + messageType );
-                    
                     if( messageType == 0 ){
-                        
-                        System.out.println( "Here good" );
                         
                         commandTextbox.setForegroundColor( new Color( 0,100,0 ) );
                         
                     } else if( messageType == 1 ){
                         
-                        System.out.println( "Here nice" );
-                        
                         commandTextbox.setForegroundColor( new Color( 255,0,0 ) );
                         
                     } else{
-                        
-                        System.out.println( "Here residue" );
                         
                         commandTextbox.setForegroundColor( new Color( 128,128,128 ) );
                     }

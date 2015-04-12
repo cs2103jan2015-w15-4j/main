@@ -99,8 +99,6 @@ public class TaskBar extends JComponent {
             
         } else{
             
-            System.out.println("went here");
-            
             heightOfLabel = 0;
         }
         
@@ -137,8 +135,6 @@ public class TaskBar extends JComponent {
             add(dateHeader);
             
         } else{
-            
-            System.out.println("went here");
             
             heightOfLabel = 0;
         }
@@ -427,8 +423,6 @@ public class TaskBar extends JComponent {
 	            
 	            if( !hasMovedUp ){
 	                
-	                System.out.println( "moved up" );
-	                
 	                moveTitleLabelVertically( -8 );
 	                
 	                hasMovedUp = true;
@@ -438,8 +432,6 @@ public class TaskBar extends JComponent {
 	        } else{
 	            
 	            if( !hasMovedDown ){
-                    
-	                System.out.println( "moved down" );
 	                
                     moveTitleLabelVertically( 8 );
                     

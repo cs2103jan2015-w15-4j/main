@@ -1,3 +1,4 @@
+//@author A0108232U
 package planner;
 
 import java.util.Arrays;
@@ -9,9 +10,7 @@ import planner.Constants.ErrorType;
 
 /**
  * This class is used to deliver the results of  
- * parsing a user command to the engine.
- * 
- * @author Tham Zheng Yi
+ * parsing a user command to the engine. 
  */
 public class ParseResult {
 
@@ -34,7 +33,7 @@ public class ParseResult {
     private boolean[] commandFlags;
     
     /**
-     * This method is the ParseResult constructor
+     * This method is the ParseResult constructor.
      * 
      * @param commandType Type of the command e.g. search
      * @param time        Time/date parsed from command               
@@ -76,48 +75,104 @@ public class ParseResult {
             this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
         }
     }
-
+	
+	/**
+	 * Gets the type of command the user input
+	 * 
+	 * @return Command type
+	 */
     public CommandType getCommandType() {
         return commandType;
     }
 
+    /**
+     * Gets the first date field the user input.
+     * 
+     * @return First date field
+     */
     public Date getDate() {        
         return parsedDate != null ? new Date(parsedDate.getTime()) : null;    // Changed to defensive copy
     }
     
+    /**
+     * Gets the second date field the user input.
+     * 
+     * @return Second date field
+     */
     public Date getSecondDate() {
         return parsedDate2;
     }
     
+    /**
+     * Gets the date by which the user wishes to be reminded.
+     * 
+     * @return Reminder date
+     */
     public Date getDateToRemind() {        
         return dateToRemind != null ? new Date(dateToRemind.getTime()) : null;    // Changed to defensive copy
     }
 
+    /**
+     * Gets the priority level the user input.
+     * 
+     * @return Priority level
+     */
     public int getPriorityLevel() {
         return priorityLevel;
     }
 
+    /**
+     * Gets the task id the user input.
+     * 
+     * @return Task id
+     */
     public long getId() {
         return taskId;
     }
 
+    /**
+     * Gets the task name the user input.
+     * 
+     * @return Task name
+     */
     public String getName() {
         return taskName;
     }
 
+    /**
+     * Gets the task description the user input.
+     * 
+     * @return Task description
+     */
     public String getDescription() {
         return taskDescription;
     }
 
+    /**
+     * Gets the task tag the user input.
+     * 
+     * @return Task tag
+     */
     public String getTag() {
         return taskTag;
     }
 
+    /**
+     * Gets the error from parsing the user command.
+     * 
+     * @return Error type
+     */
     public ErrorType getErrorType() {
         return errorType;
     }
-
+    
+    /**
+     * Gets the flags that represent which fields in the result contain valid
+     * values.
+     * 
+     * @return Field validity flags
+     */
     public boolean[] getCommandFlags() {        
-        return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];    // Changed to defensive copy
+        return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];
     }
 }

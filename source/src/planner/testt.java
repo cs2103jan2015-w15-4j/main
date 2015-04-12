@@ -56,7 +56,7 @@ public class testt extends JFrame {
         
         System.out.println( "width = " + getWidth());
         
-        sliderPanel.slideOut(tempTask);
+        sliderPanel.slideOut(tempTask, true);
         
         System.out.println( "x = " + sliderPanel.getBounds().x );
         
@@ -83,7 +83,7 @@ public class testt extends JFrame {
                     
                     else{
                         
-                        sliderPanel.slideOut(tempTask);
+                        sliderPanel.slideOut(tempTask, true);
                     }
                     
                     count ^= 1;

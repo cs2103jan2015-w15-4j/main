@@ -13,86 +13,86 @@ import java.util.ListIterator;
  * TaskList class is a container class for Tasks. It extends ArrayList.
  *
  */
-public class TaskList implements List<Task>{
-	
+public class TaskList implements List<Task> {
+
     private ArrayList<Task> tasks;
-    
+
     public TaskList() {
         tasks = new ArrayList<Task>();
     }
-    
+
     public TaskList(ArrayList<Task> input) {
-        
+
         tasks = new ArrayList<Task>();
-        
+
         // Changed to defensive copy
-    	if( input != null ){
-    		
-    	    Iterator<Task> iterator = input.iterator();
-    	    Task currentTask;
-    	    
-    	    while( iterator.hasNext() ){
-    	        
-    	        currentTask = iterator.next();
-    	        
-    	        if( currentTask != null ){
-    	            
-    	            input.add( new Task( currentTask ) );
-    	        }
-    	    }
-    	}
+        if (input != null) {
+
+            Iterator<Task> iterator = input.iterator();
+            Task currentTask;
+
+            while (iterator.hasNext()) {
+
+                currentTask = iterator.next();
+
+                if (currentTask != null) {
+
+                    input.add(new Task(currentTask));
+                }
+            }
+        }
     }
-    
-    public TaskList( TaskList anotherTaskList ){
-    	
-    	tasks = new ArrayList<Task>();
-    	
-    	copyTaskList( anotherTaskList );
+
+    public TaskList(TaskList anotherTaskList) {
+
+        tasks = new ArrayList<Task>();
+
+        copyTaskList(anotherTaskList);
     }
-    
-    public boolean copyTaskList( TaskList anotherTaskList ){
-    	
-    	if( anotherTaskList != null ){
-    		
-    		tasks.clear();
-    		
-    		Iterator<Task> iterator = anotherTaskList.iterator();
-    		
-    		Task tempTask;
-    		
-    		while( iterator.hasNext() ){
-    			
-    		    tempTask = iterator.next();
-    		    
-    		    // Corner case: NULL is inserted into anotherTaskList
-    		    // Changed adding tasks to defensive copy
-    		    if( tempTask != null ){
-    		        
-    		        tasks.add(new Task(tempTask));
-    		    }
-    		}
-    		
-    		return true;
-    		
-    	} else{
-    		
-    		return false;
-    	}
+
+    public boolean copyTaskList(TaskList anotherTaskList) {
+
+        if (anotherTaskList != null) {
+
+            tasks.clear();
+
+            Iterator<Task> iterator = anotherTaskList.iterator();
+
+            Task tempTask;
+
+            while (iterator.hasNext()) {
+
+                tempTask = iterator.next();
+
+                // Corner case: NULL is inserted into anotherTaskList
+                // Changed adding tasks to defensive copy
+                if (tempTask != null) {
+
+                    tasks.add(new Task(tempTask));
+                }
+            }
+
+            return true;
+
+        } else {
+
+            return false;
+        }
     }
-    
+
     public ArrayList<Task> getTasks() {
         return tasks;
     }
 
     public Task getTaskByID(long ID) {
-        for(Task t:tasks) {
-            if(t.getID() == ID) {
+        for (Task t : tasks) {
+            if (t.getID() == ID) {
                 return t;
             }
         }
         return null;
     }
-    
+
     @Override
     public int size() {
         return tasks.size();
@@ -161,7 +161,7 @@ public class TaskList implements List<Task>{
     @Override
     public void clear() {
         tasks.clear();
-        
+
     }
 
     @Override
@@ -173,11 +173,11 @@ public class TaskList implements List<Task>{
     public Task set(int index, Task element) {
         return tasks.set(index, element);
     }
-    
+
     @Override
     public void add(int index, Task element) {
         tasks.add(index, element);
-        
+
     }
 
     @Override

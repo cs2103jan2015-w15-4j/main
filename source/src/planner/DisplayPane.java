@@ -307,8 +307,6 @@ public class DisplayPane extends JScrollPane{
 		
 		TaskBar taskBar = new TaskBar();
 		
-		//setTaskBarParameters( taskBar, task, taskBarID + 1 );
-		
 		setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
 		
 		taskBar.setPosition( display.getCaretPosition() );
@@ -375,7 +373,6 @@ public class DisplayPane extends JScrollPane{
                     selectTask( tempTaskBar, internalID );
                     
                     return true;
-                
                 } 
 	        }
 	    }
@@ -398,7 +395,6 @@ public class DisplayPane extends JScrollPane{
 	                selectTask( tempTaskBar, internalID );
 	                
 	                return true;
-	                
 	            } 
 	        }
 	    }
