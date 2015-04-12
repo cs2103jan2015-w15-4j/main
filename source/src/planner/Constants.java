@@ -194,9 +194,9 @@ public class Constants {
     public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 17;
     public static final int NAVIGATION_BARS_MAX_NUM = 10;
     
-    EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
+    public static EnumMap<ErrorType, String> errorMessages = new EnumMap<ErrorType, String>(ErrorType.class);
     
-    public void initializeErrorMessages() {
+    public static void initializeErrorMessages() {
         errorMessages.put(ErrorType.INVALID_COMMAND, "invalid command type");
         errorMessages.put(ErrorType.INVALID_TASK_ID, "a number must be entered for the task id");
         errorMessages.put(ErrorType.BLANK_TASK_NAME, "the name of the task added cannot be blank");
