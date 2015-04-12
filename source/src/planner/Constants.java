@@ -180,15 +180,15 @@ public class Constants {
         },
         {"Show command history",
          "This shortcut will display your past commands and their results.\n\nExample usage: Shift + F1\n\n[This causes your command history to be displayed in the side panel]",
-         "Example usage: Shift + F1"
+         "Example usage: Shift \\+ F1"
         },
         {"Scroll through info panel or command history",
          "This will scroll through your info panel or command history.\n\nExample usage: Ctrl + down/up arrow key\n\n[This scrolls through the info panel/command history]",
-         "Ctrl + down/up arrow key"
+         "Example usage: Ctrl \\+ down\\/up arrow key"
         },
         {"Cycle through previous commands",
          "This will cycle through the commands you previously input.\n\nExample usage: Shift + down/up arrow key\n\n[This cycles through your previous commands in the input box]",
-         "Shift + down/up arrow key"
+         "Example usage: Shift \\+ down\\/up arrow key"
         }
     };
 
