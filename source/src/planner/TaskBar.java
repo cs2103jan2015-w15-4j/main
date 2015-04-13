@@ -109,7 +109,7 @@ public class TaskBar extends JComponent {
     private final String DONE_TASK_DATE_STRING = "Completed at ";
     private final String FROM_DATE_STRING = "From ";
     private final String TO_DATE_STRING = " to ";
-    private final String TO_DATE_STRING_II = "To";
+    private final String TO_DATE_STRING_II = "To ";
     private final String BY_DATE_STRING = "By ";
     private final String DISPLAY_DATE_FORMAT = "d MMM yyyy 'at' h:mma";
     private final String BACKGROUND_IMAGE_RESOURCE_LINK = "/planner/TaskBar.png";
