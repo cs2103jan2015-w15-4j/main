@@ -13,12 +13,18 @@ import java.util.TreeMap;
 import planner.Constants.SortType;
 
 /**
- * SORTLOGIC IS USED TO SORT DISPLAYTASKLIST OR TREEMAPS
+ * This class is used to sort displayTaskList as well as how tasks are ordered 
+ * before inserting into TreeMaps. 
+ * Contains multiple ways to sort such as sorting by date, priority, ID 
+ * and name
  */
 public class SortLogic {
     
+    private static final int TIME_GREATER_THAN_2359 = 2400;
+    private static final int HOUR_MULTIPLIER = 100;
+    
     /**
-     * Comparators for DisplayTaskList
+     * Comparators for DisplayTaskList comparison
      * Order: Time -> priority -> Name -> Task ID
      */
     private static Comparator<DisplayTask> dateComparator = new Comparator<DisplayTask>() {
@@ -40,6 +46,15 @@ public class SortLogic {
             }
         }
         
+        /**
+         * Determines whether the task can be completed in a specific date
+         * Otherwise return 2400 which is a greater number than 2359
+         * such that the task will always appear at the bottom 
+         * 
+         * @param task      DisplayTask that will be checked whether it is 
+         *                  a due date or timed task
+         * @return          An integer format of time in a day 
+         */
         private int getTime (DisplayTask task) {
             if (task.getDueDate() == null) {
                 
@@ -52,7 +67,7 @@ public class SortLogic {
                     return getTimeFromDate(task.getEndDate());
                     
                 } else {   
-                    return 2400;                 
+                    return TIME_GREATER_THAN_2359;                 
                 }    
                 
             } else {
@@ -60,12 +75,22 @@ public class SortLogic {
             }
         }
         
+        /**
+         * Converts time for comparison into a 4 digit Integer
+         * 0 is the smallest indicating 12.00 AM
+         * 2359 is the biggest indicatin 11.59 PM
+         * 
+         * @param date      The date to be used for comparison
+         * @return          An integer that is used for time comparison
+         */
         private int getTimeFromDate (Date date) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
+            
             int hours = cal.get(Calendar.HOUR_OF_DAY);
             int minutes = cal.get(Calendar.MINUTE);
-            int totalTime = (hours * 100) + minutes;
+            int totalTime = (hours * HOUR_MULTIPLIER) + minutes;
+            
             return totalTime;
         }
     };
@@ -137,12 +162,14 @@ public class SortLogic {
     };
     
     /**
-     * Helper Methods
-     * @param displayTask1
-     * @param displayTask2
-     * @return
+     * Compares the priority of 2 DisplayTasks
+     * If they are equal, compare by name
+     * 
+     * @param displayTask1      First DisplayTask to be compared
+     * @param displayTask2      Second DisplayTask to be compared
+     * @return                  An integer result dictating which DisplayTask
+     *                          is greater 
      */
-    
     private static int comparePriority(DisplayTask displayTask1, DisplayTask displayTask2) {
         Task task1 = displayTask1.getParent();
         Task task2 = displayTask2.getParent();
@@ -160,6 +187,16 @@ public class SortLogic {
         }
     }
     
+    /**
+     * Compares the name of 2 DisplayTasks
+     * If they are equal, compare by ID
+     * Assumption: No 2 Task ID can be the same
+     * 
+     * @param displayTask1      First DisplayTask to be compared
+     * @param displayTask2      Second DisplayTask to be compared
+     * @return                  An integer result dictating which DisplayTask
+     *                          is greater 
+     */
     private static int compareName(DisplayTask displayTask1, DisplayTask displayTask2) {
         
         Task task1 = displayTask1.getParent();
@@ -192,7 +229,15 @@ public class SortLogic {
         }
     }
     
-    public static DisplayTaskList sortDisplayTaskList(DisplayTaskList tasks, SortType sortMode) {
+    /**
+     * Sorts a given displayTaskList in accordance to the sort type provided
+     * 
+     * @param tasks         Input displayTaskList to be sorted
+     * @param sortMode      The type of sorting that the engine demands
+     * @return              A sorted DisplayTaskList
+     * @throws IllegalArgumentException     Thrown when Sort type given is invalid
+     */
+    public static DisplayTaskList sortDisplayTaskList(DisplayTaskList tasks, SortType sortMode) throws IllegalArgumentException {
         DisplayTaskList newTasks = new DisplayTaskList(tasks);
         switch (sortMode) {
             case SORT_DATE :
@@ -208,32 +253,19 @@ public class SortLogic {
                 break;
                 
             default :
-                break;
+                throw new IllegalArgumentException
+                ("SortType given does not belong to this method.");
         }
         return newTasks;
     }
-/*    
-    public static DisplayTaskList sortByDate(DisplayTaskList tasks) {
-        //ADD LOG
-        DisplayTaskList newTasks = new DisplayTaskList(tasks);
-        Collections.sort(newTasks, dateComparator);
-        return newTasks;
-    }
-    
-    public static DisplayTaskList sortByPriority(DisplayTaskList tasks) {
-        //ADD LOG
-        DisplayTaskList newTasks = new DisplayTaskList(tasks);
-        Collections.sort(newTasks, priorityComparator);
-        return newTasks;
-    }
-    
-    public static DisplayTaskList sortByName(DisplayTaskList tasks) {
-        
-        DisplayTaskList newTasks = new DisplayTaskList(tasks);
-        Collections.sort(newTasks, nameComparator);
-        return newTasks;
-    }
-*/    
+   
+    /**
+     * Iterated through all the nodes in a Date TreeMap and sorts all 
+     * DisplayTaskLists in order of time, priority, name and ID
+     * 
+     * @param map       The TreeMap to be sorted
+     * @return          A sorted TreeMap by order of time
+     */
     public static TreeMap <Date, DisplayTaskList> sortTreeMapIntoSetMapByDate(
                                         TreeMap <Date, DisplayTaskList> map) {
         
@@ -253,13 +285,21 @@ public class SortLogic {
                 sortedTree.put(key, sortedDisplayList);           
             } else {            
                 DisplayTaskList sortedDisplayList = 
-                        sortDisplayTaskList(unsortedList, SortType.SORT_DATE);       
+                        sortDisplayTaskList(unsortedList, SortType.SORT_DATE);  
+                
                 sortedTree.put(key, sortedDisplayList);
             }        
         }
         return sortedTree;
     }
     
+    /**
+     * Iterated through all the nodes in an Integer TreeMap and sorts all 
+     * DisplayTaskLists in order of priority, name and ID
+     * 
+     * @param map       The TreeMap to be sorted
+     * @return          A sorted TreeMap by order of priority
+     */
     public static TreeMap <Integer, DisplayTaskList> 
                             sortTreeMapIntoSetMapByPriority(TreeMap <Integer, 
                                                         DisplayTaskList> map) {
@@ -282,6 +322,14 @@ public class SortLogic {
         return displayMap;
     }
     
+    /**
+     * Sorts and inserts a displayTask from the list into the corresponding
+     * priority key within the TreeMap
+     * 
+     * @param input     The displayTaskList to be read
+     * @return          A TreeMap that contains all displayTasks under their 
+     *                  priority header
+     */
     public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority 
                                                     (DisplayTaskList input) {
         
@@ -298,6 +346,36 @@ public class SortLogic {
         return displayMap;
     }
     
+    /**
+     * Sorts and inserts a displayTask from the list into the corresponding
+     * Date key within the TreeMap
+     * 
+     * @param input     The displayTaskList to be read
+     * @return          A TreeMap that contains all displayTasks under their 
+     *                  date header
+     */
+    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (
+                                                    DisplayTaskList input) {
+    
+        TreeMap < Date, DisplayTaskList > displayMap = 
+                new TreeMap < Date, DisplayTaskList>(dateComparatorForMap);
+        
+        for (int i = 0; i < input.size(); i++) {   
+            
+            DisplayTask temp = input.get(i);
+            addDisplayTaskToMapByDate(displayMap, temp);
+        }
+        return displayMap;
+    }
+    
+    /**
+     * Adding of a the displayTask into the correct priority header of the
+     * TreeMap
+     * 
+     * @param displayMap        TreeMap that is used for containing displayTask
+     * @param inputTask         The displayTask that is checked and inserted 
+     *                          into the correct key header in the TreeMap
+     */
     private static void addDisplayTaskToMapByPriority(
                             TreeMap < Integer, DisplayTaskList> displayMap, 
                             DisplayTask inputTask) {
@@ -314,21 +392,15 @@ public class SortLogic {
             displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
         }
     }
-    
-    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (
-                                                    DisplayTaskList input) {
-    
-        TreeMap < Date, DisplayTaskList > displayMap = 
-                new TreeMap < Date, DisplayTaskList>(dateComparatorForMap);
-        
-        for (int i = 0; i < input.size(); i++) {   
-            
-            DisplayTask temp = input.get(i);
-            addDisplayTaskToMapByDate(displayMap, temp);
-        }
-        return displayMap;
-    }
-    
+
+    /**
+     * Adding of a the displayTask into the correct Date header of the
+     * TreeMap
+     * 
+     * @param displayMap        TreeMap that is used for containing displayTask
+     * @param inputTask         The displayTask that is checked and inserted 
+     *                          into the correct key header in the TreeMap
+     */
     private static void addDisplayTaskToMapByDate(
             TreeMap <Date, DisplayTaskList> displayMap, 
             DisplayTask inputTask) {
