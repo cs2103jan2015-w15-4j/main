@@ -71,9 +71,16 @@ public class Parser {
     private static String description = "";
     private static String tag = "";
     private static boolean isTimeSetByUser = false;
-    private static boolean isTime2SetByUser = false;    
+    private static boolean isTime2SetByUser = false;
+    private static boolean isParseDateComplete = false;
     private static boolean[] flags = new boolean[8];
-    private static Calendar calendar = null;
+    private static Calendar desiredTime = null;
+    
+    // fields used for parsing date
+    private static int year = 0;
+    private static int month = 0;
+    private static int day = 0;
+    private static int dayOfWeek = 0;
     
     private static final int COMMAND_WORD_INDEX = 0;
     private static final int FIRST_AFTER_COMMAND_TYPE = 1;
@@ -300,9 +307,10 @@ public class Parser {
         tag = "";
         errorType = null;
         flags = new boolean[8];
-        calendar = null;
+        desiredTime = null;
         isTimeSetByUser = false;
-        isTime2SetByUser = false;        
+        isTime2SetByUser = false;    
+        isParseDateComplete = false;
     }
 
     /**
@@ -581,14 +589,14 @@ public class Parser {
      * @param dateFieldToUpdate Index representing which date field to update.
      */
     private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
-        calendar = parseDate(keywordArgs, dateFieldToUpdate);
-        if (calendar != null) {
+        desiredTime = parseDate(keywordArgs, dateFieldToUpdate);
+        if (desiredTime != null) {
             if (dateFieldToUpdate == 1) {
-                date = calendar.getTime();
+                date = desiredTime.getTime();
             } else if (dateFieldToUpdate == 2) {
-                date2 = calendar.getTime();
+                date2 = desiredTime.getTime();
             } else {
-                dateToRemind = calendar.getTime();
+                dateToRemind = desiredTime.getTime();
             }
         }      
     }
@@ -765,131 +773,235 @@ public class Parser {
      */
     private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
+        desiredTime = Calendar.getInstance();
         Calendar currentTime = Calendar.getInstance();
-        int day = currentTime.get(Calendar.DATE);
-        int month = currentTime.get(Calendar.MONTH);
-        int year = currentTime.get(Calendar.YEAR);
+        updateDateFields(desiredTime);
         int tokenBeingParsedIndex = 0;
-        
         // the tokens that will individually represent day, month etc
         String[] dateParts = splitBySpaceDelimiter(arguments);
         assert(dateParts.length > 0);
+        
+        parseFirstDateArg(dateParts, arguments, tokenBeingParsedIndex, dateBeingParsedIndex, currentTime);
+        if (isParseDateComplete) {
+            return desiredTime;
+        }
+        
+        // now parsing second token
+        tokenBeingParsedIndex++;
+        parseSecondDateArg(dateParts, arguments, tokenBeingParsedIndex, dateBeingParsedIndex, currentTime);
+        if (isParseDateComplete) {
+            return desiredTime;
+        }
+        
+        // now parsing third token
+        tokenBeingParsedIndex++;
+        parseThirdDateArg(dateParts, arguments, tokenBeingParsedIndex, dateBeingParsedIndex);
+        if (isParseDateComplete) {
+            return desiredTime;
+        }
+        
+        tokenBeingParsedIndex++;
+        // parsing 4th/5th token, user has input year, month, day, and time
+        if (dateParts.length == 5) {            
+            parseFourthAndFithDateArg(dateParts, arguments, tokenBeingParsedIndex, dateBeingParsedIndex);         
+            return desiredTime;
+        }
+        
+        return createCalendar(year, month - 1, day, 0, 0);
+    }
+    
+    /**
+     * Updates the individual date related fields with the given calendar.
+     * @param desiredTime Time to update to.
+     */
+    private static void updateDateFields(Calendar desiredTime) {
+        day = desiredTime.get(Calendar.DATE);
+        month = desiredTime.get(Calendar.MONTH);
+        year = desiredTime.get(Calendar.YEAR);
+    }
+    
+    /**
+     * Processes the first date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param existingTime          Existing time.
+     */
+    private static void parseFirstDateArg(String[] dateParts, String arguments, 
+            int tokenBeingParsedIndex, int dateBeingParsedIndex, 
+            Calendar existingTime) {
         // may be a representation of the day, or a time keyword, or the next keyword
         String firstArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+        
+        try {
+            day = Integer.parseInt(firstArg);
+            
+            // check whether there are no more args to be processed
+            if (dateParts.length == 1) {
+                /* handle whether the next occurrence of the specified day occurs
+                this month or next month */
+                if (day < existingTime.get(Calendar.DATE)) {
+                    desiredTime = createCalendar(year, month + 1, day, 0, 0); 
+                } else {
+                    desiredTime = createCalendar(year, month, day, 0, 0);
+                }
+            }
+        } catch (NumberFormatException e) {
+            // try parsing as a non standard format (e.g. time field, next day)
+            calcDiffFormatDateOnFirstDateArg(arguments, dateParts, 
+                                                           tokenBeingParsedIndex, 
+                                                           dateBeingParsedIndex,
+                                                           firstArg);
+        }
+    }
+    
+    /**
+     * Processes the second date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param existingTime          Existing time.
+     */
+    private static void parseSecondDateArg(String[] dateParts, String arguments, 
+        int tokenBeingParsedIndex, int dateBeingParsedIndex, 
+        Calendar existingTime) {
+     // may be a representation of the month, or a time keyword
+        String secondArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+            
+        try {
+            month = Integer.parseInt(secondArg);
+            
+            // check whether there are no more args to be processed
+            if (dateParts.length == 2) {
+                /* handle whether the next occurrence of the specified month occurs
+                this year or next year */
+                if (month < existingTime.get(Calendar.MONTH)) {
+                    desiredTime = createCalendar(year + 1, month - 1, day, 0, 0);
+                } else {
+                    desiredTime = createCalendar(year, month - 1, day, 0, 0);
+                }
+                isParseDateComplete = true;
+            }
+        } catch (NumberFormatException e) {            
+            int monthIndex = months.indexOf(secondArg.toLowerCase());
+            // check whether it is an English month string
+            if (monthIndex != -1) {
+                month = (monthIndex / 2) + 1;
+            } else {
+                desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                                         tokenBeingParsedIndex, 
+                                         dateBeingParsedIndex,
+                                         secondArg);                
+            }
+        }
+    }
+    
+    /**
+     * Processes the third date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     */
+    private static void parseThirdDateArg(String[] dateParts, String arguments, 
+            int tokenBeingParsedIndex, int dateBeingParsedIndex) {
+        // may be a representation of the year, or a time keyword
+        String thirdArg = dateParts[2].toLowerCase();
+        
+        try {
+            year = Integer.parseInt(thirdArg);
+        } catch (NumberFormatException e) {
+            desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                    tokenBeingParsedIndex, 
+                    dateBeingParsedIndex,
+                    thirdArg);            
+        }
+    }
+    
+    /**
+     * Processes the fourth and fifth date arguments, expected to be for time.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     */
+    private static void parseFourthAndFithDateArg(String[] dateParts, String arguments, 
+            int tokenBeingParsedIndex, int dateBeingParsedIndex) {
+        // expected to be a time keyword
+        String fourthArg = dateParts[3].toLowerCase();
+        
+        desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                tokenBeingParsedIndex, 
+                dateBeingParsedIndex,
+                fourthArg);
+    }
+    
+    /**
+     * Processes the first argument of the arguments for date. Expected to 
+     * be either a time keyword (pm/am) or 'next' to signify a command similar
+     * to 'next day'.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param dateArg               First argument of the date.
+     */
+    private static void calcDiffFormatDateOnFirstDateArg(String arguments,
+            String[] dateParts, int tokenBeingParsedIndex, 
+            int dateBeingParsedIndex, String firstArg) {
         
         // check whether the current argument is a keyword for time
         if (firstArg.equals("pm") || firstArg.equals("am")) {
             setTimeSetByUserToTrue(dateBeingParsedIndex);
+            desiredTime = calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                    firstArg);            
+        
+        // use parseNext when "next" is the first argument
+        } else if (firstArg.toLowerCase().trim().equals("next")) {
+            desiredTime = parseNext(arguments);
+        } else { 
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_DATE);
+            logger.log(Level.WARNING, "unable to parse day");
+            desiredTime = null;
+        }
+        isParseDateComplete = true;
+    }
+    
+    /**
+     * Calculate the time given an argument that is expected to be a time 
+     * keyword (am/pm).
+     * 
+     * @param arguments             All the date arguments.
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param dateArg               Expected to be am/pm.
+     * @return                      Result date/time.
+     */
+    private static Calendar calcTimeOnDateArg(String arguments,
+            String[] dateParts, int tokenBeingParsedIndex, 
+            int dateBeingParsedIndex, String dateArg) {
+        // check whether the current argument is a keyword for time
+        if (dateArg.equals("pm") || dateArg.equals("am")) {
+            setTimeSetByUserToTrue(dateBeingParsedIndex);
             return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                       firstArg, year, month, day); 
-        
-        } else {
-            // parse as date without regards to time
-            logger.log(Level.INFO, "value expected to be day or next keyword: " + firstArg);
-            try {
-                day = Integer.parseInt(firstArg);
-                
-            } catch (NumberFormatException e) {
-                
-                //Goes into parseNext when "next" is the first argument
-                if (firstArg.toLowerCase().trim().equals("next")) {
-                    return parseNext(arguments);
-                } else { 
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_DATE);
-                    logger.log(Level.WARNING, "unable to parse day");
-                    return null;
-                }
-            }
-        }        
-        
-        //Checks whether date information is incomplete, if so checks whether date has passed
-        //If so push to next month, else keep the current month
-        if (dateParts.length == 1) {
-            if (day < currentTime.get(Calendar.DATE)) {
-                return createCalendar(year, month + 1, day, 0, 0); 
-            } else {
-                return createCalendar(year, month, day, 0, 0);
-            }
-        } else {
-            // now parsing the second token
-            tokenBeingParsedIndex++;
-            // may be a representation of the month, or a time keyword
-            String secondArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+                                       dateArg); 
             
-            // check whether the current argument is a keyword for time
-            if (secondArg.equals("pm") || secondArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           secondArg, year, month, day); 
-                
-            } else {
-                // parse as date without regards to time
-                logger.log(Level.INFO, "value expected to be month: " + secondArg);
-                try {
-                    month = Integer.parseInt(secondArg);
-                } catch (NumberFormatException e) {
-                    int monthIndex = months.indexOf(secondArg.toLowerCase());
-                    // check whether it is found in the list of English month strings
-                    if (monthIndex == -1) {
-                        setCommandType(CommandType.INVALID);
-                        setErrorType(ErrorType.INVALID_DATE);
-                        logger.log(Level.WARNING, "unable to parse month");
-                        return null;
-                    } else {
-                        month = (monthIndex / 2) + 1;
-                        logger.log(Level.INFO, "month of parsed date: " + month);
-                    }
-                }
-            }            
-        }     
-        
-        // Similar check as above, push to next year if month had passed
-        if (dateParts.length == 2) {
-            if (month < currentTime.get(Calendar.MONTH)) {
-                return createCalendar(year + 1, month - 1, day, 0, 0);
-            } else {
-                return createCalendar(year, month - 1, day, 0, 0);
-            }
         } else {
-            // now parsing the third token
-            tokenBeingParsedIndex++;
-            // may be a representation of the year, or a time keyword
-            String thirdArg = dateParts[2].toLowerCase();
-
-            // check whether the current argument is a keyword for time
-            if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           thirdArg, year, month, day); 
-
-            } else {
-                logger.log(Level.INFO, "value expected to be year: " + thirdArg);
-                try {
-                    year = Integer.parseInt(thirdArg);
-                } catch (NumberFormatException e) {
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_DATE);
-                    logger.log(Level.WARNING, "unable to parse year");
-                    return null;
-                }
-            }            
-        }
-        
-        // user has input year, month, day, as well as time
-        if (dateParts.length == 5) {
-            tokenBeingParsedIndex++;
-            // expected to be a time keyword
-            String fourthArg = dateParts[3].toLowerCase();
-            if (fourthArg.equals("pm") || fourthArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           fourthArg, year, month, day); 
-            }
-        }
-        
-        return createCalendar(year, month - 1, day, 0, 0);
-    }    
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_DATE);
+            logger.log(Level.WARNING, "unable to parse date");
+            return null;                
+         }
+    }   
     
     /**
      * Converts arguments in the form of 'next x time period' (e.g. next 3 
@@ -969,15 +1081,12 @@ public class Parser {
      *  
      *  @param dateParts    String tokens with date info.
      *  @param indexToCheck Index expected to contain time string.
-     *  @param year         Year of desired date.
-     *  @param month        Month of desired date.
-     *  @param day          Day of desired date.
+     *  @param pmOrAm       Differentiates which half of the day it is.
      *  @return             Representation of full date.
      */    
     private static Calendar calcDateGivenTime(String[] dateParts, 
                                                 int indexBeingParsed, 
-                                                String pmOrAm, int year, 
-                                                int month, int day) {
+                                                String pmOrAm) {
         // check for a valid argument to be parsed as the time
         if (!isTimeArgExistent(indexBeingParsed, dateParts)) {
             // does not exist, return default date value
@@ -1001,7 +1110,7 @@ public class Parser {
                 return createCalendar(year, month, day, 0, 0);
             }
             
-            return calcDateConsideringAmOrPm(pmOrAm, year, month, day, hour, min);            
+            return calcDateConsideringAmOrPm(pmOrAm, hour, min);            
             
         } catch (NumberFormatException e) {
             setCommandType(CommandType.INVALID);
@@ -1090,17 +1199,13 @@ public class Parser {
      * based on the fields calculated so far as well as whether the time given 
      * is in PM or AM.
      * 
-     * @param pmOrAm Either "pm" or "am".
-     * @param year   Desired year.
-     * @param month  Desired month.
-     * @param day    Desired day.
+     * @param pmOrAm Differentiates which half of the day it is.
      * @param hour   Desired hour.
      * @param min    Desired min.
      * @return       Resulting date.
      */
-    private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int year, 
-                                                      int month, int day, 
-                                                      int hour, int min) {
+    private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int hour, 
+                                                      int min) {
         assert(pmOrAm.equals("pm") || pmOrAm.equals("am"));
         if (pmOrAm.equals("pm")) {
             // special case of 12pm
@@ -1130,9 +1235,11 @@ public class Parser {
      * @param minute Desired minute.
      * @return       Resulting date.
      */
-    private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
+    private static Calendar createCalendar(int desiredYear, int desiredMonth, 
+                                           int desiredDay, int hour, 
+                                           int minute) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, hour, minute, 0);
+        calendar.set(desiredYear, desiredMonth, desiredDay, hour, minute, 0);
         return calendar;
     }
     
@@ -1221,21 +1328,21 @@ public class Parser {
     private static void setDefaultTimesForTimedAdd() {
         if (!isTimeSetByUser) {
             // set the default time for first date to start of the day
-            calendar.setTime(date);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 0, 0);
-            date = calendar.getTime();
+            desiredTime.setTime(date);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 0, 0);
+            date = desiredTime.getTime();
         }
         if (!isTime2SetByUser) {
             // set the default time for second date to end of the day
-            calendar.setTime(date2);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date2 = calendar.getTime();
+            desiredTime.setTime(date2);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = desiredTime.getTime();
         }
     }
     
@@ -1246,22 +1353,22 @@ public class Parser {
     private static void setDefaultTimeForDeadlineAdd() {
         if (!isTimeSetByUser && date != null) {
             // set the default time for the date to end of the day
-            calendar.setTime(date);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date = calendar.getTime();
+            desiredTime.setTime(date);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 23, 59);
+            date = desiredTime.getTime();
         }
         
         if (!isTime2SetByUser && date2 != null) {
             // set the default time for the date to end of the day
-            calendar.setTime(date2);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date2 = calendar.getTime();
+            desiredTime.setTime(date2);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 23, 59);
+            date2 = desiredTime.getTime();
         }
     }
     
