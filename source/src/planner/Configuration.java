@@ -30,6 +30,9 @@ public class Configuration {
      *            The number of tasks tracked by the program
      */
     public Configuration(String path, int taskNum) {
+
+        assert taskNum > 0;
+        
         storagePath = path;
         curTaskNum = taskNum;
         isNew = false;
@@ -43,6 +46,7 @@ public class Configuration {
      *            The path of the data storage file
      */
     public Configuration(String path) {
+
         storagePath = path;
         curTaskNum = 1;
         isNew = true;
@@ -53,6 +57,7 @@ public class Configuration {
      * @return Returns the path of the data storage file.
      */
     public String getStoragePath() {
+
         return storagePath;
     }
 
@@ -61,6 +66,7 @@ public class Configuration {
      * @return Returns the number of tasks created by the program.
      */
     public int getCurTaskNum() {
+
         return curTaskNum;
     }
 
@@ -71,6 +77,7 @@ public class Configuration {
      * @return Returns a number to be assigned to a new Task to be created.
      */
     public int getNewTaskNumber() {
+
         curTaskNum++;
         return curTaskNum - 1;
     }
@@ -83,6 +90,7 @@ public class Configuration {
      * @return
      */
     public boolean setStoragePath(String newPath) {
+
         if (isPathValid(newPath)) {
             storagePath = newPath;
             return true;
@@ -92,13 +100,15 @@ public class Configuration {
     }
 
     /**
-     * Checks the validity of the path to be used as a new storage. This is done by attempting to 
-     * create a new file with the given path and then removing that file. If there are no errors, the path is valid.
+     * Checks the validity of the path to be used as a new storage. This is done
+     * by attempting to create a new file with the given path and then removing
+     * that file. If there are no errors, the path is valid.
      * 
      * @param path
      * @return
      */
     private boolean isPathValid(String path) {
+
         File tester = new File(path);
         if (tester.exists()) {
             return false;
@@ -122,6 +132,7 @@ public class Configuration {
      * @return Returns true if the config was newly created.
      */
     public boolean isNew() {
+
         return isNew;
     }
 }

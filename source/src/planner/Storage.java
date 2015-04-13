@@ -35,23 +35,24 @@ public class Storage {
      * 
      * @return Configuration object read from the file or a brand new object
      */
-    // Not tested yet
     public Configuration readConfig() {
-        String defaultPath = getSourcePath() + Constants.DEFAULT_STORAGE_NAME;
-        Configuration result = new Configuration(defaultPath);
-        BufferedReader br = null;
-        try {
-            String sourcePath = getSourcePath();
-            String filePath = sourcePath + Constants.CONFIG_FILE_NAME;
 
-            br = new BufferedReader(new FileReader(filePath));
+        String defaultPath = getSourcePath() + Constants.DEFAULT_STORAGE_NAME;
+        Configuration defaultConfig = new Configuration(defaultPath);
+
+        BufferedReader br = null;
+
+        try {
+            String configFilePath = getConfigFilePath();
+
+            br = new BufferedReader(new FileReader(configFilePath));
 
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
             int curTaskNum = Integer.valueOf((String) taskJson.get("numTasks"));
 
-            result = new Configuration(path, curTaskNum);
+            return new Configuration(path, curTaskNum);
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         } catch (IOException e) {
@@ -67,7 +68,15 @@ public class Storage {
                 }
             }
         }
-        return result;
+
+        return defaultConfig;
+    }
+
+    private String getConfigFilePath() {
+
+        String sourcePath = getSourcePath();
+        String filePath = sourcePath + Constants.CONFIG_FILE_NAME;
+        return filePath;
     }
 
     /**
@@ -89,8 +98,8 @@ public class Storage {
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
 
-        String sourcePath = getSourcePath();
-        writeToFile(sourcePath + Constants.CONFIG_FILE_NAME, config);
+        String configFilePath = getConfigFilePath();
+        writeToFile(configFilePath, config);
 
     }
 
@@ -135,8 +144,8 @@ public class Storage {
      *            the TaskList to be converted
      * @return Strings that are ready to be written to data storage
      */
-    // Not tested yet
     private ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
+
         ArrayList<String> results = new ArrayList<String>();
         for (Task t : input) {
             results.add(convertTaskToJsonString(t));
@@ -155,9 +164,9 @@ public class Storage {
      * @throws IOException
      *             if writing fails
      */
-    // Not tested yet
     public void saveTaskList(String fileName, TaskList tasks)
             throws IOException {
+
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         writeToFile(fileName, taskJsonStrings);
     }
@@ -170,8 +179,8 @@ public class Storage {
      * @param fileName
      * @return Resultant taskList
      */
-    // Not tested yet
     public TaskList readTaskStorage(String fileName) {
+
         TaskList tasks = new TaskList();
         BufferedReader br = null;
         try {
@@ -202,29 +211,36 @@ public class Storage {
      * @return String ready to be saved
      */
     private String convertTaskToJsonString(Task task) {
+
         JSONObject taskObject = new JSONObject();
+
         taskObject.put("name", task.getName());
         taskObject.put("description", task.getDescription());
         taskObject.put("tag", task.getTag());
         taskObject.put("priority", String.valueOf(task.getPriority()));
+
         if (task.getDueDate() == null) {
             taskObject.put("due", null);
         } else {
             taskObject.put("due", task.getDueDate().getTime());
         }
+
         if (task.getEndDate() == null) {
             taskObject.put("end", null);
         } else {
             taskObject.put("end", task.getEndDate().getTime());
         }
+
         if (task.getDateCompleted() == null) {
             taskObject.put("complete", null);
         } else {
             taskObject.put("complete", task.getDateCompleted().getTime());
         }
+
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
         taskObject.put("id", String.valueOf(task.getID()));
+
         return taskObject.toJSONString();
     }
 
@@ -237,19 +253,25 @@ public class Storage {
      * @return converted Task
      */
     private Task convertTaskFromJsonString(String taskString) {
+
         try {
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(taskString);
+
             String name = (String) taskJson.get("name");
             String description = (String) taskJson.get("description");
             String tag = (String) taskJson.get("tag");
+
             int priority = Integer.valueOf((String) taskJson.get("priority"));
+
             Object due = taskJson.get("due");
             Object end = taskJson.get("end");
             Object completed = taskJson.get("complete");
+
             Date dueDate = null;
             Date endDate = null;
             Date completedDate = null;
+
             if (due != null) {
                 dueDate = new Date((Long) due);
             }
@@ -278,6 +300,7 @@ public class Storage {
             result.setEndDate(endDate);
             result.setDateCompleted(completedDate);
             result.configureCreatedDate(createdDate);
+
             return result;
         } catch (ParseException e) {
             return null;
@@ -291,6 +314,7 @@ public class Storage {
      * @return
      */
     private String getSourcePath() {
+
         CodeSource cs = getClass().getProtectionDomain().getCodeSource();
         return cs.getLocation().getPath();
     }

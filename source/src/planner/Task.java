@@ -47,7 +47,6 @@ public class Task {
         taskTag = tag;
         dateCreated = new Date(System.currentTimeMillis());
 
-        // Tests needed for null date
         if (dueDate != null) {
 
             dateDue = new Date(dueDate.getTime()); // Changed to defensive copy
@@ -122,6 +121,7 @@ public class Task {
      * @return
      */
     public String getName() {
+
         return taskName;
     }
 
@@ -131,6 +131,7 @@ public class Task {
      * @return
      */
     public String getDescription() {
+
         return taskDescription;
     }
 
@@ -140,6 +141,7 @@ public class Task {
      * @return
      */
     public String getTag() {
+
         return taskTag;
     }
 
@@ -149,6 +151,7 @@ public class Task {
      * @return
      */
     public int getPriority() {
+
         return taskPriority;
     }
 
@@ -158,6 +161,7 @@ public class Task {
      * @return
      */
     public Date getDueDate() {
+
         return dateDue;
     }
 
@@ -169,7 +173,6 @@ public class Task {
     public Date getStartDate() {
 
         return dateDue;
-
     }
 
     /**
@@ -178,6 +181,7 @@ public class Task {
      * @return
      */
     public Date getEndDate() {
+
         return dateEnd;
     }
 
@@ -187,6 +191,7 @@ public class Task {
      * @return
      */
     public Date getCreatedDate() {
+
         return dateCreated;
     }
 
@@ -196,6 +201,7 @@ public class Task {
      * @return
      */
     public int getID() {
+
         return ID;
     }
 
@@ -205,6 +211,7 @@ public class Task {
      * @return
      */
     public boolean isDone() {
+
         return taskCompleted;
     }
 
@@ -226,7 +233,6 @@ public class Task {
     public boolean isTimed() {
 
         return isTimedTask;
-
     }
 
     /**
@@ -286,12 +292,16 @@ public class Task {
      * @param newDueDate
      */
     public void setDueDate(Date newDueDate) {
+
         if (newDueDate != null) {
             dateDue = newDueDate;
             isFloatingTask = false;
 
         } else {
-            // Add assert date ends
+            
+            assert dateEnd == null;
+            assert isTimedTask == false;
+            
             dateDue = null;
             isFloatingTask = true;
         }
@@ -304,6 +314,7 @@ public class Task {
      * @param newStartDate
      */
     public void setStartDate(Date newStartDate) {
+
         setDueDate(newStartDate);
     }
 
@@ -316,7 +327,12 @@ public class Task {
      * @param newEndDate
      */
     public void setEndDate(Date newEndDate) {
+
         if (newEndDate != null) {
+            
+            assert dateDue != null;
+            assert isFloatingTask == false;
+            
             dateEnd = newEndDate;
             isTimedTask = true;
 
@@ -339,8 +355,6 @@ public class Task {
         dateCreated = newCreatedDate;
     }
 
-    
-    
     /**
      * Sets the task as done and gives it a date completed
      */
@@ -348,7 +362,6 @@ public class Task {
 
         taskCompleted = true;
         dateCompleted = new Date(System.currentTimeMillis());
-
     }
 
     /**
@@ -358,11 +371,11 @@ public class Task {
 
         taskCompleted = false;
         dateCompleted = null;
-
     }
 
     /**
      * Gets the date completed of the Task
+     * 
      * @return
      */
     public Date getDateCompleted() {
@@ -372,9 +385,11 @@ public class Task {
 
     /**
      * Sets the date completed of the Task
+     * 
      * @param date
      */
     public void setDateCompleted(Date date) {
+
         dateCompleted = date;
     }
 
