@@ -28,7 +28,6 @@ public class DisplayTaskList implements List<DisplayTask>{
         
         displayTasks = new ArrayList<DisplayTask>();
         
-        // Changed to defensive copy
         if( input != null ){
             
             Iterator<DisplayTask> iterator = input.iterator();
