@@ -67,7 +67,6 @@ public class InputList {
      * at the next getNextInputString() or getPrevInputString() call.
      */
     public void resetGetWordPosition(){
-        
         recentlyTypedCommand_ = null;
         currentStringInput_ = commandList_.listIterator();
         hasReturnedRecentlyTypedString_ = false;
@@ -87,28 +86,23 @@ public class InputList {
      * @return The next command input string stored in the list.
      */
     public String getNextInputString(){
-        
         if( currentStringInput_ != null && currentStringInput_.hasPrevious() ){
-            
             if( isNextIteratorCalled_ ){
                 isNextIteratorCalled_ = false;
                 currentStringInput_.previous();
             }
-            String tempString = null;
             if( currentStringInput_.hasPrevious() ){
-                recentCommandReturned_ = currentStringInput_.previous();
-                tempString = recentCommandReturned_;
                 isPrevIteratorCalled_ = true;
+                recentCommandReturned_ = currentStringInput_.previous();
+                return recentCommandReturned_;
             }
-            return tempString;
+        } 
+        isPrevIteratorCalled_ = false;
+        if( !hasReturnedRecentlyTypedString_ ){  
+            hasReturnedRecentlyTypedString_ = true;
+            return recentCommandReturned_ = recentlyTypedCommand_;
         } else{
-            isPrevIteratorCalled_ = false;
-            if( !hasReturnedRecentlyTypedString_ ){  
-                hasReturnedRecentlyTypedString_ = true;
-                return recentCommandReturned_ = recentlyTypedCommand_;
-            } else{
-                return null;
-            }
+            return null;
         }
     }
     
@@ -130,9 +124,7 @@ public class InputList {
      * @return The previous command input string stored in the list.
      */
     public String getPrevInputString(){
-        
         if( currentStringInput_ != null && currentStringInput_.hasNext() ){
-            
             hasReturnedRecentlyTypedString_ = false;
             if( isPrevIteratorCalled_ ){
                 isPrevIteratorCalled_ = false;
