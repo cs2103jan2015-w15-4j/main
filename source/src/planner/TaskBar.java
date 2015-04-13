@@ -99,7 +99,11 @@ public class TaskBar extends JComponent {
     private final int DEFAULT_TIMEDISPLAYLABEL_FONT_SIZE = 11;
     private final int FIRST_COMPONENT_ORDER_INDEX = 0;
     private final int MOVE_OFFSET = 8;
+    private final int MAX_TAG_CHARACTERS = 30;
+    private final int MAX_TAG_INDEX = 29;
+    private final int MIN_STRING_OFFSET = 0;
     
+    private final String STRING_BREAK = "...";
     private final String FLOATING_TASK_DATE_STRING = "No Due Date Set";
     private final String DEFAULT_COMPARE_DATE_FORMAT = "h:mma";
     private final String DONE_TASK_DATE_STRING = "Completed at ";
@@ -484,7 +488,7 @@ public class TaskBar extends JComponent {
 	        return Color.WHITE;
 	    }
 	}
-
+	
 	/**
      * This method will set tags on the TaskBar Object, retrieved from the given task
      * 
@@ -510,10 +514,15 @@ public class TaskBar extends JComponent {
 	        }
 	        if( task.getTag() != null && task.getTag().length() > MINIMUM_STRING_LENGTH ){
 	            String divider = (previousTextExist ? TAGS_DIVIDER : EMPTY_STRING);
+	            String tag = divider + task.getTag();
+	            if(tag.length() > MAX_TAG_CHARACTERS){
+	                tag = tag.substring(MIN_STRING_OFFSET,MAX_TAG_INDEX);
+	                tag += STRING_BREAK;
+	            }
 	            appendColoredStringsToDisplay( doc, 
 	                                           colorStyle, 
 	                                           getRandomColor(planner.Constants.COLOR_SERIES, colorsToExclude), 
-	                                           divider + task.getTag() );
+	                                           tag );
 	            hasTags = true;
 	        }
 	        if( hasTags ){
