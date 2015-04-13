@@ -2,10 +2,7 @@
 
 package planner;
 
-import static org.junit.Assert.*;
-
-import java.util.Calendar;
-import java.util.Date;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -13,106 +10,90 @@ public class IntegrationTest {
 
     @Test
     public void testAddTask() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
         Engine.process(addTaskInput);
-        
-        String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        Task at = afterAddList.get(afterAddList.size()-1);
-        
-        //After add
-        assertEquals("Newly added task should have the right name", "junittest", at.getName());
 
-        
+        String storagePath = Engine.getStoragePath();
+
+        Configuration beforeSaveConfig = store.readConfig();
+
         Engine.exit();
-        
+
         TaskList afterSaveList = store.readTaskStorage(storagePath);
-        Task st = afterAddList.get(afterAddList.size()-1);
         Configuration afterSaveConfig = store.readConfig();
-        
-        //After save
-        assertEquals("Newly added task should have the right name", "junittest", st.getName());
-        assertEquals("Task number should increase by 1 after add", 
-                (long)beforeSaveConfig.getCurTaskNum(), afterSaveConfig.getCurTaskNum() -1);
-        
+        Task st = afterSaveList.get(afterSaveList.size() - 1);
+
+        // After save
+        assertEquals("Newly added task should have the right name",
+                "junittest", st.getName());
+        assertEquals("Task number should increase by 1 after add",
+                (long) beforeSaveConfig.getCurTaskNum(),
+                afterSaveConfig.getCurTaskNum() - 1);
+
     }
 
     @Test
     public void testUndoTask() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
-        Engine.process(addTaskInput);
-        
         String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        
-        //After add
-        int sizeBeforeUndo = afterAddList.size();
-        
-        //Undo
-        Engine.process("undo");
-        
-        //After undo
-        TaskList afterUndoList = Engine.getAllTasks();
-        int sizeAfterUndo = afterUndoList.size();
-        assertEquals("TaskList should be smaller by 1 after undoing add", 
-                sizeBeforeUndo, sizeAfterUndo+1);
+        TaskList beforeAddList = store.readTaskStorage(storagePath);
+        int sizeBeforeAdd = beforeAddList.size();
+        Engine.process(addTaskInput);
 
-        
+        // Undo
+        Engine.process("undo");
+
         Engine.exit();
-        
+
         TaskList afterSaveList = store.readTaskStorage(storagePath);
         int sizeAfterSave = afterSaveList.size();
-        
-        //After save
-        assertEquals("TaskList size should be the same after save", 
-                sizeAfterUndo, sizeAfterSave);
-        
+
+        // After save
+        assertEquals("TaskList size should be the same after save",
+                sizeBeforeAdd, sizeAfterSave);
+
     }
-    
+
     @Test
-    public void testUpdateTaskDate() {
+    public void testUpdateTaskPriority() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
         Engine.process(addTaskInput);
-        
+
         String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        Task at = afterAddList.get(afterAddList.size()-1);
-        Long taskID = at.getID();
-        
-        //After add
-        assertEquals("Newly added task should have the right name", "junittest", at.getName());
-        
-        Engine.process("update "+taskID+" date 12 may 2015");
-        String dateString = "Tue May 12 00:00:00 SGT 2015";
-        
-        //After update
-        assertEquals("Updated task should have the right name", "junittest", at.getName());
-        assertEquals("Updated task should have the right date", dateString, at.getDueDate().toString());
-        
+
         Engine.exit();
-        
+
+        TaskList afterAddList = store.readTaskStorage(storagePath);
+        Task taskAdded = afterAddList.get(afterAddList.size() - 1);
+        int taskID = taskAdded.getID();
+        System.out.println("Taskid " + taskID);
+
+        Engine.process("update " + taskID + " priority 5");
+
+        Engine.exit();
+
+        Engine.init();
         TaskList afterSaveList = store.readTaskStorage(storagePath);
-        Task st = afterAddList.get(afterAddList.size()-1);
-        Configuration afterSaveConfig = store.readConfig();
-        
-        //After save
-        assertEquals("Saved task should have the right name", "junittest", st.getName());
-        assertEquals("Saved task should have the right date", dateString, st.getDueDate().toString());
-                
+        Task st = afterSaveList.getTaskByID(taskID);
+        System.out.println(st.getDueDate() == null);
+
+        // After save
+        assertEquals("Saved task should have the right name", "junittest",
+                st.getName());
+        assertEquals("Saved task should have the right priority", 5,
+                st.getPriority());
+
     }
 }

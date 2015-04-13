@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * This class handles the main flow of the program. It provides an interface for
  * the UI to interact with the other components. Engine stores the state of the
@@ -16,6 +19,8 @@ import java.util.Stack;
  * 
  */
 public class Engine {
+    
+    private static Logger logger = Logger.getLogger("Engine");
 
     private static Configuration config;
 
@@ -51,7 +56,6 @@ public class Engine {
     public static boolean isFirstRun() {
 
         return config.isNew();
-
     }
 
     /**
@@ -62,7 +66,6 @@ public class Engine {
     public static int lastModifiedTask() {
 
         return lastModifiedTask;
-
     }
 
     /**
@@ -73,7 +76,6 @@ public class Engine {
     public static int getClashingTask() {
 
         return clashingTask;
-
     }
 
     /**
@@ -82,9 +84,12 @@ public class Engine {
      * 
      * @return success of the process
      */
-    // Not tested yet
     public static boolean init() {
+        logger.setLevel(Level.WARNING);
+        
         try {
+            logger.log(Level.INFO, "initialising engine");
+            
             doneTasks = new TaskList();
             undoneTasks = new TaskList();
             floatingTasks = new TaskList();
@@ -95,11 +100,8 @@ public class Engine {
 
             // Initiates the storage and read the config and storage files
             storage = new Storage();
-            // System.out.println("here");
             config = storage.readConfig();
-            // System.out.println("readConfig");
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            // System.out.println("readStorage");
 
             // Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -107,12 +109,11 @@ public class Engine {
             // Updates the list for display
             refreshLists();
 
-            System.out.println(allTasks.size());
+            logger.log(Level.INFO, "initialising engine successful");
             return true;
         } catch (NullPointerException e) {
-            System.out.println("read error");
+            logger.log(Level.SEVERE, "failed to initialise engine");
             return false;
-
         }
     }
 
@@ -123,21 +124,22 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static boolean exit() {
-        try {
 
+        try {
+            logger.log(Level.INFO, "saving and exiting engine");
+            
             storage.saveConfiguration(config);
             storage.saveTaskList(config.getStoragePath(), allTasks);
 
             System.out.println(allTasks.size());
+            
+            logger.log(Level.INFO, "saving and exiting engine successful");
             return true;
 
         } catch (IOException e) {
-
-            System.out.println("write error");
+            logger.log(Level.SEVERE, "failed to save and exit engine");
             return false;
-
         }
     }
 
@@ -145,22 +147,10 @@ public class Engine {
      * Rebuilds the TaskLists with the latest allTasks such that the TaskLists
      * that GUI requests will be up to date.
      */
-    // Not tested yet
     private static void refreshLists() {
 
-        // Logic.sortTaskListByPriority(allTasks);
-        // Logic.sortTaskListByDate(allTasks);
-
-        // Clears TaskLists
-        doneTasks.clear();
-        undoneTasks.clear();
-        normalTasks.clear();
-        floatingTasks.clear();
-        todayTasks.clear();
-        upcomingTasks.clear();
-        overdueTasks.clear();
-
-        // Rebuilds TaskLists
+        logger.log(Level.INFO, "refreshing task lists");
+        
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(allTasks);
@@ -168,22 +158,26 @@ public class Engine {
         todayTasks = Logic.searchToday(allTasks);
         upcomingTasks = Logic.searchUpcomingTasks(allTasks);
         overdueTasks = Logic.searchOverDuedTasks(allTasks);
-
+        
+        logger.log(Level.INFO, "refreshing task lists successful");
     }
 
     /**
      * Copies the current allTasks and pushes the copy into the previousStates,
      * such that older states of the program is stored and can be popped to be
-     * used for undo.
+     * used for undo. Stores a maximum of 100 states.
      */
     private static void pushState() {
 
-        previousStates.push(new TaskList(allTasks));
+        logger.log(Level.INFO, "pushing previous state");
         
+        previousStates.push(new TaskList(allTasks));
+
         if (previousStates.size() > 100) {
+            logger.log(Level.INFO, "removing oldest state");
             previousStates.remove(100);
         }
-
+        logger.log(Level.INFO, "pushing previous state successful");
     }
 
     /**
@@ -201,6 +195,9 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType addTask(ParseResult result) {
+        
+        logger.log(Level.INFO, "adding new task");
+        
         // Previous state is saved
         pushState();
 
@@ -232,18 +229,21 @@ public class Engine {
 
         // Add the task
         allTasks.add(newTask);
+
         // Refresh the lists for display
         refreshLists();
+
         // Record the last updated task
         lastModifiedTask = newTask.getID();
         System.out.println(lastModifiedTask);
 
+        logger.log(Level.INFO, "adding new task successful");
+        
         if (clashingTask != -1) {
             return Constants.CommandType.ADD_CLASH;
         } else {
             return Constants.CommandType.ADD;
         }
-
     }
 
     /**
@@ -258,6 +258,9 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType updateTask(ParseResult result) {
+
+        logger.log(Level.INFO, "updating new task");
+        
         // Saves previous state
         pushState();
 
@@ -351,6 +354,7 @@ public class Engine {
         // Records the last updated task
         lastModifiedTask = toBeUpdated.getID();
 
+        logger.log(Level.INFO, "updating new task successful");
         return Constants.CommandType.UPDATE;
     }
 
@@ -362,6 +366,8 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType deleteTask(ParseResult result) {
+
+        logger.log(Level.INFO, "deleting task");
         // Saves the previous state
         pushState();
 
@@ -380,6 +386,7 @@ public class Engine {
         // Refreshes the display lists
         refreshLists();
 
+        logger.log(Level.INFO, "deleting task successful");
         return Constants.CommandType.DELETE;
     }
 
@@ -391,6 +398,7 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setDoneTask(ParseResult result) {
+        logger.log(Level.INFO, "setting task as done");
         // Saves the previous state
         pushState();
 
@@ -407,9 +415,9 @@ public class Engine {
             lastModifiedTask = toBeDone.getID();
             // Refreshes the display lists
             refreshLists();
+            logger.log(Level.INFO, "setting task as done successful");
             return Constants.CommandType.DONE;
         }
-
     }
 
     /**
@@ -420,7 +428,7 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setUndoneTask(ParseResult result) {
-
+        logger.log(Level.INFO, "setting task as not done");
         // Saves previous state
         pushState();
 
@@ -437,6 +445,7 @@ public class Engine {
             lastModifiedTask = toBeDone.getID();
             // Refreshes the display lists
             refreshLists();
+            logger.log(Level.INFO, "setting task as not done successful");
             return Constants.CommandType.SETNOTDONE;
         }
     }
@@ -452,6 +461,7 @@ public class Engine {
      */
     private static Constants.CommandType searchTask(ParseResult result) {
 
+        logger.log(Level.INFO, "searching tasks");
         boolean[] flags = result.getCommandFlags();
         searchResults = new TaskList(allTasks);
 
@@ -481,6 +491,7 @@ public class Engine {
 
         searchResultsDisplay = Logic.displayAllTaskByDate(searchResults);
 
+        logger.log(Level.INFO, "searching for tasks successful");
         return Constants.CommandType.SEARCH;
     }
 
@@ -495,16 +506,18 @@ public class Engine {
      */
     private static Constants.CommandType undo() {
 
+        logger.log(Level.INFO, "undoing action");
         if (previousStates.isEmpty()) {
             // If there were no previous saved states, command is invalid
             commandErrorType = Constants.ErrorType.NOTHING_TO_UNDO;
+            logger.log(Level.WARNING, "pushing previous state successful");
             return Constants.CommandType.INVALID;
         } else {
             allTasks = previousStates.pop();
             refreshLists();
+            logger.log(Level.INFO, "undoing action successful");
             return Constants.CommandType.UNDO;
         }
-
     }
 
     /**
@@ -516,6 +529,7 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType convertToDeadline(ParseResult result) {
+        logger.log(Level.INFO, "converting to deadline task");
         // Saves previous state
         pushState();
 
@@ -528,7 +542,6 @@ public class Engine {
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
-            // CHANGE DATE
             toBeConverted.setEndDate(null);
             boolean[] flags = result.getCommandFlags();
             if (flags[0] == true) {
@@ -539,6 +552,7 @@ public class Engine {
             // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to deadline task successful");
             return Constants.CommandType.CONVERT_DEADLINE;
         }
     }
@@ -551,6 +565,8 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType convertToTimed(ParseResult result) {
+
+        logger.log(Level.INFO, "converting to timed task");
         // Saves previous state
         pushState();
 
@@ -569,6 +585,7 @@ public class Engine {
             // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to timed task successful");
             return Constants.CommandType.CONVERT_TIMED;
         }
     }
@@ -582,6 +599,8 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType convertToFloating(ParseResult result) {
+
+        logger.log(Level.INFO, "converting to floating task");
         // Saves previous state
         pushState();
 
@@ -600,6 +619,7 @@ public class Engine {
             // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to floating task successful");
             return Constants.CommandType.CONVERT_FLOATING;
         }
     }
@@ -610,6 +630,7 @@ public class Engine {
      * @return
      */
     public static String getStoragePath() {
+
         return config.getStoragePath();
     }
 
@@ -619,7 +640,7 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType fetchStoragePath() {
-        // System.out.println(config.getStoragePath());
+
         return Constants.CommandType.SAVEWHERE;
     }
 
@@ -630,14 +651,17 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setStoragePath(ParseResult result) {
+
+        logger.log(Level.INFO, "setting storage path");
         String newPath = result.getName();
         if (config.setStoragePath(newPath)) {
+            logger.log(Level.INFO, "setting storage path successful");
             return Constants.CommandType.SAVEHERE;
         } else {
             commandErrorType = Constants.ErrorType.INVALID_PATH;
+            logger.log(Level.WARNING, "path provided invalid");
             return Constants.CommandType.INVALID;
         }
-
     }
 
     /**
@@ -647,10 +671,9 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType handleInvalidCommand(ParseResult result) {
-
+        logger.log(Level.WARNING, "command type not recognised");
         commandErrorType = result.getErrorType();
         return Constants.CommandType.INVALID;
-
     }
 
     /**
@@ -659,7 +682,7 @@ public class Engine {
      * @return
      */
     public static Constants.ErrorType getErrorType() {
-        
+
         return commandErrorType;
     }
 
@@ -670,9 +693,9 @@ public class Engine {
      * @param userInput
      * @return
      */
-    // Not tested yet
     public static Constants.CommandType process(String userInput) {
 
+        logger.log(Level.INFO, "processing user input");
         if (userInput == null) {
             commandErrorType = Constants.ErrorType.NO_INPUT;
             return Constants.CommandType.INVALID;
@@ -683,75 +706,71 @@ public class Engine {
         Constants.CommandType command = result.getCommandType();
 
         switch (command) {
-        case ADD:
-            return addTask(result);
+            case ADD :
+                return addTask(result);
 
-        case UPDATE:
-            return updateTask(result);
+            case UPDATE :
+                return updateTask(result);
 
-        case DELETE:
-            return deleteTask(result);
+            case DELETE :
+                return deleteTask(result);
 
-        case SHOW:
-            // TO BE DONE
-            return Constants.CommandType.SHOW;
+            case DONE :
+                return setDoneTask(result);
 
-        case DONE:
-            return setDoneTask(result);
+            case UNDO :
+                return undo();
 
-        case UNDO:
-            return undo();
+            case SEARCH :
+                return searchTask(result);
 
-        case SEARCH:
-            return searchTask(result);
+            case CONVERT_FLOATING :
+                return convertToFloating(result);
 
-        case CONVERT_FLOATING:
-            return convertToFloating(result);
+            case CONVERT_DEADLINE :
+                return convertToDeadline(result);
 
-        case CONVERT_DEADLINE:
-            return convertToDeadline(result);
+            case CONVERT_TIMED :
+                return convertToTimed(result);
 
-        case CONVERT_TIMED:
-            return convertToTimed(result);
+            case SETNOTDONE :
+                return setUndoneTask(result);
 
-        case SETNOTDONE:
-            return setUndoneTask(result);
+            case SAVEWHERE :
+                return fetchStoragePath();
 
-        case SAVEWHERE:
-            return fetchStoragePath();
+            case SAVEHERE :
+                return setStoragePath(result);
 
-        case SAVEHERE:
-            return setStoragePath(result);
+            case HELP :
+                return Constants.CommandType.HELP;
 
-        case HELP:
-            return Constants.CommandType.HELP;
+            case HELP_ADD :
+                return Constants.CommandType.HELP_ADD;
 
-        case HELP_ADD:
-            return Constants.CommandType.HELP_ADD;
+            case HELP_UPDATE :
+                return Constants.CommandType.HELP_UPDATE;
 
-        case HELP_UPDATE:
-            return Constants.CommandType.HELP_UPDATE;
+            case HELP_DELETE :
+                return Constants.CommandType.HELP_DELETE;
 
-        case HELP_DELETE:
-            return Constants.CommandType.HELP_DELETE;
+            case HELP_SHOW :
+                return Constants.CommandType.HELP_SHOW;
 
-        case HELP_SHOW:
-            return Constants.CommandType.HELP_SHOW;
+            case HELP_DONE :
+                return Constants.CommandType.HELP_DONE;
 
-        case HELP_DONE:
-            return Constants.CommandType.HELP_DONE;
+            case HELP_UNDO :
+                return Constants.CommandType.HELP_UNDO;
 
-        case HELP_UNDO:
-            return Constants.CommandType.HELP_UNDO;
+            case HELP_SEARCH :
+                return Constants.CommandType.HELP_SEARCH;
 
-        case HELP_SEARCH:
-            return Constants.CommandType.HELP_SEARCH;
+            case EXIT :
+                return Constants.CommandType.EXIT;
 
-        case EXIT:
-            return Constants.CommandType.EXIT;
-
-        default:
-            return handleInvalidCommand(result);
+            default :
+                return handleInvalidCommand(result);
         }
     }
 
@@ -760,8 +779,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getAllTasks() {
+
         return Logic.displayAllTaskByDate(allTasks);
     }
 
@@ -771,6 +790,7 @@ public class Engine {
      * @return
      */
     public static int getAllTasksSize() {
+
         return allTasks.size();
     }
 
@@ -779,8 +799,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getDoneTasks() {
+
         return Logic.displayAllTaskByDate(doneTasks);
     }
 
@@ -790,6 +810,7 @@ public class Engine {
      * @return
      */
     public static int getDoneTasksSize() {
+
         return doneTasks.size();
     }
 
@@ -798,8 +819,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUndoneTasks() {
+
         return Logic.displayAllTaskByDate(undoneTasks);
     }
 
@@ -809,6 +830,7 @@ public class Engine {
      * @return
      */
     public static int getUndoneTasksSize() {
+
         return undoneTasks.size();
     }
 
@@ -817,8 +839,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getFloatingTasks() {
+
         return Logic.displayAllTaskByPriority(floatingTasks);
     }
 
@@ -828,6 +850,7 @@ public class Engine {
      * @return
      */
     public static int getFloatingTasksSize() {
+
         return floatingTasks.size();
     }
 
@@ -836,8 +859,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
+
         return Logic.displayAllTaskByDate(normalTasks);
     }
 
@@ -847,6 +870,7 @@ public class Engine {
      * @return
      */
     public static int getConfirmedTasksSize() {
+
         return normalTasks.size();
     }
 
@@ -855,8 +879,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getTodayTasks() {
+
         return Logic.displaySearchedTaskByPriority(todayTasks);
     }
 
@@ -866,6 +890,7 @@ public class Engine {
      * @return
      */
     public static int getTodayTasksSize() {
+
         return todayTasks.size();
     }
 
@@ -874,8 +899,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getOverdueTasks() {
+
         return Logic.displayAllTaskByDate(overdueTasks);
     }
 
@@ -885,6 +910,7 @@ public class Engine {
      * @return
      */
     public static int getOverdueTasksSize() {
+
         return overdueTasks.size();
     }
 
@@ -893,8 +919,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUpcomingTasks() {
+
         return Logic.displayAllTaskByDate(upcomingTasks);
     }
 
@@ -904,6 +930,7 @@ public class Engine {
      * @return
      */
     public static int getUpcomingTasksSize() {
+
         return upcomingTasks.size();
     }
 
@@ -912,8 +939,8 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getSearchResult() {
+
         return searchResultsDisplay;
     }
 
