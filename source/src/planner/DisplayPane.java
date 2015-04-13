@@ -32,18 +32,18 @@ import javax.swing.text.StyledDocument;
 */
 public class DisplayPane extends JScrollPane{
 
-	private JTextPane display;
+	private JTextPane display_;
 	
-	private TaskBar currentTaskBar;
+	private TaskBar currentTaskBar_;
 	
-	private long currentTaskBarID;
+	private long currentTaskBarID_;
 	
-	private TreeMap<Long, TaskBar> listOfTasks;
-	private TreeMap<Long, DisplayTask> tasksList;
-	private TreeMap<Integer, Long> taskNumberList;
-	private TreeMap<Integer, Long> jumpList;
+	private TreeMap<Long, TaskBar> listOfTasks_;
+	private TreeMap<Long, DisplayTask> tasksList_;
+	private TreeMap<Integer, Long> taskNumberList_;
+	private TreeMap<Integer, Long> jumpList_;
 	
-	private CustomScrollBarUI scrollBarSkin;
+	private CustomScrollBarUI scrollBarSkin_;
 	
 	private final long DEFAULT_INVALID_TASKBAR_ID = -1;
 	private final long MINIMUM_VALID_TASKBAR_ID = 0;
@@ -104,15 +104,15 @@ public class DisplayPane extends JScrollPane{
     */
 	public DisplayPane(){
 		
-		listOfTasks = new TreeMap<Long, TaskBar>();
-		tasksList = new TreeMap<Long, DisplayTask>();
-		taskNumberList = new TreeMap<Integer, Long>();
-		jumpList = new TreeMap<Integer, Long>();
-		currentTaskBarID = DEFAULT_INVALID_TASKBAR_ID;
+		listOfTasks_ = new TreeMap<Long, TaskBar>();
+		tasksList_ = new TreeMap<Long, DisplayTask>();
+		taskNumberList_ = new TreeMap<Integer, Long>();
+		jumpList_ = new TreeMap<Integer, Long>();
+		currentTaskBarID_ = DEFAULT_INVALID_TASKBAR_ID;
 		
 		// prepareDisplay() must be called first because it is added as viewport to scrollpane
 		prepareDisplay();
-		setViewportView(display);
+		setViewportView(display_);
 		setBorder(null);
 		setOpaque(false);
 		setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -121,8 +121,8 @@ public class DisplayPane extends JScrollPane{
 		
 		JScrollBar verticalScrollBar = getVerticalScrollBar();
 		verticalScrollBar.setOpaque(false);
-		scrollBarSkin = new CustomScrollBarUI();
-		verticalScrollBar.setUI( scrollBarSkin );
+		scrollBarSkin_ = new CustomScrollBarUI();
+		verticalScrollBar.setUI( scrollBarSkin_ );
 	}
 	
     /**
@@ -131,31 +131,31 @@ public class DisplayPane extends JScrollPane{
      * @return True if there are tasks being displayed currently; false otherwise
      */
 	public boolean hasTasksDisplayed(){
-	    return (listOfTasks != null && !listOfTasks.isEmpty());
+	    return (listOfTasks_ != null && !listOfTasks_.isEmpty());
 	}
 	
 	/**
      * Initializes and sets the attributes for the display component of this DisplayPane.
      */
 	private void prepareDisplay(){
-		display = new JTextPane();
-		display.setHighlighter(null);
-		display.setEditable(false);
-		display.setOpaque(false);
-		display.setBorder(null);
-		display.setFont( new Font( DEFAULT_DISPLAY_FONT_FAMILY, Font.PLAIN, DEFAULT_DISPLAY_FONT_SIZE ) );
+		display_ = new JTextPane();
+		display_.setHighlighter(null);
+		display_.setEditable(false);
+		display_.setOpaque(false);
+		display_.setBorder(null);
+		display_.setFont( new Font( DEFAULT_DISPLAY_FONT_FAMILY, Font.PLAIN, DEFAULT_DISPLAY_FONT_SIZE ) );
 	}
 	
 	/**
      * Clears all content currently being displayed on the display component of this DisplayPane.
      */
 	public void clearDisplay(){
-		display.setText(EMPTY_STRING);
-		currentTaskBar = null;
-		currentTaskBarID = DEFAULT_INVALID_TASKBAR_ID;
-		listOfTasks.clear();
-		tasksList.clear();
-		taskNumberList.clear();
+		display_.setText(EMPTY_STRING);
+		currentTaskBar_ = null;
+		currentTaskBarID_ = DEFAULT_INVALID_TASKBAR_ID;
+		listOfTasks_.clear();
+		tasksList_.clear();
+		taskNumberList_.clear();
 	}
 	
 	/**
@@ -164,7 +164,7 @@ public class DisplayPane extends JScrollPane{
      * @return The task id of the currently highlighted task in the display component of this DisplayPane.
      */
 	public long getCurrentSelectedTaskID(){
-	    return currentTaskBarID;
+	    return currentTaskBarID_;
 	}
 
 	/**
@@ -173,8 +173,8 @@ public class DisplayPane extends JScrollPane{
      * @return The task id of the currently highlighted task in the display component of this DisplayPane.
      */
 	public boolean selectTask( long lineNumber ){
-		if( lineNumber >= MINIMUM_LINENUMBER && lineNumber <= listOfTasks.size() ){
-			TaskBar tempTaskBar = listOfTasks.get(lineNumber-SIZE_OF_ONE_LINE);
+		if( lineNumber >= MINIMUM_LINENUMBER && lineNumber <= listOfTasks_.size() ){
+			TaskBar tempTaskBar = listOfTasks_.get(lineNumber-SIZE_OF_ONE_LINE);
 			if( tempTaskBar != null ){
 				selectTask( tempTaskBar, lineNumber-SIZE_OF_ONE_LINE );             // Changed this function
 				return true;
@@ -190,15 +190,15 @@ public class DisplayPane extends JScrollPane{
      *         the currently highlighted task does not exists; false otherwise.
      */
 	public boolean selectTaskRelativeToCurrentSelectedTask( int distance ){
-	    if( !listOfTasks.isEmpty() ){
-	        long newCurrentTaskBarID = currentTaskBarID + distance;
-	        newCurrentTaskBarID = Math.max( listOfTasks.firstKey(), newCurrentTaskBarID ); 
-	        newCurrentTaskBarID = Math.min( listOfTasks.lastKey(),  newCurrentTaskBarID );
+	    if( !listOfTasks_.isEmpty() ){
+	        long newCurrentTaskBarID = currentTaskBarID_ + distance;
+	        newCurrentTaskBarID = Math.max( listOfTasks_.firstKey(), newCurrentTaskBarID ); 
+	        newCurrentTaskBarID = Math.min( listOfTasks_.lastKey(),  newCurrentTaskBarID );
 	        
-	        if( newCurrentTaskBarID == currentTaskBarID ){
+	        if( newCurrentTaskBarID == currentTaskBarID_ ){
 	            return true;
 	        }
-	        TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
+	        TaskBar tempTaskBar = listOfTasks_.get( newCurrentTaskBarID );
 	        if( tempTaskBar != null ){
 	            selectTask( tempTaskBar, newCurrentTaskBarID );
                 return true;
@@ -214,15 +214,15 @@ public class DisplayPane extends JScrollPane{
      *              does not exists; false otherwise.
      */
 	public boolean selectPreviousTask(){
-		if( !listOfTasks.isEmpty() && (currentTaskBarID - SIZE_OF_ONE_TASK < listOfTasks.size()) ){
+		if( !listOfTasks_.isEmpty() && (currentTaskBarID_ - SIZE_OF_ONE_TASK < listOfTasks_.size()) ){
 		    
 		    long newCurrentTaskBarID;
-		    if( currentTaskBarID - SIZE_OF_ONE_TASK <= DEFAULT_INVALID_TASKBAR_ID ){
-		        newCurrentTaskBarID = listOfTasks.size() - SIZE_OF_ONE_TASK;
+		    if( currentTaskBarID_ - SIZE_OF_ONE_TASK <= DEFAULT_INVALID_TASKBAR_ID ){
+		        newCurrentTaskBarID = listOfTasks_.size() - SIZE_OF_ONE_TASK;
 		    } else{
-		        newCurrentTaskBarID = currentTaskBarID - SIZE_OF_ONE_TASK;
+		        newCurrentTaskBarID = currentTaskBarID_ - SIZE_OF_ONE_TASK;
 		    }
-			TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
+			TaskBar tempTaskBar = listOfTasks_.get( newCurrentTaskBarID );
 			if( tempTaskBar != null ){
 				selectTask( tempTaskBar, newCurrentTaskBarID );
 				return true;
@@ -239,15 +239,15 @@ public class DisplayPane extends JScrollPane{
      */
 	public boolean selectNextTask(){
 	    
-		if( !listOfTasks.isEmpty() && currentTaskBarID + SIZE_OF_ONE_TASK >= MINIMUM_VALID_TASKBAR_ID ){
+		if( !listOfTasks_.isEmpty() && currentTaskBarID_ + SIZE_OF_ONE_TASK >= MINIMUM_VALID_TASKBAR_ID ){
 			
 		    long newCurrentTaskBarID;
-		    if( currentTaskBarID + SIZE_OF_ONE_TASK >= listOfTasks.size() ){
+		    if( currentTaskBarID_ + SIZE_OF_ONE_TASK >= listOfTasks_.size() ){
 		        newCurrentTaskBarID = MINIMUM_VALID_TASKBAR_ID;
 		    } else{
-		        newCurrentTaskBarID = currentTaskBarID + SIZE_OF_ONE_TASK;
+		        newCurrentTaskBarID = currentTaskBarID_ + SIZE_OF_ONE_TASK;
 		    }
-			TaskBar tempTaskBar = listOfTasks.get( newCurrentTaskBarID );
+			TaskBar tempTaskBar = listOfTasks_.get( newCurrentTaskBarID );
 			if( tempTaskBar != null ){
 				selectTask( tempTaskBar, newCurrentTaskBarID );
 				return true;
@@ -264,12 +264,12 @@ public class DisplayPane extends JScrollPane{
      * @param id        The id of the taskBar to be highlighted
      */
 	private void selectTask( TaskBar taskBar, long id ){
-		if( taskBar != null && id >= MINIMUM_VALID_TASKBAR_ID && id < listOfTasks.size()  ){
-			deselectTask( currentTaskBar );
+		if( taskBar != null && id >= MINIMUM_VALID_TASKBAR_ID && id < listOfTasks_.size()  ){
+			deselectTask( currentTaskBar_ );
 			taskBar.setFocusedTaskBar();
-			display.setCaretPosition(taskBar.getPosition());
-			currentTaskBarID = id;
-			currentTaskBar = taskBar;
+			display_.setCaretPosition(taskBar.getPosition());
+			currentTaskBarID_ = id;
+			currentTaskBar_ = taskBar;
 		}
 	}
 	
@@ -281,9 +281,9 @@ public class DisplayPane extends JScrollPane{
      */
 	private void deselectTask( TaskBar taskBar ){
 		if( taskBar != null ){
-			currentTaskBarID = DEFAULT_INVALID_TASKBAR_ID;
+			currentTaskBarID_ = DEFAULT_INVALID_TASKBAR_ID;
 			taskBar.setUnfocusedTaskBar();
-			currentTaskBar = null;
+			currentTaskBar_ = null;
 		}
 	}
 	
@@ -295,7 +295,7 @@ public class DisplayPane extends JScrollPane{
 	private void addComponentToDisplay( JComponent component ){
 		if( component != null ){
 			try{
-				StyledDocument styledDocument = (StyledDocument) display.getDocument();
+				StyledDocument styledDocument = (StyledDocument) display_.getDocument();
 				Style style = styledDocument.addStyle("component", null);
 				StyleConstants.setComponent(style, component);
 				styledDocument.insertString( styledDocument.getLength(), "component", style );
@@ -340,7 +340,7 @@ public class DisplayPane extends JScrollPane{
 	private void appendString( String string, Style style ){
 		if( string != null ){
 			try{
-				StyledDocument doc = display.getStyledDocument();
+				StyledDocument doc = display_.getStyledDocument();
 				doc.insertString(doc.getLength(), string, style );
 			} catch( BadLocationException badLocationException ){}
 		}
@@ -359,16 +359,16 @@ public class DisplayPane extends JScrollPane{
 		if( task == null || task.getParent() == null ){
 			return false;
 		}
-		long taskBarID = listOfTasks.size();
+		long taskBarID = listOfTasks_.size();
 		TaskBar taskBar = new TaskBar();
 		setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
-		taskBar.setPosition( display.getCaretPosition() );
+		taskBar.setPosition( display_.getCaretPosition() );
 		appendString(BORDER_SPACING, null);
 		addComponentToDisplay( taskBar );
-		listOfTasks.put( taskBarID, taskBar );
-		tasksList.put(taskBarID, task);
-		taskNumberList.put(task.getParent().getID(), taskBarID);
-		jumpList.put(task.getID(), taskBarID);
+		listOfTasks_.put( taskBarID, taskBar );
+		tasksList_.put(taskBarID, task);
+		taskNumberList_.put(task.getParent().getID(), taskBarID);
+		jumpList_.put(task.getID(), taskBarID);
 		appendString(NEW_LINE, null);
 		selectTask( taskBar, taskBarID );
 		return true;
@@ -378,7 +378,7 @@ public class DisplayPane extends JScrollPane{
      * Returns the DisplayTask Object representing the currently highlighted taskBar
      */
 	public DisplayTask getCurrentSelectedTask(){
-	    return tasksList.get(currentTaskBarID);
+	    return tasksList_.get(currentTaskBarID_);
 	}
 	
 	/**
@@ -389,9 +389,9 @@ public class DisplayPane extends JScrollPane{
      */
 	public boolean selectGivenJumpID( int jumpID ){
 	    if( jumpID >= MINIMUM_VALID_JUMP_ID ){
-            Long internalID = jumpList.get(jumpID);
+            Long internalID = jumpList_.get(jumpID);
             if( internalID != null ){     
-                TaskBar tempTaskBar = listOfTasks.get(internalID);  
+                TaskBar tempTaskBar = listOfTasks_.get(internalID);  
                 if(tempTaskBar != null){   
                     selectTask( tempTaskBar, internalID );
                     return true;  
@@ -409,9 +409,9 @@ public class DisplayPane extends JScrollPane{
      */
 	public boolean selectGivenTaskID( int taskID ){
 	    if( taskID >= MINIMUM_VALID_TASK_ID ){
-	        Long internalID = taskNumberList.get(taskID);
+	        Long internalID = taskNumberList_.get(taskID);
 	        if( internalID != null ){
-                TaskBar tempTaskBar = listOfTasks.get(internalID);
+                TaskBar tempTaskBar = listOfTasks_.get(internalID);
                 if(tempTaskBar != null){
                     selectTask( tempTaskBar, internalID );
                     return true;
@@ -429,9 +429,9 @@ public class DisplayPane extends JScrollPane{
      */
 	public boolean selectGivenTask( Task task ){
 	    if( task != null ){
-	        Long internalID = taskNumberList.get(task.getID());
+	        Long internalID = taskNumberList_.get(task.getID());
 	        if( internalID != null ){
-	            TaskBar tempTaskBar = listOfTasks.get(internalID);
+	            TaskBar tempTaskBar = listOfTasks_.get(internalID);
 	            if(tempTaskBar != null){
 	                selectTask( tempTaskBar, internalID );
 	                return true;
@@ -455,8 +455,8 @@ public class DisplayPane extends JScrollPane{
 		if( !addTasksToDisplayWithoutSelection(currentDate, taskList) ){
 		    return false;
 		}
-		if( !listOfTasks.isEmpty() && currentTaskBarID != MINIMUM_VALID_TASKBAR_ID ){
-			selectTask( listOfTasks.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
+		if( !listOfTasks_.isEmpty() && currentTaskBarID_ != MINIMUM_VALID_TASKBAR_ID ){
+			selectTask( listOfTasks_.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
 		}
 		return true;
 	}
@@ -467,7 +467,7 @@ public class DisplayPane extends JScrollPane{
      * @return The number of tasks currently being displayed on the display component in the form of a TaskBar object
      */
 	public int getNumberOfTasksDisplayed(){
-	    return listOfTasks.size();
+	    return listOfTasks_.size();
 	}
 	
 	/**
@@ -486,7 +486,7 @@ public class DisplayPane extends JScrollPane{
 	        messagePane.setForeground(Color.WHITE);
 	        messagePane.setBounds(DEFAULT_RELATIVE_XCOORDINATE_OF_MESSAGEPANE, 
 	                              DEFAULT_RELATIVE_YCOORDINATE_OF_MESSAGEPANE, 
-	                              display.getWidth(), DEFAULT_HEIGHT_OF_MESSAGEPANE);
+	                              display_.getWidth(), DEFAULT_HEIGHT_OF_MESSAGEPANE);
 	        SimpleAttributeSet newLineStyle = new SimpleAttributeSet();
 	        StyleConstants.setFontFamily(newLineStyle, DEFAULT_FONT_FAMILY_OF_MESSAGEPANE);
 	        StyleConstants.setFontSize(newLineStyle, DEFAULT_FONT_SPACE_SIZE_OF_MESSAGEPANE);
@@ -555,10 +555,10 @@ public class DisplayPane extends JScrollPane{
 	                }
 	            }
 	        }
-	        if( !listOfTasks.isEmpty() && currentTaskBarID != MINIMUM_VALID_TASKBAR_ID ){
-                selectTask( listOfTasks.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
+	        if( !listOfTasks_.isEmpty() && currentTaskBarID_ != MINIMUM_VALID_TASKBAR_ID ){
+                selectTask( listOfTasks_.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
             }
-	        display.setCaretPosition(MINIMUM_DOCUMENT_INDEX);
+	        display_.setCaretPosition(MINIMUM_DOCUMENT_INDEX);
 	        return true;
 	    }   
 	    return false;
@@ -593,7 +593,7 @@ public class DisplayPane extends JScrollPane{
         messagePane.setFont(new Font( DEFAULT_FONT_FAMILY_OF_MESSAGEPANE, Font.BOLD, DEFAULT_FONT_SIZE_OF_MESSAGEPANE ));
         messagePane.setForeground(Color.WHITE);
         messagePane.setBounds(DEFAULT_RELATIVE_XCOORDINATE_OF_MESSAGEPANE, DEFAULT_RELATIVE_YCOORDINATE_OF_MESSAGEPANE, 
-                              display.getWidth(), DEFAULT_HEIGHT_OF_MESSAGEPANE);
+                              display_.getWidth(), DEFAULT_HEIGHT_OF_MESSAGEPANE);
         messagePane.initialiseForResize();
         messagePane.appendText(TOP_BORDER_SPACING, newLineStyle);
         messagePane.appendText(info, TextStyle);
@@ -622,16 +622,16 @@ public class DisplayPane extends JScrollPane{
 	    if( task == null || task.getParent() == null ){
             return false;
         }
-	    long taskBarID = listOfTasks.size();
+	    long taskBarID = listOfTasks_.size();
         TaskBar taskBar = new TaskBar(header);
         setTaskBarParameters( currentDate, taskBar, task, task.getParent().getID() );
-        taskBar.setPosition( display.getCaretPosition() );
+        taskBar.setPosition( display_.getCaretPosition() );
         appendString(BORDER_SPACING, null);
         addComponentToDisplay( taskBar );
-        listOfTasks.put( taskBarID, taskBar );
-        tasksList.put(taskBarID, task);
-        taskNumberList.put(task.getParent().getID(), taskBarID);
-        jumpList.put(task.getID(), taskBarID);
+        listOfTasks_.put( taskBarID, taskBar );
+        tasksList_.put(taskBarID, task);
+        taskNumberList_.put(task.getParent().getID(), taskBarID);
+        jumpList_.put(task.getID(), taskBarID);
         appendString(NEW_LINE, null);
         return true;
 	}
@@ -653,7 +653,7 @@ public class DisplayPane extends JScrollPane{
         }
         ListIterator<DisplayTask> iterator = taskList.listIterator();
         DisplayTask currentTask;
-        display.setCaretPosition(display.getStyledDocument().getLength());
+        display_.setCaretPosition(display_.getStyledDocument().getLength());
   
         long idxForCurrentTaskBar;
         TaskBar tempTaskBar;
@@ -663,13 +663,13 @@ public class DisplayPane extends JScrollPane{
                 appendString(BORDER_SPACING, null);
                 tempTaskBar = new TaskBar();
                 setTaskBarParameters( currentDate, tempTaskBar, currentTask, currentTask.getParent().getID() );
-                tempTaskBar.setPosition( display.getCaretPosition() );
+                tempTaskBar.setPosition( display_.getCaretPosition() );
                 addComponentToDisplay( tempTaskBar );
-                idxForCurrentTaskBar = listOfTasks.size();
-                listOfTasks.put( idxForCurrentTaskBar, tempTaskBar );
-                tasksList.put(idxForCurrentTaskBar, currentTask);
-                taskNumberList.put( currentTask.getParent().getID(), idxForCurrentTaskBar );
-                jumpList.put(currentTask.getID(), idxForCurrentTaskBar);
+                idxForCurrentTaskBar = listOfTasks_.size();
+                listOfTasks_.put( idxForCurrentTaskBar, tempTaskBar );
+                tasksList_.put(idxForCurrentTaskBar, currentTask);
+                taskNumberList_.put( currentTask.getParent().getID(), idxForCurrentTaskBar );
+                jumpList_.put(currentTask.getID(), idxForCurrentTaskBar);
                 appendString(NEW_LINE, null);
             }
         }
@@ -684,7 +684,7 @@ public class DisplayPane extends JScrollPane{
      * DisplayPanel
      */
 	public InvisibleButton getUpButtonComponent(){
-        return (scrollBarSkin != null ? scrollBarSkin.getUpButtonComponent() : null);
+        return (scrollBarSkin_ != null ? scrollBarSkin_.getUpButtonComponent() : null);
     }
     
 	/**
@@ -695,7 +695,7 @@ public class DisplayPane extends JScrollPane{
      * DisplayPanel
      */
     public InvisibleButton getDownButtonComponent(){
-        return (scrollBarSkin != null ? scrollBarSkin.getDownButtonComponent() : null);
+        return (scrollBarSkin_ != null ? scrollBarSkin_.getDownButtonComponent() : null);
     }
     
     /**
@@ -704,7 +704,7 @@ public class DisplayPane extends JScrollPane{
      * @return The display component of this DisplayPanel
      */
     public JTextPane getDisplayComponent(){
-        return display;
+        return display_;
     }
     
     /**
@@ -744,8 +744,8 @@ public class DisplayPane extends JScrollPane{
                 }
                 appendString( BOTTOM_BORDER_SPACING_II, null );
             }
-            if( !listOfTasks.isEmpty() && currentTaskBarID != MINIMUM_VALID_TASKBAR_ID ){
-                selectTask( listOfTasks.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
+            if( !listOfTasks_.isEmpty() && currentTaskBarID_ != MINIMUM_VALID_TASKBAR_ID ){
+                selectTask( listOfTasks_.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
             }
         }
         if( !hasTasksDisplayed() ){
@@ -791,8 +791,8 @@ public class DisplayPane extends JScrollPane{
                 }
                 appendString( BOTTOM_BORDER_SPACING_II, null );
             }
-            if( !listOfTasks.isEmpty() && currentTaskBarID != MINIMUM_VALID_TASKBAR_ID ){
-                selectTask( listOfTasks.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
+            if( !listOfTasks_.isEmpty() && currentTaskBarID_ != MINIMUM_VALID_TASKBAR_ID ){
+                selectTask( listOfTasks_.get(MINIMUM_VALID_TASKBAR_ID), MINIMUM_VALID_TASKBAR_ID );
             }
         }
         if( !hasTasksDisplayed() ){
