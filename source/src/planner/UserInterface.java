@@ -3,7 +3,6 @@
 package planner;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -16,7 +15,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,9 +46,60 @@ import planner.Constants.DisplayStateFlag;
 // This class handles all GUI logic and processing
 public class UserInterface extends JFrame {
 
-    ///////////////////////////////////////////////////////////////////// 
-    //  PROCESS COMMANDS FUNCTIONS START HERE
-    ///////////////////////////////////////////////////////////////////// 
+    private JPanel contentPane;
+    private JPanel slidePanelFrame;
+    
+    private SliderPanel infoPanel;
+    private SliderPanel lastCommandPanel;
+    
+    private CommandTextbox commandPanel;
+    private JTextPane commandInputField;
+    
+    private DisplayPane displayPane;
+    
+    private JLabel closeButton;
+    private JLabel minimiseButton;
+    private JLabel dragPanel;
+    private JLabel sectionTitle;
+    private JLabel sectionTitleLine;
+    private JLabel background;
+    
+    private InvisibleButton upArrowButton;
+    private InvisibleButton downArrowButton;
+    
+    private JTextPane taskDisplayPanel;
+    private JTextPane navigationPanel;
+    
+    // Used for drag logic
+    private int mouseXCoordinate;
+    private int mouseYCoordinate;
+    
+    private int caretPositionToAppendLastCommandString;
+    
+    private DisplayTaskList currentList;
+    
+    private Set<Map.Entry<Integer, DisplayTaskList>> currentDisplayListForPriority;
+    private Set<Map.Entry<Date, DisplayTaskList>> currentDisplayListForDate;
+    
+    private boolean isMessageDisplayed;
+    
+    private ArrayList<NavigationBar> currentNavigationBars;
+    
+    private final static Logger userInterfaceLogger = Logger.getLogger(UserInterface.class.getName());
+    
+    private char characterToTransfer;
+    private boolean isBackspacePressed;
+
+    private int messageType;  // 0 - success message, 1 - error message, anything else - normal message
+    
+    private JComboBox<String> popupBox;
+    
+    private DisplayStateStack displayStateStack;
+    private final int maxNumOfDisplayStates = 100;
+    
+    private InputList inputList;
+    private final int MAX_INPUT_LIST_SIZE = 1000;
+    
     public void processCommand( String input ){
         
         planner.Constants.CommandType commandType = Engine.process(input);
@@ -1169,63 +1218,6 @@ public class UserInterface extends JFrame {
         isMessageDisplayed = true;
         commandPanel.setText( "Feature not supported in V0.5", true );
     }
-    ///////////////////////////////////////////////////////////////////// 
-    //  PROCESS COMMANDS FUNCTIONS END HERE
-    /////////////////////////////////////////////////////////////////////
-    
-    private JPanel contentPane;
-    private JPanel slidePanelFrame;
-    
-    private SliderPanel infoPanel;
-    private SliderPanel lastCommandPanel;
-    
-    private CommandTextbox commandPanel;
-    private JTextPane commandInputField;
-    
-    private DisplayPane displayPane;
-    
-    private JLabel closeButton;
-    private JLabel minimiseButton;
-    private JLabel dragPanel;
-    private JLabel sectionTitle;
-    private JLabel sectionTitleLine;
-    private JLabel background;
-    
-    private InvisibleButton upArrowButton;
-    private InvisibleButton downArrowButton;
-    
-    private JTextPane taskDisplayPanel;
-    private JTextPane navigationPanel;
-    
-    // Used for drag logic
-    private int mouseXCoordinate;
-    private int mouseYCoordinate;
-    
-    private int caretPositionToAppendLastCommandString;
-    
-    private DisplayTaskList currentList;
-    
-    private Set<Map.Entry<Integer, DisplayTaskList>> currentDisplayListForPriority;
-    private Set<Map.Entry<Date, DisplayTaskList>> currentDisplayListForDate;
-    
-    private boolean isMessageDisplayed;
-    
-    private ArrayList<NavigationBar> currentNavigationBars;
-    
-    private final static Logger userInterfaceLogger = Logger.getLogger(UserInterface.class.getName());
-    
-    private char characterToTransfer;
-    private boolean isBackspacePressed;
-
-    private int messageType;  // 0 - success message, 1 - error message, anything else - normal message
-    
-    private JComboBox<String> popupBox;
-    
-    private DisplayStateStack displayStateStack;
-    private final int maxNumOfDisplayStates = 100;
-    
-    private InputList inputList;
-    private final int MAX_INPUT_LIST_SIZE = 1000;
     
     public static void main(String[] args) {
         
@@ -1798,9 +1790,6 @@ public class UserInterface extends JFrame {
                         
                         String prevInputString = inputList.getPrevInputString();
                         
-                        System.out.println( "currentInput = " + currentInput );
-                        System.out.println( "prevInputString = " + prevInputString );
-                        
                         if( prevInputString != null){
                             
                             commandPanel.setText(prevInputString, false);
@@ -1887,9 +1876,6 @@ public class UserInterface extends JFrame {
                         inputList.setRecentlyTypedString(currentInput);
                         
                         String nextInputString = inputList.getNextInputString();
-                        
-                        System.out.println( "currentInput = " + currentInput );
-                        System.out.println( "nextInputString = " + nextInputString );
                         
                         if( nextInputString != null){
                             
