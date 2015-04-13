@@ -35,9 +35,9 @@ public class ParseResult {
     /**
      * This method is the ParseResult constructor.
      * 
-     * @param commandType Type of the command e.g. search
-     * @param time        Time/date parsed from command               
-     * @param flags       Indicate presence of properties (e.g. time)
+     * @param commandType Type of the command e.g. search.
+     * @param time        Time/date parsed from command.               
+     * @param flags       Indicate presence of properties (e.g. time).
      */
 	public ParseResult(CommandType commandType,
                        Date date, Date date2, Date dateToRemind, 
@@ -79,7 +79,7 @@ public class ParseResult {
 	/**
 	 * Gets the type of command the user input
 	 * 
-	 * @return Command type
+	 * @return Command type.
 	 */
     public CommandType getCommandType() {
         return commandType;
@@ -88,7 +88,7 @@ public class ParseResult {
     /**
      * Gets the first date field the user input.
      * 
-     * @return First date field
+     * @return First date field.
      */
     public Date getDate() {        
         return parsedDate != null ? new Date(parsedDate.getTime()) : null;    // Changed to defensive copy
@@ -97,7 +97,7 @@ public class ParseResult {
     /**
      * Gets the second date field the user input.
      * 
-     * @return Second date field
+     * @return Second date field.
      */
     public Date getSecondDate() {
         return parsedDate2;
@@ -106,7 +106,7 @@ public class ParseResult {
     /**
      * Gets the date by which the user wishes to be reminded.
      * 
-     * @return Reminder date
+     * @return Reminder date.
      */
     public Date getDateToRemind() {        
         return dateToRemind != null ? new Date(dateToRemind.getTime()) : null;    // Changed to defensive copy
@@ -115,7 +115,7 @@ public class ParseResult {
     /**
      * Gets the priority level the user input.
      * 
-     * @return Priority level
+     * @return Priority level.
      */
     public int getPriorityLevel() {
         return priorityLevel;
@@ -124,7 +124,7 @@ public class ParseResult {
     /**
      * Gets the task id the user input.
      * 
-     * @return Task id
+     * @return Task id.
      */
     public long getId() {
         return taskId;
@@ -133,7 +133,7 @@ public class ParseResult {
     /**
      * Gets the task name the user input.
      * 
-     * @return Task name
+     * @return Task name.
      */
     public String getName() {
         return taskName;
@@ -142,7 +142,7 @@ public class ParseResult {
     /**
      * Gets the task description the user input.
      * 
-     * @return Task description
+     * @return Task description.
      */
     public String getDescription() {
         return taskDescription;
@@ -151,7 +151,7 @@ public class ParseResult {
     /**
      * Gets the task tag the user input.
      * 
-     * @return Task tag
+     * @return Task tag.
      */
     public String getTag() {
         return taskTag;
@@ -160,7 +160,7 @@ public class ParseResult {
     /**
      * Gets the error from parsing the user command.
      * 
-     * @return Error type
+     * @return Error type.
      */
     public ErrorType getErrorType() {
         return errorType;
@@ -170,7 +170,7 @@ public class ParseResult {
      * Gets the flags that represent which fields in the result contain valid
      * values.
      * 
-     * @return Field validity flags
+     * @return Field validity flags.
      */
     public boolean[] getCommandFlags() {        
         return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];
