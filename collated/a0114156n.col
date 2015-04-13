@@ -13,61 +13,70 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * This class holds the configurations and settings of the program.
- * It is meant to keep track of where the program data is stored and
- * the number of tasks that have been created in the program. 
+ * This class holds the configurations and settings of the program. It is meant
+ * to keep track of where the program data is stored and the number of tasks
+ * that have been created in the program.
  * 
  *
  */
 
 public class Configuration {
-    
-    //Class variables
+
+    // Class variables
     private String storagePath;
     private int curTaskNum;
     private boolean isNew;
-    
+
     /**
-     * Constructor for storing an existing configuration after reading
-     * from the config file.
+     * Constructor for storing an existing configuration after reading from the
+     * config file.
      * 
-     * @param path The path of the data storage file
-     * @param taskNum The number of tasks tracked by the program
+     * @param path
+     *            The path of the data storage file
+     * @param taskNum
+     *            The number of tasks tracked by the program
      */
     public Configuration(String path, int taskNum) {
+
+        assert taskNum > 0;
+        
         storagePath = path;
         curTaskNum = taskNum;
         isNew = false;
     }
-    
+
     /**
-     * Constructor for creating a new configuration, when old config file
-     * is not found or cannot be read. Implies first run of the program.
+     * Constructor for creating a new configuration, when old config file is not
+     * found or cannot be read. Implies first run of the program.
      * 
-     * @param path The path of the data storage file
+     * @param path
+     *            The path of the data storage file
      */
     public Configuration(String path) {
+
         storagePath = path;
         curTaskNum = 1;
         isNew = true;
     }
-    
+
     /**
      * 
      * @return Returns the path of the data storage file.
      */
     public String getStoragePath() {
+
         return storagePath;
     }
-    
+
     /**
      * 
      * @return Returns the number of tasks created by the program.
      */
     public int getCurTaskNum() {
+
         return curTaskNum;
     }
-    
+
     /**
      * Returns a number to be assigned to a new Task and increases the internal
      * Task count.
@@ -75,10 +84,11 @@ public class Configuration {
      * @return Returns a number to be assigned to a new Task to be created.
      */
     public int getNewTaskNumber() {
+
         curTaskNum++;
         return curTaskNum - 1;
     }
-    
+
     /**
      * Returns the validity of the path given. Also sets the config to the new
      * path if it was valid.
@@ -87,23 +97,27 @@ public class Configuration {
      * @return
      */
     public boolean setStoragePath(String newPath) {
-        if(isPathValid(newPath)) {
+
+        if (isPathValid(newPath)) {
             storagePath = newPath;
             return true;
         } else {
             return false;
         }
     }
-    
+
     /**
-     * Checks the validity of the path to be used as a new storage.
+     * Checks the validity of the path to be used as a new storage. This is done
+     * by attempting to create a new file with the given path and then removing
+     * that file. If there are no errors, the path is valid.
      * 
      * @param path
      * @return
      */
     private boolean isPathValid(String path) {
+
         File tester = new File(path);
-        if(tester.exists()) {
+        if (tester.exists()) {
             return false;
         } else {
             try {
@@ -111,12 +125,13 @@ public class Configuration {
                 tester.createNewFile();
                 tester.delete();
                 return true;
-            } catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println(e);
                 return false;
             }
         }
     }
+
     /**
      * Returns true if config was newly created, false otherwise. Returning
      * false implies that a config file was read.
@@ -124,73 +139,12 @@ public class Configuration {
      * @return Returns true if the config was newly created.
      */
     public boolean isNew() {
+
         return isNew;
     }
 }
 
 	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Configuration.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
-	 */
-
-    public enum TipType{
-        UP_TIP, DOWN_TIP, UPDOWN_TIP
-    }
-    
-    public enum DisplayStateFlag {
-        ALL, TODAY, TENTATIVE, OVERDUE, UPCOMING, DONE, NOTDONE, WORD_SEARCH, PRIORITY_SEARCH, INVALID,
-        HELP, HELP_ADD, HELP_UPDATE, HELP_DELETE, HELP_DONE, HELP_UNDO, HELP_SEARCH, HELP_PRIORITY_SEARCH,
-        SETTINGS
-    }
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
-	 */
-
-    public static String[] NAVIGATION_BAR_STRING_CONTENTS = { "More info for task #",           // F1
-                                                              "Previous View",                  // F2
-                                                              "Tutorial",                       // F3
-                                                              " Task due today",                // F4
-                                                              " Tasks due today",
-                                                              " Task in total",                 // F5
-                                                              " Tasks in total",
-                                                              " Upcoming Task",                 // F6
-                                                              " Upcoming Tasks",
-                                                              " Floating Task",                // F7
-                                                              " Floating Tasks",
-                                                              " Overdue Task",                  // F8
-                                                              " Overdue Tasks",
-                                                              " Task Done",                     // F9
-                                                              " Tasks Done",
-                                                              " Task not Done",                 // F10
-                                                              " Tasks not Done"};                   
-    
-    public static Color[] COLOR_SERIES = { new Color( 239, 52, 65 ),
-                                           new Color( 244, 132, 57 ),
-                                           new Color( 224, 226, 54 ),
-                                           new Color( 47, 244, 237 ),
-                                           new Color( 74, 243, 110 ),
-                                           new Color( 242, 141, 236 ),
-                                           new Color( 245, 142, 142 ) };
-    
-    public static final String CONFIG_FILE_NAME = "config";
-    public static final String DEFAULT_STORAGE_NAME = "data";
-
-    public static final int NO_PRIORITY_LEVEL = 0;
-    public static final int NO_ID_SET = 0;
-    public static final int NAVIGATION_BAR_STRING_CONTENTS_SIZE = 17;
-    public static final int NAVIGATION_BARS_MAX_NUM = 10;
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
 
 
 
@@ -209,20 +163,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- * This class handles the main flow of the program. It provides an interface
- * for the UI to interact with the other components. Engine stores the state
- * of the program, controls the flow of data and commands, and executes the
- * changes to the data. Provides accessors for GUI to access the different
- * types of tasks.
+ * This class handles the main flow of the program. It provides an interface for
+ * the UI to interact with the other components. Engine stores the state of the
+ * program, controls the flow of data and commands, and executes the changes to
+ * the data. Provides accessors for GUI to access the different types of tasks.
  * 
  */
 public class Engine {
     
+    private static Logger logger = Logger.getLogger("Engine");
+
     private static Configuration config;
-    
+
     private static TaskList allTasks;
-    
+
     private static TaskList doneTasks;
     private static TaskList undoneTasks;
     private static TaskList floatingTasks;
@@ -230,138 +188,124 @@ public class Engine {
     private static TaskList todayTasks;
     private static TaskList upcomingTasks;
     private static TaskList overdueTasks;
-    
+
     private static TaskList searchResults;
-    
+
     private static Set<Map.Entry<Date, DisplayTaskList>> searchResultsDisplay;
-    
+
     private static int lastModifiedTask;
-    
+
     private static Storage storage;
     private static Stack<TaskList> previousStates;
-    
+
     private static int clashingTask;
-    
+
     private static Constants.ErrorType commandErrorType;
-    
+
     /**
-     * Returns true if the config was new, i.e. no older config was read or 
+     * Returns true if the config was new, i.e. no older config was read or
      * found.
      * 
      * @return
      */
     public static boolean isFirstRun() {
-        
+
         return config.isNew();
-        
     }
-    
+
     /**
      * Returns the ID of the last modified task.
      * 
      * @return
      */
     public static int lastModifiedTask() {
-        
+
         return lastModifiedTask;
-        
     }
-    
+
     /**
      * Returns ID of the first clashing task.
      * 
      * @return
      */
     public static int getClashingTask() {
-        
+
         return clashingTask;
-        
     }
-    
+
     /**
-     * Routine to initialise engine. Reads the storage and prepares the 
+     * Routine to initialise engine. Reads the storage and prepares the
      * TaskLists to be used.
      * 
      * @return success of the process
      */
-    //Not tested yet
     public static boolean init() {
+        logger.setLevel(Level.WARNING);
+        
         try {
-            doneTasks =  new TaskList();
-            undoneTasks =  new TaskList();
-            floatingTasks =  new TaskList();
-            normalTasks =  new TaskList();
+            logger.log(Level.INFO, "initialising engine");
+            
+            doneTasks = new TaskList();
+            undoneTasks = new TaskList();
+            floatingTasks = new TaskList();
+            normalTasks = new TaskList();
             todayTasks = new TaskList();
             upcomingTasks = new TaskList();
             overdueTasks = new TaskList();
-            
-            //Initiates the storage and read the config and storage files
+
+            // Initiates the storage and read the config and storage files
             storage = new Storage();
-            //System.out.println("here");
             config = storage.readConfig();
-            //System.out.println("readConfig");
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            //System.out.println("readStorage");
-            
-            //Initiates stack to be used for undo
+
+            // Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
-            
-            //Updates the list for display
+
+            // Updates the list for display
             refreshLists();
-            
-            System.out.println(allTasks.size());
+
+            logger.log(Level.INFO, "initialising engine successful");
             return true;
-        } catch(NullPointerException e) {
-            System.out.println("read error");
+        } catch (NullPointerException e) {
+            logger.log(Level.SEVERE, "failed to initialise engine");
             return false;
-            
         }
     }
-    
+
     /**
-     * Routine to be executed before quitting the program. This method saves
-     * the configuration and all the tasks and returns status of these save
+     * Routine to be executed before quitting the program. This method saves the
+     * configuration and all the tasks and returns status of these save
      * operations
+     * 
      * @return
      */
-    //Not tested yet
     public static boolean exit() {
+
         try {
+            logger.log(Level.INFO, "saving and exiting engine");
             
             storage.saveConfiguration(config);
             storage.saveTaskList(config.getStoragePath(), allTasks);
-            
+
             System.out.println(allTasks.size());
+            
+            logger.log(Level.INFO, "saving and exiting engine successful");
             return true;
-            
-        } catch(IOException e) {
-            
-            System.out.println("write error");
+
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "failed to save and exit engine");
             return false;
-            
         }
     }
-    
+
     /**
-     * Rebuilds the TaskLists with the latest allTasks such that
-     * the TaskLists that GUI requests will be up to date.
+     * Rebuilds the TaskLists with the latest allTasks such that the TaskLists
+     * that GUI requests will be up to date.
      */
-    //Not tested yet
     private static void refreshLists() {
+
+        logger.log(Level.INFO, "refreshing task lists");
         
-        //Logic.sortTaskListByPriority(allTasks);
-        //Logic.sortTaskListByDate(allTasks);
-        
-        //Clears TaskLists
-        doneTasks.clear();
-        undoneTasks.clear();
-        normalTasks.clear();
-        floatingTasks.clear();
-        todayTasks.clear();
-        upcomingTasks.clear();
-        overdueTasks.clear();
-        
-        //Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(allTasks);
@@ -370,119 +314,134 @@ public class Engine {
         upcomingTasks = Logic.searchUpcomingTasks(allTasks);
         overdueTasks = Logic.searchOverDuedTasks(allTasks);
         
+        logger.log(Level.INFO, "refreshing task lists successful");
     }
-    
+
     /**
-     * Copies the current allTasks and pushes the copy into the
-     * previousStates, such that older states of the program is stored and 
-     * can be popped to be used for undo.
+     * Copies the current allTasks and pushes the copy into the previousStates,
+     * such that older states of the program is stored and can be popped to be
+     * used for undo. Stores a maximum of 100 states.
      */
     private static void pushState() {
+
+        logger.log(Level.INFO, "pushing previous state");
         
         previousStates.push(new TaskList(allTasks));
-        
+
+        if (previousStates.size() > 100) {
+            logger.log(Level.INFO, "removing oldest state");
+            previousStates.remove(100);
+        }
+        logger.log(Level.INFO, "pushing previous state successful");
     }
-    
+
     /**
-     * Handles the add command. If the first date is missing but second date
-     * is present, the second date will be promoted to the first date, and 
-     * the task is treated as a deadline task. Otherwise the first date is
-     * is used to create the task object. If date is null then the task is
-     * a floating task. Otherwise second date is checked and if present
-     * end date of the task is set and the task is a timed task. After a new
-     * Task is created and before it is added, it is checked for clashes with
-     * existing tasks. The Task will still be added, but a different return
-     * type will be used to inform the UI of a clash.
+     * Handles the add command. If the first date is missing but second date is
+     * present, the second date will be promoted to the first date, and the task
+     * is treated as a deadline task. Otherwise the first date is is used to
+     * create the task object. If date is null then the task is a floating task.
+     * Otherwise second date is checked and if present end date of the task is
+     * set and the task is a timed task. After a new Task is created and before
+     * it is added, it is checked for clashes with existing tasks. The Task will
+     * still be added, but a different return type will be used to inform the UI
+     * of a clash.
      * 
      * @param result
      * @return
      */
-    private static Constants.CommandType addTask (ParseResult result) {
-        //Previous state is saved
+    private static Constants.CommandType addTask(ParseResult result) {
+        
+        logger.log(Level.INFO, "adding new task");
+        
+        // Previous state is saved
         pushState();
-                
+
         boolean[] flags = result.getCommandFlags();
         Task newTask;
-        
+
         clashingTask = -1;
-        
-        if(!flags[0] && flags[7]) {
-            //If first date is absent but second is present
-            newTask = new Task(result.getName(), result.getDescription(), 
-                    result.getSecondDate(), result.getPriorityLevel(), 
+
+        if (!flags[0] && flags[7]) {
+            // If first date is absent but second is present
+            newTask = new Task(result.getName(), result.getDescription(),
+                    result.getSecondDate(), result.getPriorityLevel(),
                     result.getTag(), config.getNewTaskNumber());
-            
+
             clashingTask = Logic.findClash(allTasks, newTask.getDueDate(),
                     newTask.getDueDate());
         } else {
-            newTask = new Task(result.getName(), result.getDescription(), 
-                    result.getDate(), result.getPriorityLevel(), 
+            newTask = new Task(result.getName(), result.getDescription(),
+                    result.getDate(), result.getPriorityLevel(),
                     result.getTag(), config.getNewTaskNumber());
-            if(flags[7]) {
-                //If second date is present
+            if (flags[7]) {
+                // If second date is present
                 newTask.setEndDate(result.getSecondDate());
-                
+
                 clashingTask = Logic.findClash(allTasks,
-                        newTask.getStartDate(),
-                        newTask.getEndDate());
+                        newTask.getStartDate(), newTask.getEndDate());
             }
         }
-        
-        //Add the task
+
+        // Add the task
         allTasks.add(newTask);
-        //Refresh the lists for display
+
+        // Refresh the lists for display
         refreshLists();
-        //Record the last updated task
+
+        // Record the last updated task
         lastModifiedTask = newTask.getID();
         System.out.println(lastModifiedTask);
+
+        logger.log(Level.INFO, "adding new task successful");
         
-        if(clashingTask != -1) {
+        if (clashingTask != -1) {
             return Constants.CommandType.ADD_CLASH;
         } else {
             return Constants.CommandType.ADD;
         }
-        
     }
-    
+
     /**
      * Handles the update command. Update checks for the presences of all
      * updatable fields and updates the specified task accordingly. Returns
      * Invalid if the task to be updated is not found, or nothing was updated.
      * No conversion between floating, deadline, and timed tasks allowed in the
-     * update method. Returns invalid if dates are not matching to the task 
+     * update method. Returns invalid if dates are not matching to the task
      * type.
      * 
      * @param result
      * @return
      */
-    private static Constants.CommandType updateTask (ParseResult result) {
-        //Saves previous state
+    private static Constants.CommandType updateTask(ParseResult result) {
+
+        logger.log(Level.INFO, "updating new task");
+        
+        // Saves previous state
         pushState();
-        
+
         boolean[] flags = result.getCommandFlags();
-        
-        //Flag to check if nothing was updated
+
+        // Flag to check if nothing was updated
         boolean nothing = true;
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeUpdated = allTasks.getTaskByID(ID);
-        
-        if(toBeUpdated == null) {
-            //If no such task was found, command was invalid
+
+        if (toBeUpdated == null) {
+            // If no such task was found, command was invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         }
-        
-        //Checking for fields and setting them if present in command
-        
-        //Handling of dates for floating, deadline, and timed tasks
-        
-        
-        if(flags[0] && flags[7]) {
-            //If both start and end dates are present
-            //Check if task is a timed task
-            if(toBeUpdated.isTimed()) {
+
+        // Checking for fields and setting them if present in command
+
+        // Handling of dates for floating, deadline, and timed tasks
+
+        if (flags[0] && flags[7]) {
+            // If both start and end dates are present
+            // Check if task is a timed task
+            if (toBeUpdated.isTimed()) {
                 toBeUpdated.setStartDate(result.getDate());
                 toBeUpdated.setEndDate(result.getSecondDate());
             } else {
@@ -490,26 +449,26 @@ public class Engine {
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
-            
-        } else if(flags[0]) {
-            //If first date is present
-            //Check if task is not floating
-            //In this case updating the due date is always correct
-            if(!toBeUpdated.isFloating()) {
+
+        } else if (flags[0]) {
+            // If first date is present
+            // Check if task is not floating
+            // In this case updating the due date is always correct
+            if (!toBeUpdated.isFloating()) {
                 toBeUpdated.setDueDate(result.getDate());
             } else {
                 commandErrorType = Constants.ErrorType.CONVERT_TASK_TYPE_IN_UPDATE;
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
-            
-        } else if(flags[7]) {
-            //If second date is present
-            //Check if task is deadline task
-            if(!toBeUpdated.isFloating()) {
-                //We need to check if the task is timed. 
-                //If so the date belongs in end date.
-                if(toBeUpdated.isTimed()) {
+
+        } else if (flags[7]) {
+            // If second date is present
+            // Check if task is deadline task
+            if (!toBeUpdated.isFloating()) {
+                // We need to check if the task is timed.
+                // If so the date belongs in end date.
+                if (toBeUpdated.isTimed()) {
                     toBeUpdated.setEndDate(result.getSecondDate());
                 } else {
                     toBeUpdated.setDueDate(result.getSecondDate());
@@ -519,40 +478,41 @@ public class Engine {
                 return Constants.CommandType.INVALID;
             }
             nothing = false;
-            
+
         }
-        
-        if(flags[2]) {
+
+        if (flags[2]) {
             nothing = false;
             toBeUpdated.setPriority(result.getPriorityLevel());
         }
-        if(flags[4]) {
+        if (flags[4]) {
             nothing = false;
             toBeUpdated.setName(result.getName());
         }
-        if(flags[5]) {
+        if (flags[5]) {
             nothing = false;
             toBeUpdated.setDescription(result.getDescription());
         }
-        if(flags[6]) {
+        if (flags[6]) {
             nothing = false;
             toBeUpdated.setTag(result.getTag());
         }
-        
-        //If nothing was changed, command was invalid
-        if(nothing) {
+
+        // If nothing was changed, command was invalid
+        if (nothing) {
             commandErrorType = Constants.ErrorType.UPDATE_NO_CHANGES;
             return Constants.CommandType.INVALID;
         }
-        
-        //Refreshes lists for display
+
+        // Refreshes lists for display
         refreshLists();
-        //Records the last updated task
+        // Records the last updated task
         lastModifiedTask = toBeUpdated.getID();
-        
+
+        logger.log(Level.INFO, "updating new task successful");
         return Constants.CommandType.UPDATE;
     }
-    
+
     /**
      * Handles the delete command. Finds the task in all tasks and deletes.
      * Command is invalid if task is not found.
@@ -561,27 +521,30 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType deleteTask(ParseResult result) {
-        //Saves the previous state
+
+        logger.log(Level.INFO, "deleting task");
+        // Saves the previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeDeleted = allTasks.getTaskByID(ID);
-        
-        if(toBeDeleted == null) {
-            //If such a task is not found, command was invalid
+
+        if (toBeDeleted == null) {
+            // If such a task is not found, command was invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             allTasks.remove(allTasks.getTaskByID(ID));
         }
-        
-        //Refreshes the display lists
+
+        // Refreshes the display lists
         refreshLists();
-        
+
+        logger.log(Level.INFO, "deleting task successful");
         return Constants.CommandType.DELETE;
     }
-    
+
     /**
      * Handles done commands. Finds the task in all tasks and marks it as done.
      * Command is invalid if task is not found.
@@ -590,27 +553,28 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setDoneTask(ParseResult result) {
-        //Saves the previous state
+        logger.log(Level.INFO, "setting task as done");
+        // Saves the previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeDone = allTasks.getTaskByID(ID);
-        
-        if(toBeDone == null) {
-            //If Task is not found then command is invalid
+
+        if (toBeDone == null) {
+            // If Task is not found then command is invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             toBeDone.setDone();
             lastModifiedTask = toBeDone.getID();
-            //Refreshes the display lists
+            // Refreshes the display lists
             refreshLists();
+            logger.log(Level.INFO, "setting task as done successful");
             return Constants.CommandType.DONE;
         }
-
     }
-    
+
     /**
      * Handles set not done commands. Finds the task in all tasks and marks it
      * as not done. Command is invalid if task is not found.
@@ -619,206 +583,222 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setUndoneTask(ParseResult result) {
-        
-        //Saves previous state
+        logger.log(Level.INFO, "setting task as not done");
+        // Saves previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeDone = allTasks.getTaskByID(ID);
-        
-        if(toBeDone == null) {
-            //If Task is not found then command is invalid
+
+        if (toBeDone == null) {
+            // If Task is not found then command is invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
             toBeDone.setUndone();
             lastModifiedTask = toBeDone.getID();
-            //Refreshes the display lists
+            // Refreshes the display lists
             refreshLists();
+            logger.log(Level.INFO, "setting task as not done successful");
             return Constants.CommandType.SETNOTDONE;
         }
     }
-    
+
     /**
      * Handles search commands. Search results starts with all the tasks being
      * tracked. The presence of each flag from the parse result will indicate
-     * the presences of the criteria and the search space will be pruned 
+     * the presences of the criteria and the search space will be pruned
      * accordingly.
      * 
      * @param result
      * @return
      */
     private static Constants.CommandType searchTask(ParseResult result) {
-        
+
+        logger.log(Level.INFO, "searching tasks");
         boolean[] flags = result.getCommandFlags();
         searchResults = new TaskList(allTasks);
-        
-        if(flags[0] && flags[7]) {
-            searchResults = Logic.searchPeriod(searchResults, result.getDate(), result.getSecondDate());
-        } else if(flags[0]) {
+
+        if (flags[0] && flags[7]) {
+            searchResults = Logic.searchPeriod(searchResults, result.getDate(),
+                    result.getSecondDate());
+        } else if (flags[0]) {
             searchResults = Logic.searchDay(searchResults, result.getDate());
-        } else if(flags[7]) {
-            searchResults = Logic.searchDay(searchResults, result.getSecondDate());
+        } else if (flags[7]) {
+            searchResults = Logic.searchDay(searchResults,
+                    result.getSecondDate());
         }
-        if(flags[2]) {
-            searchResults = Logic.searchPriority(searchResults, result.getPriorityLevel());
+        if (flags[2]) {
+            searchResults = Logic.searchPriority(searchResults,
+                    result.getPriorityLevel());
         }
-        if(flags[4]) {
+        if (flags[4]) {
             searchResults = Logic.searchName(searchResults, result.getName());
         }
-        if(flags[5]) {
-            searchResults = Logic.searchDescription(searchResults, result.getDescription());
+        if (flags[5]) {
+            searchResults = Logic.searchDescription(searchResults,
+                    result.getDescription());
         }
-        if(flags[6]) {
+        if (flags[6]) {
             searchResults = Logic.searchTag(searchResults, result.getTag());
         }
-        
+
         searchResultsDisplay = Logic.displayAllTaskByDate(searchResults);
-        
+
+        logger.log(Level.INFO, "searching for tasks successful");
         return Constants.CommandType.SEARCH;
     }
-    
+
     /**
      * Handles undo commands. If there was no previous state that was saved the
      * command is invalid. Otherwise, it will pop the previous state from the
-     * stack of stored states and use it as the current one. Each operation
-     * that mutates the state of tasks should be preceeded by copying the 
-     * TaskList before the change and pushed onto previousStates.
+     * stack of stored states and use it as the current one. Each operation that
+     * mutates the state of tasks should be preceeded by copying the TaskList
+     * before the change and pushed onto previousStates.
      * 
      * @return
      */
     private static Constants.CommandType undo() {
-        
-        if(previousStates.isEmpty()) {
-            //If there were no previous saved states, command is invalid
+
+        logger.log(Level.INFO, "undoing action");
+        if (previousStates.isEmpty()) {
+            // If there were no previous saved states, command is invalid
             commandErrorType = Constants.ErrorType.NOTHING_TO_UNDO;
+            logger.log(Level.WARNING, "pushing previous state successful");
             return Constants.CommandType.INVALID;
         } else {
             allTasks = previousStates.pop();
             refreshLists();
+            logger.log(Level.INFO, "undoing action successful");
             return Constants.CommandType.UNDO;
         }
-        
     }
-    
+
     /**
      * Method handles convert to deadline tasks commands. This command takes in
-     * any tasks and strips off the second date and puts in a first date to 
+     * any tasks and strips off the second date and puts in a first date to
      * convert the task into a deadline task.
      * 
      * @param result
      * @return
      */
     private static Constants.CommandType convertToDeadline(ParseResult result) {
-      //Saves previous state
+        logger.log(Level.INFO, "converting to deadline task");
+        // Saves previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeConverted = allTasks.getTaskByID(ID);
-        
-        if(toBeConverted == null) {
-            //If Task is not found then command is invalid
+
+        if (toBeConverted == null) {
+            // If Task is not found then command is invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
-            //CHANGE DATE
             toBeConverted.setEndDate(null);
             boolean[] flags = result.getCommandFlags();
-            if(flags[0] == true) {
+            if (flags[0] == true) {
                 toBeConverted.setDueDate(result.getDate());
             } else {
                 toBeConverted.setDueDate(result.getSecondDate());
             }
-            //Refreshes the display lists
+            // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to deadline task successful");
             return Constants.CommandType.CONVERT_DEADLINE;
         }
     }
-    
+
     /**
-     * Method handles convert to timed tasks commands. This command takes in
-     * any tasks and adds the start and end date to make it a timed task.
+     * Method handles convert to timed tasks commands. This command takes in any
+     * tasks and adds the start and end date to make it a timed task.
      * 
      * @param result
      * @return
      */
     private static Constants.CommandType convertToTimed(ParseResult result) {
-      //Saves previous state
+
+        logger.log(Level.INFO, "converting to timed task");
+        // Saves previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeConverted = allTasks.getTaskByID(ID);
-        
-        if(toBeConverted == null) {
-            //If Task is not found then command is invalid
+
+        if (toBeConverted == null) {
+            // If Task is not found then command is invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
-            //CHANGE DATE
+            // CHANGE DATE
             toBeConverted.setStartDate(result.getDate());
             toBeConverted.setEndDate(result.getSecondDate());
-            //Refreshes the display lists
+            // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to timed task successful");
             return Constants.CommandType.CONVERT_TIMED;
         }
     }
-    
+
     /**
      * Method handles convert to floating tasks commands. This command takes in
-     * any tasks and strips the dates off the task to make it into a floating 
+     * any tasks and strips the dates off the task to make it into a floating
      * task.
      * 
      * @param result
      * @return
      */
     private static Constants.CommandType convertToFloating(ParseResult result) {
-      //Saves previous state
+
+        logger.log(Level.INFO, "converting to floating task");
+        // Saves previous state
         pushState();
-        
-        //Finds the task of the right ID
+
+        // Finds the task of the right ID
         long ID = result.getId();
         Task toBeConverted = allTasks.getTaskByID(ID);
-        
-        if(toBeConverted == null) {
-            //If Task is not found then command is invalid
+
+        if (toBeConverted == null) {
+            // If Task is not found then command is invalid
             commandErrorType = Constants.ErrorType.TASK_NOT_FOUND;
             return Constants.CommandType.INVALID;
         } else {
-            //CHANGE DATE
+            // CHANGE DATE
             toBeConverted.setEndDate(null);
             toBeConverted.setStartDate(null);
-            //Refreshes the display lists
+            // Refreshes the display lists
             refreshLists();
             lastModifiedTask = toBeConverted.getID();
+            logger.log(Level.INFO, "converting to floating task successful");
             return Constants.CommandType.CONVERT_FLOATING;
         }
     }
-    
+
     /**
      * Gets the storage path stored in the current configuration.
      * 
      * @return
      */
     public static String getStoragePath() {
+
         return config.getStoragePath();
     }
-    
+
     /**
-     * Handles savewhere commands. Returns the path of the current storage 
-     * file.
+     * Handles savewhere commands. Returns the path of the current storage file.
      * 
      * @return
      */
     private static Constants.CommandType fetchStoragePath() {
-        //System.out.println(config.getStoragePath());
+
         return Constants.CommandType.SAVEWHERE;
     }
-    
+
     /**
      * Handles savehere commands.
      * 
@@ -826,16 +806,19 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType setStoragePath(ParseResult result) {
+
+        logger.log(Level.INFO, "setting storage path");
         String newPath = result.getName();
-        if(config.setStoragePath(newPath)) {
+        if (config.setStoragePath(newPath)) {
+            logger.log(Level.INFO, "setting storage path successful");
             return Constants.CommandType.SAVEHERE;
         } else {
             commandErrorType = Constants.ErrorType.INVALID_PATH;
+            logger.log(Level.WARNING, "path provided invalid");
             return Constants.CommandType.INVALID;
         }
-        
     }
-    
+
     /**
      * Handles invalid/unrecognised commands.
      * 
@@ -843,278 +826,279 @@ public class Engine {
      * @return
      */
     private static Constants.CommandType handleInvalidCommand(ParseResult result) {
-        
+        logger.log(Level.WARNING, "command type not recognised");
         commandErrorType = result.getErrorType();
         return Constants.CommandType.INVALID;
-        
     }
-    
+
     /**
      * Returns error type of previous erroneous command.
      * 
      * @return
      */
-    private static Constants.ErrorType getErrorType() {
-        
+    public static Constants.ErrorType getErrorType() {
+
         return commandErrorType;
-        
     }
-    
+
     /**
-     * The function supplied to UI to call upon receiving user input. Takes
-     * in a string to be processed. Parses and acts on the command accordingly.
+     * The function supplied to UI to call upon receiving user input. Takes in a
+     * string to be processed. Parses and acts on the command accordingly.
      * 
      * @param userInput
      * @return
      */
-    //Not tested yet
     public static Constants.CommandType process(String userInput) {
-        
-        if(userInput == null){
+
+        logger.log(Level.INFO, "processing user input");
+        if (userInput == null) {
             commandErrorType = Constants.ErrorType.NO_INPUT;
             return Constants.CommandType.INVALID;
-            
+
         }
-        
-        
+
         ParseResult result = Parser.parse(userInput);
         Constants.CommandType command = result.getCommandType();
-        
+
         switch (command) {
-            case ADD:
+            case ADD :
                 return addTask(result);
-                
-            case UPDATE:
+
+            case UPDATE :
                 return updateTask(result);
-                
-            case DELETE:
+
+            case DELETE :
                 return deleteTask(result);
-                
-            case SHOW:
-                //TO BE DONE
-                return Constants.CommandType.SHOW;
-                
-            case DONE:
+
+            case DONE :
                 return setDoneTask(result);
-                
-            case UNDO:
+
+            case UNDO :
                 return undo();
-                
-            case SEARCH:
+
+            case SEARCH :
                 return searchTask(result);
-                
-            case CONVERT_FLOATING:
+
+            case CONVERT_FLOATING :
                 return convertToFloating(result);
-                
-            case CONVERT_DEADLINE:
+
+            case CONVERT_DEADLINE :
                 return convertToDeadline(result);
-                
-            case CONVERT_TIMED:
+
+            case CONVERT_TIMED :
                 return convertToTimed(result);
-                
-            case SETNOTDONE:
+
+            case SETNOTDONE :
                 return setUndoneTask(result);
-                
-            case SAVEWHERE:
+
+            case SAVEWHERE :
                 return fetchStoragePath();
-                
-            case SAVEHERE:
+
+            case SAVEHERE :
                 return setStoragePath(result);
-    
-            case HELP:
+
+            case HELP :
                 return Constants.CommandType.HELP;
-                
-            case HELP_ADD:
+
+            case HELP_ADD :
                 return Constants.CommandType.HELP_ADD;
-                
-            case HELP_UPDATE:
+
+            case HELP_UPDATE :
                 return Constants.CommandType.HELP_UPDATE;
-                
-            case HELP_DELETE:
+
+            case HELP_DELETE :
                 return Constants.CommandType.HELP_DELETE;
-                
-            case HELP_SHOW:
+
+            case HELP_SHOW :
                 return Constants.CommandType.HELP_SHOW;
-                
-            case HELP_DONE:
+
+            case HELP_DONE :
                 return Constants.CommandType.HELP_DONE;
-                
-            case HELP_UNDO: 
+
+            case HELP_UNDO :
                 return Constants.CommandType.HELP_UNDO;
-                
-            case HELP_SEARCH:
+
+            case HELP_SEARCH :
                 return Constants.CommandType.HELP_SEARCH;
-                
-            case EXIT:
+
+            case EXIT :
                 return Constants.CommandType.EXIT;
-                
-            
-            default:
+
+            default :
                 return handleInvalidCommand(result);
         }
     }
-    
+
     /**
      * Gets the display ready data of all Tasks.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getAllTasks() {
+
         return Logic.displayAllTaskByDate(allTasks);
     }
-    
+
     /**
      * Returns the size of allTasks TaskList
      * 
      * @return
      */
     public static int getAllTasksSize() {
+
         return allTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all Tasks marked done.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getDoneTasks() {
+
         return Logic.displayAllTaskByDate(doneTasks);
     }
-    
+
     /**
      * Returns the size of doneTasks TaskList
      * 
      * @return
      */
     public static int getDoneTasksSize() {
+
         return doneTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all Tasks marked not done.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUndoneTasks() {
+
         return Logic.displayAllTaskByDate(undoneTasks);
     }
-    
+
     /**
      * Returns the size of undoneTasks TaskList
      * 
      * @return
      */
     public static int getUndoneTasksSize() {
+
         return undoneTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all floating Tasks.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getFloatingTasks() {
+
         return Logic.displayAllTaskByPriority(floatingTasks);
     }
-    
+
     /**
      * Returns the size of floatingTasks TaskList
      * 
      * @return
      */
     public static int getFloatingTasksSize() {
+
         return floatingTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all confirmed Tasks.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getConfirmedTasks() {
+
         return Logic.displayAllTaskByDate(normalTasks);
     }
-    
+
     /**
      * Returns size of normalTasks TaskList
      * 
      * @return
      */
     public static int getConfirmedTasksSize() {
+
         return normalTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all Tasks today.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Integer, DisplayTaskList>> getTodayTasks() {
+
         return Logic.displaySearchedTaskByPriority(todayTasks);
     }
-    
+
     /**
      * Returns size of todayTasks TaskList
      * 
      * @return
      */
     public static int getTodayTasksSize() {
+
         return todayTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all Tasks overdue.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getOverdueTasks() {
+
         return Logic.displayAllTaskByDate(overdueTasks);
     }
-    
+
     /**
      * Returns size of overdueTasks TaskList
      * 
      * @return
      */
     public static int getOverdueTasksSize() {
+
         return overdueTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of all Tasks overdue.
      * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getUpcomingTasks() {
+
         return Logic.displayAllTaskByDate(upcomingTasks);
     }
-    
+
     /**
      * Returns size of upcomingTasks TaskList
      * 
      * @return
      */
     public static int getUpcomingTasksSize() {
+
         return upcomingTasks.size();
     }
-    
+
     /**
      * Gets the display ready data of Tasks in the search results.
+     * 
      * @return
      */
-    //Not tested yet
     public static Set<Map.Entry<Date, DisplayTaskList>> getSearchResult() {
+
         return searchResultsDisplay;
     }
-    
+
 }
 
 	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Engine.java
@@ -1145,16 +1129,16 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * This class handles the external storage of the program. The storage format
- * of the program is in JSON using the json.simple library. This class handles
- * the saving and loading of TaskList objects and Configuration objects.
+ * This class handles the external storage of the program. The storage format of
+ * the program is in JSON using the json.simple library. This class handles the
+ * saving and loading of TaskList objects and Configuration objects.
  * 
  */
 public class Storage {
-    
+
     /**
-     * This method reads the config file, of which the location is stored in 
-     * Constants.CONFIG_FILE_LOCATION and data stored in JSON String, and 
+     * This method reads the config file, of which the location is stored in
+     * Constants.CONFIG_FILE_LOCATION and data stored in JSON String, and
      * converts the data from the JSON object into a Configuration object.
      * 
      * When the method fails to find the file or fails to read the config file,
@@ -1163,23 +1147,24 @@ public class Storage {
      * 
      * @return Configuration object read from the file or a brand new object
      */
-    //Not tested yet
     public Configuration readConfig() {
+
         String defaultPath = getSourcePath() + Constants.DEFAULT_STORAGE_NAME;
-        Configuration result = new Configuration(defaultPath);
+        Configuration defaultConfig = new Configuration(defaultPath);
+
         BufferedReader br = null;
+
         try {
-            String sourcePath = getSourcePath();
-            String filePath = sourcePath + Constants.CONFIG_FILE_NAME;
-            
-            br = new BufferedReader(new FileReader(filePath));
-            
+            String configFilePath = getConfigFilePath();
+
+            br = new BufferedReader(new FileReader(configFilePath));
+
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(br.readLine());
             String path = (String) taskJson.get("storagePath");
             int curTaskNum = Integer.valueOf((String) taskJson.get("numTasks"));
-            
-            result = new Configuration(path, curTaskNum);
+
+            return new Configuration(path, curTaskNum);
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         } catch (IOException e) {
@@ -1187,122 +1172,136 @@ public class Storage {
         } catch (ParseException e) {
             System.out.println("Parse error!");
         } finally {
-            if(br != null) {
+            if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    
+
                 }
             }
         }
-        return result;
+
+        return defaultConfig;
     }
-    
-    
+
+    private String getConfigFilePath() {
+
+        String sourcePath = getSourcePath();
+        String filePath = sourcePath + Constants.CONFIG_FILE_NAME;
+        return filePath;
+    }
+
     /**
-     * Converts a Configuration object into a JSONObject, then into a string
-     * and put into an ArrayList then passed to writeToFile to write into the
-     * config file.
+     * Converts a Configuration object into a JSONObject, then into a string and
+     * put into an ArrayList then passed to writeToFile to write into the config
+     * file.
      * 
-     * @param newConfig The Configuration object to be saved.
-     * @throws IOException If there is a problem writing to file.
+     * @param newConfig
+     *            The Configuration object to be saved.
+     * @throws IOException
+     *             If there is a problem writing to file.
      */
     public void saveConfiguration(Configuration newConfig) throws IOException {
-        
+
         JSONObject configObject = new JSONObject();
         configObject.put("storagePath", newConfig.getStoragePath());
-        configObject.put("numTasks", 
-                String.valueOf(newConfig.getCurTaskNum()));
-        
+        configObject.put("numTasks", String.valueOf(newConfig.getCurTaskNum()));
+
         ArrayList<String> config = new ArrayList<String>();
         config.add(configObject.toJSONString());
-        
-        String sourcePath = getSourcePath();
-        writeToFile(sourcePath + 
-                Constants.CONFIG_FILE_NAME, config);
-        
+
+        String configFilePath = getConfigFilePath();
+        writeToFile(configFilePath, config);
+
     }
-    
+
     /**
-     * Takes in the location to write, and an ArrayList of Strings as content
-     * to be written. Creates the file if it does not exist. Writes each string
-     * as a line in the new file.
+     * Takes in the location to write, and an ArrayList of Strings as content to
+     * be written. Creates the file if it does not exist. Writes each string as
+     * a line in the new file.
      * 
-     * @param fileName The location of the file to write to.
-     * @param content An ArrayList of Strings to be written to file.
-     * @throws IOException If there is a problem writing to file.
+     * @param fileName
+     *            The location of the file to write to.
+     * @param content
+     *            An ArrayList of Strings to be written to file.
+     * @throws IOException
+     *             If there is a problem writing to file.
      */
     private static void writeToFile(String fileName, ArrayList<String> content)
             throws IOException {
-        
+
         File writeTarget = new File(fileName);
-        
-        if(!writeTarget.exists()) {
+
+        if (!writeTarget.exists()) {
             writeTarget.createNewFile();
         }
-        
+
         FileWriter fw = new FileWriter(writeTarget);
-        
-        for(String s:content) {
+
+        for (String s : content) {
             fw.write(s);
             fw.write(System.lineSeparator());
         }
-        
+
         fw.flush();
         fw.close();
     }
-    
+
     /**
      * Takes in a TaskList intended to be written to data storage, and converts
-     * each task into a String using convertTaskToJsonString. The resultant 
+     * each task into a String using convertTaskToJsonString. The resultant
      * ArrayList of Strings will be write ready for the data storage.
      * 
-     * @param input the TaskList to be converted
+     * @param input
+     *            the TaskList to be converted
      * @return Strings that are ready to be written to data storage
      */
-    //Not tested yet
     private ArrayList<String> convertTaskListToJsonStringList(TaskList input) {
+
         ArrayList<String> results = new ArrayList<String>();
-        for(Task t:input) {
+        for (Task t : input) {
             results.add(convertTaskToJsonString(t));
         }
         return results;
     }
-    
+
     /**
      * Takes in the file name to be used for the storage file and the TaskList
      * to be stored. Saves the taskList in the storage file.
      * 
-     * @param fileName The file name to store the list of tasks as
-     * @param tasks The TaskList to be stored
-     * @throws IOException if writing fails
+     * @param fileName
+     *            The file name to store the list of tasks as
+     * @param tasks
+     *            The TaskList to be stored
+     * @throws IOException
+     *             if writing fails
      */
-    //Not tested yet
-    public void saveTaskList(String fileName, TaskList tasks) 
+    public void saveTaskList(String fileName, TaskList tasks)
             throws IOException {
+
         ArrayList<String> taskJsonStrings = convertTaskListToJsonStringList(tasks);
         writeToFile(fileName, taskJsonStrings);
     }
-    
+
     /**
-     * Reads the storage file that is stored at fileName. Returns empty 
-     * TaskList if reading fails. Each line in the storage file represents a 
-     * Task, so each line is read and converted.
+     * Reads the storage file that is stored at fileName. Returns empty TaskList
+     * if reading fails. Each line in the storage file represents a Task, so
+     * each line is read and converted.
      * 
      * @param fileName
-     * @return Resultant taskList 
+     * @return Resultant taskList
      */
-    //Not tested yet
     public TaskList readTaskStorage(String fileName) {
+
         TaskList tasks = new TaskList();
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(fileName));
             String input;
-            while((input = br.readLine()) != null) {
+            while ((input = br.readLine()) != null) {
                 tasks.add(convertTaskFromJsonString(input));
             }
-            
+
             br.close();
             return tasks;
         } catch (IOException e) {
@@ -1311,7 +1310,7 @@ public class Storage {
             try {
                 br.close();
             } catch (Exception e) {
-                
+
             }
         }
     }
@@ -1319,98 +1318,115 @@ public class Storage {
     /**
      * Converts a task to the string of its JSON representation
      * 
-     * @param task to be converted
+     * @param task
+     *            to be converted
      * @return String ready to be saved
      */
     private String convertTaskToJsonString(Task task) {
+
         JSONObject taskObject = new JSONObject();
+
         taskObject.put("name", task.getName());
         taskObject.put("description", task.getDescription());
         taskObject.put("tag", task.getTag());
         taskObject.put("priority", String.valueOf(task.getPriority()));
-        if(task.getDueDate() == null) {
+
+        if (task.getDueDate() == null) {
             taskObject.put("due", null);
         } else {
             taskObject.put("due", task.getDueDate().getTime());
         }
-        if(task.getEndDate() == null) {
+
+        if (task.getEndDate() == null) {
             taskObject.put("end", null);
         } else {
             taskObject.put("end", task.getEndDate().getTime());
         }
-        if(task.getDateCompleted() == null) {
+
+        if (task.getDateCompleted() == null) {
             taskObject.put("complete", null);
         } else {
             taskObject.put("complete", task.getDateCompleted().getTime());
         }
+
         taskObject.put("created", task.getCreatedDate().getTime());
         taskObject.put("done", task.isDone());
         taskObject.put("id", String.valueOf(task.getID()));
+
         return taskObject.toJSONString();
     }
-    
+
     /**
-     * Converts a string representation of a task, typically stored in the 
+     * Converts a string representation of a task, typically stored in the
      * storage file, into a JSON object, then into a Task object.
      * 
-     * @param taskString String of a JSON object representation of a task
+     * @param taskString
+     *            String of a JSON object representation of a task
      * @return converted Task
      */
     private Task convertTaskFromJsonString(String taskString) {
+
         try {
             JSONParser parser = new JSONParser();
             JSONObject taskJson = (JSONObject) parser.parse(taskString);
+
             String name = (String) taskJson.get("name");
             String description = (String) taskJson.get("description");
             String tag = (String) taskJson.get("tag");
-            int priority = Integer.valueOf((String)taskJson.get("priority"));
+
+            int priority = Integer.valueOf((String) taskJson.get("priority"));
+
             Object due = taskJson.get("due");
             Object end = taskJson.get("end");
             Object completed = taskJson.get("complete");
+
             Date dueDate = null;
             Date endDate = null;
             Date completedDate = null;
-            if(due != null) {
+
+            if (due != null) {
                 dueDate = new Date((Long) due);
             }
-            
-            if(end != null) {
+
+            if (end != null) {
                 endDate = new Date((Long) end);
             }
-            if(completed != null) {
+            if (completed != null) {
                 completedDate = new Date((Long) completed);
             }
-            
-            int ID = Integer.valueOf((String)taskJson.get("id"));
-            
-            
+
+            int ID = Integer.valueOf((String) taskJson.get("id"));
+
             Date createdDate = new Date((Long) taskJson.get("created"));
             boolean done = (boolean) taskJson.get("done");
-            
-            Task result = new Task(name, description, dueDate, priority, tag, ID);
-            
-            if(done) {
+
+            Task result = new Task(name, description, dueDate, priority, tag,
+                    ID);
+
+            if (done) {
                 result.setDone();
             } else {
                 result.setUndone();
             }
-            
+
             result.setEndDate(endDate);
             result.setDateCompleted(completedDate);
             result.configureCreatedDate(createdDate);
+
             return result;
         } catch (ParseException e) {
             return null;
         }
     }
-    
+
     /**
-     * Gets the String representation of the path of where the program was ran 
+     * Gets the String representation of the path of where the program was ran
      * from
      * 
      * @return
      */
     private String getSourcePath() {
+
         CodeSource cs = getClass().getProtectionDomain().getCodeSource();
         return cs.getLocation().getPath();
     }
@@ -1432,287 +1448,421 @@ package planner;
 import java.util.Date;
 
 /**
- * 
+ * This class is the main entity for representing Tasks in the planner
  */
 public class Task {
-	
-	private final int ID;
-	private String taskName, taskDescription, taskTag;
-	private Date dateCreated, dateDue, dateEnd, dateCompleted;
-	private int taskPriority;
-	private boolean taskCompleted, isFloatingTask, isTimedTask;
-	
-	/**
-	* This method is the Task constructor
-	* @param name
-	* Name of the task. This cannot be an empty string. Throws IllegalArgumentException when invalid.
-	* @param description
-	* Description of task.
-	* @param dueDate
-	* Due date of task. This is represented by the Date class.
-	* @param priority
-	* Priority of task defined by an integer.
-	* @param tag
-	* A string tag on a task.
-	* @throws IllegalArgumentException
-	*/
-	public Task(String name, String description, Date dueDate, int priority, String tag, int id) throws IllegalArgumentException {
-		
-	    ID = id;
-        
-	    if (name == null) {
+
+    private final int ID;
+    private String taskName, taskDescription, taskTag;
+    private Date dateCreated, dateDue, dateEnd, dateCompleted;
+    private int taskPriority;
+    private boolean taskCompleted, isFloatingTask, isTimedTask;
+
+    /**
+     * This method is the Task constructor
+     * 
+     * @param name
+     *            Name of the task. This cannot be an empty string.
+     * @param description
+     *            Description of task.
+     * @param dueDate
+     *            Due date of task. This is represented by the Date class.
+     * @param priority
+     *            Priority of task defined by an integer.
+     * @param tag
+     *            A string tag on a task.
+     * @throws IllegalArgumentException
+     */
+    public Task(String name, String description, Date dueDate, int priority,
+            String tag, int id) throws IllegalArgumentException {
+
+        ID = id;
+
+        if (name == null) {
             throw new IllegalArgumentException("Task name cannot be null!");
         } else if (name.equals("")) {
             throw new IllegalArgumentException("Task name cannot be empty!");
         } else {
             taskName = name;
         }
-        
+
         taskDescription = description;
         taskTag = tag;
         dateCreated = new Date(System.currentTimeMillis());
-        
-        //Tests needed for null date
-        if(dueDate != null) {
-            
-            dateDue = new Date(dueDate.getTime());     // Changed to defensive copy
+
+        if (dueDate != null) {
+
+            dateDue = new Date(dueDate.getTime()); // Changed to defensive copy
             isFloatingTask = false;
-            
+
         } else {
-            
+
             dateDue = null;
             isFloatingTask = true;
         }
-		
-		taskPriority = priority;
-		taskCompleted = false;
-		isTimedTask = false;
-	}
-	
-    public Task( Task anotherTask ) throws IllegalArgumentException {
-        
-        if( anotherTask != null ){
+
+        taskPriority = priority;
+        taskCompleted = false;
+        isTimedTask = false;
+    }
+
+    /**
+     * Generates a deep copy given a Task object
+     * 
+     * @param anotherTask
+     * @throws IllegalArgumentException
+     */
+
+    public Task(Task anotherTask) throws IllegalArgumentException {
+
+        if (anotherTask != null) {
             ID = anotherTask.getID();
-            
-            if(anotherTask.getName().equals("") || anotherTask.getName() == null) {
+
+            if (anotherTask.getName().equals("")
+                    || anotherTask.getName() == null) {
                 throw new IllegalArgumentException("Task name cannot be empty!");
             }
-            
+
             taskName = anotherTask.getName();
-            taskDescription  = anotherTask.getDescription();
+            taskDescription = anotherTask.getDescription();
             taskTag = anotherTask.getTag();
-            if(anotherTask.getCreatedDate() != null) {
+            if (anotherTask.getCreatedDate() != null) {
                 dateCreated = new Date(anotherTask.getCreatedDate().getTime());
             }
-            if(anotherTask.getDueDate() != null) {
+            if (anotherTask.getDueDate() != null) {
                 dateDue = new Date(anotherTask.getDueDate().getTime());
             }
-            if(anotherTask.getEndDate() != null) {
-                dateEnd = new Date(anotherTask.getEndDate().getTime()); 
+            if (anotherTask.getEndDate() != null) {
+                dateEnd = new Date(anotherTask.getEndDate().getTime());
             }
-            if(anotherTask.getDateCompleted() != null) {
-                dateCompleted = new Date(anotherTask.getDateCompleted().getTime());
+            if (anotherTask.getDateCompleted() != null) {
+                dateCompleted = new Date(anotherTask.getDateCompleted()
+                        .getTime());
             }
             taskPriority = anotherTask.getPriority();
             taskCompleted = anotherTask.isDone();
             isFloatingTask = anotherTask.isFloating();
             isTimedTask = anotherTask.isTimed();
-            
+
         } else {
-            
+
             ID = 0;
             taskName = "Insert task Name here";
             taskDescription = "Insert task description here";
             taskTag = "";
-            dateCreated = new Date( System.currentTimeMillis() );
+            dateCreated = new Date(System.currentTimeMillis());
             dateDue = null;
             isFloatingTask = true;
             taskPriority = 0;
             taskCompleted = false;
         }
     }
-	
-	public String getName() {
-		return taskName;
-	}
-	
-	public String getDescription() {
-		return taskDescription;
-	}
-	
-	public String getTag() {
-		return taskTag;
-	}
-	
-	public int getPriority() {
-		return taskPriority;
-	}
-	
-	public Date getDueDate() {
-		return dateDue;
-	}
-	
-	public Date getStartDate() {
-	    
-	    return dateDue;
 
-	}
-	
-	public Date getEndDate() {
-	    return dateEnd;
-	}
-	
-	public Date getCreatedDate() {
-		return dateCreated;
-	}
-	
-	//Not tested yet
-	public int getID() {
-		return ID;
-	}
-	
-	//Not covered by tests yet
-	public boolean isDone() {
-		
-		return taskCompleted;
-	}
-	
-	//Not covered by tests yet
-	public boolean isFloating() {
-		
-		return isFloatingTask;
-	}
-	
-	public boolean isTimed() {
-	    
-	    return isTimedTask;
-	    
-	}
-	
-	public void setName(String newName) throws IllegalArgumentException {
-		
-	    if (newName == null) {
+    /**
+     * Returns the name of the Task
+     * 
+     * @return
+     */
+    public String getName() {
+
+        return taskName;
+    }
+
+    /**
+     * Returns the description of the Task
+     * 
+     * @return
+     */
+    public String getDescription() {
+
+        return taskDescription;
+    }
+
+    /**
+     * Returns the tag of the Task
+     * 
+     * @return
+     */
+    public String getTag() {
+
+        return taskTag;
+    }
+
+    /**
+     * Returns the priority of the Task
+     * 
+     * @return
+     */
+    public int getPriority() {
+
+        return taskPriority;
+    }
+
+    /**
+     * Returns the due date of the Task
+     * 
+     * @return
+     */
+    public Date getDueDate() {
+
+        return dateDue;
+    }
+
+    /**
+     * Returns the start date of the Task
+     * 
+     * @return
+     */
+    public Date getStartDate() {
+
+        return dateDue;
+    }
+
+    /**
+     * Returns the end date of the Task
+     * 
+     * @return
+     */
+    public Date getEndDate() {
+
+        return dateEnd;
+    }
+
+    /**
+     * Returns the date the Task was created
+     * 
+     * @return
+     */
+    public Date getCreatedDate() {
+
+        return dateCreated;
+    }
+
+    /**
+     * Returns the ID of the Task
+     * 
+     * @return
+     */
+    public int getID() {
+
+        return ID;
+    }
+
+    /**
+     * Returns if the Task is marked as done
+     * 
+     * @return
+     */
+    public boolean isDone() {
+
+        return taskCompleted;
+    }
+
+    /**
+     * Returns if Task is a floating task
+     * 
+     * @return
+     */
+    public boolean isFloating() {
+
+        return isFloatingTask;
+    }
+
+    /**
+     * Returns if Task is a timed task
+     * 
+     * @return
+     */
+    public boolean isTimed() {
+
+        return isTimedTask;
+    }
+
+    /**
+     * Sets the name of the Task. Throws an exception if name is empty string or
+     * null
+     * 
+     * @param newName
+     * @throws IllegalArgumentException
+     */
+    public void setName(String newName) throws IllegalArgumentException {
+
+        if (newName == null) {
             throw new IllegalArgumentException("Task name cannot be null!");
         } else if (newName.equals("")) {
-			throw new IllegalArgumentException("Task name cannot be empty!");
-		} else {
-		    taskName = newName;
-		}
-	}
-	//Not covered by tests yet
-	public void setDescription(String newDescription) {
-	
-		taskDescription = newDescription;
-	}
-	//Not covered by tests yet
-	public void setTag(String newTag) {
-		
-		taskTag = newTag;
-	}
-	//Not covered by tests yet
-	public void setPriority(int newPriority) {
-		
-		taskPriority = newPriority;
-	}
-	//Not covered by tests yet
-	public void setDueDate(Date newDueDate) {
-		
-	//Tests needed for null date
-		if(newDueDate != null) {
-			dateDue = newDueDate;
-			isFloatingTask = false;
-			
-		} else {
-			dateDue = null;
-			isFloatingTask = true;
-		}
-	}
-	
-	public void setStartDate(Date newStartDate) {
+            throw new IllegalArgumentException("Task name cannot be empty!");
+        } else {
+            taskName = newName;
+        }
+    }
 
-	    //Tests needed for null date
-	    if(newStartDate != null) {
-	        dateDue = newStartDate;
-	        isFloatingTask = false;
+    /**
+     * Sets the description for the Task
+     * 
+     * @param newDescription
+     */
+    public void setDescription(String newDescription) {
 
-	    } else {
-	        dateDue = null;
-	        isFloatingTask = true;
-	    }
-	}
-	
-	public void setEndDate(Date newEndDate) {
-	    if(newEndDate != null) {
+        taskDescription = newDescription;
+    }
+
+    /**
+     * Sets the tag for the Task
+     * 
+     * @param newTag
+     */
+    public void setTag(String newTag) {
+
+        taskTag = newTag;
+    }
+
+    /**
+     * Sets the priority for the Task
+     * 
+     * @param newPriority
+     */
+    public void setPriority(int newPriority) {
+
+        taskPriority = newPriority;
+    }
+
+    /**
+     * Sets the due date for the Task. If the due date is set to null, the Task
+     * is converted into a floating task. The dateEnd of the task should already
+     * be null and task should not be a timed task if we are casting it into a
+     * floating task.
+     * 
+     * @param newDueDate
+     */
+    public void setDueDate(Date newDueDate) {
+
+        if (newDueDate != null) {
+            dateDue = newDueDate;
+            isFloatingTask = false;
+
+        } else {
+            
+            assert dateEnd == null;
+            assert isTimedTask == false;
+            
+            dateDue = null;
+            isFloatingTask = true;
+        }
+    }
+
+    /**
+     * Sets the start date for the Task. Start is used in the context of a timed
+     * task so the dateDue is used as start date.
+     * 
+     * @param newStartDate
+     */
+    public void setStartDate(Date newStartDate) {
+
+        setDueDate(newStartDate);
+    }
+
+    /**
+     * Sets the end date for the Task. If the end date is set to a non null
+     * date, the Task is converted into a timed task. If end date is null the
+     * Task is not a timed Task. If the task is to be casted into a timed task,
+     * 
+     * 
+     * @param newEndDate
+     */
+    public void setEndDate(Date newEndDate) {
+
+        if (newEndDate != null) {
+            
+            assert dateDue != null;
+            assert isFloatingTask == false;
+            
             dateEnd = newEndDate;
             isTimedTask = true;
-            
+
         } else {
             dateEnd = null;
             isTimedTask = false;
         }
-	}
-	
-	//Not covered by tests yet
-	public void configureCreatedDate(Date newCreatedDate) {
-		
-		//Tests needed for null date
-		dateCreated = newCreatedDate;
-	}
-	
-	//Not covered by tests yet
-	public void setDone() {
-		
-		taskCompleted = true;
-		dateCompleted = new Date(System.currentTimeMillis());
-		
-	}
-	//Not covered by tests yet
-	public void setUndone() {
-		
-		taskCompleted = false;
-		dateCompleted = null;
-		
-	}
-	
-	//Not covered by tests yet
-	public Date getDateCompleted() {
-	    
-	    return dateCompleted;
-	}
-	
+    }
 
-	public void setDateCompleted(Date date) {
-	    dateCompleted = date;
-	}
+    /**
+     * Sets the dateCreated for the task. As this field is not meant to be
+     * modified, it is named differently from the other set date methods. This
+     * method is only meant to configure the dateCreated when it is read from
+     * storage.
+     * 
+     * @param newCreatedDate
+     */
+    public void configureCreatedDate(Date newCreatedDate) {
 
-	@Override
-	public boolean equals( Object obj ){
-		
-		if( obj instanceof Task ){
-			
-			Task anotherTask = (Task)obj;
-			boolean dateCheck;
-			if (dateDue == null || anotherTask.getDueDate() == null) {
-			    dateCheck = (dateDue == anotherTask.getDueDate());
-			} else {
-			    dateCheck = dateDue.equals(anotherTask.getDueDate());
-			}
-			
-			return (ID == anotherTask.getID()) &&
-				   taskName.equals( anotherTask.getName() ) &&
-				   taskDescription.equals( anotherTask.getDescription() ) &&
-				   taskTag.equals( anotherTask.getTag() ) &&
-				   dateCreated.equals(anotherTask.getCreatedDate()) &&
-				   dateCheck &&
-				   (taskPriority == anotherTask.getPriority()) &&
-				   (taskCompleted == anotherTask.isDone()) &&
-				   (isFloatingTask == anotherTask.isFloating());
-			
-		} else{
-			
-			return false;
-		}
-	}
+        dateCreated = newCreatedDate;
+    }
+
+    /**
+     * Sets the task as done and gives it a date completed
+     */
+    public void setDone() {
+
+        taskCompleted = true;
+        dateCompleted = new Date(System.currentTimeMillis());
+    }
+
+    /**
+     * Sets the task as not done and removes the date completed
+     */
+    public void setUndone() {
+
+        taskCompleted = false;
+        dateCompleted = null;
+    }
+
+    /**
+     * Gets the date completed of the Task
+     * 
+     * @return
+     */
+    public Date getDateCompleted() {
+
+        return dateCompleted;
+    }
+
+    /**
+     * Sets the date completed of the Task
+     * 
+     * @param date
+     */
+    public void setDateCompleted(Date date) {
+
+        dateCompleted = date;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof Task) {
+
+            Task anotherTask = (Task) obj;
+            boolean dateCheck;
+            if (dateDue == null || anotherTask.getDueDate() == null) {
+                dateCheck = (dateDue == anotherTask.getDueDate());
+            } else {
+                dateCheck = dateDue.equals(anotherTask.getDueDate());
+            }
+
+            return (ID == anotherTask.getID())
+                    && taskName.equals(anotherTask.getName())
+                    && taskDescription.equals(anotherTask.getDescription())
+                    && taskTag.equals(anotherTask.getTag())
+                    && dateCreated.equals(anotherTask.getCreatedDate())
+                    && dateCheck && (taskPriority == anotherTask.getPriority())
+                    && (taskCompleted == anotherTask.isDone())
+                    && (isFloatingTask == anotherTask.isFloating());
+
+        } else {
+
+            return false;
+        }
+    }
 }
 
 	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Task.java
@@ -1729,7 +1879,6 @@ public class Task {
 package planner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -1739,200 +1888,240 @@ import java.util.ListIterator;
  * TaskList class is a container class for Tasks. It extends ArrayList.
  *
  */
-public class TaskList implements List<Task>{
-	
+public class TaskList implements List<Task> {
+
     private ArrayList<Task> tasks;
-    
+
+    /**
+     * Creates a new TaskList
+     */
     public TaskList() {
+
         tasks = new ArrayList<Task>();
     }
-    
+
+    /**
+     * Creates a TaskList given an ArrayList of Tasks. Each Task is a deep copy
+     * and operating on the resulting TaskList will not affect the original
+     * tasks.
+     * 
+     * @param input
+     */
     public TaskList(ArrayList<Task> input) {
-        
+
         tasks = new ArrayList<Task>();
-        
-        // Changed to defensive copy
-    	if( input != null ){
-    		
-    	    Iterator<Task> iterator = input.iterator();
-    	    Task currentTask;
-    	    
-    	    while( iterator.hasNext() ){
-    	        
-    	        currentTask = iterator.next();
-    	        
-    	        if( currentTask != null ){
-    	            
-    	            input.add( new Task( currentTask ) );
-    	        }
-    	    }
-    	}
+
+        if (input != null) {
+
+            Iterator<Task> iterator = input.iterator();
+            Task currentTask;
+
+            while (iterator.hasNext()) {
+
+                currentTask = iterator.next();
+
+                if (currentTask != null) {
+
+                    input.add(new Task(currentTask));
+                }
+            }
+        }
     }
-    
-    public TaskList( TaskList anotherTaskList ){
-    	
-    	tasks = new ArrayList<Task>();
-    	
-    	copyTaskList( anotherTaskList );
+
+    /**
+     * Creates a deep copy of a given TaskList
+     * 
+     * @param anotherTaskList
+     */
+    public TaskList(TaskList anotherTaskList) {
+
+        tasks = new ArrayList<Task>();
+
+        copyTaskList(anotherTaskList);
     }
-    
-    public boolean copyTaskList( TaskList anotherTaskList ){
-    	
-    	if( anotherTaskList != null ){
-    		
-    		tasks.clear();
-    		
-    		Iterator<Task> iterator = anotherTaskList.iterator();
-    		
-    		Task tempTask;
-    		
-    		while( iterator.hasNext() ){
-    			
-    		    tempTask = iterator.next();
-    		    
-    		    // Corner case: NULL is inserted into anotherTaskList
-    		    // Changed adding tasks to defensive copy
-    		    if( tempTask != null ){
-    		        
-    		        tasks.add(new Task(tempTask));
-    		    }
-    		}
-    		
-    		return true;
-    		
-    	} else{
-    		
-    		return false;
-    	}
+
+    public boolean copyTaskList(TaskList anotherTaskList) {
+
+        if (anotherTaskList != null) {
+
+            tasks.clear();
+
+            Iterator<Task> iterator = anotherTaskList.iterator();
+
+            Task tempTask;
+
+            while (iterator.hasNext()) {
+
+                tempTask = iterator.next();
+
+                if (tempTask != null) {
+
+                    tasks.add(new Task(tempTask));
+                }
+            }
+
+            return true;
+
+        } else {
+
+            return false;
+        }
     }
-    
+
     public ArrayList<Task> getTasks() {
+
         return tasks;
     }
 
     public Task getTaskByID(long ID) {
-        for(Task t:tasks) {
-            if(t.getID() == ID) {
+
+        assert ID > 0;
+        
+        for (Task t : tasks) {
+            if (t.getID() == ID) {
                 return t;
             }
         }
         return null;
     }
-    
+
     @Override
     public int size() {
+
         return tasks.size();
     }
 
     @Override
     public boolean isEmpty() {
+
         return tasks.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
+
         return tasks.contains(o);
     }
 
     @Override
     public Iterator<Task> iterator() {
+
         return tasks.iterator();
     }
 
     @Override
     public Object[] toArray() {
+
         return tasks.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
+
         return tasks.toArray(a);
     }
 
     @Override
     public boolean add(Task e) {
+
         return tasks.add(e);
     }
 
     @Override
     public boolean remove(Object o) {
+
         return tasks.remove(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
+
         return tasks.containsAll(c);
     }
 
     @Override
     public boolean addAll(Collection<? extends Task> c) {
+
         return tasks.addAll(c);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends Task> c) {
+
         return tasks.addAll(index, c);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
+
         return tasks.removeAll(c);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
+
         return tasks.retainAll(c);
     }
 
     @Override
     public void clear() {
+
         tasks.clear();
-        
+
     }
 
     @Override
     public Task get(int index) {
+
         return tasks.get(index);
     }
 
     @Override
     public Task set(int index, Task element) {
+
         return tasks.set(index, element);
     }
-    
+
     @Override
     public void add(int index, Task element) {
+
         tasks.add(index, element);
-        
+
     }
 
     @Override
     public Task remove(int index) {
+
         return tasks.remove(index);
     }
 
     @Override
     public int indexOf(Object o) {
+
         return tasks.indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
+
         return tasks.lastIndexOf(o);
     }
 
     @Override
     public ListIterator<Task> listIterator() {
+
         return tasks.listIterator();
     }
 
     @Override
     public ListIterator<Task> listIterator(int index) {
+
         return tasks.listIterator(index);
     }
 
     @Override
     public List<Task> subList(int fromIndex, int toIndex) {
+
         return tasks.subList(fromIndex, toIndex);
     }
 }
@@ -1950,87 +2139,78 @@ public class TaskList implements List<Task>{
 
 package planner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
 public class ConfigurationTest {
 
     @Test
-    public void createTest() {
-        Configuration oldConfig = new Configuration("C:/Test/", 35);
-        Configuration newConfig = new Configuration("/User/Documents/");
-    }
-
-    @Test
     public void configShouldReturnCorrectPath() {
+
         String oldConfigPath = "C:/Test/";
         int oldConfigId = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigId);
-        assertEquals("Config path should be " + oldConfigPath, oldConfigPath, oldConfig.getStoragePath());
-        
+        assertEquals("Config path should be " + oldConfigPath, oldConfigPath,
+                oldConfig.getStoragePath());
+
         String newConfigPath = "/User/Documents/";
         Configuration newConfig = new Configuration(newConfigPath);
-        assertEquals("Config path should be " + newConfigPath, newConfigPath, newConfig.getStoragePath());
+        assertEquals("Config path should be " + newConfigPath, newConfigPath,
+                newConfig.getStoragePath());
     }
-    
+
     @Test
     public void configShouldReturnCorrectID() {
+
         String oldConfigPath = "C:/Test/";
         int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
-        assertEquals("Config ID should be " + oldConfigID, oldConfigID, oldConfig.getCurTaskNum());
-        
+        assertEquals("Config ID should be " + oldConfigID, oldConfigID,
+                oldConfig.getCurTaskNum());
+
         String newConfigPath = "/User/Documents/";
         Configuration newConfig = new Configuration(newConfigPath);
-        assertEquals("Config ID should be " + newConfigPath, 1, newConfig.getCurTaskNum());
+        assertEquals("Config ID should be " + newConfigPath, 1,
+                newConfig.getCurTaskNum());
     }
-    
+
     @Test
     public void newConfigShouldReturnTrueIsNew() {
+
         String oldConfigPath = "C:/Test/";
         int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
-        assertEquals("isNew on an old config should return false", false, oldConfig.isNew());
-        
+        assertEquals("isNew on an old config should return false", false,
+                oldConfig.isNew());
+
         String newConfigPath = "/User/Documents/";
         Configuration newConfig = new Configuration(newConfigPath);
-        assertEquals("isNew on an new config should return false", true, newConfig.isNew());
+        assertEquals("isNew on an new config should return false", true,
+                newConfig.isNew());
     }
-    
-    @Test
-    public void setStoragePathShouldUpdateStoragePath() {
-        String oldConfigPath = "C:/Test/";
-        String oldConfigPathUpdate = "C:/Another/Place";
-        int oldConfigID = 35;
-        Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
-        oldConfig.setStoragePath(oldConfigPathUpdate);
-        assertEquals("Config path should be " + oldConfigPathUpdate, oldConfigPathUpdate, oldConfig.getStoragePath());
-        
-        String newConfigPath = "/User/Documents/";
-        String newConfigPathUpdate = "/User/Downloads/";
-        Configuration newConfig = new Configuration(newConfigPath);
-        newConfig.setStoragePath(newConfigPathUpdate);
-        assertEquals("Config path should be " + newConfigPathUpdate, newConfigPathUpdate, newConfig.getStoragePath());
-    }
-    
+
     @Test
     public void newTaskNumberShouldIncreaseCurTaskNum() {
+
         String oldConfigPath = "C:/Test/";
-        String oldConfigPathUpdate = "C:/Another/Place";
         int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
-        for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (oldConfigID + i), oldConfigID + i, oldConfig.getNewTaskNumber());
-            assertEquals("New num should be " + (oldConfigID + i + 1), oldConfigID + i + 1, oldConfig.getCurTaskNum());
+        for (int i = 0; i < 100000; i++) {
+            assertEquals("ID returned should be " + (oldConfigID + i),
+                    oldConfigID + i, oldConfig.getNewTaskNumber());
+            assertEquals("New num should be " + (oldConfigID + i + 1),
+                    oldConfigID + i + 1, oldConfig.getCurTaskNum());
 
         }
-        
+
         String newConfigPath = "/User/Documents/";
-        String newConfigPathUpdate = "/User/Downloads/";
         Configuration newConfig = new Configuration(newConfigPath);
-        for(int i = 0 ; i < 100000 ; i++) {
-            assertEquals("ID returned should be " + (1 + i), 1 + i, newConfig.getNewTaskNumber());
-            assertEquals("New num should be " + (1 + i + 1), 1 + i + 1, newConfig.getCurTaskNum());
+        for (int i = 0; i < 100000; i++) {
+            assertEquals("ID returned should be " + (1 + i), 1 + i,
+                    newConfig.getNewTaskNumber());
+            assertEquals("New num should be " + (1 + i + 1), 1 + i + 1,
+                    newConfig.getCurTaskNum());
 
         }
     }
@@ -2043,41 +2223,13 @@ public class ConfigurationTest {
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\EngineTest.java
-	 */
-
-
-package planner;
-
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-public class EngineTest {
-
-    @Test
-    public void test() {
-        fail("Not yet implemented");
-    }
-
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\EngineTest.java
-
-
-
-
-
-	/**
 	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\IntegrationTest.java
 	 */
 
 
 package planner;
 
-import static org.junit.Assert.*;
-
-import java.util.Calendar;
-import java.util.Date;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -2085,107 +2237,91 @@ public class IntegrationTest {
 
     @Test
     public void testAddTask() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
         Engine.process(addTaskInput);
-        
-        String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        Task at = afterAddList.get(afterAddList.size()-1);
-        
-        //After add
-        assertEquals("Newly added task should have the right name", "junittest", at.getName());
 
-        
+        String storagePath = Engine.getStoragePath();
+
+        Configuration beforeSaveConfig = store.readConfig();
+
         Engine.exit();
-        
+
         TaskList afterSaveList = store.readTaskStorage(storagePath);
-        Task st = afterAddList.get(afterAddList.size()-1);
         Configuration afterSaveConfig = store.readConfig();
-        
-        //After save
-        assertEquals("Newly added task should have the right name", "junittest", st.getName());
-        assertEquals("Task number should increase by 1 after add", 
-                (long)beforeSaveConfig.getCurTaskNum(), afterSaveConfig.getCurTaskNum() -1);
-        
+        Task st = afterSaveList.get(afterSaveList.size() - 1);
+
+        // After save
+        assertEquals("Newly added task should have the right name",
+                "junittest", st.getName());
+        assertEquals("Task number should increase by 1 after add",
+                (long) beforeSaveConfig.getCurTaskNum(),
+                afterSaveConfig.getCurTaskNum() - 1);
+
     }
 
     @Test
     public void testUndoTask() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
-        Engine.process(addTaskInput);
-        
         String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        
-        //After add
-        int sizeBeforeUndo = afterAddList.size();
-        
-        //Undo
-        Engine.process("undo");
-        
-        //After undo
-        TaskList afterUndoList = Engine.getAllTasks();
-        int sizeAfterUndo = afterUndoList.size();
-        assertEquals("TaskList should be smaller by 1 after undoing add", 
-                sizeBeforeUndo, sizeAfterUndo+1);
+        TaskList beforeAddList = store.readTaskStorage(storagePath);
+        int sizeBeforeAdd = beforeAddList.size();
+        Engine.process(addTaskInput);
 
-        
+        // Undo
+        Engine.process("undo");
+
         Engine.exit();
-        
+
         TaskList afterSaveList = store.readTaskStorage(storagePath);
         int sizeAfterSave = afterSaveList.size();
-        
-        //After save
-        assertEquals("TaskList size should be the same after save", 
-                sizeAfterUndo, sizeAfterSave);
-        
+
+        // After save
+        assertEquals("TaskList size should be the same after save",
+                sizeBeforeAdd, sizeAfterSave);
+
     }
-    
+
     @Test
-    public void testUpdateTaskDate() {
+    public void testUpdateTaskPriority() {
+
         String addTaskInput = "add junittest";
-        
+
         Engine.init();
         Storage store = new Storage();
         Engine.process(addTaskInput);
-        
+
         String storagePath = Engine.getStoragePath();
-        
-        Configuration beforeSaveConfig = store.readConfig();
-        TaskList afterAddList = Engine.getAllTasks();
-        Task at = afterAddList.get(afterAddList.size()-1);
-        Long taskID = at.getID();
-        
-        //After add
-        assertEquals("Newly added task should have the right name", "junittest", at.getName());
-        
-        Engine.process("update "+taskID+" date 12 may 2015");
-        String dateString = "Tue May 12 00:00:00 SGT 2015";
-        
-        //After update
-        assertEquals("Updated task should have the right name", "junittest", at.getName());
-        assertEquals("Updated task should have the right date", dateString, at.getDueDate().toString());
-        
+
         Engine.exit();
-        
+
+        TaskList afterAddList = store.readTaskStorage(storagePath);
+        Task taskAdded = afterAddList.get(afterAddList.size() - 1);
+        int taskID = taskAdded.getID();
+        System.out.println("Taskid " + taskID);
+
+        Engine.process("update " + taskID + " priority 5");
+
+        Engine.exit();
+
+        Engine.init();
         TaskList afterSaveList = store.readTaskStorage(storagePath);
-        Task st = afterAddList.get(afterAddList.size()-1);
-        Configuration afterSaveConfig = store.readConfig();
-        
-        //After save
-        assertEquals("Saved task should have the right name", "junittest", st.getName());
-        assertEquals("Saved task should have the right date", dateString, st.getDueDate().toString());
-                
+        Task st = afterSaveList.getTaskByID(taskID);
+        System.out.println(st.getDueDate() == null);
+
+        // After save
+        assertEquals("Saved task should have the right name", "junittest",
+                st.getName());
+        assertEquals("Saved task should have the right priority", 5,
+                st.getPriority());
+
     }
 }
 
@@ -2217,49 +2353,59 @@ public class StorageTest {
 
     @Test
     public void testSaveConfiguration() {
+
         try {
 
             Storage storage = new Storage();
-            File configFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_NAME);
+            File configFile = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath()
+                    + Constants.CONFIG_FILE_NAME);
             configFile.createNewFile();
             BufferedReader br = new BufferedReader(new FileReader(configFile));
 
             Configuration config1 = new Configuration("path1");
 
             storage.saveConfiguration(config1);
-            
+
             String fileContents = br.readLine();
-            
-            assertEquals("File should contain configuration", "{\"storagePath\":\""+config1.getStoragePath()+"\",\"numTasks\":\"1\"}", fileContents);
-            
+
+            assertEquals("File should contain configuration",
+                    "{\"storagePath\":\"" + config1.getStoragePath()
+                            + "\",\"numTasks\":\"1\"}", fileContents);
+
             br.close();
             configFile.delete();
-            
+
             Configuration config2 = new Configuration("another.path");
             storage.saveConfiguration(config2);
-            
-            File configFile2 = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + Constants.CONFIG_FILE_NAME);
+
+            File configFile2 = new File(getClass().getProtectionDomain()
+                    .getCodeSource().getLocation().getPath()
+                    + Constants.CONFIG_FILE_NAME);
             BufferedReader br2 = new BufferedReader(new FileReader(configFile2));
-            
+
             String fileContents2 = br2.readLine();
-            
-            assertEquals("File should contain configuration", "{\"storagePath\":\""+config2.getStoragePath()+"\",\"numTasks\":\"1\"}", fileContents2);
-            
+
+            assertEquals("File should contain configuration",
+                    "{\"storagePath\":\"" + config2.getStoragePath()
+                            + "\",\"numTasks\":\"1\"}", fileContents2);
+
             br2.close();
             configFile.delete();
-            
-            
+
         } catch (Exception e) {
             fail(e.toString());
         }
     }
-    
+
     @Test
     public void testWriteToFile() {
+
         try {
-            Method method = Storage.class.getDeclaredMethod("writeToFile", String.class, ArrayList.class);
+            Method method = Storage.class.getDeclaredMethod("writeToFile",
+                    String.class, ArrayList.class);
             method.setAccessible(true);
-            
+
             String testPath = "testPath";
             String testContentLine1 = "testContent1";
             String testContentLine2 = "testContent2";
@@ -2269,24 +2415,26 @@ public class StorageTest {
             testContent.add(testContentLine2);
             File tester = new File(testPath);
             tester.createNewFile();
-            
+
             method.invoke(null, testPath, testContent);
             BufferedReader br = new BufferedReader(new FileReader(tester));
-            for(int i=0; i<testContent.size();i++) {
-                assertEquals("content in file should be same as content to be written", testContent.get(i), br.readLine());
+            for (int i = 0; i < testContent.size(); i++) {
+                assertEquals(
+                        "content in file should be same as content to be written",
+                        testContent.get(i), br.readLine());
             }
             br.close();
-            
+
             testContent.add(testContentLine3);
             method.invoke(null, testPath, testContent);
             br = new BufferedReader(new FileReader(tester));
-            for(int i=0; i<testContent.size();i++) {
-                assertEquals("content in file should be same as content to be written", testContent.get(i), br.readLine());
+            for (int i = 0; i < testContent.size(); i++) {
+                assertEquals(
+                        "content in file should be same as content to be written",
+                        testContent.get(i), br.readLine());
             }
             br.close();
-            
-            
-            
+
             tester.delete();
         } catch (Exception e) {
             fail(e.toString());
@@ -2295,107 +2443,171 @@ public class StorageTest {
 
     @Test
     public void testConvertTaskBetweenJsonString() {
+
         try {
             Storage storage = new Storage();
-            Method convertToJson = Storage.class.getDeclaredMethod("convertTaskToJsonString", Task.class);
+            Method convertToJson = Storage.class.getDeclaredMethod(
+                    "convertTaskToJsonString", Task.class);
             convertToJson.setAccessible(true);
-            Method convertFromJson = Storage.class.getDeclaredMethod("convertTaskFromJsonString", String.class);
+            Method convertFromJson = Storage.class.getDeclaredMethod(
+                    "convertTaskFromJsonString", String.class);
             convertFromJson.setAccessible(true);
-            
+
             String result;
-            
+
             String name = "testTask";
             String description = "toTestConversionIntoJson";
             Date dueDate = new Date(System.currentTimeMillis());
             int priority = 3;
             String tag = "testing";
             int ID = 400;
-            
-            Task testTask = new Task(name, description, dueDate, priority, tag, ID);
-            
+
+            Task testTask = new Task(name, description, dueDate, priority, tag,
+                    ID);
+
             Date createdDate = testTask.getCreatedDate();
             boolean floating = testTask.isFloating();
             boolean done = testTask.isDone();
-            
+
             result = (String) convertToJson.invoke(storage, testTask);
-            Task postConversionTask = (Task) convertFromJson.invoke(storage, result);
-            
-            
-            assertEquals("name after converting back and forth should be equal", testTask.getName(), postConversionTask.getName());
-            assertEquals("description after converting back and forth should be equal", testTask.getDescription(), postConversionTask.getDescription());
-            assertEquals("tag after converting back and forth should be equal", testTask.getTag(), postConversionTask.getTag());
-            assertEquals("priority after converting back and forth should be equal", testTask.getPriority(), postConversionTask.getPriority());
-            assertEquals("due date after converting back and forth should be equal", testTask.getDueDate(), postConversionTask.getDueDate());
-            assertEquals("created date after converting back and forth should be equal", testTask.getCreatedDate(), postConversionTask.getCreatedDate());
-            assertEquals("done status after converting back and forth should be equal", testTask.isDone(), postConversionTask.isDone());
-            assertEquals("floating status after converting back and forth should be equal", testTask.isFloating(), postConversionTask.isFloating());
-            assertEquals("ID after converting back and forth should be equal", testTask.getID(), postConversionTask.getID());
-            
-            
+            Task postConversionTask = (Task) convertFromJson.invoke(storage,
+                    result);
+
+            assertEquals(
+                    "name after converting back and forth should be equal",
+                    testTask.getName(), postConversionTask.getName());
+            assertEquals(
+                    "description after converting back and forth should be equal",
+                    testTask.getDescription(),
+                    postConversionTask.getDescription());
+            assertEquals("tag after converting back and forth should be equal",
+                    testTask.getTag(), postConversionTask.getTag());
+            assertEquals(
+                    "priority after converting back and forth should be equal",
+                    testTask.getPriority(), postConversionTask.getPriority());
+            assertEquals(
+                    "due date after converting back and forth should be equal",
+                    testTask.getDueDate(), postConversionTask.getDueDate());
+            assertEquals(
+                    "created date after converting back and forth should be equal",
+                    testTask.getCreatedDate(),
+                    postConversionTask.getCreatedDate());
+            assertEquals(
+                    "done status after converting back and forth should be equal",
+                    testTask.isDone(), postConversionTask.isDone());
+            assertEquals(
+                    "floating status after converting back and forth should be equal",
+                    testTask.isFloating(), postConversionTask.isFloating());
+            assertEquals("ID after converting back and forth should be equal",
+                    testTask.getID(), postConversionTask.getID());
+
         } catch (Exception e) {
             fail(e.toString());
         }
     }
-    
+
     @Test
     public void testSaveAndReadTaskList() {
-        try{
+
+        try {
             Storage storage = new Storage();
-            Method save = Storage.class.getDeclaredMethod("saveTaskList", String.class, TaskList.class);
+            Method save = Storage.class.getDeclaredMethod("saveTaskList",
+                    String.class, TaskList.class);
             save.setAccessible(true);
-            Method read = Storage.class.getDeclaredMethod("readTaskStorage", String.class);
+            Method read = Storage.class.getDeclaredMethod("readTaskStorage",
+                    String.class);
             read.setAccessible(true);
-            
+
             String fileName = "testFile.txt";
             TaskList testList = new TaskList();
             TaskList result;
             Task saveTask;
             Task readTask;
-            Task task1 = new Task("task1", "description1", new Date(System.currentTimeMillis()), 3, "first tag", 1);
-            Task task2 = new Task("task2", "description2", new Date(System.currentTimeMillis()), 2, "second tag", 2);
+            Task task1 = new Task("task1", "description1", new Date(
+                    System.currentTimeMillis()), 3, "first tag", 1);
+            Task task2 = new Task("task2", "description2", new Date(
+                    System.currentTimeMillis()), 2, "second tag", 2);
             testList.add(task1);
             testList.add(task2);
-            
+
             save.invoke(storage, fileName, testList);
             result = (TaskList) read.invoke(storage, fileName);
-            
-            for(int i=0; i<testList.size();i++) {
+
+            for (int i = 0; i < testList.size(); i++) {
                 saveTask = testList.get(i);
                 readTask = result.get(i);
-                assertEquals("name after converting back and forth should be equal", saveTask.getName(), readTask.getName());
-                assertEquals("description after converting back and forth should be equal", saveTask.getDescription(), readTask.getDescription());
-                assertEquals("tag after converting back and forth should be equal", saveTask.getTag(), readTask.getTag());
-                assertEquals("priority after converting back and forth should be equal", saveTask.getPriority(), readTask.getPriority());
-                assertEquals("due date after converting back and forth should be equal", saveTask.getDueDate(), readTask.getDueDate());
-                assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
-                assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
-                assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
-                assertEquals("ID after converting back and forth should be equal", saveTask.getID(), readTask.getID());
+                assertEquals(
+                        "name after converting back and forth should be equal",
+                        saveTask.getName(), readTask.getName());
+                assertEquals(
+                        "description after converting back and forth should be equal",
+                        saveTask.getDescription(), readTask.getDescription());
+                assertEquals(
+                        "tag after converting back and forth should be equal",
+                        saveTask.getTag(), readTask.getTag());
+                assertEquals(
+                        "priority after converting back and forth should be equal",
+                        saveTask.getPriority(), readTask.getPriority());
+                assertEquals(
+                        "due date after converting back and forth should be equal",
+                        saveTask.getDueDate(), readTask.getDueDate());
+                assertEquals(
+                        "created date after converting back and forth should be equal",
+                        saveTask.getCreatedDate(), readTask.getCreatedDate());
+                assertEquals(
+                        "done status after converting back and forth should be equal",
+                        saveTask.isDone(), readTask.isDone());
+                assertEquals(
+                        "floating status after converting back and forth should be equal",
+                        saveTask.isFloating(), readTask.isFloating());
+                assertEquals(
+                        "ID after converting back and forth should be equal",
+                        saveTask.getID(), readTask.getID());
             }
-            
-            Task task3 = new Task("task3", "description3", new Date(System.currentTimeMillis()), 1, "third tag", 3);
-            Task task4 = new Task("task4", "description4", null, 8, "fourth tag", 4);
-            
+
+            Task task3 = new Task("task3", "description3", new Date(
+                    System.currentTimeMillis()), 1, "third tag", 3);
+            Task task4 = new Task("task4", "description4", null, 8,
+                    "fourth tag", 4);
+
             save.invoke(storage, fileName, testList);
             result = (TaskList) read.invoke(storage, fileName);
-            
-            for(int i=0; i<testList.size();i++) {
+
+            for (int i = 0; i < testList.size(); i++) {
                 saveTask = testList.get(i);
                 readTask = result.get(i);
-                assertEquals("name after converting back and forth should be equal", saveTask.getName(), readTask.getName());
-                assertEquals("description after converting back and forth should be equal", saveTask.getDescription(), readTask.getDescription());
-                assertEquals("tag after converting back and forth should be equal", saveTask.getTag(), readTask.getTag());
-                assertEquals("priority after converting back and forth should be equal", saveTask.getPriority(), readTask.getPriority());
-                assertEquals("due date after converting back and forth should be equal", saveTask.getDueDate(), readTask.getDueDate());
-                assertEquals("created date after converting back and forth should be equal", saveTask.getCreatedDate(), readTask.getCreatedDate());
-                assertEquals("done status after converting back and forth should be equal", saveTask.isDone(), readTask.isDone());
-                assertEquals("floating status after converting back and forth should be equal", saveTask.isFloating(), readTask.isFloating());
-                assertEquals("ID after converting back and forth should be equal", saveTask.getID(), readTask.getID());
+                assertEquals(
+                        "name after converting back and forth should be equal",
+                        saveTask.getName(), readTask.getName());
+                assertEquals(
+                        "description after converting back and forth should be equal",
+                        saveTask.getDescription(), readTask.getDescription());
+                assertEquals(
+                        "tag after converting back and forth should be equal",
+                        saveTask.getTag(), readTask.getTag());
+                assertEquals(
+                        "priority after converting back and forth should be equal",
+                        saveTask.getPriority(), readTask.getPriority());
+                assertEquals(
+                        "due date after converting back and forth should be equal",
+                        saveTask.getDueDate(), readTask.getDueDate());
+                assertEquals(
+                        "created date after converting back and forth should be equal",
+                        saveTask.getCreatedDate(), readTask.getCreatedDate());
+                assertEquals(
+                        "done status after converting back and forth should be equal",
+                        saveTask.isDone(), readTask.isDone());
+                assertEquals(
+                        "floating status after converting back and forth should be equal",
+                        saveTask.isFloating(), readTask.isFloating());
+                assertEquals(
+                        "ID after converting back and forth should be equal",
+                        saveTask.getID(), readTask.getID());
             }
-            
+
             File configFile = new File(fileName);
             configFile.delete();
-        } catch(Exception e) {
+        } catch (Exception e) {
             fail(e.toString());
         }
     }
@@ -2414,7 +2626,7 @@ public class StorageTest {
 
 package planner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
 
@@ -2424,218 +2636,261 @@ public class TaskTest {
 
     @Test
     public void createTest() {
+
         String taskName = "entry1";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 1;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void throwsIllegalArgumentExceptionIfTaskNameIsEmpty() {
+
         String emptyTask = "";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 3;
-        
-        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
+
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
     }
-    
+
     @Test
     public void testGetName() {
-        String taskName = "getTask";
-        String taskDescription = "testing";
-        Date taskDueDate = new Date(System.currentTimeMillis());
-        String taskTag = "nothing";
-        int taskPriority = 5;
-        long ID = 4;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, 4);
-        assertEquals("Task name should be "+taskName, taskName, entry.getName());
-        
-        String taskName2 = "anotherTask";
-        String taskDescription2 = "other";
-        Date taskDueDate2 = new Date(System.currentTimeMillis());
-        String taskTag2 = "others";
-        int taskPriority2 = 3;
-        long ID2 = 400;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, 400);
-        assertEquals("Task name should be "+taskName2, taskName2, another.getName());
-    }
-    
-    @Test
-    public void testGetDescription() {
+
         String taskName = "getTask";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 4;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        assertEquals("Task description should be "+taskDescription, taskDescription, entry.getDescription());
-        
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+        assertEquals("Task name should be " + taskName, taskName,
+                entry.getName());
+
+        String taskName2 = "anotherTask";
+        String taskDescription2 = "other";
+        Date taskDueDate2 = new Date(System.currentTimeMillis());
+        String taskTag2 = "others";
+        int taskPriority2 = 3;
+        int ID2 = 400;
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+        assertEquals("Task name should be " + taskName2, taskName2,
+                another.getName());
+    }
+
+    @Test
+    public void testGetDescription() {
+
+        String taskName = "getTask";
+        String taskDescription = "testing";
+        Date taskDueDate = new Date(System.currentTimeMillis());
+        String taskTag = "nothing";
+        int taskPriority = 5;
+        int ID = 4;
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+        assertEquals("Task description should be " + taskDescription,
+                taskDescription, entry.getDescription());
+
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         int ID2 = 5;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
-        assertEquals("Task description should be "+taskDescription2, taskDescription2, another.getDescription());
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+        assertEquals("Task description should be " + taskDescription2,
+                taskDescription2, another.getDescription());
     }
-    
+
     @Test
     public void testGetTag() {
+
         String taskName = "getTask";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 4;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, 4);
-        assertEquals("Task tag should be "+taskTag, taskTag, entry.getTag());
-        
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+        assertEquals("Task tag should be " + taskTag, taskTag, entry.getTag());
+
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         int ID2 = 41;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
-        assertEquals("Task tag should be "+taskTag2, taskTag2, another.getTag());
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+        assertEquals("Task tag should be " + taskTag2, taskTag2,
+                another.getTag());
     }
-    
+
     @Test
     public void testGetPriority() {
+
         String taskName = "getTask";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 8;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        assertEquals("Task priority should be "+taskPriority, taskPriority, entry.getPriority());
-        
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+        assertEquals("Task priority should be " + taskPriority, taskPriority,
+                entry.getPriority());
+
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         int ID2 = 4103;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
-        assertEquals("Task priority should be "+taskPriority2, taskPriority2, another.getPriority());
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+        assertEquals("Task priority should be " + taskPriority2, taskPriority2,
+                another.getPriority());
     }
-    
+
     @Test
     public void testGetDueDate() {
+
         String taskName = "getTask";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 4;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        assertEquals("Task due date should be "+taskDueDate, taskDueDate.toString(), entry.getDueDate().toString());
-        
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+        assertEquals("Task due date should be " + taskDueDate,
+                taskDueDate.toString(), entry.getDueDate().toString());
+
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         int ID2 = 42;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
-        assertEquals("Task due date should be "+taskDueDate2, taskDueDate2, another.getDueDate());
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+        assertEquals("Task due date should be " + taskDueDate2, taskDueDate2,
+                another.getDueDate());
     }
+
+    // The following few test cases use partitioning to test that setting name
+    // behaves correctly
     
-    /*This is a typical case for setting name*/
+    /* This is a typical case for setting name */
     @Test
     public void testSetName() {
+
         String taskName = "getTask";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 4;
-        
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        
+
+        Task entry = new Task(taskName, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+
         String newName = "newTask";
         entry.setName(newName);
-        assertEquals("New task name should be "+newName, newName, entry.getName());
-        
+        assertEquals("New task name should be " + newName, newName,
+                entry.getName());
+
         String taskName2 = "anotherTask";
         String taskDescription2 = "other";
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
         int ID2 = 24;
-        
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
-        
+
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2,
+                taskPriority2, taskTag2, ID2);
+
         String newName2 = "modifiedTask";
         another.setName(newName2);
-        assertEquals("New task name should be "+newName2, newName2, another.getName());
+        assertEquals("New task name should be " + newName2, newName2,
+                another.getName());
     }
-    
-    /*This is a boundary case where name is null*/
-    @Test(expected=IllegalArgumentException.class)
+
+    /* This is a boundary case where name is null */
+    @Test(expected = IllegalArgumentException.class)
     public void throwsIllegalArgumentExceptionIfNameIsSetNull() {
+
         String emptyTask = "name";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 3;
-        
-        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        
+
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+
         empty.setName(null);
     }
-    
-    /*This is a boundary case where name is an empty string*/
-    @Test(expected=IllegalArgumentException.class)
+
+    /* This is a boundary case where name is an empty string */
+    @Test(expected = IllegalArgumentException.class)
     public void throwsIllegalArgumentExceptionIfNameIsSetEmpty() {
+
         String emptyTask = "name";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 3;
-        
-        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        
+
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+
         empty.setName("");
     }
-    
-    /*This is a boundary case where name is a string with only 1 character*/
+
+    /* This is a boundary case where name is a string with only 1 character */
     @Test
     public void testSetNameToShortString() {
+
         String emptyTask = "name";
         String taskDescription = "testing";
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
         int ID = 3;
-        
-        Task empty = new Task(emptyTask, taskDescription, taskDueDate, taskPriority, taskTag, ID);
-        
+
+        Task empty = new Task(emptyTask, taskDescription, taskDueDate,
+                taskPriority, taskTag, ID);
+
         String shortName = "a";
         empty.setName(shortName);
-        assertEquals("New task name should be "+shortName, shortName, empty.getName());
+        assertEquals("New task name should be " + shortName, shortName,
+                empty.getName());
     }
 }
 

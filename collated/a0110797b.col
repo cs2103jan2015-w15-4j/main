@@ -1,0 +1,2423 @@
+//@author: a0110797b
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
+	 */
+
+    public enum SearchType{
+        SEARCH_NAME, SEARCH_DESC, SEARCH_TAG, SEARCH_OVERDUE, SEARCH_UPCOMING, 
+        SEARCH_FLOATING, SEARCH_CONFIRMED, SEARCH_DONE, SEARCH_NOTDONE,
+        SEARCH_TIMED
+    };
+    
+    public enum SortType{
+        SORT_DATE, SORT_PRIORITY, SORT_NAME
+    };
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Constants.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayTask.java
+	 */
+
+
+package planner;
+
+import java.util.Date;
+
+/**
+ * 
+ * displayDate is used for sorting
+ */
+public class DisplayTask {
+    private int ID;
+    private Date displayDate;
+    private Date dueDate, endDate;
+    private Task parentTask;
+    
+    /**
+     * Constructor for DisplayTask
+     * 
+     * @param id            Display ID of DisplayTask
+     * @param shownDate     Display date of DisplayTask
+     * @param from          Start date of DisplayTask
+     * @param to            End date of DisplayTask
+     * @param parent        Parent Task of DisplayTask, this cannot be null
+     * @throws IllegalArgumentException
+     */
+    public DisplayTask(int id, Date shownDate, Date from, Date to, Task parent) throws IllegalArgumentException {
+        ID = id;
+        displayDate = shownDate;
+        dueDate = from;
+        endDate = to;
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = parent;
+        }
+    }
+    
+    /**
+     * Generates a copy of another DisplayTask
+     * 
+     * @param anotherTask       Another DisplayTask used as reference for copy
+     * @throws IllegalArgumentException     Thrown when parent task is null
+     */
+    public DisplayTask(DisplayTask anotherTask) throws IllegalArgumentException {
+        ID = anotherTask.getID();
+        displayDate = anotherTask.getShownDate();
+        dueDate = anotherTask.getDueDate();
+        endDate = anotherTask.getEndDate();
+        if (anotherTask.getParent() == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = anotherTask.getParent();
+        }
+    }
+    
+    /**
+     * Set new DisplayTask ID
+     * 
+     * @param id    New ID of DisplayTask
+     */
+    public void setID(int id) {
+        ID = id;
+    }
+    
+    /**
+     * Set new Display date 
+     * @param shownDate     New Display date
+     */
+    public void setShownDate(Date shownDate) {
+        displayDate = shownDate;
+    }
+    
+    /**
+     * Set new Due date
+     * 
+     * @param date      New Due date
+     */
+    public void setDueDate(Date date) {
+        dueDate = date;
+    }
+    
+    /**
+     * Set new End date
+     * 
+     * @param date      New End date
+     */
+    public void setEndDate(Date date) {
+        endDate = date;
+    }
+    
+    /**
+     * Link parent Task
+     * 
+     * @param parent   Task that will be linked 
+     * @throws IllegalArgumentException     Thrown when Task is null
+     */
+    public void setParent(Task parent) throws IllegalArgumentException {
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent Task cannot be null!");
+        } else {
+            parentTask = parent;
+        }
+    }
+    
+    /**
+     * @return      DisplayTask ID
+     */
+    public int getID() {
+        return this.ID;
+    }
+    
+    /**
+     * @return      DisplayTask display date
+     */
+    public Date getShownDate() {
+        return this.displayDate;
+    }
+    
+    /**
+     * @return      DisplayTask due date
+     */
+    public Date getDueDate() {
+        return this.dueDate;
+    }
+    
+    /**
+     * @return      DisplayTask end date
+     */
+    public Date getEndDate() {
+        return this.endDate;
+    }
+    
+    /**
+     * @return      DisplayTask parent Task
+     */
+    public Task getParent() {
+        return this.parentTask;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if( obj instanceof DisplayTask ){
+            
+            DisplayTask anotherTask = (DisplayTask)obj;
+            
+            boolean dueDateCheck, endDateCheck, displayDateCheck;
+            
+            if (dueDate == null || anotherTask.getDueDate() == null) {
+                dueDateCheck = (dueDate == anotherTask.getDueDate());       
+            } else {               
+                dueDateCheck = dueDate.equals(anotherTask.getDueDate());
+            }
+            
+            if (endDate == null || anotherTask.getEndDate() == null) {   
+                endDateCheck = (endDate == anotherTask.getEndDate());    
+            } else {  
+                endDateCheck = endDate.equals(anotherTask.getEndDate());
+            }
+            
+            if (displayDate == null || anotherTask.getShownDate() == null) {
+                displayDateCheck = (displayDate == anotherTask.getShownDate());
+            } else {
+                
+                displayDateCheck = displayDate.equals(anotherTask.getShownDate());
+            }
+            
+            if (dueDateCheck == false) {
+                System.out.println("false dueDatecheck");
+            }
+            if (endDateCheck == false) {
+                System.out.println("false endDatecheck");
+            }
+            if (displayDateCheck == false) {
+                System.out.println("false displayDatecheck");
+                System.out.println(displayDate + " " + anotherTask.getShownDate());
+            }
+            
+            return ((ID == anotherTask.getID()) &&
+                   dueDateCheck &&
+                   endDateCheck &&
+                   displayDateCheck &&
+                   (parentTask.equals(anotherTask.getParent())));
+            
+        } else{
+            
+            return false;
+        }
+    }
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayTask.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayTaskList.java
+	 */
+
+
+package planner;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+/**
+ * DisplayTaskList class is a container class for DisplayTasks. It extends ArrayList.
+ */
+public class DisplayTaskList implements List<DisplayTask>{
+    
+    private ArrayList<DisplayTask> displayTasks;
+    
+    public DisplayTaskList() {
+        displayTasks = new ArrayList<DisplayTask>();
+    }
+    
+    /**
+     * Constructs a new DisplayTaskList from an arraylist of DisplayTasks
+     * 
+     * @param input     Another DisplayTaskList
+     */
+    public DisplayTaskList (ArrayList<DisplayTask> input) {
+        
+        displayTasks = new ArrayList<DisplayTask>();
+        
+        if( input != null ){
+            
+            Iterator<DisplayTask> iterator = input.iterator();
+            DisplayTask currentTask;
+            
+            while( iterator.hasNext() ){
+                
+                currentTask = iterator.next();
+                
+                if( currentTask != null ){
+                    
+                    input.add( new DisplayTask( currentTask ) );
+                }
+            }
+        }
+    }
+    
+    /**
+     * Constructs a DisplayTaskList by copying another DisplayTaskList
+     * 
+     * @param anotherTaskList           Another DisplayTaskList
+     */
+    public DisplayTaskList( DisplayTaskList anotherTaskList ){
+        
+        displayTasks = new ArrayList<DisplayTask>();
+        
+        copyTaskList( anotherTaskList );
+    }
+    
+    /**
+     * Copies a displayTaskList into another
+     * 
+     * @param anotherTaskList       Another DisplayTaskList
+     * @return                      True if another displayTaskList is not null
+     *                              False otherwise
+     */
+    public boolean copyTaskList( DisplayTaskList anotherTaskList ){
+        
+        if( anotherTaskList != null ){
+            
+            displayTasks.clear();
+            
+            Iterator<DisplayTask> iterator = anotherTaskList.iterator();
+            
+            DisplayTask tempTask;
+            
+            while( iterator.hasNext() ){
+                
+                tempTask = iterator.next();
+                
+                // Corner case: NULL is inserted into anotherTaskList
+                // Changed adding tasks to defensive copy
+                if( tempTask != null ){
+                    
+                    displayTasks.add(new DisplayTask(tempTask));
+                }
+            }
+            
+            return true;
+            
+        } else{
+            
+            return false;
+        }
+    }
+    
+    /**
+     * Gets the DisplayTaskList
+     * 
+     * @return      DisplayTaskList
+     */
+    public ArrayList<DisplayTask> getTasks() {
+        return displayTasks;
+    }
+    
+    /**
+     * Obtains the displayTask by checking on DisplayTask ID 
+     * 
+     * @param ID        DisplayTask ID
+     * @return          DisplayTask found
+     */
+    public DisplayTask getTaskByID(long ID) {
+        for(DisplayTask t:displayTasks) {
+            if(t.getID() == ID) {
+                return t;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Obtains the displayTask by checking the parent Task ID
+     * 
+     * @param ID        Task ID 
+     * @return          DisplayTask found
+     */
+    public DisplayTask getTaskByParentID(int ID ){
+        for(DisplayTask t:displayTasks) {
+            if( t.getParent() != null 
+                    && t.getParent().getID() == ID ){
+                return t;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Used for testing purposes
+     */
+    public void print() {
+        for (int i = 0; i < this.size(); i++) {
+            Task taskPrint = this.get(i).getParent();
+            System.out.println("ID: " +
+                    this.get(i).getID() + " Showned Date: " +
+                    this.get(i).getShownDate() + " Due Date: " +
+                    this.get(i).getDueDate() + " End Date: " +
+                    this.get(i).getEndDate());
+            System.out.println("Task ID: " +
+                    taskPrint.getID() + " Name: " +
+                    taskPrint.getName() + " Priority: " +
+                    taskPrint.getPriority());
+        }
+
+    }
+    
+    @Override
+    public int size() {
+        return displayTasks.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return displayTasks.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return displayTasks.contains(o);
+    }
+
+    @Override
+    public Iterator<DisplayTask> iterator() {
+        return displayTasks.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return displayTasks.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return displayTasks.toArray(a);
+    }
+
+    @Override
+    public boolean add(DisplayTask e) {
+        return displayTasks.add(e);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return displayTasks.remove(o);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return displayTasks.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends DisplayTask> c) {
+        return displayTasks.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends DisplayTask> c) {
+        return displayTasks.addAll(index, c);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return displayTasks.removeAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return displayTasks.retainAll(c);
+    }
+
+    @Override
+    public void clear() {
+        displayTasks.clear();
+        
+    }
+
+    @Override
+    public DisplayTask get(int index) {
+        return displayTasks.get(index);
+    }
+
+    @Override
+    public DisplayTask set(int index, DisplayTask element) {
+        return displayTasks.set(index, element);
+    }
+
+    @Override
+    public void add(int index, DisplayTask element) {
+        displayTasks.add(index, element);    
+    }
+
+    @Override
+    public DisplayTask remove(int index) {
+        return displayTasks.remove(index);
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return displayTasks.indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return displayTasks.lastIndexOf(o);
+    }
+
+    @Override
+    public ListIterator<DisplayTask> listIterator() {
+        return displayTasks.listIterator();
+    }
+
+    @Override
+    public ListIterator<DisplayTask> listIterator(int index) {
+        return displayTasks.listIterator(index);
+    }
+
+    @Override
+    public List<DisplayTask> subList(int fromIndex, int toIndex) {
+        return displayTasks.subList(fromIndex, toIndex);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DisplayTaskList) {
+            
+            DisplayTaskList tasks = (DisplayTaskList) obj;
+            if (this.size() == tasks.size()) {
+                //System.out.println("Right size");
+                for (int i = 0; i < tasks.size(); i++) {
+                    if (!(this.get(i).equals(tasks.get(i)))) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                //System.out.println("Wrong size");
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayTaskList.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Logic.java
+	 */
+
+
+package planner;
+
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import planner.Constants.SearchType;
+
+/**
+ * This class contains the main methods that are needed by the engine such as
+ * searching and returning sorted Set Maps
+ */
+public class Logic {
+    private static Logger logger = Logger.getLogger("Logic");
+    
+    /**
+     * Returns a tasklist of searched results found within the time period
+     * Assumption: start and end date must not be null
+     *             start date must be before end date
+     * 
+     * @param input     Input tasklist to perform time period search on 
+     * @param start     Starting time
+     * @param end       Ending time
+     * @return          A search list containing all tasks found within the time 
+     *                  period
+     */
+    public static TaskList searchPeriod(TaskList input, Date start, Date end) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search of time period");
+        try {
+            searchedList = SearchLogic.searchPeriod(input, start, end);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching time period");
+        }
+        logger.log(Level.INFO, "End of search of time period");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results found within today
+     * 
+     * @param input     Input tasklist to perform time period search for today
+     * @return          A search list containing all tasks found within today
+     */
+    public static TaskList searchToday(TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for task today");
+        try {
+            Date today = new Date();
+            searchedList = SearchLogic.searchDay(input, today);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching today");
+        }
+        logger.log(Level.INFO, "End of search within today");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results found within the specified day
+     * Assumptions: day cannot be null
+     * 
+     * @param input     Input tasklist to perform time period search within specified day
+     * @param day       Specific day to be searched upon
+     * @return          A search list containing all tasks found within the specified day
+     */
+    public static TaskList searchDay(TaskList input, Date day) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for task on a set date");
+        try {
+            searchedList = SearchLogic.searchDay(input, day);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching on set date");
+        }
+        logger.log(Level.INFO, "End of search for the set date");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for tasks with priority 
+     * greater or above the given priority
+     * Assumption: priority must be an integer from 0 to 5 (inclusive)
+     * 
+     * @param input     Input tasklist to perform priority search upon
+     * @param priority  The priority number that is used to benchmark 
+     * @return          A search list of tasks with greater or equal to 
+     *                  the given priority integer
+     */
+    public static TaskList searchPriority(TaskList input , int priority) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for priority");
+        try {
+            searchedList = SearchLogic.searchPriorityGreaterThan(input, priority);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for priority");
+        }
+        logger.log(Level.INFO, "End of search for priority");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched result for tasks containing substring of the name
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @param name      Task name will be checked to determine whether it 
+     *                  contains this substring
+     * @return          A search list of tasks with names containing this substring
+     */
+    public static TaskList searchName(TaskList input, String name) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search within name field");
+        try {
+            searchedList = SearchLogic.searchString(input, name, SearchType.SEARCH_NAME);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for name");
+        }
+        logger.log(Level.INFO, "End of search within name field");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched result for tasks containing substring of the description
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @param name      Task description will be checked to determine whether it 
+     *                  contains this substring
+     * @return          A search list of tasks with description containing this substring
+     */
+    public static TaskList searchDescription(TaskList input, String desc) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search within description field");
+        try {
+            searchedList = SearchLogic.searchString(input, desc, SearchType.SEARCH_DESC);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for description");
+        }
+        logger.log(Level.INFO, "End of search within description field");
+        return searchedList;
+        
+    }
+    
+    /**
+     * Returns a tasklist of searched result for tasks containing substring of the tags
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @param name      Task tags will be checked to determine whether it 
+     *                  contains this substring
+     * @return          A search list of tasks with tags containing this substring
+     */
+    public static TaskList searchTag(TaskList input, String tags) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search within tag field");
+        try {
+            searchedList = SearchLogic.searchString(input, tags, SearchType.SEARCH_TAG);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for tag");
+        }
+        logger.log(Level.INFO, "End of search within tag field");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for tasks that are overdue
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing overdued tasks
+     */
+    public static TaskList searchOverDuedTasks (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for overdue tasks");
+        try {
+            searchedList = SearchLogic.searchTaskDue(input, SearchType.SEARCH_OVERDUE);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for overdue tasks");
+        }
+        logger.log(Level.INFO, "End of search for overdue tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for upcoming tasks
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing upcoming tasks
+     */
+    public static TaskList searchUpcomingTasks (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for upcoming tasks");
+        try {
+            searchedList = SearchLogic.searchTaskDue(input, SearchType.SEARCH_UPCOMING);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for upcoming tasks");
+        }
+        logger.log(Level.INFO, "End of search for upcoming tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for timed tasks
+     * This old method is never called by engine since the GUI does not need
+     * it anymore due to the new displayTask implementation that splits 
+     * most tasks to be displayed into singular dates anyway
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing timed tasks
+     */
+    public static TaskList searchTimedTask (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for timed tasks");
+        try {
+            searchedList = SearchLogic.searchTaskProperties(input, SearchType.SEARCH_TIMED);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for timed tasks");
+        }
+        logger.log(Level.INFO, "End of search for timed tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for completed tasks
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing all completed tasks
+     */
+    public static TaskList searchDone (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for completed tasks");
+        try {
+            searchedList = SearchLogic.searchTaskProperties(input, SearchType.SEARCH_DONE);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for completed tasks");
+        }
+        logger.log(Level.INFO, "End of search for completed tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for uncompleted tasks
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing all uncompleted tasks
+     */
+    public static TaskList searchNotDone (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for uncompleted tasks");
+        try {
+            searchedList = SearchLogic.searchTaskProperties(input, SearchType.SEARCH_NOTDONE);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for uncompleted tasks");
+        }
+        logger.log(Level.INFO, "End of search for uncompleted tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for floating tasks
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing all floating tasks
+     */
+    public static TaskList searchFloating (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for floating tasks");
+        try {
+            searchedList = SearchLogic.searchTaskProperties(input, SearchType.SEARCH_FLOATING);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for floating tasks");
+        }
+        logger.log(Level.INFO, "End of search for floating tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns a tasklist of searched results for non-floating tasks
+     * 
+     * @param input     Input tasklist to perform the search upon
+     * @return          A search list containing all non-floating tasks
+     */
+    public static TaskList searchConfirmed (TaskList input) {
+        TaskList searchedList = new TaskList();
+        logger.log(Level.INFO, "Starting search for non-floating tasks");
+        try {
+            searchedList = SearchLogic.searchTaskProperties(input, SearchType.SEARCH_CONFIRMED);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for non-floating tasks");
+        }
+        logger.log(Level.INFO, "End of search for non-floating tasks");
+        return searchedList;
+    }
+    
+    /**
+     * Returns an integer result that is passed from the engine to UI to be displayed to the user
+     * 
+     * @param taskInput     Input tasklist to check the clash upon
+     * @param start         The starting time within the time period
+     * @param end           The ending time within the time period
+     * @return              An integer that returns either -1 when no clash is detected
+     *                      or an ID when the first clash occurs
+     */
+    public static int findClash(TaskList taskInput, Date start, Date end) {
+        int clashID = 0;
+        logger.log(Level.INFO, "Starting search for clashes");
+        try {
+            clashID = SearchLogic.searchForClash(taskInput, start, end);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Search error encountered when searching for clashes");
+        }
+        logger.log(Level.INFO, "End of search for clashes");
+        return clashID;
+    }
+    
+    /**
+     * Splits and converts the input tasklist into a displayTaskList by date
+     * This method was created solely for testing purposes
+     * 
+     * @param input     Input tasklist to be scanned through and every task to be 
+     *                  converted to a displayTask (can be multiple) instead
+     * @return          The split and converted DisplayTaskList is returned
+     */
+    public static DisplayTaskList splitAllTask (TaskList input) {
+        return SplitLogic.splitAllTaskList(input);
+    }
+    
+    /**
+     * Splits and converts the input tasklist into a displayTaskList by priority
+     * 
+     * @param input     Input tasklist to be scanned through and every 1 
+     *                  task is converted to 1 displayTask
+     * @return          The converted DisplayTaskList is returned after 
+     */
+    public static DisplayTaskList splitAllPriorityTask(TaskList input) {
+        return SplitLogic.splitAllPriorityTask(input);
+    }
+    /**
+     * Splits and converts input DisplayTaskLists into TreeMaps by date
+     * Purpose: For testing
+     * 
+     * @param taskInput
+     * @return
+     */
+    public static TreeMap<Date, DisplayTaskList> convertToTreeMapWithDate(DisplayTaskList taskInput) {
+        return SortLogic.sortListToMapByDate(taskInput);
+    }
+    
+    public static TreeMap<Integer, DisplayTaskList> convertToTreeMapWithPriority(DisplayTaskList taskInput) {
+        return SortLogic.sortListToMapByPriority(taskInput);
+    }
+    
+    /**
+     * Every date key is the day where the task will be displayed
+     * Every value is the displayTaskList that holds the number of tasks to 
+     * be displayed by the UI in days
+     * 
+     * @param taskInput     Input tasklist to be split, inserted into a 
+     *                      TreeMap and sorted by date and converted into 
+     *                      Set map
+     * @return              A set map containing keys in dates and values in 
+     *                      displayTaskLists
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> displayAllTaskByDate (TaskList taskInput) {
+        
+        DisplayTaskList input = splitAllTask(taskInput);
+        
+        TreeMap<Date, DisplayTaskList> allTaskMap = SortLogic.sortListToMapByDate(input);
+        
+        return convertTreeMapToSetMapByDate(allTaskMap);
+        
+    }
+    
+    /**
+     * Every integer key is the priority where the tasks will be displayed 
+     * under
+     * Every value is the displayTaskList that holds the number of tasks to 
+     * be displayed by the UI in days
+     * 
+     * @param taskInput     Input tasklist to be split, inserted into TreeMap 
+     *                      and sorted by priority and converted into Set map
+     * @return              A set map containing keys in Integer and values in 
+     *                      displayTaskLists
+     */
+    public static Set<Map.Entry<Integer, DisplayTaskList>> displayAllTaskByPriority (TaskList taskInput) {
+        
+        DisplayTaskList floatingList = splitAllTask(taskInput); 
+        
+        TreeMap<Integer, DisplayTaskList> floatingMap = SortLogic.sortListToMapByPriority(floatingList);
+        
+        return convertTreeMapToSetMapByName(floatingMap);
+    }
+    
+    /**
+     * Every integer key is the priority 
+     * Every value is the displayTaskList that holds tasks to be displayed
+     * by the UI 
+     * 
+     * This is used by the engine to search and display today tasks
+     * Rather than showing multiple displayTasks that are displaying the same 
+     * task, this method does not split tasks into multiple displayTasks
+     * 
+     * Purpose: Clearer display of today's tasks
+     * 
+     * @param taskInput     Input tasklist to be converted, inserted into a 
+     *                      TreeMap and sorted by priority into Set Map
+     * @return              A set map containing keys in Integers and values in 
+     *                      displayTaskLists
+     */
+    public static Set<Map.Entry<Integer, DisplayTaskList>> displaySearchedTaskByPriority (TaskList taskInput) {
+        
+        DisplayTaskList searchedList = splitAllPriorityTask(taskInput);
+        
+        TreeMap<Integer, DisplayTaskList> searchedMap = SortLogic.sortListToMapByPriority(searchedList);
+        
+        return convertTreeMapToSetMapByName(searchedMap);
+    }
+    
+    /**
+     * Sorts every node on the TreeMap by name before returning a Set Map
+     * 
+     * @param map       TreeMap that is passed to be iterated through and 
+     *                  sorted accordingly
+     * @return          A Set Map that is sorted by name
+     */
+    public static Set<Map.Entry<Integer, DisplayTaskList>> convertTreeMapToSetMapByName (TreeMap <Integer, DisplayTaskList> map) {
+        TreeMap <Integer, DisplayTaskList> priorityMap = SortLogic.sortTreeMapIntoSetMapByPriority(map);
+        return priorityMap.entrySet();
+    }
+    
+    /**
+     * Sorts every node on the TreeMap by Time before returning a Set Map
+     * 
+     * @param map       TreeMap that is passed to be iterated through and 
+     *                  sorted accordingly
+     * @return          A Set Map that is sorted by name
+     */
+    public static Set<Map.Entry<Date, DisplayTaskList>> convertTreeMapToSetMapByDate (TreeMap <Date, DisplayTaskList> map) {
+        TreeMap <Date, DisplayTaskList> dateMap = SortLogic.sortTreeMapIntoSetMapByDate(map);
+        return dateMap.entrySet();
+    }
+}
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\Logic.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SortLogic.java
+	 */
+
+
+package planner;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
+
+import planner.Constants.SortType;
+
+/**
+ * This class is used to sort displayTaskList as well as how tasks are ordered 
+ * before inserting into TreeMaps. 
+ * Contains multiple ways to sort such as sorting by date, priority, ID 
+ * and name
+ */
+public class SortLogic {
+    
+    private static final int TIME_GREATER_THAN_2359 = 2400;
+    private static final int HOUR_MULTIPLIER = 100;
+    
+    /**
+     * Comparators for DisplayTaskList comparison
+     * Order: Time -> priority -> Name -> Task ID
+     */
+    private static Comparator<DisplayTask> dateComparator = new Comparator<DisplayTask>() {
+        
+        @Override
+        public int compare(DisplayTask task1, DisplayTask task2) {
+            
+            int time1 = getTime(task1);
+            int time2 = getTime(task2);
+            
+            if (time1 < time2) {        
+                return -1;     
+                
+            } else if (time1 > time2) { 
+                return 1;  
+                
+            } else {
+                return comparePriority(task1, task2);
+            }
+        }
+        
+        /**
+         * Determines whether the task can be completed in a specific date
+         * Otherwise return 2400 which is a greater number than 2359
+         * such that the task will always appear at the bottom 
+         * 
+         * @param task      DisplayTask that will be checked whether it is 
+         *                  a due date or timed task
+         * @return          An integer format of time in a day 
+         */
+        private int getTime (DisplayTask task) {
+            if (task.getDueDate() == null) {
+                
+                SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
+                
+                String endTime = dateFormatter.format(task.getEndDate());
+                String today = dateFormatter.format(task.getShownDate());
+                
+                if (endTime.equals(today)) {
+                    return getTimeFromDate(task.getEndDate());
+                    
+                } else {   
+                    return TIME_GREATER_THAN_2359;                 
+                }    
+                
+            } else {
+                return getTimeFromDate(task.getDueDate());
+            }
+        }
+        
+        /**
+         * Converts time for comparison into a 4 digit Integer
+         * 0 is the smallest indicating 12.00 AM
+         * 2359 is the biggest indicatin 11.59 PM
+         * 
+         * @param date      The date to be used for comparison
+         * @return          An integer that is used for time comparison
+         */
+        private int getTimeFromDate (Date date) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            
+            int hours = cal.get(Calendar.HOUR_OF_DAY);
+            int minutes = cal.get(Calendar.MINUTE);
+            int totalTime = (hours * HOUR_MULTIPLIER) + minutes;
+            
+            return totalTime;
+        }
+    };
+    
+    //Comparator for sorting tasks according to priority
+    private static Comparator<DisplayTask> priorityComparator = new Comparator<DisplayTask>() {
+        
+        @Override
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) {  
+            return comparePriority(displayTask1, displayTask2);
+        }
+    };
+    
+    private static Comparator<DisplayTask> nameComparator = new Comparator<DisplayTask>() {
+        
+        @Override
+        public int compare(DisplayTask displayTask1, DisplayTask displayTask2) { 
+            return compareName(displayTask1, displayTask2);
+        }
+    };
+    
+    /**
+     * Comparators for Maps
+     */
+    
+    private static Comparator<Integer> priorityComparatorForMap = new Comparator<Integer>() {
+        
+        @Override
+        public int compare(Integer priority1, Integer priority2) {   
+            if (priority1 > priority2) {
+                return -1;
+     
+            } else if (priority1 < priority2) {
+                return 1;
+         
+            } else {
+                return 0;
+            }
+        }
+    };
+    
+    
+    private static Comparator<Date> dateComparatorForMap = new Comparator<Date>() {
+        
+        @Override
+        public int compare(Date date1, Date date2) {
+            if( date1 != null && date2 != null ){ 
+                SimpleDateFormat dateFormatter = new SimpleDateFormat( "yyyy-MM-dd" );
+                
+                String dateOneString = dateFormatter.format(date1);
+                String dateTwoString = dateFormatter.format(date2);
+                
+                if( dateOneString.equals(dateTwoString) ){       
+                    return 0;
+                    
+                } else{         
+                    return date1.compareTo(date2);        
+                }            
+            } else if( date1 != null ){   
+                return -1;
+                
+            } else if( date2 != null ){     
+                return 1;
+                
+            } else{   
+                return 0;      
+            }
+        }   
+    };
+    
+    /**
+     * Compares the priority of 2 DisplayTasks
+     * If they are equal, compare by name
+     * 
+     * @param displayTask1      First DisplayTask to be compared
+     * @param displayTask2      Second DisplayTask to be compared
+     * @return                  An integer result dictating which DisplayTask
+     *                          is greater 
+     */
+    private static int comparePriority(DisplayTask displayTask1, DisplayTask displayTask2) {
+        Task task1 = displayTask1.getParent();
+        Task task2 = displayTask2.getParent();
+        
+        int result = task1.getPriority() - task2.getPriority();
+        
+        if (result > 0) {    
+            return -1;
+            
+        } else if (result < 0) {
+            return 1;
+            
+        } else {   
+            return compareName(displayTask1, displayTask2);
+        }
+    }
+    
+    /**
+     * Compares the name of 2 DisplayTasks
+     * If they are equal, compare by ID
+     * Assumption: No 2 Task ID can be the same
+     * 
+     * @param displayTask1      First DisplayTask to be compared
+     * @param displayTask2      Second DisplayTask to be compared
+     * @return                  An integer result dictating which DisplayTask
+     *                          is greater 
+     */
+    private static int compareName(DisplayTask displayTask1, DisplayTask displayTask2) {
+        
+        Task task1 = displayTask1.getParent();
+        Task task2 = displayTask1.getParent();
+        
+        String name1 = task1.getName();
+        String name2 = task2.getName();
+        
+        int name = name1.compareTo(name2);
+        
+        if (name > 0) {       
+            return 1;
+            
+        } else if (name < 0) {  
+            return -1;
+            
+        } else {  
+            long ID1 = task1.getID();
+            long ID2 = task2.getID();
+            
+            if (ID1 > ID2) {    
+                return 1;
+                
+            } else if (ID1 < ID2) {   
+               return -1;
+               
+            } else {
+                return 0;
+            }
+        }
+    }
+    
+    /**
+     * Sorts a given displayTaskList in accordance to the sort type provided
+     * 
+     * @param tasks         Input displayTaskList to be sorted
+     * @param sortMode      The type of sorting that the engine demands
+     * @return              A sorted DisplayTaskList
+     * @throws IllegalArgumentException     Thrown when Sort type given is invalid
+     */
+    public static DisplayTaskList sortDisplayTaskList(DisplayTaskList tasks, SortType sortMode) throws IllegalArgumentException {
+        DisplayTaskList newTasks = new DisplayTaskList(tasks);
+        switch (sortMode) {
+            case SORT_DATE :
+                Collections.sort(newTasks, dateComparator);
+                break;
+                
+            case SORT_PRIORITY :
+                Collections.sort(newTasks, priorityComparator);
+                break;
+                
+            case SORT_NAME :
+                Collections.sort(newTasks, nameComparator);
+                break;
+                
+            default :
+                throw new IllegalArgumentException
+                ("SortType given does not belong to this method.");
+        }
+        return newTasks;
+    }
+   
+    /**
+     * Iterated through all the nodes in a Date TreeMap and sorts all 
+     * DisplayTaskLists in order of time, priority, name and ID
+     * 
+     * @param map       The TreeMap to be sorted
+     * @return          A sorted TreeMap by order of time
+     */
+    public static TreeMap <Date, DisplayTaskList> sortTreeMapIntoSetMapByDate(
+                                        TreeMap <Date, DisplayTaskList> map) {
+        
+        TreeMap<Date, DisplayTaskList> sortedTree = 
+                new TreeMap<Date, DisplayTaskList>(dateComparatorForMap);
+        
+        for (Map.Entry<Date, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();     
+            Date key = entry.getKey();
+            
+            if (key == null) {          
+                DisplayTaskList sortedDisplayList = 
+                        sortDisplayTaskList(unsortedList, 
+                                            SortType.SORT_PRIORITY);  
+                
+                sortedTree.put(key, sortedDisplayList);           
+            } else {            
+                DisplayTaskList sortedDisplayList = 
+                        sortDisplayTaskList(unsortedList, SortType.SORT_DATE);  
+                
+                sortedTree.put(key, sortedDisplayList);
+            }        
+        }
+        return sortedTree;
+    }
+    
+    /**
+     * Iterated through all the nodes in an Integer TreeMap and sorts all 
+     * DisplayTaskLists in order of priority, name and ID
+     * 
+     * @param map       The TreeMap to be sorted
+     * @return          A sorted TreeMap by order of priority
+     */
+    public static TreeMap <Integer, DisplayTaskList> 
+                            sortTreeMapIntoSetMapByPriority(TreeMap <Integer, 
+                                                        DisplayTaskList> map) {
+        
+        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
+                <Integer, DisplayTaskList> (priorityComparatorForMap);
+        
+        for (Map.Entry<Integer, DisplayTaskList> entry : map.entrySet()) {
+            
+            DisplayTaskList unsortedList = entry.getValue();
+            
+            Integer key = entry.getKey();
+            
+            DisplayTaskList sortedDisplayList = 
+                    sortDisplayTaskList(unsortedList, SortType.SORT_NAME);
+                
+            displayMap.put(key, sortedDisplayList);
+        }
+        
+        return displayMap;
+    }
+    
+    /**
+     * Sorts and inserts a displayTask from the list into the corresponding
+     * priority key within the TreeMap
+     * 
+     * @param input     The displayTaskList to be read
+     * @return          A TreeMap that contains all displayTasks under their 
+     *                  priority header
+     */
+    public static TreeMap <Integer, DisplayTaskList> sortListToMapByPriority 
+                                                    (DisplayTaskList input) {
+        
+        TreeMap <Integer, DisplayTaskList> displayMap = new TreeMap 
+                <Integer, DisplayTaskList> (priorityComparatorForMap);
+        
+        for (int i = 0; i < input.size(); i++) {
+        
+            DisplayTask temp = input.get(i);
+            
+            addDisplayTaskToMapByPriority(displayMap, temp);
+        }
+        
+        return displayMap;
+    }
+    
+    /**
+     * Sorts and inserts a displayTask from the list into the corresponding
+     * Date key within the TreeMap
+     * 
+     * @param input     The displayTaskList to be read
+     * @return          A TreeMap that contains all displayTasks under their 
+     *                  date header
+     */
+    public static TreeMap <Date, DisplayTaskList> sortListToMapByDate (
+                                                    DisplayTaskList input) {
+    
+        TreeMap < Date, DisplayTaskList > displayMap = 
+                new TreeMap < Date, DisplayTaskList>(dateComparatorForMap);
+        
+        for (int i = 0; i < input.size(); i++) {   
+            
+            DisplayTask temp = input.get(i);
+            addDisplayTaskToMapByDate(displayMap, temp);
+        }
+        return displayMap;
+    }
+    
+    /**
+     * Adding of a the displayTask into the correct priority header of the
+     * TreeMap
+     * 
+     * @param displayMap        TreeMap that is used for containing displayTask
+     * @param inputTask         The displayTask that is checked and inserted 
+     *                          into the correct key header in the TreeMap
+     */
+    private static void addDisplayTaskToMapByPriority(
+                            TreeMap < Integer, DisplayTaskList> displayMap, 
+                            DisplayTask inputTask) {
+        
+        if (displayMap.containsKey(inputTask.getParent().getPriority())) {
+            
+            displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
+            
+        } else {
+            
+            displayMap.put(inputTask.getParent().getPriority(), 
+                                        new DisplayTaskList());
+            
+            displayMap.get(inputTask.getParent().getPriority()).add(inputTask);
+        }
+    }
+
+    /**
+     * Adding of a the displayTask into the correct Date header of the
+     * TreeMap
+     * 
+     * @param displayMap        TreeMap that is used for containing displayTask
+     * @param inputTask         The displayTask that is checked and inserted 
+     *                          into the correct key header in the TreeMap
+     */
+    private static void addDisplayTaskToMapByDate(
+            TreeMap <Date, DisplayTaskList> displayMap, 
+            DisplayTask inputTask) {
+        
+        if (displayMap.containsKey(inputTask.getShownDate())) {        
+            displayMap.get(inputTask.getShownDate()).add(inputTask);
+            
+        } else {        
+            displayMap.put(inputTask.getShownDate(), new DisplayTaskList());     
+            displayMap.get(inputTask.getShownDate()).add(inputTask);
+        }
+    }
+    
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SortLogic.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SplitLogic.java
+	 */
+
+
+package planner;
+
+import java.util.Date;
+import java.util.Calendar;
+
+/**
+ * A class used to convert TaskList into DisplayTaskList
+ */
+public class SplitLogic {
+    
+    private static int ID;
+    private static final int INITIALIZE_ID = 0;
+    private static final int INCREMENT_DATE_BY_ONE = 1;
+    private static final int ZERO_HOUR = 0;
+    private static final int ZERO_MINUTE = 0;
+    private static final int ZERO_SECOND = 0;
+    private static final int SECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+    
+    /**
+     * Splits the input tasklist into an output displayTaskList
+     * This method will split tasks that are more than 1 day into multiple
+     * displayTasks each representing 1 day
+     * 
+     * @param input     Input tasklist to be split and converted
+     * @return          Output displayTaskList that is properly split
+     */
+    public static DisplayTaskList splitAllTaskList(TaskList input) {
+        ID = INITIALIZE_ID;
+        
+        DisplayTaskList outputList = new DisplayTaskList();
+        
+        for (int i = 0; i < input.size(); i++) {           
+            addNewDisplayTask(outputList, input.get(i));
+        }   
+        return outputList;
+    }
+ 
+    /**
+     * Another method used to split and convert every task into 1 respective displayTask
+     * Used by engine to show Today date
+     * 
+     * @param input         Input tasklist 
+     * @return              The converted displayTaskList
+     */
+    public static DisplayTaskList splitAllPriorityTask(TaskList input) {      
+        ID = INITIALIZE_ID;
+        
+        DisplayTaskList outputList = new DisplayTaskList();
+        
+        for (int i = 0; i < input.size(); i++) {
+            Task temp = input.get(i);
+            createNewDisplayTask(outputList, null, temp.getDueDate(), 
+                                 temp.getEndDate(), input.get(i));
+        }      
+        return outputList;
+    }
+    
+    /**
+     * Used only by splitAllTaskList method
+     * Creates and adds a newly converted displayTask into the output 
+     * displayTaskList
+     * 
+     * Done tasks are converted into 1 displayTask containing date completed
+     * Floating tasks are converted into 1 displayTask containing null dates
+     * Due date tasks are converted into 1 displayTask containing its single
+     * due date
+     * Timed tasks can be converted into 1 or more displayTasks depending 
+     * on its time span
+     * 
+     * @param outputList        Output displayTaskList containing all 
+     *                          displayTask
+     * @param inputTask         Input task to be checked by its type before 
+     *                          creating the necessary amount of displayTasks
+     */
+    private static void addNewDisplayTask(DisplayTaskList outputList, 
+                                          Task inputTask) {
+        if (!inputTask.isDone()) {
+            if (inputTask.isFloating()) {
+                createNewDisplayTask(outputList, null, null, null, inputTask);
+                
+            } else if (inputTask.getEndDate() == null) {  
+                assert(inputTask.getDueDate() != null);
+                
+                Date shownDate = getShownDate(inputTask.getDueDate());
+                
+                createNewDisplayTask(outputList, shownDate, 
+                                     inputTask.getDueDate(), null, inputTask);
+            } else {
+                assert(inputTask.getEndDate() != null);
+                assert(inputTask.getDueDate() != null);
+                
+                long DateDifference = calculateDifferenceInDate(inputTask);
+                
+                // Creates a single displayTask if the task is all 
+                // within a single day
+                if (DateDifference == 0) {
+                    Date shownDate = getShownDate(inputTask.getDueDate());
+                    
+                    createNewDisplayTask(outputList, shownDate, 
+                                         inputTask.getDueDate(), 
+                                         inputTask.getEndDate(), inputTask);
+                } else {
+                    // Otherwise display tasks will have to be created for 
+                    // every single day till difference in days is 0
+                    
+                    Date tempDate = getShownDate(inputTask.getDueDate());
+                    Calendar cal = Calendar.getInstance();
+                    
+                    for (int j = 0; j <= DateDifference; j++) {
+                        if (j == 0) {
+                            createNewDisplayTask(outputList, tempDate, 
+                                                 inputTask.getDueDate(), null, 
+                                                 inputTask);       
+                        } else {
+                            cal.setTime(tempDate);
+                            cal.add(Calendar.DATE, INCREMENT_DATE_BY_ONE);
+                            tempDate = cal.getTime();
+                            
+                            createNewDisplayTask(outputList, tempDate, null, 
+                                                 inputTask.getEndDate(), 
+                                                 inputTask);
+                        }    
+                    } 
+                    // There might be a case where date difference is X.X
+                    // where int rounds it down to X.0
+                    // This method captures such cases and creates the final
+                    // displaytask on the final date
+                    createLastDisplayTaskIfNeeded(outputList, 
+                                                  inputTask, tempDate);
+                }
+            }  
+        } else {
+            assert(inputTask.getDateCompleted() != null);
+            
+            Date doneDate = getShownDate(inputTask.getDateCompleted());
+            
+            createNewDisplayTask(outputList, doneDate, null, 
+                                 inputTask.getDateCompleted(), inputTask);
+        }
+    }
+    
+    /**
+     * Creates and add a new displayTask into the output displayTaskList 
+     * 
+     * @param outputList        Output displayTaskList for displayTasks to be
+     *                          added into
+     * @param shownDate         The date that is used by Sort logic to 
+     *                          insert into a TreeMap of date keys
+     * @param from              Time of the start of task
+     * @param to                Time of the end of task
+     * @param inputTask         The parent task that will be directed to when 
+     *                          more information such as ID needs to be found
+     */
+    private static void createNewDisplayTask(DisplayTaskList outputList, 
+                                             Date shownDate, Date from, 
+                                             Date to, Task inputTask) {
+        assert(inputTask != null);
+        
+        DisplayTask newTask = new DisplayTask(ID, shownDate, from, to, inputTask);
+        
+        outputList.add(newTask);
+        
+        ID++;
+    }
+    
+    /**
+     * Calculates the difference in the number of days so that multiple days
+     * can be created for timed task splitting
+     * 
+     * @param inputTask     Input timed task
+     * @return              The time span of the timed task
+     */
+    private static long calculateDifferenceInDate(Task inputTask) {
+        Calendar dueDate = Calendar.getInstance();
+        dueDate.setTime(inputTask.getDueDate());
+        long dueDateDay = dueDate.getTimeInMillis();
+        
+        Calendar endDate = Calendar.getInstance();
+        endDate.setTime(inputTask.getEndDate());
+        long endDateDay = endDate.getTimeInMillis();
+        
+        assert(endDateDay >= dueDateDay);
+        long DateDifference = (endDateDay - dueDateDay) / SECONDS_PER_DAY;
+        return DateDifference;
+    }
+    
+    /**
+     * Determines whether the final date has been reached, if not create the 
+     * final displayTask
+     * Used to catch cases where difference in days are rounded down and the 
+     * final day is left out
+     * 
+     * @param outputList        Output displayTaskList
+     * @param inputTask         Input tasklist 
+     * @param tempDate          Date that is used to check if the final date
+     *                          has been reached
+     */
+    private static void createLastDisplayTaskIfNeeded(
+                                            DisplayTaskList outputList, 
+                                            Task inputTask, Date tempDate) {
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(tempDate);
+        cal.add(Calendar.DATE, INCREMENT_DATE_BY_ONE);
+        tempDate = cal.getTime();
+        int finalDate = cal.get(Calendar.DATE);
+        cal.setTime(inputTask.getEndDate());
+        int endTime = cal.get(Calendar.DATE);
+
+        if (finalDate == endTime) {
+            createNewDisplayTask(outputList, tempDate, null, 
+                                 inputTask.getEndDate(), inputTask);
+        }
+    }
+    
+    /**
+     * Converts specific time into a date that contains only day, month and year
+     * Purpose: Used as keys to sort them into TreeMap<Date, DisplayTaskList>
+     * 
+     * @param day       Day that is referenced to create the displayDate 
+     * @return          The displayDate
+     */
+    private static Date getShownDate(Date day) {  
+        Calendar cal = Calendar.getInstance();
+        
+        cal.setTime(day);
+        
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int date = cal.get(Calendar.DATE);
+        
+        cal.set(year, month, date, ZERO_HOUR, ZERO_MINUTE, ZERO_SECOND);
+        
+        return cal.getTime();
+    } 
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SplitLogic.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\LogicTest.java
+	 */
+
+package planner;
+
+import static org.junit.Assert.*;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TreeMap;
+
+import org.junit.Test;
+/**
+ * Tests search, sort and splitting components of Logic class
+ */
+public class LogicTest {
+    
+    private static Task task1;
+    private static Task task2;
+    private static Task task3;
+    private static Task task4;
+    private static Task task5;
+    private static Task task6;
+    private static Task task7;
+    private static Task task8;
+    private static Task task9;
+    private static Task task10;
+    private static DisplayTask dt1;
+    private static DisplayTask dt2;
+    private static DisplayTask dt3;
+    private static DisplayTask dt4;
+    private static DisplayTask dt5;
+    private static DisplayTask dt6;
+    private static DisplayTask dt7;
+    private static DisplayTask dt8;
+    private static DisplayTask dt9;
+    private static DisplayTask dt10;
+    private static DisplayTask dt11;
+    private static DisplayTask dt12;
+    private static DisplayTask dt13;
+    private static DisplayTask dt14;
+    private static DisplayTask dt15;
+    private static DisplayTask dt16;
+    private static DisplayTask dt17;
+    private static DisplayTask dt18;
+    private static DisplayTask dt19;
+    private static DisplayTask dt20;
+    private static DisplayTask dt21;
+    private static DisplayTask dt22;
+    private static DisplayTask dt23;
+    private static DisplayTask dt24;
+    private static DisplayTask dt25;
+    private static DisplayTask dt26;
+    private static DisplayTask dt27;
+    private static DisplayTask dt28;
+    private static DisplayTask dt29;
+    private static DisplayTask dt30;
+    private static DisplayTask dt31;
+    private static DisplayTask dt32;
+    
+    private static DisplayTaskList list1;
+    private static DisplayTaskList list2;
+    private static DisplayTaskList list3;
+    private static DisplayTaskList list4;
+    private static DisplayTaskList list5;
+    private static DisplayTaskList list6;
+    private static DisplayTaskList list7;
+    private static DisplayTaskList list8;
+    private static DisplayTaskList list9;
+    private static DisplayTaskList list10;
+    private static DisplayTaskList list11;
+    private static DisplayTaskList list12;
+    private static DisplayTaskList list13;
+    private static DisplayTaskList list14;
+    private static DisplayTaskList list15;
+    private static DisplayTaskList list16;
+    private static DisplayTaskList list17;
+    private static DisplayTaskList list18;
+    private static DisplayTaskList list19;
+    private static DisplayTaskList list20;
+    private static DisplayTaskList list21;
+    private static DisplayTaskList list22;
+    private static DisplayTaskList list23;
+    private static DisplayTaskList list24;
+    
+    /**
+     * Initalizes TaskList to be tested
+     * 
+     * @return      TaskList
+     * @throws Exception        
+     */
+    private TaskList initializeList() throws Exception {
+        Calendar calFirst = Calendar.getInstance();
+        calFirst.set(2015, 5, 3, 0, 0, 0);
+        
+        Calendar calSecond = Calendar.getInstance();
+        calSecond.set(2015, 5, 8, 23, 59, 0);
+        
+        Calendar calThird = Calendar.getInstance();
+        calThird.set(2015, 5, 3, 23, 59, 0);
+        
+        Calendar calFourth = Calendar.getInstance();
+        calFourth.set(2014, 5, 10, 23, 59, 0);
+
+        Calendar calOverDue = Calendar.getInstance();
+        calOverDue.set(2015, 2, 20, 23, 59, 0);
+        
+        Calendar calOverDue1 = Calendar.getInstance();
+        calOverDue1.set(2015, 3, 3, 0, 0, 0);
+        
+        Calendar calOverDue2 = Calendar.getInstance();
+        calOverDue2.set(2015, 2, 23, 23, 59, 0);
+        
+        Calendar calZero = Calendar.getInstance();
+        calZero.set(2015, 8, 23, 0, 0, 0);
+        
+        task1 = new Task("THIS IS A DUEDATE TASK", "NOTHING", calZero.getTime(), 1, "work", 1);
+        task2 = new Task("THIS IS A TIMEDTASK", "SPREAD THROUGHOUT SEVERAL DAYS", calFirst.getTime(), 2, "workload", 2);
+        task3 = new Task("THIS IS ANOTHER TIMEDTASK", "WITHIN ONE DAY", calFirst.getTime(), 2, "workload", 3);
+        task4 = new Task("THIS IS AN OVERDUED TASK", "DUEDATE TASK", calOverDue.getTime(), 4, "nothing", 4);
+        task5 = new Task("THIS IS AN OVERDUED TIMED TASK", "STILL ONGOING", calOverDue.getTime(), 3, "this is a tag", 5);
+        task6 = new Task("THIS IS AN OVERDUED TIMED TASK", "LONG PAST", calOverDue.getTime(), 5, "tags cannot be searched can it", 6);
+        task7 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "can you find this", 7);
+        task8 = new Task("THIS IS A FLOATING TASK", "NULL DATE", null, 2, "these are tags", 8);
+        task9 = new Task("THIS IS A FLOATING TASK", "HIGHEST PRIORITY", null, 5, "can you dig it", 9);
+        task10 = new Task("THIS IS A RANDOM DUEDATE TASK", "", calFourth.getTime(), 4, "", 10);
+        
+        task2.setEndDate(calSecond.getTime());
+        task3.setEndDate(calThird.getTime());
+        task5.setEndDate(calOverDue1.getTime());
+        task6.setEndDate(calOverDue2.getTime());
+        
+        TaskList TL1 = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TL1.add(task6);
+        TL1.add(task7);
+        TL1.add(task8);
+        TL1.add(task9);
+        TL1.add(task10);
+    
+        return TL1;
+    }
+    
+    /**
+     * Initializes the static DisplayTaskList
+     * 
+     * @throws Exception
+     */
+    private void initializeDisplayList() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.set(2015, 8, 23, 0, 0, 0);
+        
+        dt1 = new DisplayTask(0, cal.getTime(), task1.getDueDate(), null, task1);
+        
+        cal.set(2015, 5, 3, 0, 0, 0);
+        dt2 = new DisplayTask(1, cal.getTime(), task2.getDueDate(), null, task2);
+        cal.add(Calendar.DATE, 1);
+        dt3 = new DisplayTask(2, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt4 = new DisplayTask(3, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt5 = new DisplayTask(4, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt6 = new DisplayTask(5, cal.getTime(), null, task2.getEndDate(), task2);
+        cal.add(Calendar.DATE, 1);
+        dt7 = new DisplayTask(6, cal.getTime(), null, task2.getEndDate(), task2);
+        
+        cal.set(2015, 5, 3, 0, 0, 0);
+        dt8 = new DisplayTask(7, cal.getTime(), task3.getDueDate(), task3.getEndDate(), task3);
+        
+        cal.set(2015, 2, 20, 0, 0, 0);
+        dt9 = new DisplayTask(8, cal.getTime(), task4.getDueDate(), null, task4);
+        
+        dt10 = new DisplayTask(9, cal.getTime(), task5.getDueDate(), null, task5);
+        cal.add(Calendar.DATE, 1);
+        dt11 = new DisplayTask(10, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt12 = new DisplayTask(11, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt13 = new DisplayTask(12, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt14 = new DisplayTask(13, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt15 = new DisplayTask(14, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt16 = new DisplayTask(15, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt17 = new DisplayTask(16, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt18 = new DisplayTask(17, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt19 = new DisplayTask(18, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt20 = new DisplayTask(19, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt21 = new DisplayTask(20, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt22 = new DisplayTask(21, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt23 = new DisplayTask(22, cal.getTime(), null, task5.getEndDate(), task5);
+        cal.add(Calendar.DATE, 1);
+        dt24 = new DisplayTask(23, cal.getTime(), null, task5.getEndDate(), task5);
+        
+        cal.set(2015, 2, 20, 0, 0, 0);
+        dt25 = new DisplayTask(24, cal.getTime(), task6.getDueDate(), null, task6);
+        cal.add(Calendar.DATE, 1);
+        dt26 = new DisplayTask(25, cal.getTime(), null, task6.getEndDate(), task6);
+        cal.add(Calendar.DATE, 1);
+        dt27 = new DisplayTask(26, cal.getTime(), null, task6.getEndDate(), task6);
+        cal.add(Calendar.DATE, 1);
+        dt28 = new DisplayTask(27, cal.getTime(), null, task6.getEndDate(), task6);
+        
+        dt29 = new DisplayTask(28, null, null, null, task7);
+        dt30 = new DisplayTask(29, null, null, null, task8);
+        dt31 = new DisplayTask(30, null, null, null, task9);
+        
+        cal.set(2014, 5, 10, 0, 0, 0);
+        dt32 = new DisplayTask(31, cal.getTime(), task10.getDueDate(), null, task10);
+        
+    }
+    /**
+     * Initialized DisplayTaskLists
+     * 
+     * @throws Exception
+     */
+    private void initializeTreeLists() throws Exception{
+        list1 = new DisplayTaskList();
+        list2 = new DisplayTaskList();
+        list3 = new DisplayTaskList();
+        list4 = new DisplayTaskList();
+        list5 = new DisplayTaskList();
+        list6 = new DisplayTaskList();
+        list7 = new DisplayTaskList();
+        list8 = new DisplayTaskList();
+        list9 = new DisplayTaskList();
+        list10 = new DisplayTaskList();
+        list11 = new DisplayTaskList();
+        list12 = new DisplayTaskList();
+        list13 = new DisplayTaskList();
+        list14 = new DisplayTaskList();
+        list15 = new DisplayTaskList();
+        list16 = new DisplayTaskList();
+        list17 = new DisplayTaskList();
+        list18 = new DisplayTaskList();
+        list19 = new DisplayTaskList();
+        list20 = new DisplayTaskList();
+        list21 = new DisplayTaskList();
+        list22 = new DisplayTaskList();
+        list23 = new DisplayTaskList();
+        list24 = new DisplayTaskList();
+    }
+    
+    /**
+     * Tests search by tags
+     * Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
+     * 
+     * Expected Output :
+     * task1, 2 and 4 are standard test case in the expected bound
+     * task3 is a boundary case where searched result is part of the substring of the word searched
+     * task5 is a boundary case where the letters have different cases
+     * 
+     * @throws Exception
+     */
+    @Test 
+    public void testSearchTags() throws Exception{
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("dummy1", "test", date, 1, "Can you work", 1);
+        Task task2 = new Task("dummy2", "test", date, 2, "work hello world", 2);
+        Task task3 = new Task("dummy3", "test", date, 1, "workload", 3);
+        Task task4 = new Task("dummy4", "test", date, 1, "hello", 4);
+        Task task5 = new Task("dummy5", "test", date, 1, "wOrK", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList Search = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TL2.add(task1);
+        TL2.add(task2);
+        TL2.add(task3);
+        TL2.add(task5);
+        
+        Search = Logic.searchTag(TL1, "work");
+        assertEquals(Search.get(0), TL2.get(0));
+        assertEquals(Search.get(1), TL2.get(1));
+        assertEquals(Search.get(2), TL2.get(2));
+        assertEquals(Search.get(3), TL2.get(3));
+  
+    }
+    
+    /**
+     * Test search for tags, name and description
+     * Test cases include word in name, description and tags in different cases with a combination of all if possible
+     * 
+     * Expected Output : <1, 5>
+     * 
+     * @throws Exception
+     */
+    @Test 
+    public void testSearchDesc() throws Exception{
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
+        Task task2 = new Task("CS2103T", "Need to integrate components in homework", date, 2, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to finish", date, 1, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", date, 1, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 1, "work", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList Search = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TL2.add(task1);
+        TL2.add(task5);
+        
+        Search = Logic.searchDescription(TL1, "fiNIsH hOMeWORk");
+        assertEquals(Search.get(0), TL2.get(0));
+        assertEquals(Search.get(1), TL2.get(1));
+    }
+    
+    /**
+     * This test determines whether the order of priority search is correct
+     *  
+     *  Expected Output :
+     *  First 3 tasks are boundary test cases for 'negative value' partition
+     *  Last 2 tasks are boundary test cases for 'positive value' partition
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testSearchPriority() throws Exception{
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("Work to do for CS2103T", "Need to finish homework on demo video", date, 1, "work", 1);
+        Task task2 = new Task("CS2103T", "Need to integrate components", date, -1, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", date, 0, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", date, 322, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 323, "work", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList Search = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TL2.add(task4);
+        TL2.add(task5);
+        
+        Search = Logic.searchPriority(TL1, 3);
+        assertEquals(Search.get(0), TL2.get(0));
+        assertEquals(Search.get(1), TL2.get(1));
+        
+    }
+    
+    /**
+     * Tests whether splitting the task list according to tentative tasks 
+     * is in order
+     * 
+     * Expected Output : <1, 3, 4> and <2, 5>
+     * All tasks are standard data participants
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSplitTentative() throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Date date2 = dateFormat.parse("20/12/9999");
+        Task task1 = new Task("HELLO WORLD", "Need to finish homework on demo video", null, 1, "work", 1);
+        Task task2 = new Task("SILHFGYUIJ", "Need to integrate components", date, 2, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", null, 5, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", null, 1, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 3, "work", 5);
+        
+        TaskList TL1 = new TaskList();
+        TaskList SearchTent = new TaskList();
+        TaskList SearchConf = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TaskList TL3 = new TaskList();
+        TL2.add(task1);
+        TL2.add(task3);
+        TL2.add(task4);
+        TL3.add(task2);
+        TL3.add(task5);
+        
+        SearchTent = Logic.searchFloating(TL1);
+        SearchConf = Logic.searchConfirmed(TL1);
+        assertEquals(SearchTent.get(0), TL2.get(0));
+        assertEquals(SearchTent.get(1), TL2.get(1));
+        assertEquals(SearchTent.get(2), TL2.get(2));
+        assertEquals(SearchConf.get(0), TL3.get(0));
+        assertEquals(SearchConf.get(1), TL3.get(1));      
+    }
+    
+    /**
+     * Test splitting of done tasks
+     *
+     * Expected Output : <2, 4, 5> and <1, 3>
+     * All tasks are standard data participants 
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSplitDone() throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = dateFormat.parse("23/09/2015"); 
+        Task task1 = new Task("HELLO WORLD", "Need to finish homework on demo video", null, 1, "work", 1);
+        Task task2 = new Task("SILHFGYUIJ", "Need to integrate components", date, 2, "workload", 2);
+        Task task3 = new Task("CS2101", "Have some wORk to do for CS2101", null, 5, "workload", 3);
+        Task task4 = new Task("LAJ2201 WORK", "", null, 1, "", 4);
+        Task task5 = new Task("CS3230", "have to finish homework", date, 3, "work", 5);
+        
+        task2.setDone();
+        task4.setDone();
+        task5.setDone();
+        
+        TaskList TL1 = new TaskList();
+        TaskList SearchDone = new TaskList();
+        TaskList SearchUndone = new TaskList();
+        TL1.add(task1);
+        TL1.add(task2);
+        TL1.add(task3);
+        TL1.add(task4);
+        TL1.add(task5);
+        TaskList TL2 = new TaskList();
+        TaskList TL3 = new TaskList();
+        TL2.add(task2);
+        TL2.add(task4);
+        TL2.add(task5);
+        TL3.add(task1);
+        TL3.add(task3);
+          
+        SearchDone = Logic.searchDone(TL1);
+        SearchUndone = Logic.searchNotDone(TL1);
+        assertEquals(SearchDone.get(0), TL2.get(0));
+        assertEquals(SearchDone.get(1), TL2.get(1));
+        assertEquals(SearchDone.get(2), TL2.get(2));
+        assertEquals(SearchUndone.get(0), TL3.get(0));
+        assertEquals(SearchUndone.get(1), TL3.get(1));      
+    }
+    
+    /**
+     * Test the splitting of TaskList into DisplayTaskList
+     * Test was crafted to include all task type 
+     * 
+     * Expected Output: Split DisplayTaskList converted matches DisplayTaskList created
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testSplitAllTask() throws Exception {
+
+        TaskList TL1 = initializeList();
+        initializeDisplayList();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+
+        DisplayTaskList splitTest = new DisplayTaskList();
+        splitTest.add(dt1);
+        splitTest.add(dt2);
+        splitTest.add(dt3);
+        splitTest.add(dt4);
+        splitTest.add(dt5);
+        splitTest.add(dt6);
+        splitTest.add(dt7);
+        splitTest.add(dt8);
+        splitTest.add(dt9);
+        splitTest.add(dt10);
+        splitTest.add(dt11);
+        splitTest.add(dt12);
+        splitTest.add(dt13);
+        splitTest.add(dt14);
+        splitTest.add(dt15);
+        splitTest.add(dt16);
+        splitTest.add(dt17);
+        splitTest.add(dt18);
+        splitTest.add(dt19);
+        splitTest.add(dt20);
+        splitTest.add(dt21);
+        splitTest.add(dt22);
+        splitTest.add(dt23);
+        splitTest.add(dt24);
+        splitTest.add(dt25);
+        splitTest.add(dt26);
+        splitTest.add(dt27);
+        splitTest.add(dt28);
+        splitTest.add(dt29);
+        splitTest.add(dt30);
+        splitTest.add(dt31);
+        splitTest.add(dt32);
+        
+        assertEquals(displayTest, splitTest);
+        
+    }
+    
+    /**
+     * Tests if split is working as intended (Done tasks are sorted according
+     * to their date completed and will only take up 1 displayTask slot)
+     * 
+     * Expected Output: Split DisplayTaskList matches the DisplayTaskList created
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testSplitWithDone() throws Exception{
+        TaskList TL1 = initializeList();
+        TL1.get(0).setDone();
+        TL1.get(2).setDone();
+        TL1.get(4).setDone();
+        initializeDisplayList();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        
+        DisplayTaskList splitTest = new DisplayTaskList();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(TL1.get(0).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        
+        DisplayTask done1 = new DisplayTask(0, cal.getTime(), null, TL1.get(0).getDateCompleted(), TL1.get(0));
+        
+        cal.setTime(TL1.get(2).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        DisplayTask done3 = new DisplayTask(7, cal.getTime(), null, TL1.get(2).getDateCompleted(), TL1.get(2));
+        
+        cal.setTime(TL1.get(4).getDateCompleted());
+        cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE), 0, 0, 0);
+        DisplayTask done5 = new DisplayTask(9, cal.getTime(), null, TL1.get(4).getDateCompleted(), TL1.get(4));
+        
+        splitTest.add(done1);
+        splitTest.add(dt2);
+        splitTest.add(dt3);
+        splitTest.add(dt4);
+        splitTest.add(dt5);
+        splitTest.add(dt6);
+        splitTest.add(dt7);
+        splitTest.add(done3);
+        splitTest.add(dt9);
+        splitTest.add(done5);
+
+        dt25.setID(10);
+        dt26.setID(11);
+        dt27.setID(12);
+        dt28.setID(13);
+        dt29.setID(14);
+        dt30.setID(15);
+        dt31.setID(16);
+        dt32.setID(17);
+        splitTest.add(dt25);
+        splitTest.add(dt26);
+        splitTest.add(dt27);
+        splitTest.add(dt28);
+        splitTest.add(dt29);
+        splitTest.add(dt30);
+        splitTest.add(dt31);
+        splitTest.add(dt32);
+        
+        assertEquals(displayTest, splitTest);
+       
+    }
+    
+    /**
+     * Tests the insertion of DisplayTasks into TreeMap is in the correct order
+     * by checking each node in a predetermined order 
+     * 
+     * Expected output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testConvertToDateTree() throws Exception {
+        TaskList TL1 = initializeList();
+        initializeDisplayList();
+        initializeTreeLists();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
+
+        list1.add(dt1);
+        list2.add(dt2);
+        list2.add(dt8);
+        list3.add(dt3);
+        list4.add(dt4);
+        list5.add(dt5);
+        list6.add(dt6);
+        list7.add(dt7);
+        list8.add(dt9);
+        list8.add(dt10);
+        list8.add(dt25);
+        list9.add(dt11);
+        list9.add(dt26);
+        list10.add(dt12);
+        list10.add(dt27);
+        list11.add(dt13);
+        list11.add(dt28);
+        list12.add(dt14);
+        list13.add(dt15);
+        list14.add(dt16);
+        list15.add(dt17);
+        list16.add(dt18);
+        list17.add(dt19);
+        list18.add(dt20);
+        list19.add(dt21);
+        list20.add(dt22);
+        list21.add(dt23);
+        list22.add(dt24);
+        list23.add(dt29);
+        list23.add(dt30);
+        list23.add(dt31);
+        list24.add(dt32);
+        
+        assertEquals(map.get(dt1.getShownDate()), list1);
+        assertEquals(map.get(dt3.getShownDate()), list3);
+        assertEquals(map.get(dt4.getShownDate()), list4);
+        assertEquals(map.get(dt5.getShownDate()), list5);
+        assertEquals(map.get(dt6.getShownDate()), list6);
+        assertEquals(map.get(dt7.getShownDate()), list7);
+        assertEquals(map.get(dt9.getShownDate()), list8);
+        assertEquals(map.get(dt11.getShownDate()), list9);
+        assertEquals(map.get(dt12.getShownDate()), list10);
+        assertEquals(map.get(dt13.getShownDate()), list11);
+        assertEquals(map.get(dt14.getShownDate()), list12);
+        assertEquals(map.get(dt15.getShownDate()), list13);
+        assertEquals(map.get(dt16.getShownDate()), list14);
+        assertEquals(map.get(dt17.getShownDate()), list15);
+        assertEquals(map.get(dt18.getShownDate()), list16);
+        assertEquals(map.get(dt19.getShownDate()), list17);
+        assertEquals(map.get(dt20.getShownDate()), list18);
+        assertEquals(map.get(dt21.getShownDate()), list19);
+        assertEquals(map.get(dt22.getShownDate()), list20);
+        assertEquals(map.get(dt23.getShownDate()), list21);
+        assertEquals(map.get(dt24.getShownDate()), list22);
+        assertEquals(map.get(dt29.getShownDate()), list23);
+        assertEquals(map.get(dt32.getShownDate()), list24);
+        
+    }
+    
+    /**
+     * Tests the insertion of floating DisplayTasks into TreeMap is in the 
+     * correct order
+     * 
+     * Expected Output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testConvertToFloatingTree() throws Exception {
+
+        TaskList TL1 = initializeList();
+        TaskList TL = Logic.searchFloating(TL1);
+        DisplayTaskList displayTest = Logic.splitAllTask(TL);
+        TreeMap <Integer, DisplayTaskList> map = Logic.convertToTreeMapWithPriority(displayTest);
+        
+        initializeDisplayList();
+        initializeTreeLists();
+        
+        list1.add(dt29);
+        list1.get(0).setID(0);
+        list1.add(dt30);
+        list1.get(1).setID(1);
+        list2.add(dt31);
+        list2.get(0).setID(2);
+        
+        assertEquals(map.get(dt29.getParent().getPriority()), list1);
+        assertEquals(map.get(dt31.getParent().getPriority()), list2);
+    }
+    /**
+     * Tests the insertion of non-floating DisplayTasks into TreeMap is 
+     * in the correct order
+     * 
+     * Expected Output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void sortDateTree() throws Exception {
+
+        TaskList TL1 = initializeList();
+        initializeDisplayList();
+        initializeTreeLists();
+        DisplayTaskList displayTest = Logic.splitAllTask(TL1);
+        TreeMap <Date, DisplayTaskList> map = Logic.convertToTreeMapWithDate(displayTest);
+        TreeMap <Date, DisplayTaskList> sortedMap = SortLogic.sortTreeMapIntoSetMapByDate(map);
+        
+        list1.add(dt1);
+        list2.add(dt2);
+        list2.add(dt8);
+        list3.add(dt3);
+        list4.add(dt4);
+        list5.add(dt5);
+        list6.add(dt6);
+        list7.add(dt7);
+        list8.add(dt25);
+        list8.add(dt9);
+        list8.add(dt10);
+        list9.add(dt26);
+        list9.add(dt11);
+        list10.add(dt27);
+        list10.add(dt12);
+        list11.add(dt28);
+        list11.add(dt13);
+        list12.add(dt14);
+        list13.add(dt15);
+        list14.add(dt16);
+        list15.add(dt17);
+        list16.add(dt18);
+        list17.add(dt19);
+        list18.add(dt20);
+        list19.add(dt21);
+        list20.add(dt22);
+        list21.add(dt23);
+        list22.add(dt24);
+        list23.add(dt31);
+        list23.add(dt29);
+        list23.add(dt30);
+        list24.add(dt32);
+        
+        assertEquals(sortedMap.get(dt1.getShownDate()), list1);
+        assertEquals(sortedMap.get(dt2.getShownDate()), list2);
+        assertEquals(sortedMap.get(dt3.getShownDate()), list3);
+        assertEquals(sortedMap.get(dt4.getShownDate()), list4);
+        assertEquals(sortedMap.get(dt5.getShownDate()), list5);
+        assertEquals(sortedMap.get(dt6.getShownDate()), list6);
+        assertEquals(sortedMap.get(dt7.getShownDate()), list7);
+        assertEquals(sortedMap.get(dt9.getShownDate()), list8);
+        assertEquals(sortedMap.get(dt11.getShownDate()), list9);
+        assertEquals(sortedMap.get(dt12.getShownDate()), list10);
+        assertEquals(sortedMap.get(dt13.getShownDate()), list11);
+        assertEquals(sortedMap.get(dt14.getShownDate()), list12);
+        assertEquals(sortedMap.get(dt15.getShownDate()), list13);
+        assertEquals(sortedMap.get(dt16.getShownDate()), list14);
+        assertEquals(sortedMap.get(dt17.getShownDate()), list15);
+        assertEquals(sortedMap.get(dt18.getShownDate()), list16);
+        assertEquals(sortedMap.get(dt19.getShownDate()), list17);
+        assertEquals(sortedMap.get(dt20.getShownDate()), list18);
+        assertEquals(sortedMap.get(dt21.getShownDate()), list19);
+        assertEquals(sortedMap.get(dt22.getShownDate()), list20);
+        assertEquals(sortedMap.get(dt23.getShownDate()), list21);
+        assertEquals(sortedMap.get(dt24.getShownDate()), list22);
+        assertEquals(sortedMap.get(dt29.getShownDate()), list23);
+        assertEquals(sortedMap.get(dt32.getShownDate()), list24);
+      
+    }
+}
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\LogicTest.java
+
+
+
+
+

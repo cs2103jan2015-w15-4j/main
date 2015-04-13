@@ -1,4 +1,11 @@
-//@author A0110767B
+//@author: a0110767b
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SearchLogic.java
+	 */
+
 
 package planner;
 
@@ -352,3 +359,10 @@ public class SearchLogic {
         return false;
     }
 }
+
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SearchLogic.java
+
+
+
+
+

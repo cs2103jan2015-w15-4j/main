@@ -1,0 +1,118 @@
+//@author: a0108232u-unused
+
+
+
+	/**
+	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\ParserTest.java
+	 */
+
+    /**
+     * Tests that the Jump command correctly sets the command type to JUMP and
+     * has the correct Date value on the valid date argument partition.
+     * JUMP NO LONGER IN USE AS FEATURE WAS SCRAPPED
+     */
+    public void testValidJumpCommand() {
+        ParseResult result = Parser.parse("jump 15 aug 2217 am 3.20");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Fri Aug 15 03:20:00 SGT 2217", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getPriorityLevel());
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    /**
+     * Tests that the Jump command correctly sets the command type to JUMP 
+     * and has the correct date value on the alternate command format ("jump 
+     * date <date>" instead of "jump <date>") partition.
+     * JUMP NO LONGER IN USE AS FEATURE WAS SCRAPPED
+     */
+    public void testAlternateFormatValidJumpCommand() {        
+        ParseResult result = Parser.parse("jump date 22 jan 4563 pm 10.25");
+        assertEquals(Constants.CommandType.JUMP, result.getCommandType());
+        assertEquals("Sat Jan 22 22:25:00 SGT 4563", result.getDate().toString());
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getPriorityLevel());
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {true, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    /**
+     * Tests that the Jump command correctly sets the command type to INVALID 
+     * and has no date value on the invalid date argument partition.
+     * JUMP NO LONGER IN USE AS FEATURE WAS SCRAPPED
+     */
+    public void testInvalidJumpCommand() {
+        ParseResult result = Parser.parse("jump i am a fish");
+        assertEquals(Constants.CommandType.INVALID, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(0, result.getPriorityLevel());
+        assertEquals(0, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertEquals(Constants.ErrorType.INVALID_DATE, result.getErrorType());
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    /**
+     * Tests that the show command with no id provided sets the command type
+     * correctly.
+     * SHOW NO LONGER IN USE AS GUI ALREADY SHOWS ALL INFO
+     */
+    public void testShowAllTasksCommand() {
+        ParseResult result = Parser.parse("display for the at 10 Jun 1999");
+        assertEquals(Constants.CommandType.SHOW_ALL, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(Constants.NO_ID_SET, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, false, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+    /**
+     * Tests that the show command with an id provided sets the fields 
+     * correctly.
+     * SHOW NO LONGER IN USE AS GUI ALREADY SHOWS ALL INFO
+     */
+    public void testShowSingleTaskCommand() {
+        ParseResult result = Parser.parse("display 135135 on at by 1992");
+        assertEquals(Constants.CommandType.SHOW_ONE, result.getCommandType());
+        assertTrue(result.getDate() == null);
+        assertTrue(result.getSecondDate() == null);
+        assertTrue(result.getDateToRemind() == null);
+        assertEquals(135135, result.getId());
+        assertEquals("", result.getDescription());
+        assertEquals("", result.getTag());
+        assertTrue(result.getErrorType() == null);
+        boolean[] flags = {false, false, false, true, false, false, false, false};
+        assertTrue(Arrays.equals(flags, result.getCommandFlags()));
+        assertEquals("", result.getName());
+    }
+    
+	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\ParserTest.java
+
+
+
+
+
