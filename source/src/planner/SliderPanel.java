@@ -95,6 +95,8 @@ public class SliderPanel extends JComponent{
     private final int EMPTY_STRING_LENGTH = 0;
     private final int MINIMUM_PARENT_WIDTH = 0;
     
+    private final String NO_TASK_TAG_MESSAGE = "This task has no tags";
+    private final String TASK_TAG_HEADER = "\n\nTask Tags:\n";
     private final String EMPTY_STRING = "";
     private final String DEFAULT_BOLD_TEXT_STYLE_NAME = "big bold text";
     private final String DEFAULT_SMALL_TEXT_STYLE_NAME = "small text";
@@ -603,9 +605,30 @@ public class SliderPanel extends JComponent{
                 } else{
                     displayTimedTask( doc, task, bigBoldText, smallText );
                 }
+                displayTags(doc, task, bigBoldText, smallText);
                 infoPanel_.setCaretPosition(MINIMUM_DOCUMENT_INDEX);
             } catch( BadLocationException badLocationException ){}
               catch( IllegalArgumentException illegalArgumentException ){}
+        }
+    }
+    
+    /**
+     * This method will display task tag information
+     * 
+     * @param doc           The document where it will insert the task information to
+     * @param task          The task object where it will retrieve information to display
+     * @param bigBoldText   The bold and larger sized text font style
+     * @param smallText     The smaller sized text font style
+     */
+    private void displayTags(StyledDocument doc, Task task,
+                             Style bigBoldText, Style smallText) throws BadLocationException{
+        if( doc != null && task != null ){
+            doc.insertString( doc.getLength(), TASK_TAG_HEADER, bigBoldText );
+            if (task.getTag() != null && task.getTag().length() > 0){
+                doc.insertString(doc.getLength(), task.getTag(), smallText);
+            }else{
+                doc.insertString(doc.getLength(), NO_TASK_TAG_MESSAGE, smallText);
+            }
         }
     }
     
