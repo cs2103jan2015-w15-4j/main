@@ -234,6 +234,10 @@ public class TaskBar extends JComponent {
         StyleConstants.setBold(tempStyle, true);
         StyleConstants.setForeground(tempStyle, Color.WHITE);
         infoPane.setText(info);
+        
+        assert infoPane.isFocusable() == false;
+        assert infoPane.isEditable() == false;
+        assert infoPane.isOpaque() == false;
     }
 	
 	/**
