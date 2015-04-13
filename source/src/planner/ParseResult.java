@@ -2,7 +2,6 @@
 package planner;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 
 import planner.Constants.CommandType;
@@ -48,13 +47,13 @@ public class ParseResult {
         this.commandType = commandType;
         
         if (date != null) {            
-            this.parsedDate = new Date(date.getTime());            // Changed to defensive copy            
+            this.parsedDate = new Date(date.getTime());                   
         } else {            
             this.parsedDate = null;
         }
         
         if (dateToRemind != null) {            
-            this.dateToRemind = new Date(dateToRemind.getTime());  // Changed to defensive copy            
+            this.dateToRemind = new Date(dateToRemind.getTime());           
         } else {            
             this.dateToRemind = null;
         }
@@ -70,7 +69,7 @@ public class ParseResult {
         this.commandFlags = flags;
         
         if(flags != null) {            
-            this.commandFlags = Arrays.copyOf( flags, flags.length );   // changed to defensive copy            
+            this.commandFlags = Arrays.copyOf(flags, flags.length);       
         } else {            
             this.commandFlags = new boolean[COMMAND_FLAGS_MAX_SIZE];
         }
@@ -90,8 +89,12 @@ public class ParseResult {
      * 
      * @return First date field.
      */
-    public Date getDate() {        
-        return parsedDate != null ? new Date(parsedDate.getTime()) : null;    // Changed to defensive copy
+    public Date getDate() {
+        if (parsedDate != null) {
+            return new Date(parsedDate.getTime());
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -108,8 +111,12 @@ public class ParseResult {
      * 
      * @return Reminder date.
      */
-    public Date getDateToRemind() {        
-        return dateToRemind != null ? new Date(dateToRemind.getTime()) : null;    // Changed to defensive copy
+    public Date getDateToRemind() {     
+        if (dateToRemind != null) {
+            return new Date(dateToRemind.getTime());
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -172,7 +179,11 @@ public class ParseResult {
      * 
      * @return Field validity flags.
      */
-    public boolean[] getCommandFlags() {        
-        return commandFlags != null ? Arrays.copyOf( commandFlags, commandFlags.length ) : new boolean[COMMAND_FLAGS_MAX_SIZE];
+    public boolean[] getCommandFlags() {
+        if (commandFlags != null) {
+            return Arrays.copyOf(commandFlags, commandFlags.length);
+        } else {
+            return new boolean[COMMAND_FLAGS_MAX_SIZE];
+        }
     }
 }
