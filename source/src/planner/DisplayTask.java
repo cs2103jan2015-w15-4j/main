@@ -6,7 +6,6 @@ import java.util.Date;
 
 /**
  * 
- * @author Ke Jing
  * displayDate is used for sorting
  */
 public class DisplayTask {
@@ -15,6 +14,16 @@ public class DisplayTask {
     private Date dueDate, endDate;
     private Task parentTask;
     
+    /**
+     * Constructor for DisplayTask
+     * 
+     * @param id            Display ID of DisplayTask
+     * @param shownDate     Display date of DisplayTask
+     * @param from          Start date of DisplayTask
+     * @param to            End date of DisplayTask
+     * @param parent        Parent Task of DisplayTask, this cannot be null
+     * @throws IllegalArgumentException
+     */
     public DisplayTask(int id, Date shownDate, Date from, Date to, Task parent) throws IllegalArgumentException {
         ID = id;
         displayDate = shownDate;
@@ -27,6 +36,12 @@ public class DisplayTask {
         }
     }
     
+    /**
+     * Generates a copy of another DisplayTask
+     * 
+     * @param anotherTask       Another DisplayTask used as reference for copy
+     * @throws IllegalArgumentException     Thrown when parent task is null
+     */
     public DisplayTask(DisplayTask anotherTask) throws IllegalArgumentException {
         ID = anotherTask.getID();
         displayDate = anotherTask.getShownDate();
@@ -39,22 +54,47 @@ public class DisplayTask {
         }
     }
     
+    /**
+     * Set new DisplayTask ID
+     * 
+     * @param id    New ID of DisplayTask
+     */
     public void setID(int id) {
         ID = id;
     }
     
+    /**
+     * Set new Display date 
+     * @param shownDate     New Display date
+     */
     public void setShownDate(Date shownDate) {
         displayDate = shownDate;
     }
     
+    /**
+     * Set new Due date
+     * 
+     * @param date      New Due date
+     */
     public void setDueDate(Date date) {
         dueDate = date;
     }
     
+    /**
+     * Set new End date
+     * 
+     * @param date      New End date
+     */
     public void setEndDate(Date date) {
         endDate = date;
     }
     
+    /**
+     * Link parent Task
+     * 
+     * @param parent   Task that will be linked 
+     * @throws IllegalArgumentException     Thrown when Task is null
+     */
     public void setParent(Task parent) throws IllegalArgumentException {
         if (parent == null) {
             throw new IllegalArgumentException("Parent Task cannot be null!");
@@ -63,22 +103,37 @@ public class DisplayTask {
         }
     }
     
+    /**
+     * @return      DisplayTask ID
+     */
     public int getID() {
         return this.ID;
     }
     
+    /**
+     * @return      DisplayTask display date
+     */
     public Date getShownDate() {
         return this.displayDate;
     }
     
+    /**
+     * @return      DisplayTask due date
+     */
     public Date getDueDate() {
         return this.dueDate;
     }
     
+    /**
+     * @return      DisplayTask end date
+     */
     public Date getEndDate() {
         return this.endDate;
     }
     
+    /**
+     * @return      DisplayTask parent Task
+     */
     public Task getParent() {
         return this.parentTask;
     }

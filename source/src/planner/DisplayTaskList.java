@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * DisplayTaskList class is a container class for DisplayTasks. It extends ArrayList.
+ */
 public class DisplayTaskList implements List<DisplayTask>{
     
     private ArrayList<DisplayTask> displayTasks;
@@ -16,6 +19,11 @@ public class DisplayTaskList implements List<DisplayTask>{
         displayTasks = new ArrayList<DisplayTask>();
     }
     
+    /**
+     * Constructs a new DisplayTaskList from an arraylist of DisplayTasks
+     * 
+     * @param input     Another DisplayTaskList
+     */
     public DisplayTaskList (ArrayList<DisplayTask> input) {
         
         displayTasks = new ArrayList<DisplayTask>();
@@ -38,6 +46,11 @@ public class DisplayTaskList implements List<DisplayTask>{
         }
     }
     
+    /**
+     * Constructs a DisplayTaskList by copying another DisplayTaskList
+     * 
+     * @param anotherTaskList           Another DisplayTaskList
+     */
     public DisplayTaskList( DisplayTaskList anotherTaskList ){
         
         displayTasks = new ArrayList<DisplayTask>();
@@ -45,6 +58,13 @@ public class DisplayTaskList implements List<DisplayTask>{
         copyTaskList( anotherTaskList );
     }
     
+    /**
+     * Copies a displayTaskList into another
+     * 
+     * @param anotherTaskList       Another DisplayTaskList
+     * @return                      True if another displayTaskList is not null
+     *                              False otherwise
+     */
     public boolean copyTaskList( DisplayTaskList anotherTaskList ){
         
         if( anotherTaskList != null ){
@@ -75,10 +95,21 @@ public class DisplayTaskList implements List<DisplayTask>{
         }
     }
     
+    /**
+     * Gets the DisplayTaskList
+     * 
+     * @return      DisplayTaskList
+     */
     public ArrayList<DisplayTask> getTasks() {
         return displayTasks;
     }
-
+    
+    /**
+     * Obtains the displayTask by checking on DisplayTask ID 
+     * 
+     * @param ID        DisplayTask ID
+     * @return          DisplayTask found
+     */
     public DisplayTask getTaskByID(long ID) {
         for(DisplayTask t:displayTasks) {
             if(t.getID() == ID) {
@@ -88,15 +119,25 @@ public class DisplayTaskList implements List<DisplayTask>{
         return null;
     }
     
-    public DisplayTask getTaskByParentID( int ID ){
+    /**
+     * Obtains the displayTask by checking the parent Task ID
+     * 
+     * @param ID        Task ID 
+     * @return          DisplayTask found
+     */
+    public DisplayTask getTaskByParentID(int ID ){
         for(DisplayTask t:displayTasks) {
-            if( t.getParent() != null && t.getParent().getID() == ID ){
+            if( t.getParent() != null 
+                    && t.getParent().getID() == ID ){
                 return t;
             }
         }
         return null;
     }
-
+    
+    /**
+     * Used for testing purposes
+     */
     public void print() {
         for (int i = 0; i < this.size(); i++) {
             Task taskPrint = this.get(i).getParent();
