@@ -45,8 +45,8 @@ public class Parser {
     
     // common ways to type days
     private static String[] daysInWeek = {"mon", "monday", "tue", "tuesday", 
-        "wed", "wednesday", "thu", "thursday", "fri", "friday", "sat", "saturday",
-        "sun", "sunday"
+        "wed", "wednesday", "thu", "thursday", "fri", "friday", "sat", 
+        "saturday", "sun", "sunday"
     };
     private static ArrayList<String> days =
             new ArrayList<String>(Arrays.asList(daysInWeek));
@@ -56,8 +56,77 @@ public class Parser {
     private static String[] cmdsWithoutFollowingKeywords = {"help", "undo",
         "delete", "done", "setnotdone", "savewhere", "savehere", "show", "exit"
     };
-    private static ArrayList<String> commandsWithoutFollowingKeywords =
+    private static ArrayList<String> monoKeywordCommands =
             new ArrayList<String>(Arrays.asList(cmdsWithoutFollowingKeywords));
+    
+    private static final int COMMAND_WORD_INDEX = 0;
+    private static final int FIRST_ARG = 0;
+    private static final int SECOND_ARG = 1;
+    private static final int THIRD_ARG = 2;
+    private static final int FOURTH_ARG = 3;
+    private static final int NEXT_ARG = 1;
+    private static final int FIRST_AFTER_COMMAND_TYPE = 1;
+    private static final int HALF_DAY_IN_HOURS = 12;
+    private static final int DATE_1_INDEX = 1;
+    private static final int DATE_2_INDEX = 2;
+    private static final int NO_PRIORITY_LVL = 0;
+    private static final int LOWEST_PRIORITY_LVL = 1;
+    private static final int HIGHEST_PRIORITY_LVL = 5;
+    private static final int DATE_TO_REMIND_INDEX = 3;
+    private static final int ONE_WORD = 1;
+    private static final int FLAGS_SIZE = 8;
+    private static final int DATE_FLAG = 0;
+    private static final int DATE_TO_REMIND_FLAG = 1;
+    private static final int PRIORITY_LVL_FLAG = 2;
+    private static final int ID_FLAG = 3;
+    private static final int NAME_FLAG = 4;
+    private static final int DESC_FLAG = 5;
+    private static final int TAG_FLAG = 6;
+    private static final int DATE_2_FLAG = 7;
+    private static final int FIRST_TOKEN = 0;
+    private static final int ALL_DATE_ARGS = 5;
+    private static final int CORRECT_NO_TIME_ARGS = 2;
+    private static final int ONLY_DAY_ARG = 1;
+    private static final int DAY_AND_MONTH_ARGS = 2;
+    private static final int ZERO_HOURS = 0;
+    private static final int ZERO_MINUTES = 0;
+    private static final int ZERO_SECONDS = 0;
+    private static final int ONE_DAY = 1;
+    private static final int ONE_MONTH = 1;
+    private static final int FIRST_MONTH = 0;
+    private static final int ONE_YEAR = 1;
+    private static final int DAYS_IN_WEEK = 7;
+    private static final int WEEK_DIFFERENCE_IN_DAYS = 0;
+    private static final int MONTH_ENGLISH_VARIATIONS = 2;
+    private static final int DAY_ENGLISH_VARIATIONS = 2;
+    private static final int SMALLEST_HOUR = 0;
+    private static final int BIGGEST_HOUR = 12;
+    private static final int BIGGEST_24_HOUR_HOUR = 23;
+    private static final int SMALLEST_MIN = 0;
+    private static final int BIGGEST_MIN = 59;
+    private static final int NOT_FOUND = -1;
+    private static final String ADD_COMMAND_STR = "add";
+    private static final String UPDATE_COMMAND_STR = "update";
+    private static final String DEL_COMMAND_STR = "delete";
+    private static final String SHOW_COMMAND_STR = "show";
+    private static final String DONE_COMMAND_STR = "done";
+    private static final String SETNOTDONE_COMMAND_STR = "setnotdone";
+    private static final String UNDO_COMMAND_STR = "undo";
+    private static final String SEARCH_COMMAND_STR = "search";
+    private static final String HELP_COMMAND_STR = "help";
+    private static final String JUMP_COMMAND_STR = "jump";
+    private static final String CONVERT_COMMAND_STR = "convert";
+    private static final String SAVEWHERE_COMMAND_STR = "savewhere";
+    private static final String SAVEHERE_COMMAND_STR = "savehere";
+    private static final String EXIT_COMMAND_STR = "exit";    
+    private static final String DATE_KEYWORD = "date";
+    private static final String DEADLINE_TYPE = "deadline";
+    private static final String TIMED_TYPE = "timed";
+    private static final String FLOATING_TYPE = "floating";
+    private static final String PM = "pm";
+    private static final String AM = "am";
+    private static final String NEXT_KEYWORD = "next";
+    private static final String TIME_DELIMITER = "\\.";
     
     // these fields will be used to construct the parseResult
     private static ErrorType errorType = null;
@@ -65,22 +134,21 @@ public class Parser {
     private static Date date = null;
     private static Date date2 = null;
     private static Date dateToRemind = null;
-    private static int priorityLevel = 0;
+    private static int priorityLevel = NO_PRIORITY_LVL;
     private static long id = 0;
     private static String name = "";
     private static String description = "";
     private static String tag = "";
     private static boolean isTimeSetByUser = false;
-    private static boolean isTime2SetByUser = false;    
-    private static boolean[] flags = new boolean[8];
-    private static Calendar calendar = null;
+    private static boolean isTime2SetByUser = false;
+    private static boolean isParseDateComplete = false;
+    private static boolean[] flags = new boolean[FLAGS_SIZE];
+    private static Calendar desiredTime = null;
     
-    private static final int COMMAND_WORD_INDEX = 0;
-    private static final int FIRST_AFTER_COMMAND_TYPE = 1;
-    private static final int HALF_DAY_IN_HOURS = 12;
-    private static final int DATE_1_INDEX = 1;
-    private static final int DATE_2_INDEX = 2;
-    private static final int DATE_TO_REMIND_INDEX = 3;
+    // fields used for parsing date
+    private static int year = 0;
+    private static int month = 0;
+    private static int day = 0;
     
     /**
      * Processes a user input string and returns a result object containing
@@ -104,14 +172,11 @@ public class Parser {
      * @param inputString The user input.
      * @return            A result containing information such as command type.
      */
-    private static void process(String inputString) {        
-        logger.log(Level.INFO, "going to begin processing");
+    private static void process(String inputString) {
         inputTokens = splitBySpaceDelimiter(inputString);
         assert(inputTokens.length > 0);
         commandType = determineCommandType(inputTokens[COMMAND_WORD_INDEX]);
         processDependingOnCommandType(commandType);
-        
-        logger.log(Level.INFO, "processing ended.");
     }
     
     /**
@@ -203,64 +268,65 @@ public class Parser {
     private static void processDependingOnCommandType(CommandType commandType) {
         switch(commandType) {
             case ADD:
-                processCommand("add");
+                processCommand(ADD_COMMAND_STR);
                 break;
                 
             case UPDATE:
-                processCommand("update");
+                processCommand(UPDATE_COMMAND_STR);
                 break;
                 
             case DELETE:
-                processCommand("delete");
+                processCommand(DEL_COMMAND_STR);
                 break;
                 
             case SHOW:
-                processCommand("show");
+                processCommand(SHOW_COMMAND_STR);
                 break;
                 
             case DONE:
-                processCommand("done");
+                processCommand(DONE_COMMAND_STR);
                 break;
             
             case SETNOTDONE:
-                processCommand("setnotdone");
+                processCommand(SETNOTDONE_COMMAND_STR);
                 break;
                 
             case UNDO:
-                processCommand("undo");
+                processCommand(UNDO_COMMAND_STR);
                 break;
                 
             case SEARCH:
-                processCommand("search");
+                processCommand(SEARCH_COMMAND_STR);
                 break;
                 
             case HELP:
-                processCommand("help");
+                processCommand(HELP_COMMAND_STR);
                 break;
             
             case JUMP:
-                processCommand("jump");
+                processCommand(JUMP_COMMAND_STR);
                 break;
                 
             case CONVERT:
-                processCommand("convert");
+                processCommand(CONVERT_COMMAND_STR);
                 break;
                 
             case SAVEWHERE:
-                processCommand("savewhere");
+                processCommand(SAVEWHERE_COMMAND_STR);
                 break;
             
             case SAVEHERE:
-                processCommand("savehere");
+                processCommand(SAVEHERE_COMMAND_STR);
                 break;
             
             case EXIT:
-                processCommand("exit");
+                processCommand(EXIT_COMMAND_STR);
                 break;
                 
             default:
                 setErrorType(ErrorType.INVALID_COMMAND);
-                logger.log(Level.WARNING, "command " + commandType.toString() + " not recognized");
+                logger.log(Level.WARNING, "command " + commandType.toString() + 
+                           " not recognized");
                 break;
         }
     }
@@ -293,16 +359,17 @@ public class Parser {
         date = null;
         date2 = null;
         dateToRemind = null;
-        priorityLevel = 0;
+        priorityLevel = NO_PRIORITY_LVL;
         id = 0;
         name = "";
         description = "";
         tag = "";
         errorType = null;
-        flags = new boolean[8];
-        calendar = null;
+        flags = new boolean[FLAGS_SIZE];
+        desiredTime = null;
         isTimeSetByUser = false;
-        isTime2SetByUser = false;        
+        isTime2SetByUser = false;    
+        isParseDateComplete = false;
     }
 
     /**
@@ -348,11 +415,12 @@ public class Parser {
             if (isNonCmdKeyword(wordBeingProcessed)) {
                 /* all text after the help, delete, done, setnotdone, savewhere,
                    savehere and show commands and their arguments is ignored */
-                if (commandsWithoutFollowingKeywords.contains(keywordBeingProcessed)) {
+                if (monoKeywordCommands.contains(keywordBeingProcessed)) {
                     break;
-                } else if (keywordBeingProcessed.equals("jump")) {
-                    // allow users to say use "jump date <date>" as well as "jump <date>"
-                    if (wordBeingProcessed.equals("date")) {
+                } else if (keywordBeingProcessed.equals(JUMP_COMMAND_STR)) {
+                    /* allow users to say use "jump date <date>" as well as 
+                     * "jump <date>" */
+                    if (wordBeingProcessed.equals(DATE_KEYWORD)) {
                         // do nothing
                     } else {
                         break;
@@ -432,7 +500,7 @@ public class Parser {
                 break;
     
             case "priority":
-                updatePriorityLevel(keywordArgsArray[0]);                
+                updatePriorityLevel(keywordArgsArray[FIRST_ARG]);                
                 break;
     
             case "desc":
@@ -473,13 +541,13 @@ public class Parser {
                 break;
     
             case "update":
-                updateId(keywordArgsArray[0], keyword);
+                updateId(keywordArgsArray[FIRST_ARG], keyword);
                 updateName(keywordArgsArray);
                 
             case "delete":
             case "setnotdone":
             case "done":
-                updateId(keywordArgsArray[0], keyword);                
+                updateId(keywordArgsArray[FIRST_ARG], keyword);                
                 break;
     
             case "show":
@@ -495,15 +563,16 @@ public class Parser {
                 break;
     
             case "help":
-                determineWhatUserNeedsHelpWith(keywordArgsArray[0]);
+                determineWhatUserNeedsHelpWith(keywordArgsArray[FIRST_ARG]);
                 break;
             
             case "convert":
                 // get id of task to convert
-                updateId(keywordArgsArray[0], keyword); 
+                updateId(keywordArgsArray[FIRST_ARG], keyword); 
                 
                 // determine type to convert to
-                setCommandType(determineConvertType(keywordArgsArray[1]));             
+                setCommandType(determineConvertType(
+                               keywordArgsArray[SECOND_ARG]));             
                 break;
                 
             case "savewhere":
@@ -540,7 +609,9 @@ public class Parser {
             setErrorType(ErrorType.INVALID_PRIORITY_LEVEL);
         }
         
-        if (priorityLevel < 1 || priorityLevel > 5) {
+        if (priorityLevel < LOWEST_PRIORITY_LVL || 
+            priorityLevel > HIGHEST_PRIORITY_LVL) {
+            
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_PRIORITY_LEVEL);
         }
@@ -553,18 +624,20 @@ public class Parser {
      * @param targetIdString     Target task of command.
      * @param keywordBeingParsed Keyword being parsed.
      */
-    private static void updateId(String targetIdString, String keywordBeingParsed) {
+    private static void updateId(String targetIdString, 
+                                 String keywordBeingParsed) {
         try {
             id = Long.parseLong(targetIdString);
         } catch (NumberFormatException e) {
-            logger.log(Level.WARNING, "error parsing id in " + keywordBeingParsed);
+            logger.log(Level.WARNING, "error parsing id in " + 
+                       keywordBeingParsed);
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TASK_ID);
         }
     }
     
     private static void updateName(String[] keywordArgs) {
-        if (keywordArgs.length > 1) {
+        if (keywordArgs.length > ONE_WORD) {
             String nameToUpdateTo = "";
             for (int i = 1; i < keywordArgs.length; i++) {
                 nameToUpdateTo += keywordArgs[i] + " ";
@@ -581,14 +654,14 @@ public class Parser {
      * @param dateFieldToUpdate Index representing which date field to update.
      */
     private static void updateDate(String keywordArgs, int dateFieldToUpdate) {
-        calendar = parseDate(keywordArgs, dateFieldToUpdate);
-        if (calendar != null) {
-            if (dateFieldToUpdate == 1) {
-                date = calendar.getTime();
-            } else if (dateFieldToUpdate == 2) {
-                date2 = calendar.getTime();
+        desiredTime = parseDate(keywordArgs, dateFieldToUpdate);
+        if (desiredTime != null) {
+            if (dateFieldToUpdate == DATE_1_INDEX) {
+                date = desiredTime.getTime();
+            } else if (dateFieldToUpdate == DATE_2_INDEX) {
+                date2 = desiredTime.getTime();
             } else {
-                dateToRemind = calendar.getTime();
+                dateToRemind = desiredTime.getTime();
             }
         }      
     }
@@ -596,6 +669,7 @@ public class Parser {
     /**
      * Updates the command type to a help-related command type if the user has
      * specified a valid command type as an argument.
+     * 
      * @param commandType Type of command user needs help with.
      */
     private static void determineWhatUserNeedsHelpWith(String commandType) {
@@ -610,7 +684,7 @@ public class Parser {
             logger.log(Level.INFO, "show general help");
         } else {
             logger.log(Level.INFO, "show help for specific command");
-            setCommandType(determineHelpCommandType(cmdToHelpWithType));
+            setCommandType(determineHelpCmdType(cmdToHelpWithType));
         }
     }
     
@@ -649,33 +723,33 @@ public class Parser {
                                                int priorityLevel, long id, 
                                                String name, String description, 
                                                String tag, Date date2) {
-        // flags order: date, dateToRemind, priorityLevel, id, name,
-        //              description, tag
-        boolean[] resultFlags = new boolean[8];
+        /* flags order: date, dateToRemind, priorityLevel, id, name,
+                        description, tag */
+        boolean[] resultFlags = new boolean[FLAGS_SIZE];
 
         if (date != null) {
-            resultFlags[0] = true;
+            resultFlags[DATE_FLAG] = true;
         }
         if (dateToRemind != null) {
-            resultFlags[1] = true;
+            resultFlags[DATE_TO_REMIND_FLAG] = true;
         }
         if (priorityLevel != 0) {
-            resultFlags[2] = true;
+            resultFlags[PRIORITY_LVL_FLAG] = true;
         }
         if (id != 0) {
-            resultFlags[3] = true;
+            resultFlags[ID_FLAG] = true;
         }
         if (!name.equals("")) {
-            resultFlags[4] = true;
+            resultFlags[NAME_FLAG] = true;
         }
         if (!description.equals("")) {
-            resultFlags[5] = true;
+            resultFlags[DESC_FLAG] = true;
         }
         if (!tag.equals("")) {
-            resultFlags[6] = true;
+            resultFlags[TAG_FLAG] = true;
         }
         if (date2 != null) {
-            resultFlags[7] = true;
+            resultFlags[DATE_2_FLAG] = true;
         }
         return resultFlags;
     }
@@ -700,7 +774,7 @@ public class Parser {
      * @param commandType Command that user wants help with.
      * @return            Help-related command type.
      */
-    private static CommandType determineHelpCommandType(CommandType commandType) {
+    private static CommandType determineHelpCmdType(CommandType commandType) {
         switch(commandType) {
             case ADD:
                 return CommandType.HELP_ADD;
@@ -738,13 +812,13 @@ public class Parser {
      */
     private static CommandType determineConvertType(String convertTypeString) {
         switch (convertTypeString.trim()) {
-            case "deadline":
+            case DEADLINE_TYPE:
                 return CommandType.CONVERT_DEADLINE;
                 
-            case "floating":
+            case FLOATING_TYPE:
                 return CommandType.CONVERT_FLOATING;
                 
-            case "timed":
+            case TIMED_TYPE:
                 return CommandType.CONVERT_TIMED;
                
             default:
@@ -763,133 +837,257 @@ public class Parser {
      *                             date, date2).
      * @return                     Parsed date.
      */
-    private static Calendar parseDate(String arguments, int dateBeingParsedIndex) {
+    private static Calendar parseDate(String arguments, 
+                                      int dateBeingParsedIndex) {
         logger.log(Level.INFO, "beginning date parsing");
+        desiredTime = Calendar.getInstance();
         Calendar currentTime = Calendar.getInstance();
-        int day = currentTime.get(Calendar.DATE);
-        int month = currentTime.get(Calendar.MONTH);
-        int year = currentTime.get(Calendar.YEAR);
-        int tokenBeingParsedIndex = 0;
-        
+        updateDateFields(desiredTime);
+        int tokenBeingParsedIndex = FIRST_TOKEN;
         // the tokens that will individually represent day, month etc
         String[] dateParts = splitBySpaceDelimiter(arguments);
         assert(dateParts.length > 0);
-        // may be a representation of the day, or a time keyword, or the next keyword
-        String firstArg = dateParts[tokenBeingParsedIndex].toLowerCase();
         
-        // check whether the current argument is a keyword for time
-        if (firstArg.equals("pm") || firstArg.equals("am")) {
-            setTimeSetByUserToTrue(dateBeingParsedIndex);
-            return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                       firstArg, year, month, day); 
+        parseFirstDateArg(dateParts, arguments, tokenBeingParsedIndex, 
+                          dateBeingParsedIndex, currentTime);
+        if (isParseDateComplete) {
+            return desiredTime;
+        }
         
-        } else {
-            // parse as date without regards to time
-            logger.log(Level.INFO, "value expected to be day or next keyword: " + firstArg);
-            try {
-                day = Integer.parseInt(firstArg);
-                
-            } catch (NumberFormatException e) {
-                
-                //Goes into parseNext when "next" is the first argument
-                if (firstArg.toLowerCase().trim().equals("next")) {
-                    return parseNext(arguments);
-                } else { 
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_DATE);
-                    logger.log(Level.WARNING, "unable to parse day");
-                    return null;
-                }
-            }
+        // now parsing second token
+        tokenBeingParsedIndex++;
+        parseSecondDateArg(dateParts, arguments, tokenBeingParsedIndex, 
+                           dateBeingParsedIndex, currentTime);
+        if (isParseDateComplete) {
+            return desiredTime;
+        }
+        
+        // now parsing third token
+        tokenBeingParsedIndex++;
+        parseThirdDateArg(dateParts, arguments, tokenBeingParsedIndex, 
+                          dateBeingParsedIndex);
+        if (isParseDateComplete) {
+            return desiredTime;
         }        
         
-        //Checks whether date information is incomplete, if so checks whether date has passed
-        //If so push to next month, else keep the current month
-        if (dateParts.length == 1) {
-            if (day < currentTime.get(Calendar.DATE)) {
-                return createCalendar(year, month + 1, day, 0, 0); 
-            } else {
-                return createCalendar(year, month, day, 0, 0);
-            }
-        } else {
-            // now parsing the second token
-            tokenBeingParsedIndex++;
-            // may be a representation of the month, or a time keyword
-            String secondArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+        tokenBeingParsedIndex++;     
+        
+        if (dateParts.length == ALL_DATE_ARGS) {
+            // parsing 4th/5th token, user has input year, month, day, and time
+            parseFourthAndFithDateArg(dateParts, arguments, 
+                                      tokenBeingParsedIndex, 
+                                      dateBeingParsedIndex);         
+            return desiredTime;
+        }
+        
+        logger.log(Level.INFO, "ending date parsing");
+        
+        // date was parsed with a simple day month year format.
+        return createCalendar(year, month - ONE_MONTH, day, 0, 0);
+    }
+    
+    /**
+     * Updates the individual date related fields with the given calendar.
+     * @param desiredTime Time to update to.
+     */
+    private static void updateDateFields(Calendar desiredTime) {
+        day = desiredTime.get(Calendar.DATE);
+        month = desiredTime.get(Calendar.MONTH);
+        year = desiredTime.get(Calendar.YEAR);
+    }
+    
+    /**
+     * Processes the first date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param existingTime          Existing time.
+     */
+    private static void parseFirstDateArg(String[] dateParts, String arguments, 
+                                          int tokenBeingParsedIndex, 
+                                          int dateBeingParsedIndex, 
+                                          Calendar existingTime) {
+        // may be the day, a time keyword, or the next keyword
+        String firstArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+        
+        try {
+            day = Integer.parseInt(firstArg);
             
-            // check whether the current argument is a keyword for time
-            if (secondArg.equals("pm") || secondArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           secondArg, year, month, day); 
-                
-            } else {
-                // parse as date without regards to time
-                logger.log(Level.INFO, "value expected to be month: " + secondArg);
-                try {
-                    month = Integer.parseInt(secondArg);
-                } catch (NumberFormatException e) {
-                    int monthIndex = months.indexOf(secondArg.toLowerCase());
-                    // check whether it is found in the list of English month strings
-                    if (monthIndex == -1) {
-                        setCommandType(CommandType.INVALID);
-                        setErrorType(ErrorType.INVALID_DATE);
-                        logger.log(Level.WARNING, "unable to parse month");
-                        return null;
-                    } else {
-                        month = (monthIndex / 2) + 1;
-                        logger.log(Level.INFO, "month of parsed date: " + month);
-                    }
+            // check whether there are no more args to be processed
+            if (dateParts.length == ONLY_DAY_ARG) {
+                /* handle whether the next occurrence of the specified day 
+                 * occurs this month or next month */
+                if (day < existingTime.get(Calendar.DATE)) {
+                    desiredTime = createCalendar(year, month + ONE_MONTH, day, 
+                                                 ZERO_HOURS, ZERO_MINUTES); 
+                } else {
+                    desiredTime = createCalendar(year, month, day, ZERO_HOURS, 
+                                                 ZERO_MINUTES);
                 }
-            }            
-        }     
-        
-        // Similar check as above, push to next year if month had passed
-        if (dateParts.length == 2) {
-            if (month < currentTime.get(Calendar.MONTH)) {
-                return createCalendar(year + 1, month - 1, day, 0, 0);
-            } else {
-                return createCalendar(year, month - 1, day, 0, 0);
             }
+        } catch (NumberFormatException e) {
+            // try parsing as a non standard format (e.g. time field, next day)
+            calcDiffFormatDateOnFirstDateArg(arguments, dateParts, 
+                                             tokenBeingParsedIndex, 
+                                             dateBeingParsedIndex,
+                                             firstArg);
+        }
+    }
+    
+    /**
+     * Processes the second date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param existingTime          Existing time.
+     */
+    private static void parseSecondDateArg(String[] dateParts, String arguments, 
+                                           int tokenBeingParsedIndex, 
+                                           int dateBeingParsedIndex, 
+                                           Calendar existingTime) {
+        // may be a representation of the month, or a time keyword
+        String secondArg = dateParts[tokenBeingParsedIndex].toLowerCase();
+            
+        try {
+            month = Integer.parseInt(secondArg);
+            
+            // check whether there are no more args to be processed
+            if (dateParts.length == DAY_AND_MONTH_ARGS) {
+                /* handle whether the next occurrence of the specified month 
+                 * occurs this year or next year */
+                if (month < existingTime.get(Calendar.MONTH)) {
+                    desiredTime = createCalendar(year + ONE_YEAR, 
+                                                 month - ONE_MONTH, day, 
+                                                 ZERO_HOURS, ZERO_MINUTES);
+                } else {
+                    desiredTime = createCalendar(year, month - ONE_MONTH, day, 
+                                                 ZERO_HOURS, ZERO_MINUTES);
+                }
+                isParseDateComplete = true;
+            }
+        } catch (NumberFormatException e) {            
+            int monthIndex = months.indexOf(secondArg.toLowerCase());
+            // check whether it is an English month string
+            if (monthIndex != NOT_FOUND) {
+                month = (monthIndex / MONTH_ENGLISH_VARIATIONS) + ONE_MONTH;
+            } else {
+                desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                                         tokenBeingParsedIndex, 
+                                         dateBeingParsedIndex,
+                                         secondArg);                
+            }
+        }
+    }
+    
+    /**
+     * Processes the third date argument.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     */
+    private static void parseThirdDateArg(String[] dateParts, String arguments, 
+                                          int tokenBeingParsedIndex, 
+                                          int dateBeingParsedIndex) {
+        // may be a representation of the year, or a time keyword
+        String thirdArg = dateParts[THIRD_ARG].toLowerCase();
+        
+        try {
+            year = Integer.parseInt(thirdArg);
+        } catch (NumberFormatException e) {
+            desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                                            tokenBeingParsedIndex, 
+                                            dateBeingParsedIndex,
+                                            thirdArg);            
+        }
+    }
+    
+    /**
+     * Processes the fourth and fifth date arguments, expected to be for time.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     */
+    private static void parseFourthAndFithDateArg(String[] dateParts, 
+                                                  String arguments, 
+                                                  int tokenBeingParsedIndex, 
+                                                  int dateBeingParsedIndex) {
+        // expected to be a time keyword
+        String fourthArg = dateParts[FOURTH_ARG].toLowerCase();
+        
+        desiredTime = calcTimeOnDateArg(arguments, dateParts, 
+                                        tokenBeingParsedIndex, 
+                                        dateBeingParsedIndex,
+                                        fourthArg);
+    }
+    
+    /**
+     * Processes the first argument of the arguments for date. Expected to 
+     * be either a time keyword (pm/am) or 'next' to signify a command similar
+     * to 'next day'.
+     * 
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param arguments             All the date arguments.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param dateArg               First argument of the date.
+     */
+    private static void calcDiffFormatDateOnFirstDateArg(String arguments,
+            String[] dateParts, int tokenBeingParsedIndex, 
+            int dateBeingParsedIndex, String firstArg) {
+        
+        // check whether the current argument is a keyword for time
+        if (firstArg.equals(PM) || firstArg.equals(AM)) {
+            setTimeSetByUserToTrue(dateBeingParsedIndex);
+            desiredTime = calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                            firstArg);            
+        
+        // use parseNext when "next" is the first argument
+        } else if (firstArg.toLowerCase().trim().equals(NEXT_KEYWORD)) {
+            desiredTime = parseNext(arguments);
+        } else { 
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_DATE);
+            logger.log(Level.WARNING, "unable to parse day");
+            desiredTime = null;
+        }
+        isParseDateComplete = true;
+    }
+    
+    /**
+     * Calculate the time given an argument that is expected to be a time 
+     * keyword (am/pm).
+     * 
+     * @param arguments             All the date arguments.
+     * @param dateParts             Tokens that represent day, month, etc.
+     * @param tokenBeingParsedIndex Index of the token being parsed.
+     * @param dateBeingParsedIndex  Either date1 or date2.
+     * @param dateArg               Expected to be am/pm.
+     * @return                      Result date/time.
+     */
+    private static Calendar calcTimeOnDateArg(String arguments,
+            String[] dateParts, int tokenBeingParsedIndex, 
+            int dateBeingParsedIndex, String dateArg) {
+        // check whether the current argument is a keyword for time
+        if (dateArg.equals(PM) || dateArg.equals(AM)) {
+            setTimeSetByUserToTrue(dateBeingParsedIndex);
+            return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
+                                       dateArg); 
+            
         } else {
-            // now parsing the third token
-            tokenBeingParsedIndex++;
-            // may be a representation of the year, or a time keyword
-            String thirdArg = dateParts[2].toLowerCase();
-
-            // check whether the current argument is a keyword for time
-            if (thirdArg.equals("pm") || thirdArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           thirdArg, year, month, day); 
-
-            } else {
-                logger.log(Level.INFO, "value expected to be year: " + thirdArg);
-                try {
-                    year = Integer.parseInt(thirdArg);
-                } catch (NumberFormatException e) {
-                    setCommandType(CommandType.INVALID);
-                    setErrorType(ErrorType.INVALID_DATE);
-                    logger.log(Level.WARNING, "unable to parse year");
-                    return null;
-                }
-            }            
-        }
-        
-        // user has input year, month, day, as well as time
-        if (dateParts.length == 5) {
-            tokenBeingParsedIndex++;
-            // expected to be a time keyword
-            String fourthArg = dateParts[3].toLowerCase();
-            if (fourthArg.equals("pm") || fourthArg.equals("am")) {
-                setTimeSetByUserToTrue(dateBeingParsedIndex);
-                return calcDateGivenTime(dateParts, tokenBeingParsedIndex, 
-                                           fourthArg, year, month, day); 
-            }
-        }
-        
-        return createCalendar(year, month - 1, day, 0, 0);
-    }    
+            setCommandType(CommandType.INVALID);
+            setErrorType(ErrorType.INVALID_DATE);
+            logger.log(Level.WARNING, "unable to parse date");
+            return null;                
+         }
+    }   
     
     /**
      * Converts arguments in the form of 'next x time period' (e.g. next 3 
@@ -900,66 +1098,102 @@ public class Parser {
      */
     private static Calendar parseNext(String arguments) {
         String[] dateParts = splitBySpaceDelimiter(arguments);
-        String secondArg = dateParts[1].toLowerCase().trim();
-        Calendar currentTime = Calendar.getInstance();
-        int year = currentTime.get(Calendar.YEAR);
-        int month = currentTime.get(Calendar.MONTH);
-        int date = currentTime.get(Calendar.DATE);
-        int day = currentTime.get(Calendar.DAY_OF_WEEK);
+        String secondArg = dateParts[SECOND_ARG].toLowerCase().trim();
+        Calendar existingTime = Calendar.getInstance();
+        int year = existingTime.get(Calendar.YEAR);
+        int month = existingTime.get(Calendar.MONTH);
+        int date = existingTime.get(Calendar.DATE);
+        int day = existingTime.get(Calendar.DAY_OF_WEEK);
         try {
             switch(secondArg) {
                 case "day":
-                    return createCalendar(year, month, date + 1, 0, 0);
+                    return createCalendar(year, month, date + ONE_DAY, 
+                                          ZERO_HOURS, ZERO_MINUTES);
                 
                 case "month":
-                    return createCalendar(year, month + 1, 1, 0 ,0);
+                    return createCalendar(year, month + ONE_MONTH, ONE_DAY, 
+                                          ZERO_HOURS, ZERO_MINUTES);
                     
                 case "year":
-                    return createCalendar(year + 1, 0, 1, 0 ,0);
+                    return createCalendar(year + ONE_YEAR, FIRST_MONTH, ONE_DAY, 
+                                          ZERO_HOURS, ZERO_MINUTES);
                     
-                case "week": 
+                case "week":                     
+                    return createCalendarForNextWeek(year, month, date, day);
                     
-                    //Calendar forces monday = 2, sunday = 1 for some reason and hence if current date is monday
-                    //the difference calculated after %7 is 0 so i must change it to 7
-                    int daysDifference = (8 - day + 1) % 7;
-                    if (daysDifference == 0) {
-                        daysDifference = 7;
-                    }
-                    return createCalendar(year, month, date + daysDifference, 0 ,0);
-                    
-                default:
-                    
-                    //Checks the months arraylist to find matches
-                    int index = months.indexOf(secondArg.toLowerCase().trim());
-                    if (index == -1) {
-                        
-                        //If it is not in months, check newly created daysInWeek arraylist
-                        index = days.indexOf(secondArg.toLowerCase().trim());
-                        if (index == -1) {
-                            
-                            //report error and return junk calendar values to avoid exception errors 
-                            setCommandType(CommandType.INVALID);
-                            setErrorType(ErrorType.INVALID_DATE);
-                            break;
-                        } else {
-                            
-                            //If found calculate differences, magic numbers again since mon = 2 for calendar 
-                            //while mon = 1 from arraylist index
-                            int dayDifference = 7 + (index / 2) + 1 - (day - 1);
-                            System.out.println(day);
-                            return createCalendar(year, month, date + dayDifference , 0, 0);
-                        }
-                    } else {
-                        int monthRequested = (index / 2) + 1;
-                        return createCalendar(year + 1, monthRequested - 1, 1, 0, 0);                    
-                    }
+                default:                    
+                    return createCalendarForNextNamedTime(secondArg, date, day);
             }
         } catch (NumberFormatException e) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_DATE);
             logger.log(Level.WARNING, "unable to parse date");
         }
-        return createCalendar(year, month, date, 0, 0);        
+        return createCalendar(year, month, date, ZERO_HOURS, ZERO_MINUTES);        
+    }
+    
+    /**
+     * Handles the special case of 'next week' when parsing a date.
+     * 
+     * @param existingYear      Existing year.
+     * @param existingMonth     Existing month.
+     * @param existingDate      Existing day of the month.
+     * @param existingDayOfWeek Existing day of the week.
+     * @return                  Parsed date.
+     */
+    private static Calendar createCalendarForNextWeek(int existingYear, 
+                                                      int existingMonth, 
+                                                      int existingDate, 
+                                                      int existingDayOfWeek) {
+        /* Calendar forces monday = 2, sunday = 1. If current day is monday,
+         * difference calculated after %7 is 0 so needs to be changed back to 7
+         */
+        int daysDifference = (DAYS_IN_WEEK - existingDayOfWeek) % DAYS_IN_WEEK;
+        if (daysDifference == WEEK_DIFFERENCE_IN_DAYS) {
+            daysDifference = DAYS_IN_WEEK;
+        }
+        return createCalendar(existingYear, existingMonth, 
+                              existingDate + daysDifference, ZERO_HOURS, 
+                              ZERO_MINUTES);
+    }
+    
+    /**
+     * Handles the special case of parsing a named time such as 'next Friday'
+     * or 'next October'.
+     * 
+     * @param dateArg           Expected to be the name (e.g. Friday, Oct).
+     * @param existingDate      Existing day of the month.
+     * @param existingDayOfWeek Existing day of the week.
+     * @return                  Parsed date.
+     */
+    private static Calendar createCalendarForNextNamedTime(String dateArg, 
+            int existingDate, int existingDayOfWeek) {
+        // check if argument is a month in English
+        int index = months.indexOf(dateArg.toLowerCase().trim());
+        if (index == NOT_FOUND) {
+            
+            // check if argument is a day of the week
+            index = days.indexOf(dateArg.toLowerCase().trim());
+            if (index == NOT_FOUND) {                
+                // invalid argument, set error
+                setCommandType(CommandType.INVALID);
+                setErrorType(ErrorType.INVALID_DATE);
+                return null;
+            } else {
+                
+                /* calculate differences since mon = 2 for calendar while 
+                   mon = 1 from arraylist index */
+                int dayDiff = DAYS_IN_WEEK + (index / DAY_ENGLISH_VARIATIONS) + 
+                              ONE_DAY - (existingDayOfWeek - ONE_DAY);
+                System.out.println(existingDayOfWeek);
+                return createCalendar(year, month, existingDate + dayDiff, 
+                                      ZERO_HOURS, ZERO_MINUTES);
+            }
+        } else {
+            int monthRequested = (index / MONTH_ENGLISH_VARIATIONS) + ONE_MONTH;
+            return createCalendar(year + ONE_YEAR, monthRequested - ONE_MONTH, 
+                                  ONE_DAY, ZERO_HOURS, ZERO_MINUTES);                    
+        }
     }
     
     /**
@@ -969,28 +1203,27 @@ public class Parser {
      *  
      *  @param dateParts    String tokens with date info.
      *  @param indexToCheck Index expected to contain time string.
-     *  @param year         Year of desired date.
-     *  @param month        Month of desired date.
-     *  @param day          Day of desired date.
-     *  @return             Representation of full date.
+     *  @param pmOrAm       Differentiates which half of the day it is.
+     *  @return             Parsed date.
      */    
     private static Calendar calcDateGivenTime(String[] dateParts, 
-                                                int indexBeingParsed, 
-                                                String pmOrAm, int year, 
-                                                int month, int day) {
+                                              int indexBeingParsed, 
+                                              String pmOrAm) {
         // check for a valid argument to be parsed as the time
         if (!isTimeArgExistent(indexBeingParsed, dateParts)) {
             // does not exist, return default date value
-            return createCalendar(year, month - 1, day, 0, 0);
+            return createCalendar(year, month - ONE_MONTH, day, ZERO_HOURS, 
+                                  ZERO_MINUTES);
         }
         
-        String timeString = dateParts[indexBeingParsed + 1];
-        String[] timeParts = timeString.split("\\.");  
+        String timeString = dateParts[indexBeingParsed + NEXT_ARG];
+        String[] timeParts = timeString.split(TIME_DELIMITER);  
         
         // check for appropriate format (##.##) 
         if (!isValidTimeFormat(indexBeingParsed, timeParts)) {
             // invalid date format, return default date value
-            return createCalendar(year, month - 1, day, 0, 0);
+            return createCalendar(year, month - ONE_MONTH, day, ZERO_HOURS, 
+                                  ZERO_MINUTES);
         }       
 
         try {
@@ -998,16 +1231,19 @@ public class Parser {
             int min = Integer.parseInt(timeParts[1]);
             if (!isValidHour(hour) || !isValidMin(min)) {
                 // hour and/or minute not valid, return default date value
-                return createCalendar(year, month, day, 0, 0);
+                return createCalendar(year, month, day, ZERO_HOURS, 
+                                      ZERO_MINUTES);
             }
             
-            return calcDateConsideringAmOrPm(pmOrAm, year, month, day, hour, min);            
+            return calcDateConsideringAmOrPm(pmOrAm, hour, min);            
             
         } catch (NumberFormatException e) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "error parsing time on argument number " + indexBeingParsed);
-            return createCalendar(year, month - 1, day, 0, 0);
+            logger.log(Level.WARNING, "error parsing time on argument number " + 
+                       indexBeingParsed);
+            return createCalendar(year, month - ONE_MONTH, day, ZERO_HOURS, 
+                                  ZERO_MINUTES);
         }
         
     }
@@ -1020,11 +1256,14 @@ public class Parser {
      * @param dateParts        String tokens with date info.
      * @return                 Whether the argument exists.
      */
-    private static boolean isTimeArgExistent(int indexBeingParsed, String[] dateParts) {
-        if (indexBeingParsed + 1 > dateParts.length) {
+    private static boolean isTimeArgExistent(int indexBeingParsed, 
+                                             String[] dateParts) {
+        if (indexBeingParsed + NEXT_ARG > dateParts.length) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to no token after time keyword");
+            logger.log(Level.WARNING, "unable to parse time on argument " + 
+                       "number " + indexBeingParsed + 
+                       " due to no token after time keyword");
             return false;
         } else {
             return true;
@@ -1041,10 +1280,12 @@ public class Parser {
      * @return                 Whether there are two parts.
      */
     private static boolean isValidTimeFormat(int indexBeingParsed, String[] timeParts) {  
-        if (timeParts.length != 2) {
+        if (timeParts.length != CORRECT_NO_TIME_ARGS) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number " + indexBeingParsed + " due to incorrect format");
+            logger.log(Level.WARNING, "unable to parse time on argument " + 
+                       "number " + indexBeingParsed + 
+                       " due to incorrect format");
             return false;
         } else {
             return true;
@@ -1058,10 +1299,11 @@ public class Parser {
      * @return     Whether the hour is valid.
      */
     private static boolean isValidHour(int hour) {
-        if (hour < 0 || hour > 12) {
+        if (hour < SMALLEST_HOUR || hour > BIGGEST_HOUR) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number due to invalid hour given");
+            logger.log(Level.WARNING, "unable to parse time on argument " +
+                                      "due to invalid hour given");
             return false;
         } else {
             return true;
@@ -1075,10 +1317,11 @@ public class Parser {
      * @return    Whether the minute is valid.
      */
     private static boolean isValidMin(int min) {
-        if (min < 0 || min > 59) {
+        if (min < SMALLEST_MIN || min > BIGGEST_MIN) {
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_TIME);
-            logger.log(Level.WARNING, "unable to parse time on argument number due to invalid minute given");
+            logger.log(Level.WARNING, "unable to parse time on argument " + 
+                       "due to invalid minute given");
             return false;
         } else {
             return true;
@@ -1090,31 +1333,30 @@ public class Parser {
      * based on the fields calculated so far as well as whether the time given 
      * is in PM or AM.
      * 
-     * @param pmOrAm Either "pm" or "am".
-     * @param year   Desired year.
-     * @param month  Desired month.
-     * @param day    Desired day.
+     * @param pmOrAm Differentiates which half of the day it is.
      * @param hour   Desired hour.
      * @param min    Desired min.
      * @return       Resulting date.
      */
-    private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int year, 
-                                                      int month, int day, 
-                                                      int hour, int min) {
-        assert(pmOrAm.equals("pm") || pmOrAm.equals("am"));
-        if (pmOrAm.equals("pm")) {
+    private static Calendar calcDateConsideringAmOrPm(String pmOrAm, int hour, 
+                                                      int min) {
+        assert(pmOrAm.equals(PM) || pmOrAm.equals(AM));
+        if (pmOrAm.equals(PM)) {
             // special case of 12pm
-            if (hour == 12) {
-                return createCalendar(year, month - 1, day, hour, min); 
+            if (hour == BIGGEST_HOUR) {
+                return createCalendar(year, month - ONE_MONTH, day, hour, min); 
             } else {
-                return createCalendar(year, month - 1, day, hour + HALF_DAY_IN_HOURS, min); 
-            }                    
+                return createCalendar(year, month - ONE_MONTH, day, 
+                                      hour + HALF_DAY_IN_HOURS, min); 
+            }
+        // am case
         } else {
             // special case for 12am
-            if (hour == 12) {
-                return createCalendar(year, month - 1, day, hour - HALF_DAY_IN_HOURS, min); 
+            if (hour == BIGGEST_HOUR) {
+                return createCalendar(year, month - ONE_MONTH, day,
+                                      hour - HALF_DAY_IN_HOURS, min); 
             } else {
-                return createCalendar(year, month - 1, day, hour, min);  
+                return createCalendar(year, month - ONE_MONTH, day, hour, min);  
             }                    
         }
     }
@@ -1130,9 +1372,12 @@ public class Parser {
      * @param minute Desired minute.
      * @return       Resulting date.
      */
-    private static Calendar createCalendar(int year, int month, int day, int hour, int minute) {
+    private static Calendar createCalendar(int desiredYear, int desiredMonth, 
+                                           int desiredDay, int hour, 
+                                           int minute) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, day, hour, minute, 0);
+        calendar.set(desiredYear, desiredMonth, desiredDay, hour, minute, 
+                     ZERO_SECONDS);
         return calendar;
     }
     
@@ -1168,7 +1413,8 @@ public class Parser {
      */
     private static void checkValidDates() {
         if (date == null || date2 == null) {
-            logger.log(Level.WARNING, "Less than two valid dates for Convert Timed");
+            logger.log(Level.WARNING, "Less than two valid dates for " + 
+                       "Convert Timed");
             setCommandType(CommandType.INVALID);
             setErrorType(ErrorType.INVALID_NUMBER_OF_DATES);
         }
@@ -1188,12 +1434,12 @@ public class Parser {
      * Sets true the flag showing whether the user has set a particular time 
      * field.
      * 
-     * @param targetTimeIndex Index of time field the user has set.
+     * @param targetDateIndex Index of date field the user has set.
      */
-    private static void setTimeSetByUserToTrue(int targetTimeIndex) {
-        if (targetTimeIndex == 1) {
+    private static void setTimeSetByUserToTrue(int targetDateIndex) {
+        if (targetDateIndex == DATE_1_INDEX) {
             isTimeSetByUser = true;
-        } else if (targetTimeIndex == 2) {
+        } else if (targetDateIndex == DATE_2_INDEX) {
             isTime2SetByUser = true;
         }
     }
@@ -1221,21 +1467,23 @@ public class Parser {
     private static void setDefaultTimesForTimedAdd() {
         if (!isTimeSetByUser) {
             // set the default time for first date to start of the day
-            calendar.setTime(date);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 0, 0);
-            date = calendar.getTime();
+            desiredTime.setTime(date);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 
+                            ZERO_HOURS, ZERO_MINUTES);
+            date = desiredTime.getTime();
         }
         if (!isTime2SetByUser) {
             // set the default time for second date to end of the day
-            calendar.setTime(date2);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date2 = calendar.getTime();
+            desiredTime.setTime(date2);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 
+                            BIGGEST_24_HOUR_HOUR, BIGGEST_MIN);
+            date2 = desiredTime.getTime();
         }
     }
     
@@ -1246,22 +1494,24 @@ public class Parser {
     private static void setDefaultTimeForDeadlineAdd() {
         if (!isTimeSetByUser && date != null) {
             // set the default time for the date to end of the day
-            calendar.setTime(date);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date = calendar.getTime();
+            desiredTime.setTime(date);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 
+                            BIGGEST_24_HOUR_HOUR, BIGGEST_MIN);
+            date = desiredTime.getTime();
         }
         
         if (!isTime2SetByUser && date2 != null) {
             // set the default time for the date to end of the day
-            calendar.setTime(date2);
-            int existingYear = calendar.get(Calendar.YEAR);
-            int existingMonth = calendar.get(Calendar.MONTH);
-            int existingDay = calendar.get(Calendar.DATE);
-            calendar.set(existingYear, existingMonth, existingDay, 23, 59);
-            date2 = calendar.getTime();
+            desiredTime.setTime(date2);
+            int existingYear = desiredTime.get(Calendar.YEAR);
+            int existingMonth = desiredTime.get(Calendar.MONTH);
+            int existingDay = desiredTime.get(Calendar.DATE);
+            desiredTime.set(existingYear, existingMonth, existingDay, 
+                            BIGGEST_24_HOUR_HOUR, BIGGEST_MIN);
+            date2 = desiredTime.getTime();
         }
     }
     

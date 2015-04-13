@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.TreeMap;
 
 import org.junit.Test;
-
+/**
+ * Tests search, sort and splitting components of Logic class
+ */
 public class LogicTest {
     
     private static Task task1;
@@ -80,7 +82,13 @@ public class LogicTest {
     private static DisplayTaskList list22;
     private static DisplayTaskList list23;
     private static DisplayTaskList list24;
-
+    
+    /**
+     * Initalizes TaskList to be tested
+     * 
+     * @return      TaskList
+     * @throws Exception        
+     */
     private TaskList initializeList() throws Exception {
         Calendar calFirst = Calendar.getInstance();
         calFirst.set(2015, 5, 3, 0, 0, 0);
@@ -137,6 +145,11 @@ public class LogicTest {
         return TL1;
     }
     
+    /**
+     * Initializes the static DisplayTaskList
+     * 
+     * @throws Exception
+     */
     private void initializeDisplayList() throws Exception {
         Calendar cal = Calendar.getInstance();
         cal.set(2015, 8, 23, 0, 0, 0);
@@ -209,7 +222,11 @@ public class LogicTest {
         dt32 = new DisplayTask(31, cal.getTime(), task10.getDueDate(), null, task10);
         
     }
-    
+    /**
+     * Initialized DisplayTaskLists
+     * 
+     * @throws Exception
+     */
     private void initializeTreeLists() throws Exception{
         list1 = new DisplayTaskList();
         list2 = new DisplayTaskList();
@@ -237,8 +254,17 @@ public class LogicTest {
         list24 = new DisplayTaskList();
     }
     
-    //Tests search by tags
-    //Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
+    /**
+     * Tests search by tags
+     * Test cases might have same tag string but different upper/lower cases, as well as substring containing the tag
+     * 
+     * Expected Output :
+     * task1, 2 and 4 are standard test case in the expected bound
+     * task3 is a boundary case where searched result is part of the substring of the word searched
+     * task5 is a boundary case where the letters have different cases
+     * 
+     * @throws Exception
+     */
     @Test 
     public void testSearchTags() throws Exception{
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -262,13 +288,6 @@ public class LogicTest {
         TL2.add(task3);
         TL2.add(task5);
         
-        /**
-         * Expected Output:
-         * task1, 2 and 4 are standard test case in the expected bound
-         * task3 is a boundary case where searched result is part of the substring of the word searched
-         * task5 is a boundary case where the letters have different cases
-         */
-        
         Search = Logic.searchTag(TL1, "work");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
@@ -277,8 +296,14 @@ public class LogicTest {
   
     }
     
-    //Test search for tags, name and description
-    //Test cases include word in name, description and tags in different cases with a combination of all if possible
+    /**
+     * Test search for tags, name and description
+     * Test cases include word in name, description and tags in different cases with a combination of all if possible
+     * 
+     * Expected Output : <1, 5>
+     * 
+     * @throws Exception
+     */
     @Test 
     public void testSearchDesc() throws Exception{
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -300,17 +325,20 @@ public class LogicTest {
         TL2.add(task1);
         TL2.add(task5);
         
-        /**
-         * Expected Output: <1, 5>
-         * Task
-         */
-        
         Search = Logic.searchDescription(TL1, "fiNIsH hOMeWORk");
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
     }
     
-    //This test determines whether the order of priority search is correct
+    /**
+     * This test determines whether the order of priority search is correct
+     *  
+     *  Expected Output :
+     *  First 3 tasks are boundary test cases for 'negative value' partition
+     *  Last 2 tasks are boundary test cases for 'positive value' partition
+     * 
+     * @throws Exception
+     */
     @Test
     public void testSearchPriority() throws Exception{
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -332,19 +360,21 @@ public class LogicTest {
         TL2.add(task4);
         TL2.add(task5);
         
-        /** Expected Output:
-         *  First 3 tasks are boundary test cases for 'negative value' partition
-         *  Last 2 tasks are boundary test cases for 'positive value' partition
-         */
-        
         Search = Logic.searchPriority(TL1, 3);
         assertEquals(Search.get(0), TL2.get(0));
         assertEquals(Search.get(1), TL2.get(1));
         
     }
     
-    //Tests whether splitting the task list according to tentative tasks
-    //is in order
+    /**
+     * Tests whether splitting the task list according to tentative tasks 
+     * is in order
+     * 
+     * Expected Output : <1, 3, 4> and <2, 5>
+     * All tasks are standard data participants
+     *
+     * @throws Exception
+     */
     @Test
     public void testSplitTentative() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -372,11 +402,6 @@ public class LogicTest {
         TL3.add(task2);
         TL3.add(task5);
         
-        /**
-         * Expected Output: <1, 3, 4> and <2, 5>
-         * All tasks are standard data participants
-         */
-        
         SearchTent = Logic.searchFloating(TL1);
         SearchConf = Logic.searchConfirmed(TL1);
         assertEquals(SearchTent.get(0), TL2.get(0));
@@ -386,6 +411,14 @@ public class LogicTest {
         assertEquals(SearchConf.get(1), TL3.get(1));      
     }
     
+    /**
+     * Test splitting of done tasks
+     *
+     * Expected Output : <2, 4, 5> and <1, 3>
+     * All tasks are standard data participants 
+     *
+     * @throws Exception
+     */
     @Test
     public void testSplitDone() throws Exception {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -415,12 +448,7 @@ public class LogicTest {
         TL2.add(task5);
         TL3.add(task1);
         TL3.add(task3);
-        
-        /**
-         * Expected Output: <2, 4, 5> and <1, 3>
-         * All tasks are standard data participants
-         */
-        
+          
         SearchDone = Logic.searchDone(TL1);
         SearchUndone = Logic.searchNotDone(TL1);
         assertEquals(SearchDone.get(0), TL2.get(0));
@@ -430,6 +458,14 @@ public class LogicTest {
         assertEquals(SearchUndone.get(1), TL3.get(1));      
     }
     
+    /**
+     * Test the splitting of TaskList into DisplayTaskList
+     * Test was crafted to include all task type 
+     * 
+     * Expected Output: Split DisplayTaskList converted matches DisplayTaskList created
+     * 
+     * @throws Exception
+     */
     @Test
     public void testSplitAllTask() throws Exception {
 
@@ -475,6 +511,14 @@ public class LogicTest {
         
     }
     
+    /**
+     * Tests if split is working as intended (Done tasks are sorted according
+     * to their date completed and will only take up 1 displayTask slot)
+     * 
+     * Expected Output: Split DisplayTaskList matches the DisplayTaskList created
+     * 
+     * @throws Exception
+     */
     @Test
     public void testSplitWithDone() throws Exception{
         TaskList TL1 = initializeList();
@@ -531,6 +575,14 @@ public class LogicTest {
        
     }
     
+    /**
+     * Tests the insertion of DisplayTasks into TreeMap is in the correct order
+     * by checking each node in a predetermined order 
+     * 
+     * Expected output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
     @Test
     public void testConvertToDateTree() throws Exception {
         TaskList TL1 = initializeList();
@@ -598,6 +650,14 @@ public class LogicTest {
         
     }
     
+    /**
+     * Tests the insertion of floating DisplayTasks into TreeMap is in the 
+     * correct order
+     * 
+     * Expected Output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
     @Test
     public void testConvertToFloatingTree() throws Exception {
 
@@ -619,7 +679,14 @@ public class LogicTest {
         assertEquals(map.get(dt29.getParent().getPriority()), list1);
         assertEquals(map.get(dt31.getParent().getPriority()), list2);
     }
-    
+    /**
+     * Tests the insertion of non-floating DisplayTasks into TreeMap is 
+     * in the correct order
+     * 
+     * Expected Output : Results in the TreeMap is the same as predicted
+     * 
+     * @throws Exception
+     */
     @Test
     public void sortDateTree() throws Exception {
 
@@ -688,10 +755,5 @@ public class LogicTest {
         assertEquals(sortedMap.get(dt29.getShownDate()), list23);
         assertEquals(sortedMap.get(dt32.getShownDate()), list24);
       
-    }
-    
-    @Test
-    public void sortPriorityTree() throws Exception {
-        
     }
 }
