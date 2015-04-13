@@ -69,6 +69,7 @@ public class Parser {
     private static final int HALF_DAY_IN_HOURS = 12;
     private static final int DATE_1_INDEX = 1;
     private static final int DATE_2_INDEX = 2;
+    private static final int NO_PRIORITY_LVL = 0;
     private static final int LOWEST_PRIORITY_LVL = 1;
     private static final int HIGHEST_PRIORITY_LVL = 5;
     private static final int DATE_TO_REMIND_INDEX = 3;
@@ -133,7 +134,7 @@ public class Parser {
     private static Date date = null;
     private static Date date2 = null;
     private static Date dateToRemind = null;
-    private static int priorityLevel = 0;
+    private static int priorityLevel = NO_PRIORITY_LVL;
     private static long id = 0;
     private static String name = "";
     private static String description = "";
@@ -149,8 +150,6 @@ public class Parser {
     private static int month = 0;
     private static int day = 0;
     
-    
-
     /**
      * Processes a user input string and returns a result object containing
      * information such as the user's desired command type and the relevant
@@ -360,13 +359,13 @@ public class Parser {
         date = null;
         date2 = null;
         dateToRemind = null;
-        priorityLevel = 0;
+        priorityLevel = NO_PRIORITY_LVL;
         id = 0;
         name = "";
         description = "";
         tag = "";
         errorType = null;
-        flags = new boolean[8];
+        flags = new boolean[FLAGS_SIZE];
         desiredTime = null;
         isTimeSetByUser = false;
         isTime2SetByUser = false;    
