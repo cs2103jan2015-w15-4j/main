@@ -32,24 +32,24 @@ import javax.swing.text.StyleConstants;
 */
 public class CommandTextbox extends JScrollPane{
 
-    private JTextPane inputCommandBox;
+    private JTextPane inputCommandBox_;
     
-    private JComboBox<String> popUpBox;
+    private JComboBox<String> popUpBox_;
     
-    private DefaultComboBoxModel<String> popUpList;
+    private DefaultComboBoxModel<String> popUpList_;
     
-    private String []m_commandKeywords;
-    private String []m_nonCommandKeywords;
+    private String []commandKeywords_;
+    private String []nonCommandKeywords_;
     
-    private Style originalTextStyle;
+    private Style originalTextStyle_;
     
-    private ArrayList<String> possibleCommands;
+    private ArrayList<String> possibleCommands_;
     
-    private int currentPopupListIndex;
+    private int currentPopupListIndex_;
     
-    private CustomTextFieldDocumentFilter commandPanelDocumentFilter;
+    private CustomTextFieldDocumentFilter commandPanelDocumentFilter_;
     
-    private boolean isCurrentlyHandlingKeyEvent;
+    private boolean isCurrentlyHandlingKeyEvent_;
     
     private final int SELF_DEFINED_MINIMUM_IDX_OF_POPUP_LIST = -2;
     private final int MINIMUM_IDX_OF_POPUP_LIST = -1;
@@ -64,6 +64,10 @@ public class CommandTextbox extends JScrollPane{
     private final int NUM_WORDS_TO_SPLIT_INTO = 2;
     private final int MIMIMUM_STRING_LENGTH = 0;
     private final int FIRST_WORD_INDEX = 0;
+    private final int MINIMUM_SCROLLBAR_WIDTH = 0;
+    private final int MINIMUM_SCROLLBAR_HEIGHT = 0;
+    private final int ONE_CARET_INCREMENT_LENGTH = 1;
+    private final int MINIMUM_CARET_POSITION = 0;
     
     private final String DEFAULT_DELIMITER = " ";
     private final String DEFAULT_POPUP_BOX_STRING_FONT_FAMILY = "Arial";
@@ -86,17 +90,17 @@ public class CommandTextbox extends JScrollPane{
     public CommandTextbox( String []commandKeywords, String []nonCommandKeywords, 
                            ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands ){
         
-        m_commandKeywords = commandKeywords;
-        m_nonCommandKeywords = nonCommandKeywords;
-        inputCommandBox = new JTextPane();
-        prepareTextPane(inputCommandBox);
+        commandKeywords_ = commandKeywords;
+        nonCommandKeywords_ = nonCommandKeywords;
+        inputCommandBox_ = new JTextPane();
+        prepareTextPane(inputCommandBox_);
 
         setFocusable(false);
         setBorder(null);
         setOpaque(false);
         
-        setViewportView(inputCommandBox);
-        if( inputCommandBox != null ){
+        setViewportView(inputCommandBox_);
+        if( inputCommandBox_ != null ){
             getViewport().setOpaque(false);
         }
         JScrollBar horizontalScrollBar = getHorizontalScrollBar();
@@ -104,102 +108,161 @@ public class CommandTextbox extends JScrollPane{
         if( horizontalScrollBar != null ){
             horizontalScrollBar.setUI(new InvisibleScrollBarUI());
             horizontalScrollBar.setFocusable(false);
-            horizontalScrollBar.setPreferredSize(new Dimension(0,0));
+            horizontalScrollBar.setPreferredSize(new Dimension(MINIMUM_SCROLLBAR_WIDTH,MINIMUM_SCROLLBAR_HEIGHT));
         }
-        prepareComboBox( inputCommandBox, listOfCommands );
-        isCurrentlyHandlingKeyEvent = false;
+        prepareComboBox( inputCommandBox_, listOfCommands );
+        isCurrentlyHandlingKeyEvent_ = false;
     }
     
-    // TODO Documentation
-    public boolean handleKeyEvent( KeyEvent keyEvent ){
-        
-        if( !isCurrentlyHandlingKeyEvent && keyEvent != null && popUpBox != null && popUpList != null ){
-            
-            if( popUpBox != null && popUpBox.isPopupVisible() && inputCommandBox.isFocusOwner() ){
-                
-                isCurrentlyHandlingKeyEvent = true;
-                
-                restrictPopupBoxDimensions( inputCommandBox, popUpBox, DEFAULT_POPUP_BOX_RELATIVE_YCOORDINATE );
-                
-                keyEvent.setSource( popUpBox );
-                popUpBox.dispatchEvent(keyEvent);
-                
-                if( keyEvent.getKeyCode() == KeyEvent.VK_UP ){
-                    
-                    if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
-                        
-                        currentPopupListIndex = Math.max( currentPopupListIndex - 1, -2 );
-                        popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex, popUpList.getSize() ));
-                        currentPopupListIndex = (currentPopupListIndex > -2 ? currentPopupListIndex : popUpList.getSize() - 1);
-                        
-                        if( popUpBox.getSelectedIndex() < 0 ){
-                            popUpBox.hidePopup();
-                            popUpBox.setPopupVisible(true);
-                        }
-                        
-                    } else{
-                        
-                        isCurrentlyHandlingKeyEvent = false;
-                        return false;
-                    }
-                    
-                } else if( keyEvent.getKeyCode() == KeyEvent.VK_DOWN ){
-                    
-                    if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
-                        
-                        currentPopupListIndex = Math.min( currentPopupListIndex + 1, popUpList.getSize() + 1 );
-                        popUpBox.setSelectedIndex(getPopupListIdx(currentPopupListIndex , popUpList.getSize() ));
-                        
-                        currentPopupListIndex = ( currentPopupListIndex<= popUpList.getSize() ? currentPopupListIndex  : (popUpList.getSize() > 0 ? 0 : -1) );
-                        
-                        if( popUpBox.getSelectedIndex() < 0 ){
-                            popUpBox.hidePopup();
-                            popUpBox.setPopupVisible(true);
-                        }
-                        
-                    } else{
-                        
-                        isCurrentlyHandlingKeyEvent = false;
-                        return false;
-                    }
-                    
-                } else if( keyEvent.getKeyCode() == KeyEvent.VK_LEFT ){
-                    
-                    int pos = Math.max(inputCommandBox.getCaretPosition() - 1, 0 );
-                    inputCommandBox.setCaretPosition(pos);
-                    popUpBox.hidePopup();
-                    popUpBox.setPopupVisible(true);
-                    
-                } else if( keyEvent.getKeyCode() == KeyEvent.VK_RIGHT ){
-                    
-                    int pos = Math.min(inputCommandBox.getText().length(), inputCommandBox.getCaretPosition() + 1 );
-                    inputCommandBox.setCaretPosition(pos);
-                    popUpBox.hidePopup();
-                    popUpBox.setPopupVisible(true);
-                    
-                } else if( keyEvent.getKeyCode() == KeyEvent.VK_ENTER ){
-                    
-                    if( popUpBox.getSelectedItem() != null ){
-                        
-                        inputCommandBox.setText(popUpBox.getSelectedItem().toString());
-                        popUpBox.hidePopup();
-                        popUpBox.setPopupVisible(false);
-                        inputCommandBox.setCaretPosition(inputCommandBox.getText().length());
-                        
-                    } else{
-                        
-                        popUpBox.hidePopup();
-                        popUpBox.setPopupVisible(false);
-                        isCurrentlyHandlingKeyEvent = false;
-                        return false;
-                    }
+    /**
+     * This method will invoke commandTextBox events that should be called when the up arrow key is registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    private boolean handleUpKeyEvent( KeyEvent keyEvent ){
+        if( keyEvent != null ){
+            if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
+                currentPopupListIndex_ = Math.max( currentPopupListIndex_ - SIZE_OF_ONE_ITEM_IN_POPUP_LIST, 
+                                                  SELF_DEFINED_MINIMUM_IDX_OF_POPUP_LIST );
+                popUpBox_.setSelectedIndex(getPopupListIdx(currentPopupListIndex_, popUpList_.getSize() ));
+                if( currentPopupListIndex_ <= SELF_DEFINED_MINIMUM_IDX_OF_POPUP_LIST ){
+                    currentPopupListIndex_ = popUpList_.getSize() - SIZE_OF_ONE_ITEM_IN_POPUP_LIST;
                 }
-                
-                isCurrentlyHandlingKeyEvent = false;
+                if( popUpBox_.getSelectedIndex() < SIZE_OF_EMPTY_POPUP_LIST ){
+                    popUpBox_.hidePopup();
+                    popUpBox_.setPopupVisible(true);
+                }
                 return true;
             }
         }
-            
+        return false;
+    }
+    
+    /**
+     * This method will invoke commandTextBox events that should be called when the down arrow key is registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    private boolean handleDownKeyEvent( KeyEvent keyEvent ){
+        if( keyEvent != null ){
+            if( !keyEvent.isShiftDown() && !keyEvent.isControlDown() ){
+                currentPopupListIndex_ = Math.min( currentPopupListIndex_ + SIZE_OF_ONE_ITEM_IN_POPUP_LIST, 
+                                                  popUpList_.getSize() + SIZE_OF_ONE_ITEM_IN_POPUP_LIST );
+                popUpBox_.setSelectedIndex(getPopupListIdx(currentPopupListIndex_ , popUpList_.getSize() ));
+                if( currentPopupListIndex_ > popUpList_.getSize() ){
+                    currentPopupListIndex_ = (popUpList_.getSize() > SIZE_OF_EMPTY_POPUP_LIST ? FIRST_ITEM_IDX_IN_POPUP_LIST : MINIMUM_IDX_OF_POPUP_LIST);
+                }
+                if( popUpBox_.getSelectedIndex() < SIZE_OF_EMPTY_POPUP_LIST ){
+                    popUpBox_.hidePopup();
+                    popUpBox_.setPopupVisible(true);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * This method will invoke commandTextBox events that should be called when the left arrow key is registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    private boolean handleLeftKeyEvent( KeyEvent keyEvent ){
+        if( keyEvent != null ){
+            int pos = Math.max(inputCommandBox_.getCaretPosition() - ONE_CARET_INCREMENT_LENGTH, MINIMUM_CARET_POSITION );
+            inputCommandBox_.setCaretPosition(pos);
+            popUpBox_.hidePopup();
+            popUpBox_.setPopupVisible(true);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * This method will invoke commandTextBox events that should be called when the right arrow key is registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    private boolean handleRightKeyEvent( KeyEvent keyEvent ){
+        if( keyEvent != null ){
+            int pos = Math.min(inputCommandBox_.getText().length(), inputCommandBox_.getCaretPosition() + ONE_CARET_INCREMENT_LENGTH );
+            inputCommandBox_.setCaretPosition(pos);
+            popUpBox_.hidePopup();
+            popUpBox_.setPopupVisible(true);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * This method will invoke commandTextBox events that should be called when the enter key is registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    private boolean handleEnterKeyEvent( KeyEvent keyEvent ){
+        if( keyEvent != null ){
+            if( popUpBox_.getSelectedItem() != null ){
+                inputCommandBox_.setText(popUpBox_.getSelectedItem().toString());
+                popUpBox_.hidePopup();
+                popUpBox_.setPopupVisible(false);
+                inputCommandBox_.setCaretPosition(inputCommandBox_.getText().length());
+                return true;
+            } else{
+                popUpBox_.hidePopup();
+                popUpBox_.setPopupVisible(false);
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * This method will invoke commandTextBox events that should be called when specific keys are registered by the keyboard
+     *
+     * @param keyEvent   The key event that will be processed
+     * @return TRUE if the events are invoked successfully; false otherwise.
+     */
+    public boolean handleKeyEvent( KeyEvent keyEvent ){
+        if( !isCurrentlyHandlingKeyEvent_ && keyEvent != null && popUpBox_ != null && popUpList_ != null ){
+            if( popUpBox_ != null && popUpBox_.isPopupVisible() && inputCommandBox_.isFocusOwner() ){
+                isCurrentlyHandlingKeyEvent_ = true;
+                restrictPopupBoxDimensions( inputCommandBox_, popUpBox_, DEFAULT_POPUP_BOX_RELATIVE_YCOORDINATE );
+                keyEvent.setSource( popUpBox_ );
+                popUpBox_.dispatchEvent(keyEvent);
+                if( keyEvent.getKeyCode() == KeyEvent.VK_UP ){
+                    if( !handleUpKeyEvent(keyEvent) ){
+                        isCurrentlyHandlingKeyEvent_ = false;
+                        return false;
+                    }
+                } else if( keyEvent.getKeyCode() == KeyEvent.VK_DOWN ){
+                    if( !handleDownKeyEvent(keyEvent) ){
+                        isCurrentlyHandlingKeyEvent_ = false;
+                        return false;
+                    }
+                } else if( keyEvent.getKeyCode() == KeyEvent.VK_LEFT ){
+                    if( !handleLeftKeyEvent(keyEvent) ){
+                        isCurrentlyHandlingKeyEvent_ = false;
+                        return false;
+                    }
+                } else if( keyEvent.getKeyCode() == KeyEvent.VK_RIGHT ){
+                    if( !handleRightKeyEvent(keyEvent) ){
+                        isCurrentlyHandlingKeyEvent_ = false;
+                        return false;
+                    }
+                } else if( keyEvent.getKeyCode() == KeyEvent.VK_ENTER ){
+                    if( !handleEnterKeyEvent(keyEvent) ){
+                        isCurrentlyHandlingKeyEvent_ = false;
+                        return false;
+                    }
+                }
+                isCurrentlyHandlingKeyEvent_ = false;
+                return true;
+            }
+        }
         return false;
     }
     
@@ -224,8 +287,6 @@ public class CommandTextbox extends JScrollPane{
         }
     }
     
-
-    
     /**
      * Initializes and set the attributes of the popup box and its list.
      *
@@ -237,18 +298,18 @@ public class CommandTextbox extends JScrollPane{
                                   ArrayList<Map.Entry<String, ArrayList<String>>> listOfCommands){
         
         if( textPane != null && listOfCommands != null ){
-            popUpList = new DefaultComboBoxModel<String>();
-            popUpBox = new JComboBox<String>(popUpList){
+            popUpList_ = new DefaultComboBoxModel<String>();
+            popUpBox_ = new JComboBox<String>(popUpList_){
                 @Override
                 public Dimension getPreferredSize(){
                     return new Dimension( textPane.getVisibleRect().width, MINIMUM_POPUP_BOX_HEIGHT );
                 }
             };
            
-            popUpBox.setOpaque(false);
-            popUpBox.setFocusable(false);
-            popUpBox.setFont(new Font(DEFAULT_POPUP_BOX_STRING_FONT_FAMILY, Font.PLAIN, DEFAULT_POPUP_BOX_STRING_FONT_SIZE));
-            possibleCommands = new ArrayList<String>();
+            popUpBox_.setOpaque(false);
+            popUpBox_.setFocusable(false);
+            popUpBox_.setFont(new Font(DEFAULT_POPUP_BOX_STRING_FONT_FAMILY, Font.PLAIN, DEFAULT_POPUP_BOX_STRING_FONT_SIZE));
+            possibleCommands_ = new ArrayList<String>();
             
             ArrayList<String> tempStringList;
             for( Map.Entry<String, ArrayList<String>> tempEntry : listOfCommands ){
@@ -256,16 +317,16 @@ public class CommandTextbox extends JScrollPane{
                 if( tempStringList != null ){
                     for( String tempString : tempStringList ){
                         if( tempString != null ){
-                            possibleCommands.add(tempString);
+                            possibleCommands_.add(tempString);
                         }
                     }
                 }
             }
-            currentPopupListIndex = -1;
-            popUpBox.setSelectedIndex(currentPopupListIndex);
-            bindDocumentListener( textPane, popUpBox, popUpList );
+            currentPopupListIndex_ = MINIMUM_IDX_OF_POPUP_LIST;
+            popUpBox_.setSelectedIndex(currentPopupListIndex_);
+            bindDocumentListener( textPane, popUpBox_, popUpList_ );
             textPane.setLayout(new BorderLayout());
-            textPane.add( popUpBox, BorderLayout.SOUTH );
+            textPane.add( popUpBox_, BorderLayout.SOUTH );
         }
     }
     
@@ -273,24 +334,24 @@ public class CommandTextbox extends JScrollPane{
      * Turns syntax text coloring on within the text component
      */
     public void setSyntaxFilterOn(){
-        commandPanelDocumentFilter.setFilterOn();
+        commandPanelDocumentFilter_.setFilterOn();
     }
     
     /**
      * Turns syntax text coloring off within the text component
      */
     public void setSyntaxFilterOff(){
-        commandPanelDocumentFilter.setFilterOff();
+        commandPanelDocumentFilter_.setFilterOff();
     }
     
     /**
      * Hides the popup box used to display the relevant example commands from view  
      */
     public void hidePopupBox(){
-        if( popUpBox != null ){
-            popUpBox.removeAllItems();
-            popUpBox.setPopupVisible(false);
-            popUpBox.hidePopup();
+        if( popUpBox_ != null ){
+            popUpBox_.removeAllItems();
+            popUpBox_.setPopupVisible(false);
+            popUpBox_.hidePopup();
         }
     }
     
@@ -298,9 +359,9 @@ public class CommandTextbox extends JScrollPane{
      * Displays the popup box used to show the relevant example commands
      */
     public void showPopupBox(){
-        if( popUpBox != null ){
-            popUpBox.setPopupVisible(true);
-            popUpBox.showPopup();
+        if( popUpBox_ != null ){
+            popUpBox_.setPopupVisible(true);
+            popUpBox_.showPopup();
         }
     }
     
@@ -341,7 +402,7 @@ public class CommandTextbox extends JScrollPane{
                                 if( userInputWords.length > MIMIMUM_STRING_LENGTH ){
                                     String firstWordInUserInput = userInputWords[FIRST_WORD_INDEX].toLowerCase();
                                     String []wordsInCommand;
-                                    for( String currentCommand : possibleCommands ){
+                                    for( String currentCommand : possibleCommands_ ){
                                         wordsInCommand = currentCommand.split( DEFAULT_DELIMITER, NUM_WORDS_TO_SPLIT_INTO );
                                         if( wordsInCommand.length > MIMIMUM_STRING_LENGTH && 
                                             firstWordInUserInput.startsWith(wordsInCommand[FIRST_WORD_INDEX]) ){
@@ -350,8 +411,8 @@ public class CommandTextbox extends JScrollPane{
                                     }
                                 }
                             }
-                            currentPopupListIndex = MINIMUM_IDX_OF_POPUP_LIST;
-                            popupBox.setSelectedIndex(currentPopupListIndex);
+                            currentPopupListIndex_ = MINIMUM_IDX_OF_POPUP_LIST;
+                            popupBox.setSelectedIndex(currentPopupListIndex_);
                             popupBox.hidePopup();
                             popupBox.setPopupVisible(popupBoxList.getSize() > SIZE_OF_EMPTY_POPUP_LIST);
                         }
@@ -385,15 +446,15 @@ public class CommandTextbox extends JScrollPane{
      */
     private void prepareTextPane( JTextPane textPane ){
         if( textPane != null ){
-            inputCommandBox.setEditorKit(new CustomNoWrapKit());
-            inputCommandBox.addCaretListener(new CustomCaretListener(DEFAULT_NUMBER_OF_PIXELS_TO_SHOW_BEYOND_CARET));
-            inputCommandBox.setOpaque(false);
-            inputCommandBox.setFont( new Font( DEFAULT_TEXTPANE_STRING_FONT_FAMILY, Font.BOLD, DEFAULT_TEXTPANE_STRING_FONT_SIZE ) );
-            inputCommandBox.setForeground(DEFAULT_TEXTPANE_FONT_COLOR);
-            originalTextStyle = getStyleOfTextPane(textPane);
-            AbstractDocument abstractDocument = (AbstractDocument)inputCommandBox.getDocument();
-            commandPanelDocumentFilter = new CustomTextFieldDocumentFilter( m_commandKeywords, m_nonCommandKeywords, originalTextStyle);
-            abstractDocument.setDocumentFilter(commandPanelDocumentFilter);
+            inputCommandBox_.setEditorKit(new CustomNoWrapKit());
+            inputCommandBox_.addCaretListener(new CustomCaretListener(DEFAULT_NUMBER_OF_PIXELS_TO_SHOW_BEYOND_CARET));
+            inputCommandBox_.setOpaque(false);
+            inputCommandBox_.setFont( new Font( DEFAULT_TEXTPANE_STRING_FONT_FAMILY, Font.BOLD, DEFAULT_TEXTPANE_STRING_FONT_SIZE ) );
+            inputCommandBox_.setForeground(DEFAULT_TEXTPANE_FONT_COLOR);
+            originalTextStyle_ = getStyleOfTextPane(textPane);
+            AbstractDocument abstractDocument = (AbstractDocument)inputCommandBox_.getDocument();
+            commandPanelDocumentFilter_ = new CustomTextFieldDocumentFilter( commandKeywords_, nonCommandKeywords_, originalTextStyle_);
+            abstractDocument.setDocumentFilter(commandPanelDocumentFilter_);
         }
     }
     
@@ -409,9 +470,9 @@ public class CommandTextbox extends JScrollPane{
     public void setText( String text, boolean turnOffFilter ){
         if( text != null ){
             if( turnOffFilter ){
-                commandPanelDocumentFilter.setFilterOff();
+                commandPanelDocumentFilter_.setFilterOff();
             }
-            inputCommandBox.setText(text);
+            inputCommandBox_.setText(text);
         }
     }
     
@@ -422,11 +483,11 @@ public class CommandTextbox extends JScrollPane{
      */
     public void setForegroundColor( Color colour ){
         if( colour != null ){
-            inputCommandBox.setForeground(colour);
-            Style tempStyle = getStyleOfTextPane(inputCommandBox);
+            inputCommandBox_.setForeground(colour);
+            Style tempStyle = getStyleOfTextPane(inputCommandBox_);
             StyleConstants.setForeground(tempStyle, colour);
-            commandPanelDocumentFilter.setTextStyle(tempStyle);
-            commandPanelDocumentFilter.resetTextColor(inputCommandBox.getStyledDocument());
+            commandPanelDocumentFilter_.setTextStyle(tempStyle);
+            commandPanelDocumentFilter_.resetTextColor(inputCommandBox_.getStyledDocument());
         }
     }
     
@@ -438,13 +499,13 @@ public class CommandTextbox extends JScrollPane{
      */
     public void setFontAttributes( Font newFont ){
         if( newFont != null ){
-            inputCommandBox.setFont(newFont);
-            Style tempStyle = getStyleOfTextPane(inputCommandBox);
+            inputCommandBox_.setFont(newFont);
+            Style tempStyle = getStyleOfTextPane(inputCommandBox_);
             StyleConstants.setFontFamily(tempStyle, newFont.getFamily());
             StyleConstants.setFontSize(tempStyle, newFont.getSize());
             StyleConstants.setBold(tempStyle, newFont.isBold());
             StyleConstants.setItalic(tempStyle, newFont.isItalic());
-            commandPanelDocumentFilter.setTextStyle(tempStyle);
+            commandPanelDocumentFilter_.setTextStyle(tempStyle);
         }
     }
     
@@ -454,7 +515,7 @@ public class CommandTextbox extends JScrollPane{
      * @return  The text component responsible for displaying text within the commandTextBox class
      */
     public JTextPane getTextDisplay(){
-        return inputCommandBox;
+        return inputCommandBox_;
     }
     
     /**
@@ -463,7 +524,7 @@ public class CommandTextbox extends JScrollPane{
      * @return  The pop up box responsible for showing the example commands
      */
     public JComboBox<String> getPopupBox(){
-        return popUpBox;
+        return popUpBox_;
     }
     
     /**
@@ -472,8 +533,8 @@ public class CommandTextbox extends JScrollPane{
      * @return  True if there is a currently selected item in the pop up box; false otherwise.
      */
     public boolean hasSelectedItem(){
-        if( popUpList != null ){
-            return (popUpList.getSelectedItem() != null);
+        if( popUpList_ != null ){
+            return (popUpList_.getSelectedItem() != null);
         } else {
             return false;
         }
