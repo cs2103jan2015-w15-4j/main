@@ -82,7 +82,6 @@ public class Engine {
      * 
      * @return success of the process
      */
-    // Not tested yet
     public static boolean init() {
         try {
             doneTasks = new TaskList();
@@ -95,11 +94,8 @@ public class Engine {
 
             // Initiates the storage and read the config and storage files
             storage = new Storage();
-            // System.out.println("here");
             config = storage.readConfig();
-            // System.out.println("readConfig");
             allTasks = storage.readTaskStorage(config.getStoragePath());
-            // System.out.println("readStorage");
 
             // Initiates stack to be used for undo
             previousStates = new Stack<TaskList>();
@@ -107,10 +103,8 @@ public class Engine {
             // Updates the list for display
             refreshLists();
 
-            System.out.println(allTasks.size());
             return true;
         } catch (NullPointerException e) {
-            System.out.println("read error");
             return false;
 
         }
@@ -123,7 +117,6 @@ public class Engine {
      * 
      * @return
      */
-    // Not tested yet
     public static boolean exit() {
         try {
 
@@ -134,8 +127,6 @@ public class Engine {
             return true;
 
         } catch (IOException e) {
-
-            System.out.println("write error");
             return false;
 
         }
@@ -145,22 +136,8 @@ public class Engine {
      * Rebuilds the TaskLists with the latest allTasks such that the TaskLists
      * that GUI requests will be up to date.
      */
-    // Not tested yet
     private static void refreshLists() {
 
-        // Logic.sortTaskListByPriority(allTasks);
-        // Logic.sortTaskListByDate(allTasks);
-
-        // Clears TaskLists
-        doneTasks.clear();
-        undoneTasks.clear();
-        normalTasks.clear();
-        floatingTasks.clear();
-        todayTasks.clear();
-        upcomingTasks.clear();
-        overdueTasks.clear();
-
-        // Rebuilds TaskLists
         doneTasks = Logic.searchDone(allTasks);
         undoneTasks = Logic.searchNotDone(allTasks);
         normalTasks = Logic.searchConfirmed(allTasks);
@@ -174,7 +151,7 @@ public class Engine {
     /**
      * Copies the current allTasks and pushes the copy into the previousStates,
      * such that older states of the program is stored and can be popped to be
-     * used for undo.
+     * used for undo. Stores a maximum of 100 states.
      */
     private static void pushState() {
 
@@ -232,8 +209,10 @@ public class Engine {
 
         // Add the task
         allTasks.add(newTask);
+        
         // Refresh the lists for display
         refreshLists();
+        
         // Record the last updated task
         lastModifiedTask = newTask.getID();
         System.out.println(lastModifiedTask);

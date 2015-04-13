@@ -2,16 +2,11 @@
 
 package planner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 public class ConfigurationTest {
 
-    @Test
-    public void createTest() {
-        Configuration oldConfig = new Configuration("C:/Test/", 35);
-        Configuration newConfig = new Configuration("/User/Documents/");
-    }
 
     @Test
     public void configShouldReturnCorrectPath() {
@@ -50,25 +45,8 @@ public class ConfigurationTest {
     }
     
     @Test
-    public void setStoragePathShouldUpdateStoragePath() {
-        String oldConfigPath = "C:/Test/";
-        String oldConfigPathUpdate = "C:/Another/Place";
-        int oldConfigID = 35;
-        Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
-        oldConfig.setStoragePath(oldConfigPathUpdate);
-        assertEquals("Config path should be " + oldConfigPathUpdate, oldConfigPathUpdate, oldConfig.getStoragePath());
-        
-        String newConfigPath = "/User/Documents/";
-        String newConfigPathUpdate = "/User/Downloads/";
-        Configuration newConfig = new Configuration(newConfigPath);
-        newConfig.setStoragePath(newConfigPathUpdate);
-        assertEquals("Config path should be " + newConfigPathUpdate, newConfigPathUpdate, newConfig.getStoragePath());
-    }
-    
-    @Test
     public void newTaskNumberShouldIncreaseCurTaskNum() {
         String oldConfigPath = "C:/Test/";
-        String oldConfigPathUpdate = "C:/Another/Place";
         int oldConfigID = 35;
         Configuration oldConfig = new Configuration(oldConfigPath, oldConfigID);
         for(int i = 0 ; i < 100000 ; i++) {
@@ -78,7 +56,6 @@ public class ConfigurationTest {
         }
         
         String newConfigPath = "/User/Documents/";
-        String newConfigPathUpdate = "/User/Downloads/";
         Configuration newConfig = new Configuration(newConfigPath);
         for(int i = 0 ; i < 100000 ; i++) {
             assertEquals("ID returned should be " + (1 + i), 1 + i, newConfig.getNewTaskNumber());

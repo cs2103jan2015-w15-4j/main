@@ -92,7 +92,8 @@ public class Configuration {
     }
 
     /**
-     * Checks the validity of the path to be used as a new storage.
+     * Checks the validity of the path to be used as a new storage. This is done by attempting to 
+     * create a new file with the given path and then removing that file. If there are no errors, the path is valid.
      * 
      * @param path
      * @return

@@ -3,7 +3,6 @@
 package planner;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -17,10 +16,20 @@ public class TaskList implements List<Task> {
 
     private ArrayList<Task> tasks;
 
+    /**
+     * Creates a new TaskList
+     */
     public TaskList() {
         tasks = new ArrayList<Task>();
     }
 
+    /**
+     * Creates a TaskList given an ArrayList of Tasks. Each Task is a deep copy
+     * and operating on the resulting TaskList will not affect the original
+     * tasks.
+     * 
+     * @param input
+     */
     public TaskList(ArrayList<Task> input) {
 
         tasks = new ArrayList<Task>();
@@ -43,6 +52,10 @@ public class TaskList implements List<Task> {
         }
     }
 
+    /**
+     * Creates a deep copy of a given TaskList
+     * @param anotherTaskList
+     */
     public TaskList(TaskList anotherTaskList) {
 
         tasks = new ArrayList<Task>();

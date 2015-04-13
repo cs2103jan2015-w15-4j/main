@@ -41,9 +41,9 @@ public class TaskTest {
         Date taskDueDate = new Date(System.currentTimeMillis());
         String taskTag = "nothing";
         int taskPriority = 5;
-        long ID = 4;
+        int ID = 4;
         
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, 4);
+        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
         assertEquals("Task name should be "+taskName, taskName, entry.getName());
         
         String taskName2 = "anotherTask";
@@ -51,9 +51,9 @@ public class TaskTest {
         Date taskDueDate2 = new Date(System.currentTimeMillis());
         String taskTag2 = "others";
         int taskPriority2 = 3;
-        long ID2 = 400;
+        int ID2 = 400;
         
-        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, 400);
+        Task another = new Task(taskName2, taskDescription2, taskDueDate2, taskPriority2, taskTag2, ID2);
         assertEquals("Task name should be "+taskName2, taskName2, another.getName());
     }
     
@@ -89,7 +89,7 @@ public class TaskTest {
         int taskPriority = 5;
         int ID = 4;
         
-        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, 4);
+        Task entry = new Task(taskName, taskDescription, taskDueDate, taskPriority, taskTag, ID);
         assertEquals("Task tag should be "+taskTag, taskTag, entry.getTag());
         
         String taskName2 = "anotherTask";

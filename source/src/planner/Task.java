@@ -326,14 +326,24 @@ public class Task {
         }
     }
 
-    // Not covered by tests yet
+    /**
+     * Sets the dateCreated for the task. As this field is not meant to be
+     * modified, it is named differently from the other set date methods. This
+     * method is only meant to configure the dateCreated when it is read from
+     * storage.
+     * 
+     * @param newCreatedDate
+     */
     public void configureCreatedDate(Date newCreatedDate) {
 
-        // Tests needed for null date
         dateCreated = newCreatedDate;
     }
 
-    // Not covered by tests yet
+    
+    
+    /**
+     * Sets the task as done and gives it a date completed
+     */
     public void setDone() {
 
         taskCompleted = true;
@@ -341,7 +351,9 @@ public class Task {
 
     }
 
-    // Not covered by tests yet
+    /**
+     * Sets the task as not done and removes the date completed
+     */
     public void setUndone() {
 
         taskCompleted = false;
@@ -349,12 +361,19 @@ public class Task {
 
     }
 
-    // Not covered by tests yet
+    /**
+     * Gets the date completed of the Task
+     * @return
+     */
     public Date getDateCompleted() {
 
         return dateCompleted;
     }
 
+    /**
+     * Sets the date completed of the Task
+     * @param date
+     */
     public void setDateCompleted(Date date) {
         dateCompleted = date;
     }
