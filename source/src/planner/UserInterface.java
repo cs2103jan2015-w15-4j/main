@@ -2525,19 +2525,19 @@ public class UserInterface extends JFrame {
         
         if( !Engine.isFirstRun() ){
             
-            currentDisplayListForDate = Engine.getAllTasks();
+            currentDisplayListForDate = Engine.getUpcomingTasks();
             currentDisplayListForPriority = null;
             
             currentList = convertToDisplayTaskList( currentDisplayListForDate );
             
             displayPane.displayByDate(currentDisplayListForDate);
             
-            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.ALL, "All tasks", null, 
+            displayStateStack.push(new DisplayState( planner.Constants.DisplayStateFlag.UPCOMING, "Upcoming Tasks", null, 
                     new KeyEvent( displayPane, KeyEvent.KEY_PRESSED, System.currentTimeMillis(),
-                                  0, KeyEvent.VK_F5, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
+                                  0, KeyEvent.VK_F6, '\0', KeyEvent.KEY_LOCATION_STANDARD) ) );
             
         } else{
-            
+           
             currentDisplayListForDate = null;
             currentDisplayListForPriority = null;
             currentList = null;
