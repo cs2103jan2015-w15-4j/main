@@ -3,7 +3,7 @@
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CommandTextbox.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CommandTextbox.java
 	 */
 
 
@@ -35,14 +35,14 @@ import javax.swing.text.StyleConstants;
 * a pop up box embedded within it. The pop up box will show the relevant commands depending on the text typed within the command 
 * text field
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CommandTextbox.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CommandTextbox.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CommandTextbox.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CommandTextbox.java
 	 */
 
 */
@@ -582,14 +582,14 @@ public class CommandTextbox extends JScrollPane{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CommandTextbox.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CommandTextbox.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomCaretListener.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomCaretListener.java
 	 */
 
 
@@ -607,14 +607,14 @@ import javax.swing.text.JTextComponent;
 /**
 * The CustomCaretListener class controls many pixels to be shown beyond the caret
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomCaretListener.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomCaretListener.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomCaretListener.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomCaretListener.java
 	 */
 
 */
@@ -681,71 +681,14 @@ public class CustomCaretListener implements CaretListener{
         });
     }
 }
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomCaretListener.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomCaretListener.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomNoWrapKit.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.StyledEditorKit;
-import javax.swing.text.ViewFactory;
-
-/**
-* The CustomNoWrapKit class is a style editor kit used by text components to prevent strings with widths exceeding the 
-* width of the text component from being wrapped to the next line but enables the view of the text component to move
-* along with the updated string
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomNoWrapKit.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomNoWrapKit.java
-	 */
-
-*/
-public class CustomNoWrapKit extends StyledEditorKit{
-
-    private ViewFactory customViewFactory_;
-    
-    /**
-    * Constructs a style editor kit using a custom view factory that handles the logic of scrolling of the text component's
-    * view in response to increasing string length
-    */
-    public CustomNoWrapKit(){
-        super();
-        customViewFactory_ = new NoWrapTextLogic();
-    }
-    
-    /**
-     * Gets the view factory currently used by this editor kit
-     * 
-     * @return The view factory currently used by this editor kit to handle the logic of scrolling of the text component's
-     *         view in response to increasing string length
-     */
-    @Override
-    public ViewFactory getViewFactory(){
-        return customViewFactory_;
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomNoWrapKit.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomScrollBarUI.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomScrollBarUI.java
 	 */
 
 
@@ -766,14 +709,14 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
 /**
 * The CustomScrollBarUI class implements a custom scroll bar with customized thumb and buttons
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomScrollBarUI.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomScrollBarUI.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomScrollBarUI.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomScrollBarUI.java
 	 */
 
 */
@@ -918,14 +861,14 @@ public class CustomScrollBarUI extends BasicScrollBarUI{
     
 
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomScrollBarUI.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomScrollBarUI.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomTextFieldDocumentFilter.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomTextFieldDocumentFilter.java
 	 */
 
 
@@ -949,14 +892,14 @@ import javax.swing.text.StyledDocument;
 * The CustomTextFieldDocumentFilter class handles syntax colouring of keywords, filters new line characters and
 * imposes a character limit for strings entered in text fields using this filter
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomTextFieldDocumentFilter.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomTextFieldDocumentFilter.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomTextFieldDocumentFilter.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomTextFieldDocumentFilter.java
 	 */
 
 */
@@ -1272,68 +1215,14 @@ public class CustomTextFieldDocumentFilter extends DocumentFilter{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomTextFieldDocumentFilter.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\CustomTextFieldDocumentFilter.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomWrapKit.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.StyledEditorKit;
-import javax.swing.text.ViewFactory;
-
-/**
-* The CustomWrapKit class is a style editor kit used by text components to allow for strings with widths exceeding the 
-* width of the text component to wrap around to the next line
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomWrapKit.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomWrapKit.java
-	 */
-
-*/
-public class CustomWrapKit extends StyledEditorKit{
-
-    private ViewFactory defaultViewFactory_;
-    
-    /**
-     * Constructs a style editor kit using a custom view factory that handles wrap text logic
-     */
-    public CustomWrapKit(){
-        super();
-        defaultViewFactory_ = new WrapTextLogic();
-    }
-    
-    /**
-     * Retrieves the view factory currently used by this editor kit
-     * 
-     * @return The view factory currently used by this editor kit to handle wrap text logic
-     */
-    @Override
-    public ViewFactory getViewFactory(){
-        return defaultViewFactory_;
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\CustomWrapKit.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayPane.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayPane.java
 	 */
 
 
@@ -1365,14 +1254,14 @@ import javax.swing.text.StyledDocument;
 /**
 * The DisplayPane class manages the display of all of YOPO's task information and messages.
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayPane.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayPane.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayPane.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayPane.java
 	 */
 
 */
@@ -2147,14 +2036,14 @@ public class DisplayPane extends JScrollPane{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayPane.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayPane.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayState.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayState.java
 	 */
 
 
@@ -2168,14 +2057,14 @@ import planner.Constants.DisplayStateFlag;
 /**
 * The DisplayState class is a container that stores command or key event used to invoke the display state
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayState.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayState.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayState.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayState.java
 	 */
 
 */
@@ -2347,14 +2236,14 @@ public class DisplayState {
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayState.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayState.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayStateStack.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayStateStack.java
 	 */
 
 
@@ -2366,14 +2255,14 @@ import java.util.LinkedList;
 * The DisplayStateStack class is a customised stack works like a normal stack but ignores invalid DisplayStates and limits the 
 * number of DisplayStates that exist within the stack by removing some of the oldest DisplayStates that exist on the stack
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayStateStack.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayStateStack.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayStateStack.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayStateStack.java
 	 */
 
 */
@@ -2455,14 +2344,14 @@ public class DisplayStateStack {
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\DisplayStateStack.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\DisplayStateStack.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\FadedTextField.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\FadedTextField.java
 	 */
 
 
@@ -2483,14 +2372,14 @@ import javax.swing.JTextField;
 * The FadedTextField class is a text field component that truncates very long strings and applies a faded effect to a few characters towards the
 * end of such strings. If the text fits within the width of the FadedTextField, the string will be displayed normally.
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\FadedTextField.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\FadedTextField.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\FadedTextField.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\FadedTextField.java
 	 */
 
 */
@@ -2657,14 +2546,14 @@ public class FadedTextField extends JTextField{
 		}
 	}
 }
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\FadedTextField.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\FadedTextField.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InputList.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InputList.java
 	 */
 
 */
@@ -2803,14 +2692,14 @@ public class InputList {
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InputList.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InputList.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleButton.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InvisibleButton.java
 	 */
 
 
@@ -2825,14 +2714,14 @@ import javax.swing.JButton;
 /**
 * The InvisibleButton class is a customised button component that is invisible.
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleButton.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InvisibleButton.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleButton.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InvisibleButton.java
 	 */
 
 */
@@ -2868,136 +2757,14 @@ public class InvisibleButton extends JButton{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleButton.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\InvisibleButton.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleScrollBarUI.java
-	 */
-
-
-package planner;
-
-import java.awt.Graphics;
-import java.awt.Rectangle;
-
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.plaf.basic.BasicScrollBarUI;
-
-/**
-* The InvisibleScrollBarUI class is a customised scroll bar that is invisible
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleScrollBarUI.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleScrollBarUI.java
-	 */
-
-*/
-public class InvisibleScrollBarUI extends BasicScrollBarUI{
-
-    private InvisibleButton downButton_ = null;
-    private InvisibleButton upButton_ = null;
-    
-    /**
-     * Constructs a scroll bar that is invisible
-     */
-    public InvisibleScrollBarUI(){
-        super();
-        downButton_ = new InvisibleButton(); 
-        prepareButton(downButton_);
-        upButton_ = new InvisibleButton();
-        prepareButton(upButton_);
-    }
-    
-    /**
-     * Set attributes of the buttons of the scroll bar so that it will not be focusable
-     * 
-     * @param currentButton The button of the scroll bar that is going to be set to be unfocusable
-     */
-    private void prepareButton( InvisibleButton currentButton ){
-        if( currentButton != null ){
-            currentButton.setFocusable(false);
-        }
-    }
-    
-    /**
-     * Returns the button that represent the decrease view 
-     * 
-     * @param orientation     The orientation of the scrollbar that will be using this button
-     */
-    @Override
-    protected JButton createIncreaseButton( int orientation ){
-        return downButton_;
-    }
-    
-    /**
-     * Returns the button that represent the increase view 
-     * 
-     * @param orientation     The orientation of the scrollbar that will be using this button
-     */
-    @Override
-    protected JButton createDecreaseButton( int orientation ){
-        return upButton_;
-    }
-    
-    /**
-     * Handles the rendering of the scrollbar track
-     * 
-     * @param graphics     An object that provides access to scrollbar track component rendering
-     * @param component    The scrollbar component
-     * @param thumbRect    The x coordinates, y coordinates, width and height of the scrollbar thumb
-     */
-    @Override
-    protected void paintTrack( Graphics graphics, JComponent component, Rectangle thumbRect ){
-    }
-    
-    /**
-     * Handles the rendering of the scrollbar thumb
-     * 
-     * @param graphics     An object that provides access to scrollbar thumb component rendering
-     * @param component    The scrollbar component
-     * @param thumbRect    The x coordinates, y coordinates, width and height of the scrollbar thumb
-     */
-    @Override
-    protected void paintThumb( Graphics graphics, JComponent component, Rectangle thumbRect ){
-    }
-    
-    /**
-     * Returns the custom down button component used for the invisible scrollbar.
-     * 
-     * @return The down button component used for the invisible scrollbar
-     */
-    public InvisibleButton getDownButtonComponent(){
-        return downButton_;
-    }
-    
-    /**
-     * Returns the custom up button component used for the invisible scrollbar.
-     * 
-     * @return The up button component used for the invisible scrollbar.
-     */
-    public InvisibleButton getUpButtonComponent(){
-        return upButton_;
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\InvisibleScrollBarUI.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NavigationBar.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\NavigationBar.java
 	 */
 
 
@@ -3019,14 +2786,14 @@ import javax.swing.text.StyledDocument;
 /**
 * The NavigationBar class is a component that stores and displays navigation information for YOPO
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NavigationBar.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\NavigationBar.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NavigationBar.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\NavigationBar.java
 	 */
 
 */
@@ -3225,137 +2992,14 @@ public class NavigationBar extends JComponent{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NavigationBar.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\NavigationBar.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NonWrappingParagraphLayout.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.Element;
-import javax.swing.text.ParagraphView;
-
-/**
-* The NonWrappingParagraphLayout class handles the layout of the editor kit used for non wrapping text
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NonWrappingParagraphLayout.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NonWrappingParagraphLayout.java
-	 */
-
-*/
-public class NonWrappingParagraphLayout extends ParagraphView{
-
-    /**
-     * Constructs the layout for the editor kit used for non wrapping text
-     */
-    public NonWrappingParagraphLayout( Element element ){
-        super(element);
-    }
-    
-    /**
-     * Sets the width and height of the layout for the editor kit used for non wrapping text
-     * 
-     * @param width     The width of the layout to be set
-     * @param height    The height of the layout to be set
-     */
-    @Override
-    public void layout( int width, int height ){
-        super.layout( Integer.MAX_VALUE, height );
-    }
-    
-    /**
-     * Returns the minimum span of the layout
-     * 
-     * @param axis     The orientation of the layout
-     * @return         The minimum span of the layout
-     */
-    @Override
-    public float getMinimumSpan( int axis ){
-        return super.getPreferredSpan(axis);
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NonWrappingParagraphLayout.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NoWrapTextLogic.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.BoxView;
-import javax.swing.text.Element;
-import javax.swing.text.LabelView;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-
-/**
-* The NoWrapTextLogic class handles the logic of non wrapping text for the editor kit implementing non wrapping text behavior
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NoWrapTextLogic.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NoWrapTextLogic.java
-	 */
-
-*/
-public class NoWrapTextLogic implements ViewFactory{
-
-    /**
-     * Returns the view required for the document containing the text to be displayed
-     * 
-     * @param element     An object representing the document containing the text to be displayed
-     * @return            The view required for the document containing the text to be displayed
-     */
-    @Override
-    public View create( Element element ){
-        
-        if( element == null ){
-            return null;
-        }
-        
-        String property = element.getName();
-        if( property != null ){
-            if( property.equals( AbstractDocument.ParagraphElementName ) ){
-                return new NonWrappingParagraphLayout(element);
-            } else if( property.equals( AbstractDocument.SectionElementName ) ){
-                return new BoxView(element, View.Y_AXIS );
-            }
-        }
-        return new LabelView(element);
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\NoWrapTextLogic.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SliderPanel.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\SliderPanel.java
 	 */
 
 
@@ -3388,14 +3032,14 @@ import planner.Constants.TipType;
 * The SliderPanel class is a component that will display additional task information. This display panel can slide
 * in or out of view.
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SliderPanel.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\SliderPanel.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SliderPanel.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\SliderPanel.java
 	 */
 
 */
@@ -4037,14 +3681,14 @@ public class SliderPanel extends JComponent{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\SliderPanel.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\SliderPanel.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TaskBar.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TaskBar.java
 	 */
 
 
@@ -4157,7 +3801,7 @@ public class TaskBar extends JComponent {
     private final String DONE_TASK_DATE_STRING = "Completed at ";
     private final String FROM_DATE_STRING = "From ";
     private final String TO_DATE_STRING = " to ";
-    private final String TO_DATE_STRING_II = "To";
+    private final String TO_DATE_STRING_II = "To ";
     private final String BY_DATE_STRING = "By ";
     private final String DISPLAY_DATE_FORMAT = "d MMM yyyy 'at' h:mma";
     private final String BACKGROUND_IMAGE_RESOURCE_LINK = "/planner/TaskBar.png";
@@ -4888,14 +4532,14 @@ public class TaskBar extends JComponent {
 	}
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TaskBar.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TaskBar.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TranslucentTextPane.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TranslucentTextPane.java
 	 */
 
 
@@ -4919,14 +4563,14 @@ import javax.swing.text.StyledDocument;
 * The TranslucentTextPane class is a text component that can render a translucent background color for itself and automatically
 * adjust its size to fit the text displayed within it.
 *
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TranslucentTextPane.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TranslucentTextPane.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TranslucentTextPane.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TranslucentTextPane.java
 	 */
 
 */
@@ -5087,14 +4731,14 @@ public class TranslucentTextPane extends JTextPane{
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\TranslucentTextPane.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\TranslucentTextPane.java
 
 
 
 
 
 	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\UserInterface.java
+	 * origin: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\UserInterface.java
 	 */
 
 
@@ -8020,185 +7664,7 @@ public class UserInterface extends JFrame {
     }
 }
 
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\UserInterface.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrappingLabelLayout.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.Element;
-import javax.swing.text.LabelView;
-import javax.swing.text.View;
-
-/**
-* The WrappingLabelLayout class handles the layout of the editor kit used for wrapping text
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrappingLabelLayout.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrappingLabelLayout.java
-	 */
-
-*/
-public class WrappingLabelLayout extends LabelView{
-
-    private final float DEFAULT_MINIMUM_SPAN = 0.0f;
-    
-    /**
-     * Constructs the layout for the editor kit used for wrapping text
-     */
-    public WrappingLabelLayout( Element element ){
-        super(element);
-    }
-    
-    /**
-     * Returns the minimum span of the layout
-     * 
-     * @param axis     The orientation of the layout
-     * @return         The minimum span of the layout
-     */
-    @Override
-    public float getMinimumSpan( int axis ){
-        if( axis == View.Y_AXIS ){
-            return super.getMinimumSpan(axis);
-        } else{
-            return DEFAULT_MINIMUM_SPAN;
-        }
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrappingLabelLayout.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrapTextLogic.java
-	 */
-
-
-package planner;
-
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.BoxView;
-import javax.swing.text.ComponentView;
-import javax.swing.text.Element;
-import javax.swing.text.IconView;
-import javax.swing.text.LabelView;
-import javax.swing.text.ParagraphView;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
-
-/**
-* The NoWrapTextLogic class handles the logic of wrapping text for the editor kit implementing wrapping text behavior
-*
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrapTextLogic.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrapTextLogic.java
-	 */
-
-*/
-public class WrapTextLogic implements ViewFactory{
-
-    /**
-     * Returns the view required for the document containing the text to be displayed
-     * 
-     * @param element     An object representing the document containing the text to be displayed
-     * @return            The view required for the document containing the text to be displayed
-     */
-    @Override
-    public View create( Element element ){
-        String viewType = element.getName();
-        if( viewType != null ){
-            if( viewType.equals( AbstractDocument.ParagraphElementName ) ){
-                return new ParagraphView(element);
-            } else if( viewType.equals( AbstractDocument.ContentElementName ) ){
-                return new WrappingLabelLayout(element);
-            } else if( viewType.equals( AbstractDocument.SectionElementName ) ){
-                return new BoxView( element, View.Y_AXIS );
-            } else if( viewType.equals( StyleConstants.IconElementName ) ){
-                return new IconView(element);
-            } else if( viewType.equals( StyleConstants.ComponentElementName) ){
-                return new ComponentView(element);
-            }
-        }
-        return new LabelView(element);
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\src\planner\WrapTextLogic.java
-
-
-
-
-
-	/**
-	 * origin: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\testCommandPanelDocumentFilter.java
-	 */
-
-
-package planner;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
-public class testCommandPanelDocumentFilter {
-
-    @Test
-    public void testRegularStringArray() {
-       
-        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
-        
-        String []keywords = { "nice", "done" };
-        
-        String regexOutput = commandPanelDocumentFilter.generateRegex(keywords);
-        
-        assertEquals( regexOutput, "(\\bnice\\b|\\bdone\\b)" );
-    }
-    
-    @Test
-    public void testStringArrayContainingNull() {
-        
-        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
-        
-        String []keywords = { "nice", null, "done" };
-        
-        String regexOutput = commandPanelDocumentFilter.generateRegex(keywords);
-        
-        assertEquals( regexOutput, "(\\bnice\\b|\\bdone\\b)" );
-    }
-
-    @Test
-    public void testNullStringArray(){
-        
-        CustomTextFieldDocumentFilter commandPanelDocumentFilter = new CustomTextFieldDocumentFilter();
-        
-        String regexOutput = commandPanelDocumentFilter.generateRegex(null);
-        
-        assertEquals( regexOutput, "()" );
-    }
-}
-
-	// End of segment: C:\Users\GamePro-Pc\Desktop\Work\Y2S2\CS2103\main\source\test\planner\testCommandPanelDocumentFilter.java
+	// End of segment: C:\Users\Knowledge\Desktop\Collate V2.0\src\planner\UserInterface.java
 
 
 
